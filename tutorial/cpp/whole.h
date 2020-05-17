@@ -139,8 +139,7 @@ void assign(std::ifstream & Dataset, std::vector<float> codewords, ID_T * IDs,
         }
         index.search(1, data, KNeighbors, dis.data(),ids.data());
         IDs[i] = ids[0];
-        std::cout << ids[0] << " ";
-        if (i % 10 == 0)
+        if (i % 100 == 0)
             std::cout << std::endl << "[Finished: " << i << " / " << num_vector << "] in " << (double)(clock()-start)/CLOCKS_PER_SEC << std::endl; 
     }
 }

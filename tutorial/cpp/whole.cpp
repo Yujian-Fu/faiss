@@ -140,7 +140,5 @@ int main(){
     std::cout << "Generating Line quantization Layer " << std::endl;
     std::vector<float> alphas (ncentroids);
 
-
-
     BaseSet.close();
 }
