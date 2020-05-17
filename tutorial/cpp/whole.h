@@ -6,6 +6,7 @@
 #include <faiss/IndexFlat.h>
 #include <faiss/Index.h>
 #include <string>
+#include <time.h>
 
 typedef faiss::Index::idx_t ID_T;
 
@@ -117,6 +118,7 @@ void assign(std::ifstream & Dataset, std::vector<float> codewords, ID_T * IDs,
     size_t dim = Dimension;
     std::vector<float> dis (KNeighbors);
     std::vector<ID_T> ids (KNeighbors);
+    clock_t start,end;
 
     std::cout << "Building FlatL2 Search Index " << std::endl;
     faiss::IndexFlatL2 index (Dimension);
@@ -124,6 +126,7 @@ void assign(std::ifstream & Dataset, std::vector<float> codewords, ID_T * IDs,
 
     size_t print_every = num_vector / 1000;
 
+    start = clock();
     for (size_t i = 0; i < num_vector; i++){
         Dataset.read((char *) &dim, sizeof(uint32_t));
         if (dim != Dimension){
@@ -136,8 +139,9 @@ void assign(std::ifstream & Dataset, std::vector<float> codewords, ID_T * IDs,
         }
         index.search(1, data, KNeighbors, dis.data(),ids.data());
         IDs[i] = ids[0];
-        if (i % print_every == 0)
-            std::cout << "[Finished: " << i << " / " << num_vector << "] " <<std::endl; 
+        std::cout << ids[0] << " ";
+        if (i % 10 == 0)
+            std::cout << std::endl << "[Finished: " << i << " / " << num_vector << "] in " << (double)(clock()-start)/CLOCKS_PER_SEC << std::endl; 
     }
 }
 
