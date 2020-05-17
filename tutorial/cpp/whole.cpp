@@ -54,7 +54,6 @@ int main(){
     std::cout << "Loaded Learn Set " << std::endl;
     LearnSet.close();
 
-    
     //Vector Quantization Parameter
     std::vector<float> centroids (ncentroids * Dimension) ;
     std::cout << "Starting building centroids for vector quantization " << std::endl;
