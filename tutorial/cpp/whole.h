@@ -84,10 +84,12 @@ void readXvecFvec(std::ifstream & in, float *data, const size_t dimension,
             std::cout << "file error\n";
             exit(1);
         }
-        in.read((char *) mass, dim * sizeof(float));
+        in.read((char *) mass, dim * sizeof(T));
         for (size_t j = 0; j < dimension; j++){
             data[i * dim + j] = 1. * mass[j];
+            std::cout << data[i * dim + j] << " " ;
         }
+        std::cout << std::endl;
         if ( i % (print_every) == 0)
             std::cout << "[Finished loading " << i << " / " << num_vector << "]" << std::endl; 
     }
