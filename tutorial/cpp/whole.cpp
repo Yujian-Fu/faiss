@@ -141,5 +141,6 @@ int main(){
     std::vector<float> alphas (ncentroids);
 
 
+
     BaseSet.close();
 }
