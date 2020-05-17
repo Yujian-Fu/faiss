@@ -122,7 +122,7 @@ void assign(std::ifstream & Dataset, std::vector<float> codewords, ID_T * IDs,
     faiss::IndexFlatL2 index (Dimension);
     index.add(NumCodewords, codewords.data());
 
-    size_t print_every = num_vector / 10;
+    size_t print_every = num_vector / 1000;
 
     for (size_t i = 0; i < num_vector; i++){
         Dataset.read((char *) &dim, sizeof(uint32_t));
@@ -141,6 +141,11 @@ void assign(std::ifstream & Dataset, std::vector<float> codewords, ID_T * IDs,
     }
 }
 
+template<typename Data_T> 
+void compute_aphas(float * centroids, std::ifstream & Dataset, ID_T * IDs, 
+                   size_t Dimension, size_t ncentroids){
+
+}
 /*
 void read_fvecs(const char* filename, float* &data, 
                 size_t &num_points, size_t &dim, bool print_flag = false){

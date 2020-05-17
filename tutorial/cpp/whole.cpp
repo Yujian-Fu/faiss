@@ -123,7 +123,7 @@ int main(){
             ReportFileError("VqID write set open error");
         writeXvec<ID_T>(VqIDsWrite, VectorQuantID.data(), IDDimension, IDNum);
     }
-    BaseSet.close();
+    
 
     std::cout << "Loading computed VQ ID" << std::endl;
     std::ifstream VqIDsRead;
@@ -138,7 +138,7 @@ int main(){
     readXvec<ID_T>(VqIDsRead, VectorQuantID.data(), IDDimension, IDNum, false);
 
     std::cout << "Generating Line quantization Layer " << std::endl;
+    std::vector<float> alphas (ncentroids);
 
-
-
+    BaseSet.close();
 }
