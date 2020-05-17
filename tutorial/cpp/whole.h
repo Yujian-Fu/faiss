@@ -74,6 +74,7 @@ template<typename T>
 void readXvecFvec(std::ifstream & in, float *data, const size_t dimension, 
                   const size_t num_vector = 1, bool print_flag = false)
 {
+    std::cout << "Loading data with " << num_vector << " vectors in " << dimension << std::endl;
     uint32_t dim = dimension;
     T mass[dimension];
     for (size_t i = 0; i < num_vector; i++) {
