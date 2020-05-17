@@ -24,7 +24,7 @@
 namespace faiss {
 
 ClusteringParameters::ClusteringParameters ():
-    niter(25),
+    niter(50),
     nredo(1),
     verbose(false),
     spherical(false),
@@ -32,7 +32,7 @@ ClusteringParameters::ClusteringParameters ():
     update_index(false),
     frozen_centroids(false),
     min_points_per_centroid(39),
-    max_points_per_centroid(256),
+    max_points_per_centroid(1024),
     seed(1234)
 {}
 // 39 corresponds to 10000 / 256 -> to avoid warnings on PQ tests with randu10k
