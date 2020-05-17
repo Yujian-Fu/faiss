@@ -5,16 +5,16 @@
 #include "whole.h"
 
 // Parameters on server
-/*
+
 typedef uint8_t data_t;
 const char * LearnPath = "/home/y/yujianfu/ivf-hnsw/data/SIFT1B/bigann_learn.bvecs";
 const char * CentroidsSavePath = "/home/y/yujianfu/ivf-hnsw/data/SIFT1B/vector_quantization_centroids.fvecs";
 const char * BasePath = "/home/y/yujianfu/ivf-hnsw/data/SIFT1B/bigann_base.bvecs";
 const char * ComputedVQIdsPath = "/home/y/yujianfu/ivf-hnsw/data/SIFT1B/computed_vq_ids.fvecs";
 size_t ncentroids = 1000000;
-*/
 
 
+/*
 //Parameters on laptop
 typedef float data_t;
 const char * LearnPath = "/home/yujian/Downloads/similarity_search_datasets/ANN_SIFT1M/sift_learn.fvecs";
@@ -22,6 +22,7 @@ const char * CentroidsSavePath = "/home/yujian/Downloads/similarity_search_datas
 const char * BasePath = "/home/yujian/Downloads/similarity_search_datasets/ANN_SIFT1M/sift_base.fvecs";
 const char * ComputedVQIdsPath = "/home/yujian/Downloads/similarity_search_datasets/ANN_SIFT1M/computed_vq_ids.fvecs";
 size_t ncentroids = 2000;
+*/
 
 
 int main(){
