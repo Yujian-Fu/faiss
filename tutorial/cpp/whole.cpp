@@ -33,6 +33,7 @@ int main(){
     bool train_vector_quantization = true;
     bool assign_vertor_quantization = true;
 
+
     //read_fvecs(BasePath, BaseVectors, BaseNum, Dimension);
     std::ifstream LearnSet;
     LearnSet.open(LearnPath, std::ios::binary);
