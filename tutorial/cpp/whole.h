@@ -62,6 +62,8 @@ void readXvec(std::ifstream & in, T *data, const size_t dimension,
             exit(1);
         }
         in.read((char *) (data + i * dim), dim*sizeof(T));
+        if ( i % (num_vector / 100) == 0)
+            std::cout << "[Finished loading " << i << " / " << num_vector << "]" << std::endl; 
     }
     if (print_flag)
         PrintVector<T>(data, dimension, num_vector);
@@ -84,12 +86,13 @@ void readXvecFvec(std::ifstream & in, float *data, const size_t dimension,
         for (size_t j = 0; j < dimension; j++){
             data[i * dim + j] = 1. * mass[j];
         }
+        if ( i % (num_vector / 100) == 0)
+            std::cout << "[Finished loading " << i << " / " << num_vector << "]" << std::endl; 
     }
     if (print_flag)
         PrintVector<float>(data, dimension, num_vector);
     //PrintVector(data, dimension, num_vector);
 }
-
 
 template<typename T>
 void writeXvec(std::ofstream & output, const T * vector, size_t dimension, 

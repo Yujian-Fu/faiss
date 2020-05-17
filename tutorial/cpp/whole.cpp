@@ -47,9 +47,9 @@ int main(){
     std::cout << "The learn set size is " << LearnNum << std::endl;
 
     //load learn set 
-    std::cout << "Loading Learn Set " << std::endl;
     LearnSet.seekg(0, std::ios::beg);
     std::vector<float> LearnVectors(Dimension * LearnNum);
+    std::cout << "Loading Learn Set " << std::endl;
     readXvecFvec<data_t>(LearnSet, LearnVectors.data(), Dimension, LearnNum, true);
     std::cout << "Loaded Learn Set " << std::endl;
     LearnSet.close();
@@ -57,6 +57,7 @@ int main(){
     
     //Vector Quantization Parameter
     std::vector<float> centroids (ncentroids * Dimension) ;
+    std::cout << "Starting building centroids for vector quantization " << std::endl;
     
     //Generate kmeans centroids
     if (train_vector_quantization){
@@ -90,6 +91,7 @@ int main(){
     std::cout << "The base set size is " << BaseNum << std::endl;
 
     std::vector<ID_T> VectorQuantID (BaseNum);
+    std::cout << "Building ID for vector quantization" << std::endl; 
     size_t IDDimension = 100;
     size_t IDNum = BaseNum / IDDimension;
     if (assign_vertor_quantization){
