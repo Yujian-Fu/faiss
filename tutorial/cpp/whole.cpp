@@ -49,6 +49,7 @@ int main(){
     LearnNum = (unsigned) (fsize / (Dimension + sizeof(uint32_t)/sizeof(data_t)) / sizeof(data_t));
     std::cout << "The learn set size is " << LearnNum << std::endl;
 
+    /*
     //load learn set 
     LearnSet.seekg(0, std::ios::beg);
     std::vector<float> LearnVectors(Dimension * LearnNum);
@@ -56,6 +57,7 @@ int main(){
     readXvecFvec<data_t>(LearnSet, LearnVectors.data(), Dimension, LearnNum, true);
     std::cout << "Loaded Learn Set " << std::endl;
     LearnSet.close();
+    */
 
     //Vector Quantization Parameter
     std::vector<float> centroids (ncentroids * Dimension) ;
