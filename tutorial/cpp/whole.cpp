@@ -63,6 +63,7 @@ int main(){
     std::vector<float> centroids (ncentroids * Dimension) ;
     std::cout << "Starting building centroids for vector quantization " << std::endl;
     
+    /*
     //Generate kmeans centroids
     if (train_vector_quantization){
         std::cout << "Training Centroids " << std::endl;
@@ -76,6 +77,7 @@ int main(){
         std::cout << "Saved Centroids " << std::endl;
         CentroidSave.close();
     }
+    */
 
     std::cout << "Loading Centroids " << std::endl;
     std::ifstream CentroidRead;
