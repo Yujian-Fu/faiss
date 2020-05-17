@@ -89,6 +89,7 @@ int main(){
     std::cout << "The base set file size is " << fsize << std::endl;
     ncentroids = (unsigned) (fsize / (Dimension * sizeof(float) + sizeof(uint32_t)));
     std::cout << "The number of centroids is " << ncentroids << std::endl;
+    CentroidRead.seekg(0, std::ios::beg);
     readXvec<float>(CentroidRead, centroids.data(), Dimension, ncentroids, true);
     std::cout << "Loaded Centroids " << std::endl;
     CentroidRead.close();
