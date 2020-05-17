@@ -9,7 +9,7 @@ typedef uint8_t data_t;
 const char * LearnPath = "/home/y/yujianfu/ivf-hnsw/data/SIFT1B/bigann_learn.bvecs";
 const char * CentroidsSavePath = "/home/y/yujianfu/ivf-hnsw/data/SIFT1B/vector_quantization_centroids.fvecs";
 const char * BasePath = "/home/y/yujianfu/ivf-hnsw/data/SIFT1B/bigann_base.bvecs";
-const char * ComputedVQIds = "/home/y/yujianfu/ivf-hnsw/data/SIFT1B/computed_vq_ids.fvecs";
+const char * ComputedVQIdsPath = "/home/y/yujianfu/ivf-hnsw/data/SIFT1B/computed_vq_ids.fvecs";
 size_t ncentroids = 1000000;
 
 /*
