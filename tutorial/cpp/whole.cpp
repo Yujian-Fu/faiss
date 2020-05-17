@@ -4,21 +4,14 @@
 #include <faiss/Clustering.h>
 
 typedef uint8_t data_t;
+typedef unsigned id_t;
 
 int main(){
-    //******************
-    // Parameters
-    //******************
-    //load base set
-    size_t BaseNum;
-    size_t Dimension;
-    const char * BasePath = "/home/y/yujianfu/ivf-hnsw/data/SIFT1B/bigann_base.bvecs";;
-    float * BaseVectors;
-    
     //Load Dataset
 
     //learn set parameter
     size_t LearnNum;
+    size_t Dimension;
     const char * LearnPath = "/home/y/yujianfu/ivf-hnsw/data/SIFT1B/bigann_learn.bvecs";;
 
     //read_fvecs(BasePath, BaseVectors, BaseNum, Dimension);
@@ -29,6 +22,7 @@ int main(){
     LearnSet.seekg(0, std::ios::end);
     size_t fsize = (size_t) LearnSet.tellg();
     LearnNum = (unsigned) (fsize / (Dimension + 4) / sizeof(data_t));
+    std::cout << "The learn set size is " << LearnNum << std::endl;
 
     //load learn set 
     std::cout << "Loading Learn Set " << std::endl;
@@ -57,5 +51,19 @@ int main(){
     std::ifstream CentroidRead(CentroidsSavePath, std::ios::binary);
     readXvec<float>(CentroidRead, centroids.data(), ncentroids, Dimension, true);
     std::cout << "Loaded Centroids " << std::endl;
+
+    //load base set and assign
+    size_t BaseNum;
+    size_t BatchSize = 25000000;
+    const char * BasePath = "/home/y/yujianfu/ivf-hnsw/data/SIFT1B/bigann_base.bvecs";;
+    std::fstream BaseSet (BasePath, std::ios::binary);
+    BaseSet.seekg(0, std::ios::end);
+    size_t fsize = (size_t) LearnSet.tellg();
+    BaseNum = (unsigned) (fsize / (Dimension + 4) / sizeof(data_t));
+
+    std::vector<float> BaseBatch (BatchSize * Dimension);
+    std::vector<id_t> VectorQuantID (BaseNum);
+    
+
 
 }
