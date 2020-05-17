@@ -12,6 +12,7 @@ const char * CentroidsSavePath = "/home/y/yujianfu/ivf-hnsw/data/SIFT1B/centroid
 const char * BasePath = "/home/y/yujianfu/ivf-hnsw/data/SIFT1B/bigann_base.bvecs";
 const char * ComputedVQIdsPath = "/home/y/yujianfu/ivf-hnsw/data/SIFT1B/computed_vq_ids.fvecs";
 size_t ncentroids = 1000000;
+size_t IDDimension = 10000;
 
 
 /*
@@ -22,6 +23,7 @@ const char * CentroidsSavePath = "/home/yujian/Downloads/similarity_search_datas
 const char * BasePath = "/home/yujian/Downloads/similarity_search_datasets/ANN_SIFT1M/sift_base.fvecs";
 const char * ComputedVQIdsPath = "/home/yujian/Downloads/similarity_search_datasets/ANN_SIFT1M/computed_vq_ids.fvecs";
 size_t ncentroids = 2000;
+size_t IDDimension = 100;
 */
 
 
@@ -108,7 +110,6 @@ int main(){
 
     std::vector<ID_T> VectorQuantID (BaseNum);
     std::cout << "Building ID for vector quantization" << std::endl; 
-    size_t IDDimension = 100;
     size_t IDNum = BaseNum / IDDimension;
     if (assign_vertor_quantization){
         std::cout << "Assigning all base vectors " << std::endl;

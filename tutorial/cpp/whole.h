@@ -54,7 +54,9 @@ void random_subset(const float *x, float *x_out, size_t d,
 template<typename T>
 void readXvec(std::ifstream & in, T *data, const size_t dimension, 
               const size_t num_vector = 1, bool print_flag = false){
+    std::cout << "Loading data with " << num_vector << " vectors in " << dimension << std::endl;
     size_t dim = dimension;
+    size_t print_every = num_vector / 10;
     for (size_t i = 0; i < num_vector; i++){
         in.read((char *) &dim, sizeof(uint32_t));
         if (dim != dimension){
@@ -62,10 +64,7 @@ void readXvec(std::ifstream & in, T *data, const size_t dimension,
             exit(1);
         }
         in.read((char *) (data + i * dim), dim * sizeof(T));
-        for (int temp = 0; temp < dim; temp ++)
-            std:: cout << (T) data[i * dim + temp] << " ";
-        std::cout << std::endl;
-        if ( i % (num_vector / 100) == 0)
+        if ( i % print_every == 0)
             std::cout << "[Finished loading " << i << " / " << num_vector << "]" << std::endl; 
     }
     if (print_flag)
@@ -84,7 +83,7 @@ void readXvecFvec(std::ifstream & in, float *data, const size_t dimension,
     for (size_t i = 0; i < num_vector; i++) {
         in.read((char *) &dim, sizeof(uint32_t));
         if (dim != dimension) {
-            std::cout << "file error\n";
+            std::cout << dim << " " << dimension << " dimension error \n";
             exit(1);
         }
         in.read((char *) mass, dim * sizeof(T));
