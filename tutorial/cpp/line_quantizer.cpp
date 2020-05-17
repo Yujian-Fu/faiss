@@ -6,6 +6,7 @@
 #include<string.h>
 
 
+
 int main(){
 
     size_t ncentroids = 1000000;
