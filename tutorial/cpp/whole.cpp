@@ -51,9 +51,9 @@ int main(){
 
     //load learn set 
     LearnSet.seekg(0, std::ios::beg);
-    std::vector<float> LearnVectors(Dimension * (LearnNum/100));
+    std::vector<float> LearnVectors(Dimension * LearnNum);
     std::cout << "Loading Learn Set " << std::endl;
-    readXvecFvec<data_t>(LearnSet, LearnVectors.data(), Dimension, LearnNum / 100, true);
+    readXvecFvec<data_t>(LearnSet, LearnVectors.data(), Dimension, LearnNum, true);
     std::cout << "Loaded Learn Set " << std::endl;
     LearnSet.close();
 
