@@ -82,6 +82,8 @@ int main(){
     std::cout << "Loading Centroids " << std::endl;
     std::ifstream CentroidRead;
     CentroidRead.open(CentroidsSavePath, std::ios::binary);
+    if(!CentroidRead)
+        ReportFileError("Centroid set open error");
     CentroidRead.seekg(0, std::ios::end);
     fsize = (size_t) CentroidRead.tellg();
     std::cout << "The base set file size is " << fsize << std::endl;
@@ -95,6 +97,8 @@ int main(){
     size_t BaseNum;
     std::ifstream BaseSet;
     BaseSet.open(BasePath, std::ios::binary);
+    if(!BaseSet)
+        ReportFileError("Base set open error");
     BaseSet.seekg(0, std::ios::end);
     fsize = (size_t) BaseSet.tellg();
     std::cout << "The base set file size is " << fsize << std::endl;
@@ -113,6 +117,8 @@ int main(){
         std::cout << "Saving computed ID" << std::endl;
         std::ofstream VqIDsWrite;
         VqIDsWrite.open(ComputedVQIdsPath,std::ios::binary);
+        if(!VqIDsWrite)
+            ReportFileError("VqID write set open error");
         writeXvec<ID_T>(VqIDsWrite, VectorQuantID.data(), IDDimension, IDNum);
     }
     BaseSet.close();
@@ -120,6 +126,8 @@ int main(){
     std::cout << "Loading computed VQ ID" << std::endl;
     std::ifstream VqIDsRead;
     VqIDsRead.open(ComputedVQIdsPath, std::ios::binary);
+    if(!VqIDsRead)
+        ReportFileError("VqID read set open error");
     VqIDsRead.seekg(0, std::ios::end);
     fsize = (size_t) VqIDsRead.tellg();
     std::cout << "The ID set file size is " << fsize << std::endl;

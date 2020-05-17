@@ -61,7 +61,10 @@ void readXvec(std::ifstream & in, T *data, const size_t dimension,
             std::cout << dim << " " << dimension << " dimension error \n";
             exit(1);
         }
-        in.read((char *) (data + i * dim), dim*sizeof(T));
+        in.read((char *) (data + i * dim), dim * sizeof(T));
+        for (int temp = 0; temp < dim; temp ++)
+            std:: cout << (T) data[i * dim + temp] << " ";
+        std::cout << std::endl;
         if ( i % (num_vector / 100) == 0)
             std::cout << "[Finished loading " << i << " / " << num_vector << "]" << std::endl; 
     }
