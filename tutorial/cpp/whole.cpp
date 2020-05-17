@@ -8,7 +8,7 @@
 
 typedef uint8_t data_t;
 const char * LearnPath = "/home/y/yujianfu/ivf-hnsw/data/SIFT1B/bigann_learn.bvecs";
-const char * CentroidsSavePath = "/home/y/yujianfu/ivf-hnsw/data/SIFT1B/vector_quantization_centroids.fvecs";
+const char * CentroidsSavePath = "/home/y/yujianfu/ivf-hnsw/data/SIFT1B/centroids_sift1b.fvecs";
 const char * BasePath = "/home/y/yujianfu/ivf-hnsw/data/SIFT1B/bigann_base.bvecs";
 const char * ComputedVQIdsPath = "/home/y/yujianfu/ivf-hnsw/data/SIFT1B/computed_vq_ids.fvecs";
 size_t ncentroids = 1000000;
@@ -30,7 +30,7 @@ int main(){
     //learn set parameter
     size_t LearnNum;
     size_t Dimension = 128;
-    bool train_vector_quantization = true;
+    bool train_vector_quantization = false;
     bool assign_vertor_quantization = true;
 
 
@@ -78,6 +78,11 @@ int main(){
     std::cout << "Loading Centroids " << std::endl;
     std::ifstream CentroidRead;
     CentroidRead.open(CentroidsSavePath, std::ios::binary);
+    CentroidRead.seekg(0, std::ios::end);
+    fsize = (size_t) CentroidRead.tellg();
+    std::cout << "The base set file size is " << fsize << std::endl;
+    ncentroids = (unsigned) (fsize / (Dimension * sizeof(float) + sizeof(uint32_t)));
+    std::cout << "The number of centroids is " << ncentroids << std::endl;
     readXvec<float>(CentroidRead, centroids.data(), Dimension, ncentroids, true);
     std::cout << "Loaded Centroids " << std::endl;
     CentroidRead.close();
@@ -119,6 +124,7 @@ int main(){
     readXvec<ID_T>(VqIDsRead, VectorQuantID.data(), IDDimension, IDNum, false);
 
     std::cout << "Generating Line quantization Layer " << std::endl;
+
 
 
 }
