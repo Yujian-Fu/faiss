@@ -7,6 +7,8 @@
 #include <faiss/Index.h>
 #include <string>
 #include <time.h>
+#include <faiss/gpu/GpuIndexFlat.h>
+#include <faiss/gpu/StandardGpuResources.h>
 
 typedef faiss::Index::idx_t ID_T;
 
