@@ -21,7 +21,7 @@ int main(int argc, char** argv) {
   // size can be adjusted, or your own implementation of GpuResources
   // can be made to manage memory in a different way.
     const char * LearnPath = "/home/y/yujianfu/ivf-hnsw/data/SIFT1B/bigann_learn.bvecs";
-    const char * CentroidsSavePath = "/home/y/yujianfu/ivf-hnsw/data/SIFT1B/centroids_sift1b.fvecs";
+    const char * CentroidsSavePath = "/home/y/yujianfu/ivf-hnsw/data/SIFT1B/centroids_VQ.fvecs";
     
     std::ifstream LearnSet;
     LearnSet.open(LearnPath, std::ios::binary);
