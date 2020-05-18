@@ -8,13 +8,6 @@
 
 #include "whole.h"
 
-// just generate some random vecs in a hypercube (CPU)
-std::vector<float> makeRandomVecs(size_t numVecs, int dim) {
-  std::vector<float> vecs(numVecs * dim);
-  faiss::float_rand(vecs.data(), vecs.size(), 1);
-  return vecs;
-}
-
 typedef uint8_t data_t;
 int main(int argc, char** argv) {
   // Reserves 18% of GPU memory for temporary work by default; the
@@ -28,7 +21,7 @@ int main(int argc, char** argv) {
     if(!LearnSet)
         ReportFileError("Learn set open error");
 
-    size_t Dimension;
+    size_t Dimension = 128;
     size_t LearnNum;
     LearnSet.read((char *) &Dimension, sizeof(uint32_t));
     std::cout << "The dimension of this dataset is " << Dimension << std::endl;
@@ -44,8 +37,7 @@ int main(int argc, char** argv) {
     std::cout << "Loaded Learn Set " << std::endl;
     LearnSet.close();
     
-  
-  
+
     faiss::gpu::StandardGpuResources res;
 
     int numberOfEMIterations = 50;
