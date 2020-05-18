@@ -122,6 +122,7 @@ void assign(std::ifstream & Dataset, std::vector<float> codewords, ID_T * IDs,
     std::vector<float> dis (KNeighbors);
     std::vector<ID_T> ids (KNeighbors);
     clock_t start,end;
+    /*
     bool use_gpu = false;
 
     if (use_gpu){
@@ -150,7 +151,10 @@ void assign(std::ifstream & Dataset, std::vector<float> codewords, ID_T * IDs,
         faiss::IndexFlatL2 index (Dimension);
         index.add(NumCodewords, codewords.data());
     }
+    */
 
+    faiss::IndexFlatL2 index (Dimension);
+    index.add(NumCodewords, codewords.data());
     size_t print_every = num_vector / 1000;
 
     start = clock();
@@ -171,12 +175,14 @@ void assign(std::ifstream & Dataset, std::vector<float> codewords, ID_T * IDs,
             std::cout << std::endl << "[Finished: " << i << " / " << num_vector << "] in " << (double)(clock()-start)/CLOCKS_PER_SEC << std::endl; 
     }
 
+/*
     delete index;
 
     if (use_gpu)
         for(int i = 0; i < ngpus; i++) {
             delete res[i];
         }
+*/
 }
 
 template<typename Data_T> 
