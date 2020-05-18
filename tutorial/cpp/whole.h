@@ -109,6 +109,7 @@ void writeXvec(std::ofstream & output, const T * vector, size_t dimension,
     }
 }
 
+//using gpu
 template<typename Data_T>
 void assign(std::ifstream & Dataset, std::vector<float> codewords, ID_T * IDs,
             size_t Dimension, size_t num_vector, size_t NumCodewords){
@@ -119,14 +120,39 @@ void assign(std::ifstream & Dataset, std::vector<float> codewords, ID_T * IDs,
     std::vector<float> dis (KNeighbors);
     std::vector<ID_T> ids (KNeighbors);
     clock_t start,end;
+    bool use_gpu = false;
 
-    std::cout << "Building FlatL2 Search Index " << std::endl;
-    faiss::IndexFlatL2 index (Dimension);
-    index.add(NumCodewords, codewords.data());
+    if (use_gpu){
+        //Build index in gpus
+        std::cout << "Building FlatL2 Search Index with GPU" << std::endl;
+        int ngpus = faiss::gpu::getNumDevices();
+        std::cout << "Number of GPUs: " <<  ngpus << std::endl;
+        std::vector<faiss::gpu::GpuResources*> res;
+        std::vector<int> devs;
+        for(int i = 0; i < ngpus; i++) {
+            res.push_back(new faiss::gpu::StandardGpuResources);
+            devs.push_back(i);
+        }
+        faiss::IndexFlatL2 cpu_index(Dimension);
+        faiss::Index *index =
+            faiss::gpu::index_cpu_to_gpu_multiple(
+                res,
+                devs,
+                &cpu_index
+            );
+        std::cout << "is_trained = " << index->is_trained ? "true" : "false" << std::endl;
+        index->add(NumCodewords, codewords.data());  // vectors to the index
+        std::cout << "ntotal = " << index->ntotal <<std::endl;
+    }
+    else{
+        faiss::IndexFlatL2 index (Dimension);
+        index.add(NumCodewords, codewords.data());
+    }
 
     size_t print_every = num_vector / 1000;
 
     start = clock();
+#pragma omp parallel for
     for (size_t i = 0; i < num_vector; i++){
         Dataset.read((char *) &dim, sizeof(uint32_t));
         if (dim != Dimension){
@@ -142,12 +168,21 @@ void assign(std::ifstream & Dataset, std::vector<float> codewords, ID_T * IDs,
         if (i % 100 == 0)
             std::cout << std::endl << "[Finished: " << i << " / " << num_vector << "] in " << (double)(clock()-start)/CLOCKS_PER_SEC << std::endl; 
     }
+
+    delete index;
+
+    if (use_gpu)
+        for(int i = 0; i < ngpus; i++) {
+            delete res[i];
+        }
 }
 
 template<typename Data_T> 
 void compute_aphas(float * centroids, std::ifstream & Dataset, ID_T * IDs, 
-                   size_t Dimension, size_t ncentroids){
-
+                   float * alphas, size_t Dimension, size_t ncentroids){
+    for (int i = 0; i < ncentroids; i++){
+        alphas[i] = 0.1;
+    }
 }
 /*
 void read_fvecs(const char* filename, float* &data, 
