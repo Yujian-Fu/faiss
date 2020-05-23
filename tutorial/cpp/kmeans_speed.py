@@ -10,6 +10,7 @@ d = a[:4].view('int32')[0]
 niter = 20
 verbose = True
 
+
 start = time.time()
 b = a.reshape(-1, d + 4)[:, 4:]
 b = b[random.sample(range(b.shape[0]), 10000), :]
@@ -91,13 +92,59 @@ end = time.time()
 print("Dataset size: ", b.shape[0], " Ncentroids: ", ncentroids, " : ", end-start, "\n\n")
 
 
+start = time.time()
+b = a.reshape(-1, d + 4)[:, 4:]
+b = b[random.sample(range(b.shape[0]), 10000000), :]
+b = np.ascontiguousarray(b.astype('float32'))
+ncentroids = 10000
+kmeans = faiss.Kmeans(d, ncentroids, niter=niter, verbose=verbose)
+kmeans.train(b)
+end = time.time()
+print("Dataset size: ", b.shape[0], " Ncentroids: ", ncentroids, " : ", end-start, "\n\n")
+
+
+start = time.time()
+b = a.reshape(-1, d + 4)[:, 4:]
+b = b[random.sample(range(b.shape[0]), 10000000), :]
+b = np.ascontiguousarray(b.astype('float32'))
+ncentroids = 100000
+kmeans = faiss.Kmeans(d, ncentroids, niter=niter, verbose=verbose)
+kmeans.train(b)
+end = time.time()
+print("Dataset size: ", b.shape[0], " Ncentroids: ", ncentroids, " : ", end-start, "\n\n")
 
 
 
+start = time.time()
+b = a.reshape(-1, d + 4)[:, 4:]
+b = b[random.sample(range(b.shape[0]), 100000000), :]
+b = np.ascontiguousarray(b.astype('float32'))
+ncentroids = 10000
+kmeans = faiss.Kmeans(d, ncentroids, niter=niter, verbose=verbose)
+kmeans.train(b)
+end = time.time()
+print("Dataset size: ", b.shape[0], " Ncentroids: ", ncentroids, " : ", end-start, "\n\n")
 
 
+start = time.time()
+b = a.reshape(-1, d + 4)[:, 4:]
+b = b[random.sample(range(b.shape[0]), 100000000), :]
+b = np.ascontiguousarray(b.astype('float32'))
+ncentroids = 100000
+kmeans = faiss.Kmeans(d, ncentroids, niter=niter, verbose=verbose)
+kmeans.train(b)
+end = time.time()
+print("Dataset size: ", b.shape[0], " Ncentroids: ", ncentroids, " : ", end-start, "\n\n")
 
-
+start = time.time()
+b = a.reshape(-1, d + 4)[:, 4:]
+b = b[random.sample(range(b.shape[0]), 100000000), :]
+b = np.ascontiguousarray(b.astype('float32'))
+ncentroids = 1000000
+kmeans = faiss.Kmeans(d, ncentroids, niter=niter, verbose=verbose)
+kmeans.train(b)
+end = time.time()
+print("Dataset size: ", b.shape[0], " Ncentroids: ", ncentroids, " : ", end-start, "\n\n")
 
 
 
