@@ -11,7 +11,7 @@ niter = 20
 verbose = True
 
 print("This is the GPU version of Kmeans")
-'''
+
 start = time.time()
 b = a.reshape(-1, d + 4)[:, 4:]
 b = b[random.sample(range(b.shape[0]), 10000), :]
@@ -21,7 +21,7 @@ kmeans = faiss.Kmeans(d, ncentroids, niter=niter, verbose=verbose, gpu=True)
 kmeans.train(b)
 end = time.time()
 print("Dataset size: ", b.shape[0], " Ncentroids: ", ncentroids, " : ", end-start, "\n\n")
-
+'''
 start = time.time()
 b = a.reshape(-1, d + 4)[:, 4:]
 b = b[random.sample(range(b.shape[0]), 100000), :]
@@ -108,7 +108,7 @@ start = time.time()
 b = a.reshape(-1, d + 4)[:, 4:]
 b = b[random.sample(range(b.shape[0]), 10000000), :]
 b = np.ascontiguousarray(b.astype('float32'))
-ncentroids = 500000
+ncentroids = 100000
 kmeans = faiss.Kmeans(d, ncentroids, niter=niter, verbose=verbose, gpu=True)
 kmeans.train(b)
 end = time.time()
