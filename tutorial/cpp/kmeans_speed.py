@@ -108,7 +108,7 @@ start = time.time()
 b = a.reshape(-1, d + 4)[:, 4:]
 b = b[random.sample(range(b.shape[0]), 10000000), :]
 b = np.ascontiguousarray(b.astype('float32'))
-ncentroids = 100000
+ncentroids = 200000
 kmeans = faiss.Kmeans(d, ncentroids, niter=niter, verbose=verbose, gpu=True)
 kmeans.train(b)
 end = time.time()
