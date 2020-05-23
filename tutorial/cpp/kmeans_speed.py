@@ -3,6 +3,7 @@
 import numpy as np
 import faiss
 import time
+import random
 
 a = np.memmap('/home/y/yujianfu/ivf-hnsw/data/SIFT1B/bigann_learn.bvecs', dtype='uint8', mode='r')
 d = a[:4].view('int32')[0]
