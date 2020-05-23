@@ -36,7 +36,7 @@ int main(int argc, char** argv) {
     readXvecFvec<data_t>(LearnSet, LearnVectors.data(), Dimension, LearnNum, true);
     std::cout << "Loaded Learn Set " << std::endl;
     LearnSet.close();
-    
+
 
     faiss::gpu::StandardGpuResources res;
 
