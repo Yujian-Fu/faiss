@@ -16,6 +16,7 @@ b = b[random.sample(range(b.shape[0]), 10000), :]
 b = np.ascontiguousarray(b.astype('float32'))
 ncentroids = 100
 kmeans = faiss.Kmeans(d, ncentroids, niter=niter, verbose=verbose)
+kmeans.train(b)
 end = time.time()
 print("Dataset size: ", b.shape[0], " Ncentroids: ", ncentroids, " : ", end-start)
 
@@ -25,6 +26,7 @@ b = b[random.sample(range(b.shape[0]), 100000), :]
 b = np.ascontiguousarray(b.astype('float32'))
 ncentroids = 100
 kmeans = faiss.Kmeans(d, ncentroids, niter=niter, verbose=verbose)
+kmeans.train(b)
 end = time.time()
 print("Dataset size: ", b.shape[0], " Ncentroids: ", ncentroids, " : ", end-start)
 
@@ -34,6 +36,7 @@ b = b[random.sample(range(b.shape[0]), 1000000), :]
 b = np.ascontiguousarray(b.astype('float32'))
 ncentroids = 100
 kmeans = faiss.Kmeans(d, ncentroids, niter=niter, verbose=verbose)
+kmeans.train(b)
 end = time.time()
 print("Dataset size: ", b.shape[0], " Ncentroids: ", ncentroids, " : ", end-start)
 
@@ -43,6 +46,7 @@ b = b[random.sample(range(b.shape[0]), 10000), :]
 b = np.ascontiguousarray(b.astype('float32'))
 ncentroids = 1000
 kmeans = faiss.Kmeans(d, ncentroids, niter=niter, verbose=verbose)
+kmeans.train(b)
 end = time.time()
 print("Dataset size: ", b.shape[0], " Ncentroids: ", ncentroids, " : ", end-start)
 
@@ -61,6 +65,7 @@ b = b[random.sample(range(b.shape[0]), 1000000), :]
 b = np.ascontiguousarray(b.astype('float32'))
 ncentroids = 1000
 kmeans = faiss.Kmeans(d, ncentroids, niter=niter, verbose=verbose)
+kmeans.train(b)
 end = time.time()
 print("Dataset size: ", b.shape[0], " Ncentroids: ", ncentroids, " : ", end-start)
 
@@ -70,6 +75,7 @@ b = b[random.sample(range(b.shape[0]), 100000), :]
 b = np.ascontiguousarray(b.astype('float32'))
 ncentroids = 10000
 kmeans = faiss.Kmeans(d, ncentroids, niter=niter, verbose=verbose)
+kmeans.train(b)
 end = time.time()
 print("Dataset size: ", b.shape[0], " Ncentroids: ", ncentroids, " : ", end-start)
 
@@ -79,6 +85,7 @@ b = b[random.sample(range(b.shape[0]), 1000000), :]
 b = np.ascontiguousarray(b.astype('float32'))
 ncentroids = 10000
 kmeans = faiss.Kmeans(d, ncentroids, niter=niter, verbose=verbose)
+kmeans.train(b)
 end = time.time()
 print("Dataset size: ", b.shape[0], " Ncentroids: ", ncentroids, " : ", end-start)
 
