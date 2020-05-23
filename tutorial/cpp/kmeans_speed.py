@@ -1,4 +1,4 @@
-//Testing the speed of kmeans in Faiss
+#Testing the speed of kmeans in Faiss
 
 import numpy as np
 import faiss
