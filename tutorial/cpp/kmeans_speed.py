@@ -106,8 +106,8 @@ print("Dataset size: ", b.shape[0], " Ncentroids: ", ncentroids, " : ", end-star
 
 start = time.time()
 b = a.reshape(-1, d + 4)[:, 4:]
-b = b[random.sample(range(b.shape[0]), 50000000), :]
-b = np.ascontiguousarray(b.astype('float32'))
+b = b[random.sample(range(b.shape[0]), 20000000), :]
+b = np.ascontiguousarray(b)
 ncentroids = 1000000
 kmeans = faiss.Kmeans(d, ncentroids, niter=niter, verbose=verbose, gpu=True)
 kmeans.train(b)
