@@ -21,7 +21,7 @@ kmeans = faiss.Kmeans(d, ncentroids, niter=niter, verbose=verbose, gpu=True)
 kmeans.train(b)
 end = time.time()
 print("Dataset size: ", b.shape[0], " Ncentroids: ", ncentroids, " : ", end-start, "\n\n")
-f = open("/home/y/yujianfu/ivf-hnsw/data/SIFT1B/bigann_nc_"+str(ncentroids)+".fvecs", "w")
+f = open("/home/y/yujianfu/ivf-hnsw/data/SIFT1B/bigann_nc_"+str(ncentroids)+".fvecs", "wb")
 for i in range(ncentroids):
     f.write("%d" %d);
     for j in range(d):
@@ -36,7 +36,7 @@ base_size = b.shape[0]
 print("Base set size is ", base_size)
 num_batches = 100000
 batch_size = int(base_size / num_batches)
-f = open("/home/y/yujianfu/ivf-hnsw/data/SIFT1B/bigann_ids_"+str(batch_size)+".fvecs", "w")
+f = open("/home/y/yujianfu/ivf-hnsw/data/SIFT1B/bigann_ids_"+str(batch_size)+".fvecs", "wb")
 print("Saving ids")
 for i in range(10):
     subset = b[range(batch_size*i, batch_size * (i+1)), :]
