@@ -7,7 +7,7 @@ learn_set = "/home/y/yujianfu/ivf-hnsw/data/SIFT1B/bigann_learn.bvecs"
 base_set = "/home/y/yujianfu/ivf-hnsw/data/SIFT1B/bigann_base.bvecs"
 
 a = np.memmap(learn_set, dtype='uint8', mode='r')
-d = a[:4].view('int32')[0]
+d = int(a[:4].view('int32')[0])
 print("Dataset dimension is ", d)
 niter = 20
 verbose = True
@@ -43,9 +43,10 @@ for i in range(10):
     subset = np.ascontiguousarray(subset.astype('float32'))
     D, I = kmeans.index.search(subset, 1)
     print(I)
-    f.write(int(batch_size))
+    f.write(batch_size)
     for j in I.shape[0]:
-        f.write(float(I[j][0]))
+        idx = float(I[j][0])
+        f.write(idx)
 f.close()
 
 
