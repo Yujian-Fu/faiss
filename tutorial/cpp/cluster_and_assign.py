@@ -26,7 +26,7 @@ f = open("/home/y/yujianfu/ivf-hnsw/data/SIFT1B/bigann_nc_"+str(ncentroids)+".fv
 for i in range(ncentroids):
     f.write(struct.pack('d', d));
     for j in range(d):
-        f.write(struct.pack('f', kmeans.centroids[i][j].to_bytes(4)))
+        f.write(struct.pack('f', kmeans.centroids[i][j]))
 f.close()
 
 
