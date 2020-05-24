@@ -2,6 +2,7 @@ import numpy as np
 import faiss
 import time
 import random
+import struct
 
 learn_set = "/home/y/yujianfu/ivf-hnsw/data/SIFT1B/bigann_learn.bvecs"
 base_set = "/home/y/yujianfu/ivf-hnsw/data/SIFT1B/bigann_base.bvecs"
@@ -23,9 +24,9 @@ end = time.time()
 print("Dataset size: ", b.shape[0], " Ncentroids: ", ncentroids, " : ", end-start, "\n\n")
 f = open("/home/y/yujianfu/ivf-hnsw/data/SIFT1B/bigann_nc_"+str(ncentroids)+".fvecs", "wb")
 for i in range(ncentroids):
-    f.write(d.to_bytes());
+    f.write(struct.pack('d', d));
     for j in range(d):
-        f.write(kmeans.centroids[i][j].to_bytes())
+        f.write(struct.pack('f', kmeans.centroids[i][j].to_bytes(4)))
 f.close()
 
 
@@ -43,10 +44,9 @@ for i in range(10):
     subset = np.ascontiguousarray(subset.astype('float32'))
     D, I = kmeans.index.search(subset, 1)
     print(I)
-    f.write(batch_size.to_bytes())
+    f.write(struct.pack('d', batch_size))
     for j in range(I.shape[0]):
-        idx = float(I[j][0])
-        f.write(idx.to_bytes())
+        f.write(struct.pack('f', I[j][0]))
 f.close()
 
 
