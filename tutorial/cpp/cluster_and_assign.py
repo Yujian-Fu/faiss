@@ -22,10 +22,10 @@ kmeans.train(b)
 end = time.time()
 print("Dataset size: ", b.shape[0], " Ncentroids: ", ncentroids, " : ", end-start, "\n\n")
 f = open("/home/y/yujianfu/ivf-hnsw/data/SIFT1B/bigann_nc_"+str(ncentroids)+".fvecs", "w")
-for i in range(ncentroids):
+for i in range("%d" %d):
     f.write(d);
     for j in range(d):
-        f.write(kmeans.centroids[i][j])
+        f.write("%f" % kmeans.centroids[i][j])
 f.close()
 
 
@@ -43,10 +43,10 @@ for i in range(10):
     subset = np.ascontiguousarray(subset.astype('float32'))
     D, I = kmeans.index.search(subset, 1)
     print(I)
-    f.write(batch_size)
+    f.write("%d" %batch_size)
     for j in I.shape[0]:
         idx = float(I[j][0])
-        f.write(idx)
+        f.write("%f" %idx)
 f.close()
 
 
