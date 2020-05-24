@@ -33,8 +33,9 @@ a = np.memmap(base_set, dtype='uint8', mode='r')
 d = a[:4].view('int32')[0]
 b = a.reshape(-1, d + 4)[:, 4:]
 base_size = b.shape[0]
+print("Base set size is ", base_size)
 num_batches = 100000
-batch_size = base_size / num_batches
+batch_size = int(base_size / num_batches)
 f = open("/home/y/yujianfu/ivf-hnsw/data/SIFT1B/bigann_ids_"+str(batch_size)+".fvecs", "wb")
 print("Saving ids")
 for i in range(10):
