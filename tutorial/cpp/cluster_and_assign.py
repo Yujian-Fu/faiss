@@ -8,6 +8,7 @@ base_set = "/home/y/yujianfu/ivf-hnsw/data/SIFT1B/bigann_base.bvecs"
 
 a = np.memmap(learn_set, dtype='uint8', mode='r')
 d = a[:4].view('int32')[0]
+print("Dataset dimension is ", d)
 niter = 20
 verbose = True
 
@@ -27,6 +28,7 @@ for i in range(ncentroids):
         f.write(float(kmeans.centroids[i][j]))
 f.close()
 
+
 a = np.memmap(base_set, dtype='uint8', mode='r')
 d = a[:4].view('int32')[0]
 b = a.reshape(-1, d + 4)[:, 4:]
@@ -34,10 +36,12 @@ base_size = b.shape[0]
 num_batches = 100000
 batch_size = base_size / num_batches
 f = open("/home/y/yujianfu/ivf-hnsw/data/SIFT1B/bigann_ids_"+batch_size+".fvecs", "wb+")
+print("Saving ids")
 for i in range(10):
     subset = b[range(batch_size*i, batch_size * (i+1)), :]
     subset = np.ascontiguousarray(subset.astype('float32'))
     D, I = kmeans.index.search(subset, 1)
+    print(I)
     f.write(int(batch_size))
     for j in I.shape[0]:
         f.write(float(I[j][0]))
