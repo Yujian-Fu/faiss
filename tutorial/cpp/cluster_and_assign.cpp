@@ -92,9 +92,14 @@ int main(int argc, char** argv) {
   LearnNum = (unsigned) (fsize / (Dimension + sizeof(uint32_t)/sizeof(data_t)) / sizeof(data_t));
   std::cout << "The learn set size is " << LearnNum << std::endl;
 
+  
   // generate a bunch of random vectors; note that this is on the CPU!
+  LearnSet.seekg(0, std::ios::beg);
   std::vector<float> LearnVectors(Dimension * LearnNum);
+  std::cout << "Loading Learn Set " << std::endl;
   readXvecFvec<data_t>(LearnSet, LearnVectors.data(), Dimension, LearnNum, true);
+  std::cout << "Loaded Learn Set " << std::endl;
+  LearnSet.close();
   std::vector<float> vecs(Dimension * numVecsToCluster);
   random_subset(LearnVectors.data(), vecs.data(), Dimension, LearnNum, numVecsToCluster);
 
