@@ -15,14 +15,15 @@ verbose = True
 
 start = time.time()
 b = a.reshape(-1, d + 4)[:, 4:]
-b = b[random.sample(range(b.shape[0]), 10000000), :]
+train_size = 10000000
+b = b[random.sample(range(b.shape[0]), train_size), :]
 b = np.ascontiguousarray(b.astype('float32'))
 ncentroids = 150000
 kmeans = faiss.Kmeans(d, ncentroids, niter=niter, verbose=verbose, gpu=True)
 kmeans.train(b)
 end = time.time()
 print("Dataset size: ", b.shape[0], " Ncentroids: ", ncentroids, " : ", end-start, "\n\n")
-f = open("/home/y/yujianfu/ivf-hnsw/data/SIFT1B/bigann_nc_"+str(ncentroids)+".fvecs", "wb")
+f = open("/home/y/yujianfu/ivf-hnsw/data/SIFT1B/bigann_nc_"+str(ncentroids)+"_numtrain_" + std(train_size).fvecs", "wb")
 for i in range(ncentroids):
     f.write(struct.pack('i', d))
     for j in range(d):
@@ -37,7 +38,7 @@ base_size = b.shape[0]
 print("Base set size is ", base_size)
 num_batches = 10000
 batch_size = int(base_size / num_batches)
-f = open("/home/y/yujianfu/ivf-hnsw/data/SIFT1B/bigann_ids_"+str(batch_size)+".fvecs", "wb")
+f = open("/home/y/yujianfu/ivf-hnsw/data/SIFT1B/bigann_ids_"+str(batch_size)+"_nc_" + str(ncentroids) + ".fvecs", "wb")
 print("Saving ids")
 for i in range(num_batches):
     if (i % 100 == 0):

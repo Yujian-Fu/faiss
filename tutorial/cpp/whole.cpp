@@ -52,7 +52,7 @@ int main(){
     LearnNum = (unsigned) (fsize / (Dimension + sizeof(uint32_t)/sizeof(data_t)) / sizeof(data_t));
     std::cout << "The learn set size is " << LearnNum << std::endl;
 
-    
+
     //load learn set 
     LearnSet.seekg(0, std::ios::beg);
     std::vector<float> LearnVectors(Dimension * LearnNum);
