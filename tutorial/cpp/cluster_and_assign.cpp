@@ -48,7 +48,7 @@ void readXvecFvec(std::ifstream & in, float *data, const size_t dimension,
     T mass[dimension];
     size_t print_every = num_subvector / 10;
     for (size_t i = 0; i < num_subvector; i++) {
-        in.seekg(0, (sizeof(uint32_t)+sizeof(T)*dim) *perm[i]);
+        in.seekg((sizeof(uint32_t)+sizeof(T)*dim) *perm[i], std::ios::beg);
         in.read((char *) &dim, sizeof(uint32_t));
         if (dim != dimension) {
             std::cout << dim << " " << dimension << " dimension error \n";
