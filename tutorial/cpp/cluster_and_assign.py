@@ -44,7 +44,7 @@ for i in range(10):
     D, I = kmeans.index.search(subset, 1)
     print(I)
     f.write("%d" %batch_size)
-    for j in I.shape[0]:
+    for j in range(I.shape[0]):
         idx = float(I[j][0])
         f.write("%f" %idx)
 f.close()
