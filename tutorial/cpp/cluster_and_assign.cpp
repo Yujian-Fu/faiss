@@ -36,13 +36,19 @@ void PrintVector(T *data, const size_t dimension, const size_t num_vector){
 /// Read fvec/ivec/bvec format vectors and convert them to the float array
 template<typename T>
 void readXvecFvec(std::ifstream & in, float *data, const size_t dimension, 
-                  const size_t num_vector = 1, bool print_flag = false)
+                  const size_t num_vector = 1, const size_t num_subvector = 1,
+                  bool print_flag = false)
 {
+    long seed = 1234;
+    std::vector<int> perm(num_vector);
+    faiss::rand_perm(perm.data(), nx, seed);
+
     std::cout << "Loading data with " << num_vector << " vectors in " << dimension << std::endl;
     uint32_t dim = dimension;
     T mass[dimension];
-    size_t print_every = num_vector / 10;
-    for (size_t i = 0; i < num_vector; i++) {
+    size_t print_every = num_subvector / 10;
+    for (size_t i = 0; i < num_subvector; i++) {
+        in.seekg(0, (sizeof(uint32_t)+sizeof(T)*dim) *perm[i])
         in.read((char *) &dim, sizeof(uint32_t));
         if (dim != dimension) {
             std::cout << dim << " " << dimension << " dimension error \n";
@@ -53,21 +59,11 @@ void readXvecFvec(std::ifstream & in, float *data, const size_t dimension,
             data[i * dim + j] = 1. * mass[j];
         }
         if ( i % (print_every) == 0)
-            std::cout << "[Finished loading " << i << " / " << num_vector << "]" << std::endl; 
+            std::cout << "[Finished loading " << i << " / " << num_subvector << "]" << std::endl; 
     }
     if (print_flag)
         PrintVector<float>(data, dimension, num_vector);
     //PrintVector(data, dimension, num_vector);
-}
-
-
-void random_subset(const float *x, float *x_out, size_t d, size_t nx, size_t sub_nx) {
-    long seed = 1234;
-    std::vector<int> perm(nx);
-    faiss::rand_perm(perm.data(), nx, seed);
-
-    for (size_t i = 0; i < sub_nx; i++)
-        memcpy(x_out + i * d, x + perm[i] * d, sizeof(x_out[0]) * d);
 }
 
 int main(int argc, char** argv) {
@@ -92,16 +88,14 @@ int main(int argc, char** argv) {
   LearnNum = (unsigned) (fsize / (Dimension + sizeof(uint32_t)/sizeof(data_t)) / sizeof(data_t));
   std::cout << "The learn set size is " << LearnNum << std::endl;
 
-  LearnNum = LearnNum / 5;
+  //LearnNum = LearnNum / 5;
   // generate a bunch of random vectors; note that this is on the CPU!
   LearnSet.seekg(0, std::ios::beg);
-  std::vector<float> LearnVectors(Dimension * LearnNum);
+  std::vector<float> vecs(Dimension * numVecsToCluster);
   std::cout << "Loading Learn Set " << std::endl;
-  readXvecFvec<data_t>(LearnSet, LearnVectors.data(), Dimension, LearnNum, true);
+  readXvecFvec<data_t>(LearnSet, vecs.data(), Dimension, LearnNum, numVecsToCluster, true);
   std::cout << "Loaded Learn Set " << std::endl;
   LearnSet.close();
-  std::vector<float> vecs(Dimension * numVecsToCluster);
-  random_subset(LearnVectors.data(), vecs.data(), Dimension, LearnNum, numVecsToCluster);
 
 
   faiss::gpu::GpuIndexFlatConfig config;
