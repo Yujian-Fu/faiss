@@ -61,4 +61,5 @@ int main(){
     readXvec<uint8_t>(LearnSet, LearnVectors.data(), Dimension, subset);
     std::cout << "The time for reading " << subset << " instances is " << stopw.getElapsedTimeMicro() << " us" << std::endl;
     LearnSet.close();
+    return 0;
 }
