@@ -57,7 +57,7 @@ int main(){
     LearnSet.seekg(0, std::ios::beg);
     std::vector<uint8_t> LearnVectors(Dimension * 10);
     StopW stopw = StopW();
-    size_t subset = 10;
+    size_t subset = 100;
     readXvec<uint8_t>(LearnSet, LearnVectors.data(), Dimension, subset);
     std::cout << "The time for reading " << subset << " instances is " << stopw.getElapsedTimeMicro() << " us" << std::endl;
     LearnSet.close();
