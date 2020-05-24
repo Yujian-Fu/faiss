@@ -31,7 +31,7 @@ void readXvec(std::ifstream &in, T *data, const size_t d, const size_t n = 1)
 {
     uint32_t dim = d;
     for (size_t i = 0; i < n; i++) {
-        in.seekg(sizeof(uint32_t)+sizeof(T)*dim), std::ios::beg);
+        in.seekg((sizeof(uint32_t)+sizeof(T)*dim), std::ios::beg);
         in.read((char *) &dim, sizeof(uint32_t));
         if (dim != d) {
             std::cout << "file error\n";
