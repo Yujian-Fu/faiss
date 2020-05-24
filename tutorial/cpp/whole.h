@@ -192,6 +192,17 @@ void compute_aphas(float * centroids, std::ifstream & Dataset, ID_T * IDs,
         alphas[i] = 0.1;
     }
 }
+
+
+template<typename Data_T>
+void build_subcentroids(float * centroids, std::ifstream & Dataset, ID_T * IDs,
+                        float * alphas, size_t Dimension, size_t ncentroids, size_t nsubc){
+    for (size_t i =0; i <ncentroids; i++){
+        std::vector<float> subcentroids (nsubc * Dimension);
+        std::cout << "The centroids is : " << std::endl;
+        for (size_t temp = 0; temp < )
+    }
+}
 /*
 void read_fvecs(const char* filename, float* &data, 
                 size_t &num_points, size_t &dim, bool print_flag = false){

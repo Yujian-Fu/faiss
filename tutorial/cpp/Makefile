@@ -8,7 +8,8 @@
 CPU_TARGETS = 1-Flat 2-IVFFlat 3-IVFPQ
 GPU_TARGETS = 4-GPU 5-Multiple-GPUs
 TUTORIAL_TARGETS = cluster product_quantizer line_quantizer
-EXP_TARGETS = whole k_cluster
+EXP_TARGETS = whole k_cluster 
+PRE_EXP = cluster_and_assign
 
 default: cpu
 
@@ -21,6 +22,8 @@ gpu: $(GPU_TARGETS)
 tutorial: $(TUTORIAL_TARGETS)
 
 exp: $(EXP_TARGETS)
+
+pre_exp: $(cluster_and_assign)
 
 %: %.cpp ../../libfaiss.a
 	$(CXX) $(CXXFLAGS) $(CPPFLAGS) -o $@ $^ $(LDFLAGS) -I../../.. $(LIBS)

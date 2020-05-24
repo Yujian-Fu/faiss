@@ -32,6 +32,7 @@ int main(){
     //learn set parameter
     size_t LearnNum;
     size_t Dimension = 128;
+    size_t nsubc;
     bool train_vector_quantization = false;
     bool assign_vertor_quantization = true;
 
@@ -51,7 +52,7 @@ int main(){
     LearnNum = (unsigned) (fsize / (Dimension + sizeof(uint32_t)/sizeof(data_t)) / sizeof(data_t));
     std::cout << "The learn set size is " << LearnNum << std::endl;
 
-    /*
+
     //load learn set 
     LearnSet.seekg(0, std::ios::beg);
     std::vector<float> LearnVectors(Dimension * LearnNum);
@@ -59,13 +60,13 @@ int main(){
     readXvecFvec<data_t>(LearnSet, LearnVectors.data(), Dimension, LearnNum, true);
     std::cout << "Loaded Learn Set " << std::endl;
     LearnSet.close();
-    */
+    
 
     //Vector Quantization Parameter
     std::vector<float> centroids (ncentroids * Dimension) ;
     std::cout << "Starting building centroids for vector quantization " << std::endl;
     
-    /*
+    
     //Generate kmeans centroids
     if (train_vector_quantization){
         std::cout << "Training Centroids " << std::endl;
@@ -79,7 +80,7 @@ int main(){
         std::cout << "Saved Centroids " << std::endl;
         CentroidSave.close();
     }
-    */
+    
 
     std::cout << "Loading Centroids " << std::endl;
     std::ifstream CentroidRead;
@@ -124,6 +125,7 @@ int main(){
         writeXvec<ID_T>(VqIDsWrite, VectorQuantID.data(), IDDimension, IDNum);
     }
     
+    //Train PQ for 
 
     std::cout << "Loading computed VQ ID" << std::endl;
     std::ifstream VqIDsRead;
@@ -139,7 +141,10 @@ int main(){
 
     std::cout << "Generating Line quantization Layer " << std::endl;
     std::vector<float> alphas (ncentroids);
+    BaseSet.seekg(0, std::ios::beg);
+    compute_aphas<ID_T>(centroids.data(), BaseSet, VectorQuantID.data(), alphas.data(), Dimension, ncentroids);
+    build_subcentroids(centroids.data(), BaseSet, VectorQuantID.data(), alphas.data(), Dimension, ncentroids, nsubc);
 
-    
+
     BaseSet.close();
 }
