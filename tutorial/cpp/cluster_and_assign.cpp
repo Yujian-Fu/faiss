@@ -75,7 +75,7 @@ int main(int argc, char** argv) {
   size_t LearnNum;
   int Dimension = 128;
   int numberOfEMIterations = 20;
-  size_t numberOfClusters = 1500000;
+  size_t numberOfClusters = 150000;
   size_t numVecsToCluster = 10000000;
   const char * LearnPath = "/home/y/yujianfu/ivf-hnsw/data/SIFT1B/bigann_learn.bvecs";
   std::ifstream LearnSet;
