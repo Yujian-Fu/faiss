@@ -23,7 +23,7 @@ tutorial: $(TUTORIAL_TARGETS)
 
 exp: $(EXP_TARGETS)
 
-pre_exp: $(cluster_and_assign)
+pre_exp: $(PRE_EXP)
 
 %: %.cpp ../../libfaiss.a
 	$(CXX) $(CXXFLAGS) $(CPPFLAGS) -o $@ $^ $(LDFLAGS) -I../../.. $(LIBS)
