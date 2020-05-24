@@ -92,7 +92,7 @@ int main(int argc, char** argv) {
   LearnNum = (unsigned) (fsize / (Dimension + sizeof(uint32_t)/sizeof(data_t)) / sizeof(data_t));
   std::cout << "The learn set size is " << LearnNum << std::endl;
 
-  
+  LearnNum = LearnNum / 5;
   // generate a bunch of random vectors; note that this is on the CPU!
   LearnSet.seekg(0, std::ios::beg);
   std::vector<float> LearnVectors(Dimension * LearnNum);
