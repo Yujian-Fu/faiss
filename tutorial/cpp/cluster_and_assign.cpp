@@ -4,11 +4,34 @@
 #include <faiss/Index.h>
 #include <faiss/Clustering.h>
 #include <faiss/utils/utils.h>
+#include <faiss/utils/random.h>
 #include <faiss/gpu/GpuIndexFlat.h>
 #include <faiss/gpu/StandardGpuResources.h>
+typedef uint8_t data_t;
 
+template<typename T>
+void PrintVector(T *data, const size_t dimension, const size_t num_vector){
+    std::cout << "Printing sample (2 vectors) of the dataset " << std::endl;
+    for (size_t i= 0; i < 2 * dimension; i++)
+    {
+        std::cout << (float)data[i];
+        if (!i)
+        {
+            std::cout << " ";
+            continue;
+        }
 
-
+        if (i % (dimension - 1) != 0)
+        {
+            std::cout << " ";
+        }
+        else
+        {
+            std::cout << std::endl << std::endl;
+        }
+    }
+    std::cout << std::endl;
+}
 
 /// Read fvec/ivec/bvec format vectors and convert them to the float array
 template<typename T>
@@ -79,7 +102,7 @@ int main(int argc, char** argv) {
   faiss::gpu::GpuIndexFlatConfig config;
   config.device = 0;            // this is the default
   config.useFloat16 = false;    // this is the default
-  faiss::gpu::GpuIndexFlatL2 index(&res, dim, config);
+  faiss::gpu::GpuIndexFlatL2 index(&res, Dimension, config);
 
   faiss::ClusteringParameters cp;
   cp.niter = numberOfEMIterations;
@@ -96,7 +119,7 @@ int main(int argc, char** argv) {
   // cp.max_points_per_centroid =
   //   ((numVecsToCluster + numberOfClusters - 1) / numberOfClusters);
 
-  faiss::Clustering kMeans(dim, numberOfClusters, cp);
+  faiss::Clustering kMeans(Dimension, numberOfClusters, cp);
 
   // do the work!
   kMeans.train(numVecsToCluster, vecs.data(), index);
