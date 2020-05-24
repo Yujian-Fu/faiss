@@ -22,8 +22,8 @@ kmeans.train(b)
 end = time.time()
 print("Dataset size: ", b.shape[0], " Ncentroids: ", ncentroids, " : ", end-start, "\n\n")
 f = open("/home/y/yujianfu/ivf-hnsw/data/SIFT1B/bigann_nc_"+str(ncentroids)+".fvecs", "w")
-for i in range("%d" %d):
-    f.write(d);
+for i in range(ncentroids):
+    f.write("%d" %d);
     for j in range(d):
         f.write("%f" % kmeans.centroids[i][j])
 f.close()
