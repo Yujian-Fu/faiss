@@ -145,6 +145,7 @@ int main(){
     compute_aphas<ID_T>(centroids.data(), BaseSet, VectorQuantID.data(), alphas.data(), Dimension, ncentroids);
     build_subcentroids(centroids.data(), BaseSet, VectorQuantID.data(), alphas.data(), Dimension, ncentroids, nsubc);
 
+    
 
     BaseSet.close();
 }
