@@ -3,6 +3,7 @@
 
 #include <faiss/Clustering.h>
 #include <faiss/utils/utils.h>
+#include <faiss/utils/random.h>
 #include <faiss/gpu/GpuIndexFlat.h>
 #include <faiss/gpu/StandardGpuResources.h>
 
