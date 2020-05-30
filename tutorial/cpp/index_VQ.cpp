@@ -5,8 +5,8 @@ namespace bslib{
     BS_LIB::BS_LIB(size_t dimension, size_t ncentroids, size_t bytes_per_code, size_t nbits_per_idx, bool use_quantized_distance, size_t max_group_size):
             dimension(dimension), nc(ncentroids),  use_quantized_distance(use_quantized_distance), pq(nullptr), norm_pq(nullptr)
     {
-        pq = new faiss::ProductQuantizer(dimension, bytes_per_code, nbits_per_idx);
-        norm_pq = new faiss::ProductQuantizer(1, 1, nbits_per_idx);
+        this->pq = new faiss::ProductQuantizer(dimension, bytes_per_code, nbits_per_idx);
+        this->norm_pq = new faiss::ProductQuantizer(1, 1, nbits_per_idx);
 
         code_size = pq->code_size;
         norms.resize(max_group_size);
@@ -98,6 +98,7 @@ namespace bslib{
     }
 
     void BS_LIB::add_batch(size_t n, const float * x, const idx_t * origin_ids, const idx_t * quantization_ids){
+        std::cout << "Adding a batch" << std::endl;
         const idx_t  * idx;
         if (quantization_ids)
             idx = quantization_ids;
@@ -106,26 +107,30 @@ namespace bslib{
             assign(n, x, const_cast<idx_t *> (idx));
         }
 
+        std::cout << "Computing residuals " << std::endl;
         std::vector<float> residuals(n * dimension);
         compute_residuals(n, x, residuals.data(), idx);
 
-
+        std::cout << "Encoding the residual " << std::endl;
         std::vector<uint8_t> residual_codes(n * code_size);
-        pq->compute_codes(residuals.data(), residual_codes.data(), n);
+        this->pq->compute_codes(residuals.data(), residual_codes.data(), n);
 
-
+        std::cout << "Decoding the residual " << std::endl;
         std::vector<float> decoded_residuals(n * dimension);
-        pq->decode(residual_codes.data(), decoded_residuals.data(), n);
+        this->pq->decode(residual_codes.data(), decoded_residuals.data(), n);
 
+        std::cout << "reconstructing the base vector " << std::endl;
         std::vector<float> reconstructed_x(n * dimension);
         reconstruct(n, reconstructed_x.data(), decoded_residuals.data(), idx);
 
+        std::cout << "Computing the norm of the vector " << std::endl;
         std::vector<float> norms(n);
         faiss::fvec_norms_L2sqr(norms.data(), reconstructed_x.data(), dimension, n);
 
+        std::cout << "Adding norm to codes " << std::endl;
         if (use_quantized_distance){
             std::vector<uint8_t> x_norm_codes(n);
-            norm_pq->compute_codes(norms.data(), x_norm_codes.data(), n);
+            this->norm_pq->compute_codes(norms.data(), x_norm_codes.data(), n);
 
             for (size_t i = 0; i < n; i++){
                 const idx_t key = idx[i];
@@ -139,6 +144,7 @@ namespace bslib{
             }
         }
 
+        std::cout << "Adding codes to groups " << std::endl;
         for (size_t i = 0; i < n; i++){
             const idx_t key = idx[i];
             const idx_t id = origin_ids[i];
@@ -160,10 +166,10 @@ namespace bslib{
         const size_t dim = code_size >> 2;
         size_t m = 0;
         for (size_t i = 0; i < dim; i++) {
-            result += precomputed_table[pq->ksub * m + code[m]]; m++;
-            result += precomputed_table[pq->ksub * m + code[m]]; m++;
-            result += precomputed_table[pq->ksub * m + code[m]]; m++;
-            result += precomputed_table[pq->ksub * m + code[m]]; m++;
+            result += precomputed_table[this->pq->ksub * m + code[m]]; m++;
+            result += precomputed_table[this->pq->ksub * m + code[m]]; m++;
+            result += precomputed_table[this->pq->ksub * m + code[m]]; m++;
+            result += precomputed_table[this->pq->ksub * m + code[m]]; m++;
         }
         return result;
     }
@@ -179,7 +185,7 @@ namespace bslib{
             float query_distances[k];
             idx_t query_labels[k];
             const float * query = x + query_id * dimension;
-            pq->compute_inner_prod_table(query, precomputed_table.data());
+            this->pq->compute_inner_prod_table(query, precomputed_table.data());
             faiss::maxheap_heapify(k, query_distances, query_labels);
             size_t ncode = 0;
             for (int i = 0; i < nprobe; i++){
@@ -194,7 +200,7 @@ namespace bslib{
 
                 if (use_quantized_distance){
                     const uint8_t * norm_code = base_norm_codes[centroid_idx].data();
-                    norm_pq->decode(norm_code, norms.data(), group_size);
+                    this->norm_pq->decode(norm_code, norms.data(), group_size);
                 }
                 else{
                     norms = base_norms[centroid_idx];

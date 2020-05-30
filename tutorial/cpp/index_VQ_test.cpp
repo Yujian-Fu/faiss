@@ -35,6 +35,9 @@ int main(){
     size_t nb = 1000000000;
     size_t k = 1;
 
+    const uint32_t batch_size = 10000;
+    const size_t nbatches = nb / batch_size;
+
     if (use_quantized_distance)
         path_index = "/home/y/yujianfu/ivf-hnsw/models_VQ/SIFT1B/PQ16_quantized.index";
     else
@@ -108,16 +111,12 @@ int main(){
         }
     }
 
-    
     //Assign all base vectors
     if (!exists(path_idxs)){
         std::cout << "Assigning all base vectors " << std::endl;
 
         std::ifstream input (path_base, std::ios::binary);
         std::ofstream output (path_idxs, std::ios::binary);
-
-        const uint32_t batch_size = 10000;
-        const size_t nbatches = nb / batch_size;
 
         std::vector <float> batch(batch_size * dimension);
         std::vector <faiss::Index::idx_t> idxs(batch_size);
@@ -133,7 +132,6 @@ int main(){
         }
     }
 
-    /*
     //Construct the index
     if (exists(path_index)){
         std::cout << "Loading index from " << path_index << std::endl;
@@ -143,14 +141,13 @@ int main(){
         std::ifstream base_input(path_base, std::ios::binary);
         std::ifstream idx_input(path_idxs, std::ios::binary);
 
-        const size_t batch_size = 1000000;
-        const size_t nbatches = nb / batch_size;
+
         std::vector<float> batch(batch_size * dimension);
-        std::vector<idx_t> quantization_ids(batch_size);
-        std::vector<idx_t> origin_ids(batch_size);
+        std::vector<faiss::Index::idx_t> quantization_ids(batch_size);
+        std::vector<faiss::Index::idx_t> origin_ids(batch_size);
 
         for (size_t b = 0; b < nbatches; b++){
-            readXvec<idx_t>(idx_input, quantization_ids.data(), batch_size, 1, true);
+            readXvec<faiss::Index::idx_t>(idx_input, quantization_ids.data(), batch_size, 1, true);
             readXvecFvec<uint8_t>(base_input, batch.data(), dimension, batch_size, true);
 
             for (size_t i = 0; i < batch_size; i++){
@@ -167,10 +164,11 @@ int main(){
         index->write(path_index);
     }
 
+    /*
     //Search
     std::cout << "Start Searching " << std::endl;
     float distances[nq * k];
-    idx_t labels[nq * k];
+    faiss::Index::idx_t labels[nq * k];
     size_t correct = 0;
     StopW stopw = StopW();
     index->search(nq, k, query.data(), distances, labels);
