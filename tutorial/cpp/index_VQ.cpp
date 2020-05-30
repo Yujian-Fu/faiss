@@ -52,9 +52,11 @@ namespace bslib{
     }
 
     void BS_LIB::train_pq(size_t n, const float * x, bool train_pq, bool train_norm_pq){
+        std::cout << "Assigning train data points " << std::endl;
         std::vector<idx_t> assigned_ids(n);
         assign(n, x, assigned_ids.data());
 
+        std::cout << "Computing residuals " << std::endl;
         std::vector<float> residuals (n * dimension);
         compute_residuals(n, x, residuals.data(), assigned_ids.data());
 
