@@ -30,6 +30,7 @@ namespace bslib{
         std::vector<float> centroids(dimension * nc);
         size_t centroid_size;
         XvecSize<float>(centroid_input, centroid_size, dimension);
+        centroid_input.seekg(0, std::ios::beg);
         readXvec<float> (centroid_input, centroids.data(), dimension, centroid_size, true);
         faiss::IndexFlatL2 quantizer (dimension);
         quantizer.add(centroid_size, centroids.data());
