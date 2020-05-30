@@ -56,7 +56,7 @@ namespace bslib{
     }
 
     void BS_LIB::train_pq(size_t n, const float * x, bool train_pq, bool train_norm_pq){
-        
+        std::cout << "The inserted centroids size is " << quantizer->xb.size() << std::endl;
         std::cout << "Assigning train data points " << std::endl;
         std::vector<idx_t> assigned_ids(n);
         assign(n, x, assigned_ids.data());
