@@ -6,7 +6,7 @@
 #include "index_VQ.h"
 
 using namespace bslib;
-typedef uint32_t idx_t;
+typedef faiss::Index::idx_t idx_t;
 
 int main(){
     const char * path_gt = "/home/y/yujianfu/ivf-hnsw/data/SIFT1B/gnd/idx_1000M.ivecs";
@@ -36,7 +36,8 @@ int main(){
     size_t k = 1;
 
     const uint32_t batch_size = 10000;
-    const size_t nbatches = nb / batch_size;
+    const size_t nbatches = 2;
+    //nb / batch_size;
 
     if (use_quantized_distance)
         path_index = "/home/y/yujianfu/ivf-hnsw/models_VQ/SIFT1B/PQ16_quantized.index";
@@ -49,10 +50,10 @@ int main(){
     std::cout << "Loading groundtruth from " << path_gt << std::endl;
     
     //Load Groundtruth
-    std::vector<idx_t> groundtruth(nq * ngt);
+    std::vector<uint32_t> groundtruth(nq * ngt);
     {
         std::ifstream gt_input(path_gt, std::ios::binary);
-        readXvec<idx_t>(gt_input, groundtruth.data(), ngt, nq, true);
+        readXvec<uint32_t>(gt_input, groundtruth.data(), ngt, nq, true);
     }
 
     //Load Query
@@ -119,10 +120,10 @@ int main(){
         std::ofstream output (path_idxs, std::ios::binary);
 
         std::vector <float> batch(batch_size * dimension);
-        std::vector <faiss::Index::idx_t> idxs(batch_size);
+        std::vector <idx_t> idxs(batch_size);
 
         std::cout << "Assigning base points " << std::endl;
-        for (size_t i = 0; i < 2; i++){
+        for (size_t i = 0; i < nbatches; i++){
 
             readXvecFvec<uint8_t>(input, batch.data(), dimension, batch_size, true);
             index->assign(batch_size, batch.data(), idxs.data());
@@ -143,11 +144,11 @@ int main(){
 
 
         std::vector<float> batch(batch_size * dimension);
-        std::vector<faiss::Index::idx_t> quantization_ids(batch_size);
-        std::vector<faiss::Index::idx_t> origin_ids(batch_size);
+        std::vector<idx_t> quantization_ids(batch_size);
+        std::vector<idx_t> origin_ids(batch_size);
 
-        for (size_t b = 0; b < 2; b++){
-            readXvec<faiss::Index::idx_t>(idx_input, quantization_ids.data(), batch_size, 1, true);
+        for (size_t b = 0; b < nbatches; b++){
+            readXvec<idx_t>(idx_input, quantization_ids.data(), batch_size, 1, true);
             readXvecFvec<uint8_t>(base_input, batch.data(), dimension, batch_size, true);
 
             for (size_t i = 0; i < batch_size; i++){
