@@ -92,6 +92,7 @@ int main(){
         std::cout << "Randomly select subset for training" << std::endl;
         std::vector<float> LearnSubset(nsubt * dimension);
         random_subset(LearnSet.data(), LearnSubset.data(), dimension, nt, nsubt);
+        PrintVector<float>(LearnSubset.data(), dimension);
 
         std::cout << "Training PQ codebooks " << std::endl;
         index->train_pq(nsubt, LearnSubset.data(), train_pq, train_norm_pq);
