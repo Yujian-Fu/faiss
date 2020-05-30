@@ -14,7 +14,7 @@ int main(int argc, char ** argv){
     const char * path_base = "/home/y/yujianfu/ivf-hnsw/data/SIFT1B/bigann_base.bvecs";
     const char * path_learn = "/home/y/yujianfu/ivf-hnsw/data/SIFT1B/bigann_learn.bvecs";
     
-    const char * path_centroids = "/home/y/yujianfu/ivf-hnsw/models_VQ/SIFT1B/centroids_sift1b.fvecs";
+    const char * path_centroids = "/home/y/yujianfu/ivf-hnsw/data/SIFT1B/centroids_sift1b.fvecs";
     const char * path_pq = "/home/y/yujianfu/ivf-hnsw/models_VQ/SIFT1B/PQ16.pq";
     const char * path_norm_pq = "/home/y/yujianfu/ivf-hnsw/models_VQ/SIFT1B/PQ16_NORM.pq";
     
@@ -60,11 +60,12 @@ int main(int argc, char ** argv){
         readXvecFvec<uint8_t>(query_input, query.data(), dimension, nq, true);
     }
 
-    /*
+    
     //Initialize the index
     BS_LIB * index = new BS_LIB(dimension, nc, bytes_per_codes, nbits_per_idx, use_quantized_distance, max_group_size);
     index->build_quantizer(path_centroids);
 
+    /*
     //Train the PQ
     if (exists(path_pq) && (!use_quantized_distance || exists(path_norm_pq))){
         std::cout << "Loading Reidual PQ codebook from " << path_pq << std::endl;
