@@ -10,7 +10,7 @@ GPU_TARGETS = 4-GPU 5-Multiple-GPUs
 TUTORIAL_TARGETS = cluster product_quantizer line_quantizer
 EXP_TARGETS = whole k_cluster 
 PRE_EXP = cluster_and_assign
-TEST = index_VQ index_VQ_test
+TEST = index_VQ_test
 
 default: cpu
 
