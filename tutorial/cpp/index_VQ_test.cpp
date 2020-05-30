@@ -139,6 +139,7 @@ int main(){
         index->read(path_index);
     }
     else{
+        std::cout << "Constructing the index " << std::endl;
         std::ifstream base_input(path_base, std::ios::binary);
         std::ifstream idx_input(path_idxs, std::ios::binary);
 
