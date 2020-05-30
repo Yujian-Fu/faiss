@@ -32,7 +32,7 @@ int main(){
     //learn set parameter
     size_t LearnNum;
     size_t Dimension = 128;
-    size_t nsubc;
+    size_t nsubc  = 64;
     bool train_vector_quantization = false;
     bool assign_vertor_quantization = true;
 
@@ -124,9 +124,8 @@ int main(){
             ReportFileError("VqID write set open error");
         writeXvec<ID_T>(VqIDsWrite, VectorQuantID.data(), IDDimension, IDNum);
     }
-    
-    //Train PQ for 
 
+    // Build line quantization
     std::cout << "Loading computed VQ ID" << std::endl;
     std::ifstream VqIDsRead;
     VqIDsRead.open(ComputedVQIdsPath, std::ios::binary);
@@ -144,8 +143,16 @@ int main(){
     BaseSet.seekg(0, std::ios::beg);
     compute_aphas<ID_T>(centroids.data(), BaseSet, VectorQuantID.data(), alphas.data(), Dimension, ncentroids);
     build_subcentroids(centroids.data(), BaseSet, VectorQuantID.data(), alphas.data(), Dimension, ncentroids, nsubc);
-
-    
-
     BaseSet.close();
+
+    //Train PQ for compression
+    size_t SubLearnNum;
+    std::vector<float>LearnSubset(Dimension * SubLearnNum);
+    random_subset<uint8_t>(LearnSet.data(), LearnSubset.data(), Dimension, LearnNum);
+
+    std::cout << "Training PQ codebooks" << std::endl;
+    train_pq(SubLearnNum, LearnSubset.data());
+    faiss::write_ProductionQuantizer();
+
+    std::cout << "Saving Reidual PQ code to " << std::endl;
 }
