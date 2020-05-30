@@ -31,7 +31,6 @@ namespace bslib{
         readXvec<float> (centroid_input, centroids.data(), dimension, nc, true);
         faiss::IndexFlatL2 quantizer (dimension);
         this->quantizer->add(nc, centroids.data());
-        std::cout << "The inserted centroids size is " << quantizer.xb.size() << std::endl;
     }
 
     void BS_LIB::compute_residuals(size_t n, const float * x, float * residuals, const idx_t * keys){

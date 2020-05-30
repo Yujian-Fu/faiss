@@ -108,7 +108,7 @@ int main(){
         }
     }
 
-    /*
+    
     //Assign all base vectors
     if (!exists(path_idxs)){
         std::cout << "Assigning all base vectors " << std::endl;
@@ -116,13 +116,15 @@ int main(){
         std::ifstream input (path_base, std::ios::binary);
         std::ofstream output (path_idxs, std::ios::binary);
 
-        const uint32_t batch_size = 1000000;
+        const uint32_t batch_size = 10000;
         const size_t nbatches = nb / batch_size;
 
         std::vector <float> batch(batch_size * dimension);
-        std::vector <idx_t> idxs(batch_size);
+        std::vector <faiss::Index::idx_t> idxs(batch_size);
 
-        for (size_t i = 0; i < nbatches; i++){
+        std::cout << "Assigning base points " << std::endl;
+        for (size_t i = 0; i < 2; i++){
+
             readXvecFvec<uint8_t>(input, batch.data(), dimension, batch_size, true);
             index->assign(batch_size, batch.data(), idxs.data());
 
@@ -131,6 +133,7 @@ int main(){
         }
     }
 
+    /*
     //Construct the index
     if (exists(path_index)){
         std::cout << "Loading index from " << path_index << std::endl;
