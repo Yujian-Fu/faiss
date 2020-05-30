@@ -28,12 +28,9 @@ namespace bslib{
         std::cout << "Building quantizer " << std::endl;
         std::ifstream centroid_input(centroid_path, std::ios::binary);
         std::vector<float> centroids(dimension * nc);
-        size_t centroid_size;
-        XvecSize<float>(centroid_input, centroid_size, dimension);
-        centroid_input.seekg(0, std::ios::beg);
-        readXvec<float> (centroid_input, centroids.data(), dimension, centroid_size, true);
+        readXvec<float> (centroid_input, centroids.data(), dimension, nc, true);
         faiss::IndexFlatL2 quantizer (dimension);
-        quantizer.add(centroid_size, centroids.data());
+        quantizer.add(nc, centroids.data());
     }
 
     void BS_LIB::compute_residuals(size_t n, const float * x, float * residuals, const idx_t * keys){
