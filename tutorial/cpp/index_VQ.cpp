@@ -34,6 +34,7 @@ namespace bslib{
     }
 
     void BS_LIB::compute_residuals(size_t n, const float * x, float * residuals, const idx_t * keys){
+        std::cout << "Computing residuals " << std::endl;
         for (size_t i = 0; i < n; i++){
             std::cout << keys[i] << " ";
             const float * centroid = quantizer->xb.data()+ keys[i] * dimension;
@@ -57,7 +58,7 @@ namespace bslib{
         std::vector<idx_t> assigned_ids(n);
         assign(n, x, assigned_ids.data());
 
-        std::cout << "Computing residuals " << std::endl;
+
         std::vector<float> residuals (n * dimension);
         compute_residuals(n, x, residuals.data(), assigned_ids.data());
 
