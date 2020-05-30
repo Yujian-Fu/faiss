@@ -64,7 +64,7 @@ int main(){
     BS_LIB * index = new BS_LIB(dimension, nc, bytes_per_codes, nbits_per_idx, use_quantized_distance, max_group_size);
     index->build_quantizer(path_centroids);
 
-    /*
+    
     //Train the PQ
     if (exists(path_pq) && (!use_quantized_distance || exists(path_norm_pq))){
         std::cout << "Loading Reidual PQ codebook from " << path_pq << std::endl;
@@ -81,7 +81,7 @@ int main(){
         //Load learn Set
         bool train_pq = exists(path_pq) ? false : true;
         bool train_norm_pq = (exists(path_norm_pq) || (!use_quantized_distance)) ? false : true;
-            
+        
         std::vector<float> LearnSet(nt * dimension);
         {
             std::cout << "Loading Learn Set" << std::endl;
@@ -89,10 +89,10 @@ int main(){
             readXvecFvec<uint8_t>(learn_input, LearnSet.data(), dimension, nt, true);
         }
 
+        std::cout << "Randomly select subset for training" << std::endl;
         std::vector<float> LearnSubset(nsubt * dimension);
         random_subset(LearnSet.data(), LearnSubset.data(), dimension, nt, nsubt);
 
-        
         std::cout << "Training PQ codebooks " << std::endl;
         index->train_pq(nsubt, LearnSubset.data(), train_pq, train_norm_pq);
 
@@ -106,6 +106,7 @@ int main(){
         }
     }
 
+    /*
     //Assign all base vectors
     if (!exists(path_idxs)){
         std::cout << "Assigning all base vectors " << std::endl;
