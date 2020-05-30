@@ -65,8 +65,9 @@ void readXvec(std::ifstream & in, T *data, const size_t dimension,
             exit(1);
         }
         in.read((char *) (data + i * dim), dim * sizeof(T));
+        std::cout << << data[i*dim] << " "; 
         if ( i % print_every == 0)
-            std::cout << "[Finished loading " << i << " / " << num_vector << "]" << std::endl; 
+            std::cout << "[Finished loading " << i << " / " << num_vector << "]"  << std::endl; 
     }
     if (print_flag)
         PrintVector<T>(data, dimension);
