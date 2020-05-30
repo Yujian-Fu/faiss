@@ -37,7 +37,6 @@ namespace bslib{
     void BS_LIB::compute_residuals(size_t n, const float * x, float * residuals, const idx_t * keys){
         std::cout << "Computing residuals " << std::endl;
         for (size_t i = 0; i < n; i++){
-            std::cout << keys[i] << " ";
             const float * centroid = quantizer->xb.data()+ keys[i] * dimension;
             faiss::fvec_madd(dimension, x + i * dimension, -1.0, centroid, residuals+i*dimension);
         }

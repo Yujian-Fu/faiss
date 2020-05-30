@@ -64,7 +64,7 @@ int main(){
     BS_LIB * index = new BS_LIB(dimension, nc, bytes_per_codes, nbits_per_idx, use_quantized_distance, max_group_size);
     index->build_quantizer(path_centroids);
 
-    
+
     //Train the PQ
     if (exists(path_pq) && (!use_quantized_distance || exists(path_norm_pq))){
         std::cout << "Loading Reidual PQ codebook from " << path_pq << std::endl;
