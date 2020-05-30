@@ -53,7 +53,7 @@ template<typename T>
 void readXvec(std::ifstream & in, T *data, const size_t dimension, 
               const size_t num_vector = 1, bool print_flag = false){
     std::cout << "Loading data with " << num_vector << " vectors in " << dimension << std::endl;
-    size_t dim = dimension;
+    uint32_t dim = dimension;
     size_t print_every = num_vector / 10;
     for (size_t i = 0; i < num_vector; i++){
         in.read((char *) &dim, sizeof(uint32_t));

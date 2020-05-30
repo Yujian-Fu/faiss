@@ -6,7 +6,7 @@
 #include "index.h"
 
 using namespace bslib;
-typedef faiss::Index::idx_t idx_t;
+typedef uint32_t idx_t;
 
 int main(int argc, char ** argv){
     const char * path_gt = "/home/y/yujianfu/ivf-hnsw/data/SIFT1B/gnd/idx_1000M.ivecs";
