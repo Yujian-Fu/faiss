@@ -69,28 +69,32 @@ namespace bslib{
 
         if (train_pq){
             std::cout << "Training residual PQ with parameter setting: M: " << pq->M << " number of centroids: " << pq->ksub << std::endl;
-            pq->verbose = true;
-            pq->train(n, residuals.data());
+            this->pq->verbose = true;
+            this->pq->train(n, residuals.data());
         }
 
         if (train_norm_pq){
             //Compute the code of vector
+            std::cout << "Compute the code of the train vectors " << std::endl;
             std::vector <uint8_t> residual_codes(n * code_size);
-            pq->compute_code(residuals.data(), residual_codes.data());
+            this->pq->compute_code(residuals.data(), residual_codes.data());
 
+            std::cout << "Decode the code of the train vectors " << std::endl;
             //Decode residuals, compute the centroid representation of 
             std::vector<float> decoded_residuals(n * code_size);
-            pq->decode(residual_codes.data(), decoded_residuals.data());
+            this->pq->decode(residual_codes.data(), decoded_residuals.data());
 
+            std::cout << "Reconstructing the vectors " << std::endl;
             std::vector<float> reconstructed_x(n * dimension);
             reconstruct(n, reconstructed_x.data(), decoded_residuals.data(), assigned_ids.data());
             
+            std::cout << "Computing the norm of vectors " << std::endl;
             std::vector<float> norms(n);
             faiss::fvec_norms_L2sqr(norms.data(), reconstructed_x.data(), dimension, n);
 
             std::cout << "Using quantized distance, training norm_pq with parameter: " << "M: " << norm_pq->M << "nc: " << norm_pq->ksub << std::endl;
-            norm_pq->verbose = true;
-            norm_pq->train(n, norms.data());
+            this->norm_pq->verbose = true;
+            this->norm_pq->train(n, norms.data());
         }
     }
 
