@@ -146,7 +146,7 @@ int main(){
         std::vector<faiss::Index::idx_t> quantization_ids(batch_size);
         std::vector<faiss::Index::idx_t> origin_ids(batch_size);
 
-        for (size_t b = 0; b < nbatches; b++){
+        for (size_t b = 0; b < 2; b++){
             readXvec<faiss::Index::idx_t>(idx_input, quantization_ids.data(), batch_size, 1, true);
             readXvecFvec<uint8_t>(base_input, batch.data(), dimension, batch_size, true);
 
