@@ -58,7 +58,11 @@ namespace bslib{
         std::vector<idx_t> assigned_ids(n);
         assign(n, x, assigned_ids.data());
 
-
+        std::cout << "The assigned data examples are: " << std::endl;
+        for (int i = 0; i < 10; i++)
+        {
+            std::cout << assigned_ids[i] << " "; 
+        }
         std::vector<float> residuals (n * dimension);
         compute_residuals(n, x, residuals.data(), assigned_ids.data());
 
