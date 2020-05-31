@@ -55,7 +55,7 @@ int main(){
     std::vector<uint32_t> groundtruth(nq * ngt);
     {
         std::ifstream gt_input(path_gt, std::ios::binary);
-        readXvec<uint32_t>(gt_input, groundtruth.data(), ngt, nq);
+        readXvec<uint32_t>(gt_input, groundtruth.data(), ngt, nq, false, true);
     }
 
     //Load Query
@@ -63,7 +63,7 @@ int main(){
     std::vector<float> query(nq * dimension);
     {
         std::ifstream query_input(path_query, std::ios::binary);
-        readXvecFvec<uint8_t>(query_input, query.data(), dimension, nq, true);
+        readXvecFvec<uint8_t>(query_input, query.data(), dimension, nq, true, true);
     }
 
     getrusage(RUSAGE_SELF,&r_usage);
@@ -97,7 +97,7 @@ int main(){
         {
             std::cout << "Loading Learn Set" << std::endl;
             std::ifstream learn_input(path_learn, std::ios::binary);
-            readXvecFvec<uint8_t>(learn_input, LearnSet.data(), dimension, nt, true);
+            readXvecFvec<uint8_t>(learn_input, LearnSet.data(), dimension, nt, true, true);
         }
 
         std::cout << "Randomly select subset for training" << std::endl;
@@ -137,7 +137,7 @@ int main(){
         for (size_t i = 0; i < nbatches; i++){
 
 
-            readXvecFvec<uint8_t>(input, batch.data(), dimension, batch_size, true);
+            readXvecFvec<uint8_t>(input, batch.data(), dimension, batch_size);
             index->assign(batch_size, batch.data(), idxs.data());
 
             output.write((char *) & batch_size, sizeof(uint32_t));

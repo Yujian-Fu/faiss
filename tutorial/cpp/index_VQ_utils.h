@@ -54,7 +54,7 @@ void PrintVector(T *data, const size_t dimension){
 
 template<typename T>
 void readXvec(std::ifstream & in, T *data, const size_t dimension, 
-              const size_t num_vector = 1, bool print_flag = false){
+              const size_t num_vector = 1, bool print_flag = false, bool show_process = false){
     std::cout << "Loading data with " << num_vector << " vectors in " << dimension << std::endl;
     uint32_t dim = dimension;
     size_t print_every = num_vector / 10;
@@ -65,7 +65,7 @@ void readXvec(std::ifstream & in, T *data, const size_t dimension,
             exit(1);
         }
         in.read((char *) (data + i * dim), dim * sizeof(T));
-        if ( print_every != 0 && i % print_every == 0)
+        if ( show_process && print_every != 0 && i % print_every == 0)
             std::cout << "[Finished loading " << i << " / " << num_vector << "]"  << std::endl; 
     }
     if (print_flag)
@@ -86,7 +86,7 @@ void XvecSize(std::ifstream & in, size_t & size, const size_t dimension){
 /// Read fvec/ivec/bvec format vectors and convert them to the float array
 template<typename T>
 void readXvecFvec(std::ifstream & in, float *data, const size_t dimension, 
-                  const size_t num_vector = 1, bool print_flag = false)
+                  const size_t num_vector = 1, bool print_flag = false, bool show_process = false)
 {
     std::cout << "Loading data with " << num_vector << " vectors in " << dimension << std::endl;
     uint32_t dim = dimension;
@@ -102,7 +102,7 @@ void readXvecFvec(std::ifstream & in, float *data, const size_t dimension,
         for (size_t j = 0; j < dimension; j++){
             data[i * dim + j] = 1. * mass[j];
         }
-        if ( print_every != 0 && i % (print_every) == 0)
+        if ( show_process && print_every != 0 && i % (print_every) == 0)
             std::cout << "[Finished loading " << i << " / " << num_vector << "]" << std::endl; 
     }
     if (print_flag)
