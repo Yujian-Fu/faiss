@@ -164,8 +164,8 @@ int main(){
         stopw.reset();
 
         for (size_t b = 0; b < nbatches; b++){
-            readXvec<idx_t>(idx_input, quantization_ids.data(), batch_size, 1);
-            readXvecFvec<uint8_t>(base_input, batch.data(), dimension, batch_size);
+            readXvec<idx_t>(idx_input, quantization_ids.data(), batch_size, 1, true);
+            readXvecFvec<uint8_t>(base_input, batch.data(), dimension, batch_size, true, true);
 
             for (size_t i = 0; i < batch_size; i++){
                 origin_ids[i] = batch_size * b + i;
