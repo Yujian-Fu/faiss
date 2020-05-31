@@ -37,7 +37,7 @@ int main(){
     size_t nb = 1000000000;
     size_t k = 1;
 
-    const uint32_t batch_size = 1000000;
+    const uint32_t batch_size = 100000;
     const size_t nbatches = nb / batch_size;
     struct rusage r_usage;
 
