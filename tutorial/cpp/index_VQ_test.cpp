@@ -58,7 +58,7 @@ int main(){
     std::vector<uint32_t> groundtruth(nq * ngt);
     {
         std::ifstream gt_input(path_gt, std::ios::binary);
-        readXvec<uint32_t>(gt_input, groundtruth.data(), ngt, nq, true);
+        readXvec<uint32_t>(gt_input, groundtruth.data(), ngt, nq);
     }
 
     //Load Query
@@ -71,7 +71,7 @@ int main(){
 
     getrusage(RUSAGE_SELF,&r_usage);
     // Print the maximum resident set size used (in kilobytes).
-    std::cout << std::endl << "Memory usage: " << r_usage.ru_ixrss << " / " << r_usage.ru_isrss << " / " << r_usage.ru_idrss << " / " << r_usage.ru_maxrss;
+    std::cout << std::endl << "Memory usage: " << r_usage.ru_ixrss << " / " << r_usage.ru_isrss << " / " << r_usage.ru_idrss << " / " << r_usage.ru_maxrss << std::endl;
 
     //Initialize the index
     
@@ -124,7 +124,7 @@ int main(){
     getrusage(RUSAGE_SELF,&r_usage);
     // Print the maximum resident set size used (in kilobytes).
     // printf("Memory usage: %ld kilobytes\n",r_usage.ru_maxrss);
-    std::cout << std::endl << "Memory usage: " << r_usage.ru_ixrss << " / " << r_usage.ru_isrss << " / " << r_usage.ru_idrss << " / " << r_usage.ru_maxrss;
+    std::cout << std::endl << "Memory usage: " << r_usage.ru_ixrss << " / " << r_usage.ru_isrss << " / " << r_usage.ru_idrss << " / " << r_usage.ru_maxrss << std::endl;
 
     //Assign all base vectors
     if (!exists(path_idxs)){
@@ -186,7 +186,7 @@ int main(){
     getrusage(RUSAGE_SELF,&r_usage);
     // Print the maximum resident set size used (in kilobytes).
     // printf("Memory usage: %ld kilobytes\n",r_usage.ru_maxrss);
-    std::cout << std::endl << "Memory usage: " << r_usage.ru_ixrss << " / " << r_usage.ru_isrss << " / " << r_usage.ru_idrss << " / " << r_usage.ru_maxrss;
+    std::cout << std::endl << "Memory usage: " << r_usage.ru_ixrss << " / " << r_usage.ru_isrss << " / " << r_usage.ru_idrss << " / " << r_usage.ru_maxrss << std::endl;
     /*
     //Search
     std::cout << "Start Searching " << std::endl;
