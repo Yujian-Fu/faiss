@@ -32,17 +32,14 @@ int main(){
     size_t nc = 993127;
     size_t max_group_size = 100000;
     size_t nt = 10000000;
-    //size_t nsubt = 65536;
-    size_t nsubt = 10000;
+    size_t nsubt = 65536;
+    //size_t nsubt = 10000;
     size_t nb = 1000000000;
     size_t k = 1;
 
-    //const uint32_t batch_size = 1000000;
-    //const size_t nbatches = nb / batch_size;
+    const uint32_t batch_size = 1000000;
+    const size_t nbatches = nb / batch_size;
     struct rusage r_usage;
-
-    const uint32_t batch_size = 1000;
-    const size_t nbatches = 2;
 
     if (use_quantized_distance)
         path_index = "/home/y/yujianfu/ivf-hnsw/models_VQ/SIFT1B/PQ16_quantized.index";
@@ -126,10 +123,10 @@ int main(){
     // printf("Memory usage: %ld kilobytes\n",r_usage.ru_maxrss);
     std::cout << std::endl << "Memory usage: " << r_usage.ru_ixrss << " / " << r_usage.ru_isrss << " / " << r_usage.ru_idrss << " / " << r_usage.ru_maxrss << std::endl;
 
+    StopW stopw = StopW();
     //Assign all base vectors
     if (!exists(path_idxs)){
         std::cout << "Assigning all base vectors " << std::endl;
-        StopW stopw = StopW();
 
         std::ifstream input (path_base, std::ios::binary);
         std::ofstream output (path_idxs, std::ios::binary);
@@ -146,7 +143,6 @@ int main(){
             output.write((char *) & batch_size, sizeof(uint32_t));
             output.write((char *) idxs.data(), batch_size * sizeof(idx_t));
             std::cout << " [ " << stopw.getElapsedTimeMicro() / 1000000 << "s ] in " << i << " / " << nbatches << std::endl;
-            stopw.reset();
         }
     }
 
@@ -165,6 +161,8 @@ int main(){
         std::vector<idx_t> quantization_ids(batch_size);
         std::vector<idx_t> origin_ids(batch_size);
 
+        stopw.reset();
+
         for (size_t b = 0; b < nbatches; b++){
             readXvec<idx_t>(idx_input, quantization_ids.data(), batch_size, 1);
             readXvecFvec<uint8_t>(base_input, batch.data(), dimension, batch_size);
@@ -174,6 +172,7 @@ int main(){
             }
 
             index->add_batch(batch_size, batch.data(), origin_ids.data(), quantization_ids.data());
+            std::cout << " [ " << stopw.getElapsedTimeMicro() / 1000000 << "s ] in " << b << " / " << nbatches << std::endl;
         }
 
         std::cout << "Computing the centroid norms " << std::endl;
