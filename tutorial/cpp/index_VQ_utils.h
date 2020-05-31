@@ -29,7 +29,7 @@ class StopW{
 
 template<typename T>
 void PrintVector(T *data, const size_t dimension){
-    std::cout << "Printing sample (2 vectors) of the dataset " << std::endl;
+    std::cout << "Printing sample (1 vector) of the dataset " << std::endl;
     for (size_t i= 0; i < 1 * dimension; i++)
     {
         std::cout << (float)data[i];
