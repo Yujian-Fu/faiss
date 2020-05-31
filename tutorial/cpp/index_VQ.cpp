@@ -53,7 +53,7 @@ namespace bslib{
     }
 
     void BS_LIB::train_pq(size_t n, const float * x, bool train_pq, bool train_norm_pq){
-        std::cout << "The inserted centroids size is " << this->quantizer->xb.size() << std::endl;
+        std::cout << "The inserted centroids size is " << this->quantizer->xb.size() / n << std::endl;
         std::cout << "Assigning train data points " << std::endl;
         std::vector<idx_t> assigned_ids(n);
         assign(n, x, assigned_ids.data());
@@ -80,7 +80,7 @@ namespace bslib{
 
             std::cout << "Decode the code of the train vectors " << std::endl;
             //Decode residuals, compute the centroid representation of 
-            std::vector<float> decoded_residuals(n * code_size);
+            std::vector<float> decoded_residuals(n * dimension);
             this->pq->decode(residual_codes.data(), decoded_residuals.data());
 
             std::cout << "Reconstructing the vectors " << std::endl;
