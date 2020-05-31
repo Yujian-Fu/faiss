@@ -97,7 +97,7 @@ namespace bslib{
     }
 
     void BS_LIB::add_batch(size_t n, const float * x, const idx_t * origin_ids, const idx_t * quantization_ids){
-        std::cout << "Adding a batch" << std::endl;
+        //std::cout << "Adding a batch" << std::endl;
         const idx_t  * idx;
         if (quantization_ids)
             idx = quantization_ids;
