@@ -39,6 +39,7 @@ int main(){
 
     //const uint32_t batch_size = 1000000;
     //const size_t nbatches = nb / batch_size;
+    struct rusage r_usage;
 
     const uint32_t batch_size = 1000;
     const size_t nbatches = 2;
@@ -67,6 +68,10 @@ int main(){
         std::ifstream query_input(path_query, std::ios::binary);
         readXvecFvec<uint8_t>(query_input, query.data(), dimension, nq, true);
     }
+
+    getrusage(RUSAGE_SELF,&r_usage);
+    // Print the maximum resident set size used (in kilobytes).
+    printf("Memory usage: %ld kilobytes\n",r_usage.ru_maxrss);
 
     //Initialize the index
     
@@ -115,6 +120,10 @@ int main(){
             faiss::write_ProductQuantizer(index->norm_pq, path_norm_pq);
         }
     }
+
+    getrusage(RUSAGE_SELF,&r_usage);
+    // Print the maximum resident set size used (in kilobytes).
+    printf("Memory usage: %ld kilobytes\n",r_usage.ru_maxrss);
 
     //Assign all base vectors
     if (!exists(path_idxs)){
@@ -172,6 +181,10 @@ int main(){
         std::cout << "Saving index to " << path_index << std::endl;
         index->write(path_index);
     }
+
+    getrusage(RUSAGE_SELF,&r_usage);
+    // Print the maximum resident set size used (in kilobytes).
+    printf("Memory usage: %ld kilobytes\n",r_usage.ru_maxrss);
 
     /*
     //Search
