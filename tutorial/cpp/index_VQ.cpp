@@ -36,18 +36,18 @@ namespace bslib{
     void BS_LIB::compute_residuals(size_t n, const float * x, float * residuals, const idx_t * keys){
         std::cout << "Computing residuals " << std::endl;
         for (size_t i = 0; i < n; i++){
-            const float * centroid = quantizer->xb.data()+ keys[i] * dimension;
+            const float * centroid = this->quantizer->xb.data()+ keys[i] * dimension;
             faiss::fvec_madd(dimension, x + i * dimension, -1.0, centroid, residuals+i*dimension);
         }
     }
 
     void BS_LIB::assign(size_t n, const float * x, idx_t * labels, size_t k){
-        quantizer->assign(n, x, labels, k);
+        this->quantizer->assign(n, x, labels, k);
     }
 
     void BS_LIB::reconstruct(size_t n, float * x, const float * decoded_residuals, const idx_t * keys){
         for (size_t i = 0; i < n; i++){
-            const float * centroid = quantizer->xb.data()+keys[i] * dimension;
+            const float * centroid = this->quantizer->xb.data()+keys[i] * dimension;
             faiss::fvec_madd(dimension, decoded_residuals + i * dimension, 1.0, centroid, x + i*dimension);
         }
     }
@@ -179,7 +179,7 @@ namespace bslib{
         //float centroid_dists[nq * k];
         //idx_t centroid_idxs[nq * k];
 
-        quantizer->search(nq, x, k, centroid_dists, centroid_idxs);
+        this->quantizer->search(nq, x, k, centroid_dists, centroid_idxs);
 
         for(size_t query_id = 0; query_id < nq; query_id++){
             float query_distances[k];
@@ -270,7 +270,7 @@ namespace bslib{
 
     void BS_LIB::compute_centroid_norms(){
     for (size_t i = 0; i < nc; i++){
-        const float * centroid = quantizer->xb.data()+ i * dimension;
+        const float * centroid = this->quantizer->xb.data()+ i * dimension;
         centroid_norms[i] = faiss::fvec_norm_L2sqr(centroid, dimension);
     }
     }

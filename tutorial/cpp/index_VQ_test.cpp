@@ -32,7 +32,7 @@ int main(){
     size_t nc = 993127;
     size_t max_group_size = 100000;
     size_t nt = 10000000;
-    size_t nsubt = 10000;
+    size_t nsubt = 65536;
     //size_t nsubt = 10000;
     size_t nb = 1000000000;
     size_t k = 1;
