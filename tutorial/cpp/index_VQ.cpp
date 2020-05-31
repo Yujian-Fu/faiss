@@ -35,8 +35,8 @@ namespace bslib{
 
     void BS_LIB::compute_residuals(size_t n, const float * x, float * residuals, const idx_t * keys){
         for (size_t i = 0; i < n; i++){
-            const float * centroid = this->quantizer->xb.data()+ keys[i] * dimension;
-            faiss::fvec_madd(dimension, x + i * dimension, -1.0, centroid, residuals+i*dimension);
+            const float * centroid = this->quantizer->xb.data() + keys[i] * dimension;
+            faiss::fvec_madd(dimension, x + i * dimension, -1.0, centroid, residuals + i*dimension);
         }
     }
 
@@ -98,6 +98,7 @@ namespace bslib{
 
     void BS_LIB::add_batch(size_t n, const float * x, const idx_t * origin_ids, const idx_t * quantization_ids){
         std::cout << "Adding a batch" << std::endl;
+        /*
         const idx_t  * idx;
         if (quantization_ids)
             idx = quantization_ids;
@@ -105,10 +106,11 @@ namespace bslib{
             idx = new idx_t[n];
             assign(n, x, const_cast<idx_t *> (idx));
         }
+        */
 
         std::cout << "Computing residuals " << std::endl;
         std::vector<float> residuals(n * dimension);
-        compute_residuals(n, x, residuals.data(), idx);
+        compute_residuals(n, x, residuals.data(), quantization_ids);
 
         std::cout << "Encoding the residual " << std::endl;
         std::vector<uint8_t> residual_codes(n * code_size);
@@ -120,7 +122,7 @@ namespace bslib{
 
         std::cout << "reconstructing the base vector " << std::endl;
         std::vector<float> reconstructed_x(n * dimension);
-        reconstruct(n, reconstructed_x.data(), decoded_residuals.data(), idx);
+        reconstruct(n, reconstructed_x.data(), decoded_residuals.data(), quantization_ids);
 
         std::cout << "Computing the norm of the vector " << std::endl;
         std::vector<float> norms(n);
