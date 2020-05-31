@@ -106,27 +106,27 @@ namespace bslib{
             assign(n, x, const_cast<idx_t *> (idx));
         }
 
-        std::cout << "Computing residuals " << std::endl;
+        //std::cout << "Computing residuals " << std::endl;
         std::vector<float> residuals(n * dimension);
         compute_residuals(n, x, residuals.data(), idx);
 
-        std::cout << "Encoding the residual " << std::endl;
+        //std::cout << "Encoding the residual " << std::endl;
         std::vector<uint8_t> residual_codes(n * code_size);
         this->pq->compute_codes(residuals.data(), residual_codes.data(), n);
 
-        std::cout << "Decoding the residual " << std::endl;
+        //std::cout << "Decoding the residual " << std::endl;
         std::vector<float> decoded_residuals(n * dimension);
         this->pq->decode(residual_codes.data(), decoded_residuals.data(), n);
 
-        std::cout << "reconstructing the base vector " << std::endl;
+        //std::cout << "reconstructing the base vector " << std::endl;
         std::vector<float> reconstructed_x(n * dimension);
         reconstruct(n, reconstructed_x.data(), decoded_residuals.data(), idx);
 
-        std::cout << "Computing the norm of the vector " << std::endl;
+        //std::cout << "Computing the norm of the vector " << std::endl;
         std::vector<float> norms(n);
         faiss::fvec_norms_L2sqr(norms.data(), reconstructed_x.data(), dimension, n);
 
-        std::cout << "Adding norm to codes " << std::endl;
+        //std::cout << "Adding norm to codes " << std::endl;
         if (use_quantized_distance){
             std::vector<uint8_t> x_norm_codes(n);
             this->norm_pq->compute_codes(norms.data(), x_norm_codes.data(), n);

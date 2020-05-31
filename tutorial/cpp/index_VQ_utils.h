@@ -55,6 +55,7 @@ void PrintVector(T *data, const size_t dimension){
 template<typename T>
 void readXvec(std::ifstream & in, T *data, const size_t dimension, 
               const size_t num_vector = 1, bool print_flag = false, bool show_process = false){
+    if (show_process)
     std::cout << "Loading data with " << num_vector << " vectors in " << dimension << std::endl;
     uint32_t dim = dimension;
     size_t print_every = num_vector / 10;
@@ -88,6 +89,7 @@ template<typename T>
 void readXvecFvec(std::ifstream & in, float *data, const size_t dimension, 
                   const size_t num_vector = 1, bool print_flag = false, bool show_process = false)
 {
+    if (show_process)
     std::cout << "Loading data with " << num_vector << " vectors in " << dimension << std::endl;
     uint32_t dim = dimension;
     T mass[dimension];
