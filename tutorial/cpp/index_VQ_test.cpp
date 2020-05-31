@@ -19,7 +19,7 @@ int main(){
     const char * path_pq = "/home/y/yujianfu/ivf-hnsw/models_VQ/SIFT1B/PQ16.pq";
     const char * path_norm_pq = "/home/y/yujianfu/ivf-hnsw/models_VQ/SIFT1B/PQ16_NORM.pq";
     
-    const char * path_idxs = "/home/y/yujianfu/ivf-hnsw/models_VQ/SIFT1B/idxs.ivecs";
+    const char * path_idxs = "/home/y/yujianfu/ivf-hnsw/data/SIFT1B/precomputed_idxs_sift1b.ivecs";
 
 
     const char * path_index;
@@ -37,7 +37,7 @@ int main(){
     size_t nb = 1000000000;
     size_t k = 1;
 
-    const uint32_t batch_size = 100000;
+    const uint32_t batch_size = 1000000;
     const size_t nbatches = nb / batch_size;
     struct rusage r_usage;
 
