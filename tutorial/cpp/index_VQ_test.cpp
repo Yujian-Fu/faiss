@@ -71,7 +71,7 @@ int main(){
 
     getrusage(RUSAGE_SELF,&r_usage);
     // Print the maximum resident set size used (in kilobytes).
-    std::cout << "Memory usage: " << r_usage.ru_ixrss << " / " << r_usage.ru_isrss << " / " << r_usage.ru_idrss << " / " << r_usage.ru_maxrss;
+    std::cout << std::endl << "Memory usage: " << r_usage.ru_ixrss << " / " << r_usage.ru_isrss << " / " << r_usage.ru_idrss << " / " << r_usage.ru_maxrss;
 
     //Initialize the index
     
@@ -124,7 +124,7 @@ int main(){
     getrusage(RUSAGE_SELF,&r_usage);
     // Print the maximum resident set size used (in kilobytes).
     // printf("Memory usage: %ld kilobytes\n",r_usage.ru_maxrss);
-    std::cout << "Memory usage: " << r_usage.ru_ixrss << " / " << r_usage.ru_isrss << " / " << r_usage.ru_idrss << " / " << r_usage.ru_maxrss;
+    std::cout << std::endl << "Memory usage: " << r_usage.ru_ixrss << " / " << r_usage.ru_isrss << " / " << r_usage.ru_idrss << " / " << r_usage.ru_maxrss;
 
     //Assign all base vectors
     if (!exists(path_idxs)){
@@ -186,7 +186,7 @@ int main(){
     getrusage(RUSAGE_SELF,&r_usage);
     // Print the maximum resident set size used (in kilobytes).
     // printf("Memory usage: %ld kilobytes\n",r_usage.ru_maxrss);
-    std::cout << "Memory usage: " << r_usage.ru_ixrss << " / " << r_usage.ru_isrss << " / " << r_usage.ru_idrss << " / " << r_usage.ru_maxrss;
+    std::cout << std::endl << "Memory usage: " << r_usage.ru_ixrss << " / " << r_usage.ru_isrss << " / " << r_usage.ru_idrss << " / " << r_usage.ru_maxrss;
     /*
     //Search
     std::cout << "Start Searching " << std::endl;
