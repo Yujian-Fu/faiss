@@ -2,6 +2,7 @@
 #include <fstream>
 #include <cstdio>
 #include <unordered_set>
+#include <sys/resource.h>
 
 #include "index_VQ.h"
 
@@ -20,6 +21,7 @@ int main(){
     
     const char * path_idxs = "/home/y/yujianfu/ivf-hnsw/models_VQ/SIFT1B/idxs.ivecs";
 
+
     const char * path_index;
 
     size_t ngt = 1000;
@@ -28,16 +30,18 @@ int main(){
     size_t nbits_per_idx = 8;
     bool use_quantized_distance = true;
     size_t nc = 993127;
-    size_t max_group_size = 10000;
+    size_t max_group_size = 100000;
     size_t nt = 10000000;
     //size_t nsubt = 65536;
-    size_t nsubt = 1000;
+    size_t nsubt = 10000;
     size_t nb = 1000000000;
     size_t k = 1;
 
-    const uint32_t batch_size = 10000;
+    //const uint32_t batch_size = 1000000;
+    //const size_t nbatches = nb / batch_size;
+
+    const uint32_t batch_size = 1000;
     const size_t nbatches = 2;
-    //nb / batch_size;
 
     if (use_quantized_distance)
         path_index = "/home/y/yujianfu/ivf-hnsw/models_VQ/SIFT1B/PQ16_quantized.index";
@@ -115,6 +119,7 @@ int main(){
     //Assign all base vectors
     if (!exists(path_idxs)){
         std::cout << "Assigning all base vectors " << std::endl;
+        StopW stopw = StopW();
 
         std::ifstream input (path_base, std::ios::binary);
         std::ofstream output (path_idxs, std::ios::binary);
@@ -122,14 +127,16 @@ int main(){
         std::vector <float> batch(batch_size * dimension);
         std::vector <idx_t> idxs(batch_size);
 
-        std::cout << "Assigning base points " << std::endl;
         for (size_t i = 0; i < nbatches; i++){
+
 
             readXvecFvec<uint8_t>(input, batch.data(), dimension, batch_size, true);
             index->assign(batch_size, batch.data(), idxs.data());
 
             output.write((char *) & batch_size, sizeof(uint32_t));
             output.write((char *) idxs.data(), batch_size * sizeof(idx_t));
+            std::cout << " [ " << stopw.getElapsedTimeMicro() / 1000000 << "s ] in " << i << " / " << nbatches << std::endl;
+            stopw.reset();
         }
     }
 
@@ -149,8 +156,8 @@ int main(){
         std::vector<idx_t> origin_ids(batch_size);
 
         for (size_t b = 0; b < nbatches; b++){
-            readXvec<idx_t>(idx_input, quantization_ids.data(), batch_size, 1, true);
-            readXvecFvec<uint8_t>(base_input, batch.data(), dimension, batch_size, true);
+            readXvec<idx_t>(idx_input, quantization_ids.data(), batch_size, 1);
+            readXvecFvec<uint8_t>(base_input, batch.data(), dimension, batch_size);
 
             for (size_t i = 0; i < batch_size; i++){
                 origin_ids[i] = batch_size * b + i;
