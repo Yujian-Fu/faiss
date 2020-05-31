@@ -134,20 +134,20 @@ namespace bslib{
             this->norm_pq->compute_codes(norms.data(), x_norm_codes.data(), n);
 
             for (size_t i = 0; i < n; i++){
-                const idx_t key = idx[i];
+                const idx_t key = quantization_ids[i];
                 base_norm_codes[key].push_back(x_norm_codes[i]);
             }
         }
         else{
             for (size_t i = 0; i < n; i++){
-                const idx_t key = idx[i];
+                const idx_t key = quantization_ids[i];
                 base_norms[key].push_back(norms[i]);
             }
         }
 
         std::cout << "Adding codes to groups " << std::endl;
         for (size_t i = 0; i < n; i++){
-            const idx_t key = idx[i];
+            const idx_t key = quantization_ids[i];
             const idx_t id = origin_ids[i];
             ids[key].push_back(id);
             const uint8_t * code = residual_codes.data() + i * code_size;
@@ -155,9 +155,11 @@ namespace bslib{
                 base_codes[key].push_back(code[j]);
         }
 
+        /*
         // Free memory, if it is allocated 
         if (idx != quantization_ids)
             delete idx;
+        */
     }
 
 
