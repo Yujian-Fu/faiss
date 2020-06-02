@@ -38,9 +38,11 @@ for i in range(nc1):
         file.write(struct.pack('f', kmeans.centroids[i][j]))
 file.close()
 
+LearnSet = np.ascontiguousarray(LearnSet.astype('float32'))
 print("Assigning the LearnSet vectors to first level centroids")
 index_lists = [[] for i in range(nc1)]
 D, I = kmeans.index.search(LearnSet, 1)
+assert(I.shape[0] == LearnSet.shape[0])
 for i in range(I.shape[0]):
     index_lists[I[i][0]].append(i)
 
@@ -49,7 +51,7 @@ file = open(second_level_path, "wb")
 for i in range(nc1):
     start = time.time()
     kmeans = faiss.Kmeans(dimension, nc2, niter = niter, verbose = verbose, gpu = use_GPU)
-    train_set = LearnSet[index_lists[i], :]
+    train_set = np.ascontiguousarray(LearnSet[index_lists[i], :].astype('float32'))
     kmeans.train(train_set)
     for j in range(nc2):
         file.write(struct.pack('i', dimension))
