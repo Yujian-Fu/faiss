@@ -9,19 +9,19 @@ namespace bslib_VQ_LQ{
         this->norm_pq = new faiss::ProductQuantizer(1, 1, nbits_per_idx);
 
         code_size = pq->code_size;
+
+
         norms.resize(65536);
         precomputed_table.resize(pq->ksub * pq->M);
-
         base_codes.resize(nc);
         base_norm_codes.resize(nc);
         ids.resize(nc);
         centroid_norms.resize(nc);
-
         alphas.resize(nc);
         nn_centroid_idxs.resize(nc);
         subgroup_sizes.resize(nc);
-
         query_centroid_dists.resize(nc);
+
         std::fill(query_centroid_dists.begin(), query_centroid_dists.end(), 0);
         inter_centroid_dists.resize(nc);
     }
@@ -30,7 +30,7 @@ namespace bslib_VQ_LQ{
         this->quantizer->assign(n, x, labels, k);
     }
 
-    
+
     float BS_LIB_VQ_LQ::compute_alpha(const float * centroid_vectors, const float * points, const float * centroid,
                                       const float * centroid_vector_norms_L2sqr, size_t group_size){
         float group_numerator = 0.0;
@@ -96,6 +96,7 @@ namespace bslib_VQ_LQ{
     }
 
     void BS_LIB_VQ_LQ::compute_residuals(size_t n, const float * x, float * residuals, const float * subcentroids, const idx_t * keys){
+#pragma omp parallel for        
         for (size_t i = 0; i < n; i++){
             const float * subcentroid = subcentroids + keys[i] * dimension;
             faiss::fvec_madd(dimension, x + i * dimension, -1.0, subcentroid, residuals + i * dimension);
@@ -130,7 +131,7 @@ namespace bslib_VQ_LQ{
             const idx_t centroid_idx = group.first;
             const float * centroid = this->quantizer->xb.data() + centroid_idx * dimension;
             const std::vector<float> data = group.second;
-            const int group_size = data.size() / dimension;
+            const size_t group_size = data.size() / dimension;
 
             std::vector<idx_t> nn_centroid_idxs(nsubc);
             std::vector<float> centroid_vector_norms(nsubc);
@@ -138,12 +139,12 @@ namespace bslib_VQ_LQ{
             std::vector<float> searching_dis(nsubc + 1);
             this->quantizer->search(1, this->quantizer->xb.data() + centroid_idx * dimension, nsubc+1, searching_dis.data(), searching_idxs.data());
 
+            assert(searching_idxs[0] == centroid_idx);
             for(size_t i = 0; i < nsubc; i++){
                 nn_centroid_idxs[i] = searching_idxs[i + 1];
                 centroid_vector_norms[i] = searching_dis[i + 1];
             }
             
-
             //Compute the centroid-neighbor_centroid and centroid-group_point vectors
             std::vector<float> centroid_vectors(nsubc * dimension);
             for (size_t subc = 0; subc < nsubc; subc ++){
@@ -177,8 +178,8 @@ namespace bslib_VQ_LQ{
 
         if (train_pq){
             std::cout << "Training PQ codebook with parameter setting: M: " << pq->M << " ksub: " << pq->ksub << " and trainset size:" << train_residuals.size();
-            pq->verbose = true;
-            pq->train(n, train_residuals.data());
+            this->pq->verbose = true;
+            this->pq->train(n, train_residuals.data());
         }
 
         if (train_norm_pq){
@@ -193,7 +194,7 @@ namespace bslib_VQ_LQ{
 
             //Compute the codes
             std::vector<uint8_t> residual_codes(group_size * code_size);
-            pq->compute_codes(residuals, residual_codes.data(), group_size);
+            this->pq->compute_codes(residuals, residual_codes.data(), group_size);
 
             //Decode codes
             std::vector<float> decoded_residuals(group_size * dimension);

@@ -16,7 +16,6 @@ int main(){
     const char * path_learn = "/home/y/yujianfu/ivf-hnsw/data/SIFT1B/bigann_learn.bvecs";
     const char * path_idxs = "/home/y/yujianfu/ivf-hnsw/data/SIFT1B/precomputed_idxs_sift1b.ivecs";
 
-
     const char * path_centroids = "/home/y/yujianfu/ivf-hnsw/data/SIFT1B/centroids_sift1b.fvecs";
     const char * path_pq = "/home/y/yujianfu/ivf-hnsw/models_VQ_LQ/SIFT1B/PQ16.pq";
     const char * path_norm_pq = "/home/y/yujianfu/ivf-hnsw/models_VQ_LQ/SIFT1B/PQ16_NORM.pq";
@@ -32,10 +31,10 @@ int main(){
     size_t max_group_size = 100000;
     size_t nt = 10000000;
     size_t nsubt = 65536;
-    //size_t nsubt = 10000;
     size_t nb = 1000000000;
     size_t k = 1;
     size_t groups_per_iter = 250000;
+    size_t dimension = 128;
 
     const uint32_t batch_size = 1000000;
     const size_t nbatches = nb / batch_size;
@@ -46,24 +45,6 @@ int main(){
     else
         path_index = "/home/y/yujianfu/ivf-hnsw/models_VQ/SIFT1B/PQ16.index";
     
-    size_t dimension = 128;
-
-    std::cout << "Loading groundtruth from " << path_gt << std::endl;
-    
-    //Load Groundtruth
-    std::vector<uint32_t> groundtruth(nq * ngt);
-    {
-        std::ifstream gt_input(path_gt, std::ios::binary);
-        readXvec<uint32_t>(gt_input, groundtruth.data(), ngt, nq, false, true);
-    }
-
-    //Load Query
-    std::cout << "Loading queries from " << path_query << std::endl;
-    std::vector<float> query(nq * dimension);
-    {
-        std::ifstream query_input(path_query, std::ios::binary);
-        readXvecFvec<uint8_t>(query_input, query.data(), dimension, nq, true, true);
-    }
 
     getrusage(RUSAGE_SELF,&r_usage);
     // Print the maximum resident set size used (in kilobytes).
@@ -129,8 +110,6 @@ int main(){
         std::vector <idx_t> idxs(batch_size);
 
         for (size_t i = 0; i < nbatches; i++){
-
-
             readXvecFvec<uint8_t>(input, batch.data(), dimension, batch_size);
             index->assign(batch_size, batch.data(), idxs.data());
 
@@ -213,12 +192,23 @@ int main(){
         std::cout << "Saving index to " << path_index << std::endl;
         index->write(path_index);
 
+    }
 
+    std::cout << "Loading groundtruth from " << path_gt << std::endl;
+    
+    //Load Groundtruth
+    std::vector<uint32_t> groundtruth(nq * ngt);
+    {
+        std::ifstream gt_input(path_gt, std::ios::binary);
+        readXvec<uint32_t>(gt_input, groundtruth.data(), ngt, nq, false, true);
+    }
 
-
-
-
-
+    //Load Query
+    std::cout << "Loading queries from " << path_query << std::endl;
+    std::vector<float> query(nq * dimension);
+    {
+        std::ifstream query_input(path_query, std::ios::binary);
+        readXvecFvec<uint8_t>(query_input, query.data(), dimension, nq, true, true);
     }
 
 

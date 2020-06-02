@@ -5,7 +5,7 @@ import random
 import struct
 
 nc1 = 10000
-nc2 = 500
+nc2 = 200
 niter = 30
 train_size = 10000000
 verbose = True
@@ -48,9 +48,9 @@ for i in range(I.shape[0]):
 
 print("Training second level centroids")
 file = open(second_level_path, "wb")
+start = time.time()
 for i in range(nc1):
-    start = time.time()
-    kmeans = faiss.Kmeans(dimension, nc2, niter = niter, verbose = verbose, gpu = use_GPU)
+    kmeans = faiss.Kmeans(dimension, nc2, niter = niter, verbose = False, gpu = use_GPU)
     train_set = np.ascontiguousarray(LearnSet[index_lists[i], :].astype('float32'))
     kmeans.train(train_set)
     for j in range(nc2):
@@ -60,6 +60,7 @@ for i in range(nc1):
     end = time.time()
     if (i % 100 == 0):
         print(i, " / ", nc1, " in ", end - start, " s ")
+        start = time.time()
 file.close()
 
 '''
