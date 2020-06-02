@@ -56,7 +56,8 @@ for i in range(nc1):
         for k in range(dimension):
             file.write(struct.pack('f', kmeans.centroids[j][k]))
     end = time.time()
-    print(i, " / ", nc1, " in ", end - start, " s ")
+    if (i % 100 == 0):
+        print(i, " / ", nc1, " in ", end - start, " s ")
 file.close()
 
 '''
