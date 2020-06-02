@@ -6,7 +6,7 @@ import struct
 
 nc1 = 10000
 nc2 = 100
-niter = 20
+niter = 30
 train_size = 10000000
 verbose = True
 use_GPU = False
@@ -22,6 +22,7 @@ dimension = LearnSet[:4].view('int32')[0]
 print("The dimension of dataset is ", dimension)
 
 print("Training the first level centroids")
+file = open(first_level_path, "wb")
 start = time.time()
 LearnSet = LearnSet.reshape(-1, dimension + 4)[:, 4 :]
 SubLearnSet = LearnSet[random.sample(range(LearnSet.shape[0]), train_size), :]
@@ -31,7 +32,6 @@ kmeans.train(SubLearnSet)
 end = time.time()
 print("Finished training the first level centroids in ", end-start, "s")
 print("Saving the first level centroids")
-file = open(first_level_path, "wb")
 for i in range(nc1):
     file.write(struct.pack('i', dimension))
     for j in range(dimension):
