@@ -5,7 +5,7 @@ import random
 import struct
 
 nc1 = 10000
-nc2 = 100
+nc2 = 500
 niter = 30
 train_size = 10000000
 verbose = True
