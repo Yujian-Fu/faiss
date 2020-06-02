@@ -141,7 +141,7 @@ int main(){
             index->assign(batch_size, batch.data(), idxs.data());
 
             output.write((char *) & batch_size, sizeof(uint32_t));
-            output.write((char *) idxs.data(), batch_size * sizeof(uint32_t));
+            output.write((char *) idxs.data(), batch_size * sizeof(idx_t));
             std::cout << " [ " << stopw.getElapsedTimeMicro() / 1000000 << "s ] in " << i << " / " << nbatches << std::endl;
         }
     }
@@ -165,7 +165,7 @@ int main(){
         stopw.reset();
 
         for (size_t b = 0; b < nbatches; b++){
-            readXvec<uint32_t>(idx_input, temp_quantization_ids.data(), batch_size, 1);
+            readXvec<uint32_t>(idx_input, temp_quantization_ids.data(), batch_size, true);
             readXvecFvec<uint8_t>(base_input, batch.data(), dimension, batch_size);
 
             for (size_t i = 0; i < batch_size; i++){

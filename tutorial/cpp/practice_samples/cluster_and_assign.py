@@ -23,7 +23,7 @@ kmeans = faiss.Kmeans(d, ncentroids, niter=niter, verbose=verbose, gpu=True)
 kmeans.train(b)
 end = time.time()
 print("Dataset size: ", b.shape[0], " Ncentroids: ", ncentroids, " : ", end-start, "\n\n")
-f = open("/home/y/yujianfu/ivf-hnsw/data/SIFT1B/bigann_nc_"+str(ncentroids)+"_numtrain_" + std(train_size).fvecs", "wb")
+f = open("/home/y/yujianfu/ivf-hnsw/data/SIFT1B/bigann_nc_"+str(ncentroids)+"_numtrain_" + str(train_size)+".fvecs", "wb")
 for i in range(ncentroids):
     f.write(struct.pack('i', d))
     for j in range(d):

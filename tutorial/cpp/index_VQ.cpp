@@ -178,7 +178,7 @@ namespace bslib{
         //float centroid_dists[nq * k];
         //idx_t centroid_idxs[nq * k];
 
-        this->quantizer->search(nq, x, k, centroid_dists, centroid_idxs);
+        this->quantizer->search(nq, x, nprobe, centroid_dists, centroid_idxs);
 
         for(size_t query_id = 0; query_id < nq; query_id++){
             float query_distances[k];

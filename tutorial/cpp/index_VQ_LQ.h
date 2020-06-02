@@ -63,7 +63,7 @@ namespace bslib_VQ_LQ{
         std::vector<std::vector<float>> inter_centroid_dists;
 
     public:
-        explicit BS_LIB_VQ_LQ(size_t dimension, size_t ncentroids, size_t byte_per_code, size_t nbits_per_idx, size_t nsubcentroids, bool use_quantized_distance);
+        explicit BS_LIB_VQ_LQ(size_t dimension, size_t ncentroids, size_t bytes_per_code, size_t nbits_per_idx, size_t nsubcentroids, bool use_quantized_distance);
 
         virtual void build_quantizer(const char * centroid_path);
         virtual void assign(size_t n, const float * x, idx_t * label, size_t k = 1);
