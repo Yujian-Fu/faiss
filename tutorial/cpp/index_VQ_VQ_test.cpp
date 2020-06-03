@@ -146,7 +146,7 @@ int main(){
                 sub_idxs[i] = read_sub_idxs[i];
             }
 
-            for (size_t i = 0; i < batch_size, i++){
+            for (size_t i = 0; i < batch_size; i++){
                 origin_ids[i] = batch_size * b + i;
             }
 

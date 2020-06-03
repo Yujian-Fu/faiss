@@ -237,4 +237,14 @@ namespace bslib_VQ_VQ{
         return result;
     }
 
+    void BS_LIB_VQ_VQ::compute_centroid_norms(){
+        for (size_t i = 0; i < nc1; i++){
+            for (size_t j = 0; j < nc2; j++){
+                const float * centroid = this->quantizers[i]->xb.data() + j * dimension;
+                const float norm = faiss::fvec_norm_L2sqr(centroid, dimension);
+                centroid_norms[i].push_back(norm);
+            }
+        }
+    }
+
 }
