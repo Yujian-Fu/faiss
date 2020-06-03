@@ -38,10 +38,10 @@ namespace bslib_VQ_VQ{
         }
         
         // Checking the correctness of quantizer initialization
-        assert(this->quantizer->xb.size() == nc1);
+        assert(this->quantizer->xb.size() / dimension == nc1);
         for (size_t i = 0; i < nc1; i++)
         {
-            assert(this->quantizers[i]->xb.size() == nc2);
+            assert(this->quantizers[i]->xb.size() / dimension == nc2);
         }
         std::cout << "All quantizers are added correctly " << std::endl;
     }
