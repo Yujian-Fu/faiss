@@ -36,6 +36,7 @@ namespace bslib_VQ_VQ{
             sub_quantizer->add(nc2, subcentroids.data() + i * nc2 * dimension);
             this->quantizers.push_back(sub_quantizer);
         }
+        std::cout << "The size of quatizers is " << quantizers.size() << std::endl;
         
         // Checking the correctness of quantizer initialization
         assert(this->quantizer->xb.size() / dimension == nc1);
