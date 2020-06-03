@@ -20,14 +20,14 @@ namespace bslib_VQ_VQ{
     void BS_LIB_VQ_VQ::build_quantizer(const char * centroid_path, const char * subcentroid_path){
         this->quantizer = new faiss::IndexFlatL2(dimension);
 
-        std::cout << "Building first level quantizer " << std::endl;
+        std::cout << "Building first level quantizer with centroids " << nc1 << std::endl;
         std::ifstream centroid_input(centroid_path, std::ios::binary);
         std::vector<float> centroids(nc1 * dimension);
         readXvec<float>(centroid_input, centroids.data(), dimension, nc1, true);
         this->quantizer->add(nc1, centroids.data());
 
 
-        std::cout << "Building second level quantizer" << std::endl;
+        std::cout << "Building second level quantizer with centroids " << nc2 << std::endl;
         std::ifstream subcentroid_input(subcentroid_path, std::ios::binary);
         std::vector<float> subcentroids (nc2 * nc1 * dimension);
         readXvec<float>(subcentroid_input, subcentroids.data(), dimension, nc2 * nc1, true);
@@ -35,6 +35,8 @@ namespace bslib_VQ_VQ{
             faiss::IndexFlatL2 * sub_quantizer = new faiss::IndexFlatL2(dimension);
             sub_quantizer->add(nc2, subcentroids.data() + i * nc2 * dimension);
             this->quantizers.push_back(sub_quantizer);
+            if (i % 100 == 0)
+                std::cout << "Finished " << i << " / " << nc1 << "with quantizers size " << this->quantizers.size() << std::endl;
         }
         std::cout << "The size of quatizers is " << quantizers.size() << std::endl;
         
