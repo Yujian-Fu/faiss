@@ -2,7 +2,7 @@
 
 namespace bslib_VQ_VQ{
     BS_LIB_VQ_VQ::BS_LIB_VQ_VQ(size_t dimension, size_t nc1, size_t nc2, size_t bytes_per_code, size_t nbits_per_idx):
-        dimension(dimension), nc1(nc1), nc2(nc2), pq(nullptr)
+        dimension(dimension), pq(nullptr), nc1(nc1), nc2(nc2) 
     {
         this->pq = new faiss::ProductQuantizer(dimension, bytes_per_code, nbits_per_idx);
 
@@ -87,8 +87,7 @@ namespace bslib_VQ_VQ{
 
 
     void BS_LIB_VQ_VQ::add_batch(size_t n, const float * x, const idx_t * origin_ids, const idx_t * idxs, const idx_t * sub_idxs){
-        const idx_t * idx;
-
+        
         //Computing the residuals
         std::vector<float> residuals(n * dimension);
         compute_residuals(n, x, residuals.data(), idxs, sub_idxs);

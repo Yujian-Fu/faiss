@@ -15,15 +15,15 @@ int main(){
     const char * path_base = "/home/y/yujianfu/ivf-hnsw/data/SIFT1B/bigann_base.bvecs";
     const char * path_learn = "/home/y/yujianfu/ivf-hnsw/data/SIFT1B/bigann_learn.bvecs";
     
-    const char * path_centroids = "";
-    const char * path_subcentroids = "";
+    const char * path_centroids = "/home/y/yujianfu/ivf-hnsw/models_VQ_VQ/SIFT1B/nc1_10000_nt_10000000.fvecs";
+    const char * path_subcentroids = "/home/y/yujianfu/ivf-hnsw/models_VQ_VQ/SIFT1B/nc2_200_nt_10000000.fvecs";
     const char * path_pq = "/home/y/yujianfu/ivf-hnsw/models_VQ_VQ/SIFT1B/PQ16.pq";
-    const char * path_norm_pq = "/home/y/yujianfu/ivf-hnsw/models_VQ_VQ/SIFT1B/PQ16_NORM.pq";
-    
+
     const char * path_idxs = "/home/y/yujianfu/ivf-hnsw/models_VQ_VQ/SIFT1B/precomputed_idxs_level1.ivecs";
     const char * path_sub_idxs = "/home/y/yujianfu/ivf-hnsw/models_VQ_VQ/SIFT1B/precomputed_idxs_level2.ivecs";
 
     const char * path_index = "/home/y/yujianfu/ivf-hnsw/models_VQ_VQ/SIFT1B/PQ16_quantized.index";
+    const char * path_record = "/home/y/yujianfu/ivf-hnsw/models_VQ_VQ/SIFT1B/recording.txt";
 
     //Part 1:
     size_t bytes_per_codes = 16;
@@ -33,8 +33,8 @@ int main(){
     size_t dimension = 128;
 
     //Part 2:
-    size_t nc1;
-    size_t nc2;
+    size_t nc1 = 10000;
+    size_t nc2 = 200;
 
     //Part 3:
     size_t nb = 1000000000;
@@ -49,10 +49,32 @@ int main(){
     size_t nprobe1 = 20;
     size_t nprobe2 = 100;
 
+
+    bool is_recording = true;
+    std::ofstream recording_file;
+    recording_file.open(path_record, std::ios::app);
+
+    if (is_recording){
+        recording_file << "This is the recording file for index_VQ_VQ index structure " << std::endl;
+        recording_file << "Part1: train the PQ for compression / Part2: Assign the base vectors / Build the index and store all base vectors ";
+        time_t now = time(0);
+        char* dt = ctime(&now);
+        recording_file << "The time now is " << dt << std::endl;
+        recording_file << "The memory usage format is ru_ixrss， ru_isrss， ru_idrss， ru_maxrss" << std::endl;
+        recording_file << "Now starting the indexing process " << std::endl;
+    }
+    
     std::cout << "Now starting the indexing process " << std::endl;
+    
+    
     struct rusage r_usage;
     getrusage(RUSAGE_SELF,&r_usage);
-    std::cout << std::endl << "Memory usage: " << r_usage.ru_ixrss << " / " << r_usage.ru_isrss << " / " << r_usage.ru_idrss << " / " << r_usage.ru_maxrss << std::endl;
+    std::cout << std::endl << "Initial Memory usage: " << r_usage.ru_ixrss << " / " << r_usage.ru_isrss << " / " << r_usage.ru_idrss << " / " << r_usage.ru_maxrss << std::endl;
+    
+    if (is_recording)
+        recording_file << "Initial Memory usage: " << r_usage.ru_ixrss << " / " << r_usage.ru_isrss << " / " << r_usage.ru_idrss << " / " << r_usage.ru_maxrss << std::endl;
+    StopW stopw = StopW();
+
 
     //Initialize the index
     std::cout << "Initializing the index " << std::endl;
@@ -85,14 +107,19 @@ int main(){
         faiss::write_ProductQuantizer(index->pq, path_pq);
     }
 
+    //*******************************************************//
+    std::cout << "The time for PQ training: " << stopw.getElapsedTimeMicro() / 1000000 << "us" << std::endl;
     getrusage(RUSAGE_SELF,&r_usage);
-    // Print the maximum resident set size used (in kilobytes).
-    // printf("Memory usage: %ld kilobytes\n",r_usage.ru_maxrss);
-    std::cout << std::endl << "Memory usage: " << r_usage.ru_ixrss << " / " << r_usage.ru_isrss << " / " << r_usage.ru_idrss << " / " << r_usage.ru_maxrss << std::endl;
+    std::cout << std::endl << "Memory usage after PQ: " << r_usage.ru_ixrss << " / " << r_usage.ru_isrss << " / " << r_usage.ru_idrss << " / " << r_usage.ru_maxrss << std::endl;
+    if (is_recording){
+        recording_file << "The time for PQ training: " << stopw.getElapsedTimeMicro() / 1000000 << "us" << std::endl;
+        recording_file << "Memory usage after PQ: " << r_usage.ru_ixrss << " / " << r_usage.ru_isrss << " / " << r_usage.ru_idrss << " / " << r_usage.ru_maxrss << std::endl;
+    }
+    //*******************************************************//
 
-    StopW stopw = StopW();
     //Assign all base vectors
     if (! (exists(path_idxs) && exists(path_sub_idxs))){
+        stopw.reset();
         std::cout << "Assigning all base vectors " << std::endl;
         std::ifstream input (path_base, std::ios::binary);
         std::ofstream output1 (path_idxs, std::ios::binary);
@@ -117,13 +144,29 @@ int main(){
             output2.write((char *) & batch_size, sizeof(uint32_t));
             output2.write((char *) save_sub_idxs.data(), batch_size * sizeof(uint32_t));
         }
+        //*******************************************************//
+        std::cout << "The time for assigning base vectors: " << stopw.getElapsedTimeMicro() / 1000000 << "us" << std::endl;
+        getrusage(RUSAGE_SELF,&r_usage);
+        std::cout << std::endl << "Memory usage after assigning vectors: " << r_usage.ru_ixrss << " / " << r_usage.ru_isrss << " / " << r_usage.ru_idrss << " / " << r_usage.ru_maxrss << std::endl;
+        if (is_recording){
+            recording_file << "The time for assigning base vectors: " << stopw.getElapsedTimeMicro() / 1000000 << "us" << std::endl;
+            recording_file << "Memory usage after assigning vectors: " << r_usage.ru_ixrss << " / " << r_usage.ru_isrss << " / " << r_usage.ru_idrss << " / " << r_usage.ru_maxrss << std::endl;
+        }
+        //*******************************************************//
     }
 
     if (exists(path_index)){
         std::cout << "Loading index from " << path_index << std::endl;
         index->read(path_index);
+        //*******************************************************//
+        getrusage(RUSAGE_SELF,&r_usage);
+        std::cout << std::endl << "Memory usage after loading index: " << r_usage.ru_ixrss << " / " << r_usage.ru_isrss << " / " << r_usage.ru_idrss << " / " << r_usage.ru_maxrss << std::endl;
+        if (is_recording)
+            recording_file << "Memory usage after loading index: " << r_usage.ru_ixrss << " / " << r_usage.ru_isrss << " / " << r_usage.ru_idrss << " / " << r_usage.ru_maxrss << std::endl;
+        //*******************************************************//
     }
     else{
+        stopw.reset();
         std::cout << "Constructing the index " << std::endl;
         std::ifstream base_input(path_base, std::ios::binary);
         std::ifstream idx_input(path_idxs, std::ios::binary);
@@ -151,7 +194,8 @@ int main(){
             }
 
             index->add_batch(batch_size, batch.data(), origin_ids.data(), idxs.data(), sub_idxs.data());
-            std::cout << " [ " << stopw.getElapsedTimeMicro() / 1000000 << "s ] in " << b << " / " << nbatches << std::endl;
+            if (b % 10 == 0)
+                std::cout << " [ " << stopw.getElapsedTimeMicro() / 1000000 << "s ] in " << b << " / " << nbatches << std::endl;
         }
 
         std::cout << "computing the centroid norms " << std::endl;
@@ -159,8 +203,18 @@ int main(){
 
         std::cout << "Saving index to " << path_index << std::endl;
         index->write(path_index);
+        //*******************************************************//
+        std::cout << "Time for constructing index: " << stopw.getElapsedTimeMicro() / 1000000 << std::endl;
+        getrusage(RUSAGE_SELF,&r_usage);
+        std::cout << std::endl << "Memory usage after loading index: " << r_usage.ru_ixrss << " / " << r_usage.ru_isrss << " / " << r_usage.ru_idrss << " / " << r_usage.ru_maxrss << std::endl;
+        if (is_recording){
+        recording_file << "Time for constructing index: " << stopw.getElapsedTimeMicro() / 1000000 << std::endl;
+        recording_file << "Memory usage after loading index: " << r_usage.ru_ixrss << " / " << r_usage.ru_isrss << " / " << r_usage.ru_idrss << " / " << r_usage.ru_maxrss << std::endl;
+        }
+        //*******************************************************//
     }
 
+    recording_file.close();
     std::cout << "Loading groundtruth from " << path_gt << std::endl;
     //Load Groundtruth
     std::vector<uint32_t> groundtruth(nq * ngt);
@@ -169,7 +223,6 @@ int main(){
         readXvec<uint32_t>(gt_input, groundtruth.data(), ngt, nq, false, true);
     }
 
-
     //Load Query
     std::cout << "Loading queries from " << path_query << std::endl;
     std::vector<float> query(nq * dimension);
@@ -177,24 +230,19 @@ int main(){
         std::ifstream query_input(path_query, std::ios::binary);
         readXvecFvec<uint8_t>(query_input, query.data(), dimension, nq, true, true);
     }
-    getrusage(RUSAGE_SELF,&r_usage);
-    // Print the maximum resident set size used (in kilobytes).
-    // printf("Memory usage: %ld kilobytes\n",r_usage.ru_maxrss);
-    std::cout << std::endl << "Memory usage: " << r_usage.ru_ixrss << " / " << r_usage.ru_isrss << " / " << r_usage.ru_idrss << " / " << r_usage.ru_maxrss << std::endl;
 
-    /*
     //Search
     index->nprobe1 = nprobe1;
     index->nprobe2 = nprobe2;
-    index->max_vectors = 10000;
+    index->max_vectors = max_vectors;
 
     std::cout << "Starting Searching " << std::endl;
     std::vector<float> distances(nq * k);
     std::vector<idx_t> labels(nq * k);
     size_t correct = 0;
-    StopW stopw = StopW();
+    StopW searching_stopw = StopW();
     index->search(nq, k, query.data(), distances.data(), labels.data());
-    const float time_us_per_query = stopw.getElapsedTimeMicro() / nq;
+    const float time_us_per_query = searching_stopw.getElapsedTimeMicro() / nq;
 
     for (size_t i = 0; i < nq; i++){
         std::unordered_set<idx_t> gt;
@@ -211,7 +259,5 @@ int main(){
 
     std::cout << "Recall@ " << k << " : " << correct / (nq * k) << std::endl;
     std::cout << "Time per query " << time_us_per_query << " us" << std::endl;
-
-    */
 
 }
