@@ -77,7 +77,7 @@ namespace bslib_VQ_VQ{
         compute_residuals(n, x, residuals.data(), assigned_labels.data(), assigned_sub_labels.data());
 
         std::cout << "Training residual PQ with parameter setting: M: " << pq->M << "Number of centroids: " << pq->ksub << std::endl;
-        this->pq->verbose = true;
+        this->pq->verbose = false;
         this->pq->train(n, residuals.data());
     }
 
