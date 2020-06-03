@@ -34,9 +34,10 @@ namespace bslib_VQ_VQ{
         for (size_t i = 0; i < nc1; i++){
             faiss::IndexFlatL2 * sub_quantizer = new faiss::IndexFlatL2(dimension);
             sub_quantizer->add(nc2, subcentroids.data() + i * nc2 * dimension);
-            this->quantizers.push_back(sub_quantizer);
-            if (i % 100 == 0)
-                std::cout << "Finished " << i << " / " << nc1 << "with quantizers size " << this->quantizers.size() << std::endl;
+            this->quantizers[i] = sub_quantizer;
+            
+            //if (i % 100 == 0)
+                //std::cout << "Finished " << i << " / " << nc1 << "with quantizers size " << this->quantizers.size() << std::endl;
         }
         std::cout << "The size of quatizers is " << quantizers.size() << std::endl;
         
