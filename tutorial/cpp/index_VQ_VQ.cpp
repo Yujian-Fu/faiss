@@ -67,7 +67,7 @@ namespace bslib_VQ_VQ{
     }
 
     void BS_LIB_VQ_VQ::train_pq(size_t n, const float * x){
-        std::cout << "The existing first level centroid size is" << this->quantizer->xb.size() / dimension << std::endl;
+        std::cout << "The existing first level centroid size is " << this->quantizer->xb.size() / dimension << std::endl;
         std::cout << "The existing second level centroid size is " << this->quantizers.size() * this->quantizers[0]->xb.size() / dimension << std::endl;
         std::vector<idx_t> assigned_labels(n);
         std::vector<idx_t> assigned_sub_labels(n);

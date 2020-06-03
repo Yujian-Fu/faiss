@@ -10,10 +10,12 @@ using namespace bslib_VQ_VQ;
 typedef faiss::Index::idx_t idx_t;
 
 int main(){
+    const char * path_learn = "/home/y/yujianfu/ivf-hnsw/data/SIFT1B/bigann_learn.bvecs";
     const char * path_gt = "/home/y/yujianfu/ivf-hnsw/data/SIFT1B/gnd/idx_1000M.ivecs";
+
     const char * path_query = "/home/y/yujianfu/ivf-hnsw/data/SIFT1B/bigann_learn.bvecs";
     const char * path_base = "/home/y/yujianfu/ivf-hnsw/data/SIFT1B/bigann_base.bvecs";
-    const char * path_learn = "/home/y/yujianfu/ivf-hnsw/data/SIFT1B/bigann_learn.bvecs";
+    
     
     const char * path_centroids = "/home/y/yujianfu/ivf-hnsw/models_VQ_VQ/SIFT1B/nc1_10000_nt_10000000.fvecs";
     const char * path_subcentroids = "/home/y/yujianfu/ivf-hnsw/models_VQ_VQ/SIFT1B/nc2_200_nt_10000000.fvecs";
@@ -60,7 +62,7 @@ int main(){
         time_t now = time(0);
         char* dt = ctime(&now);
         recording_file << "The time now is " << dt << std::endl;
-        recording_file << "The memory usage format is ru_ixrss， ru_isrss， ru_idrss， ru_maxrss" << std::endl;
+        recording_file << "The memory usage format is ixrss， isrss， idrss， maxrss" << std::endl;
         recording_file << "Now starting the indexing process " << std::endl;
     }
     
@@ -108,11 +110,11 @@ int main(){
     }
 
     //*******************************************************//
-    std::cout << "The time for PQ training: " << stopw.getElapsedTimeMicro() / 1000000 << "us" << std::endl;
+    std::cout << "The time for PQ training: " << stopw.getElapsedTimeMicro() / 1000000 << "s" << std::endl;
     getrusage(RUSAGE_SELF,&r_usage);
     std::cout << std::endl << "Memory usage after PQ: " << r_usage.ru_ixrss << " / " << r_usage.ru_isrss << " / " << r_usage.ru_idrss << " / " << r_usage.ru_maxrss << std::endl;
     if (is_recording){
-        recording_file << "The time for PQ training: " << stopw.getElapsedTimeMicro() / 1000000 << "us" << std::endl;
+        recording_file << "The time for PQ training: " << stopw.getElapsedTimeMicro() / 1000000 << "s" << std::endl;
         recording_file << "Memory usage after PQ: " << r_usage.ru_ixrss << " / " << r_usage.ru_isrss << " / " << r_usage.ru_idrss << " / " << r_usage.ru_maxrss << std::endl;
     }
     //*******************************************************//
@@ -139,17 +141,19 @@ int main(){
                 save_idxs[j] = idxs[j];
                 save_sub_idxs[j] = sub_idxs[j];
             }
+        if (i % 10 == 0)
+                std::cout << " [ " << stopw.getElapsedTimeMicro() / 1000000 << "s ] in " << i << " / " << nbatches << std::endl;
             output1.write((char *) & batch_size, sizeof(uint32_t));
             output1.write((char *) save_idxs.data(), batch_size * sizeof(uint32_t));
             output2.write((char *) & batch_size, sizeof(uint32_t));
             output2.write((char *) save_sub_idxs.data(), batch_size * sizeof(uint32_t));
         }
         //*******************************************************//
-        std::cout << "The time for assigning base vectors: " << stopw.getElapsedTimeMicro() / 1000000 << "us" << std::endl;
+        std::cout << "The time for assigning base vectors: " << stopw.getElapsedTimeMicro() / 1000000 << "s" << std::endl;
         getrusage(RUSAGE_SELF,&r_usage);
         std::cout << std::endl << "Memory usage after assigning vectors: " << r_usage.ru_ixrss << " / " << r_usage.ru_isrss << " / " << r_usage.ru_idrss << " / " << r_usage.ru_maxrss << std::endl;
         if (is_recording){
-            recording_file << "The time for assigning base vectors: " << stopw.getElapsedTimeMicro() / 1000000 << "us" << std::endl;
+            recording_file << "The time for assigning base vectors: " << stopw.getElapsedTimeMicro() / 1000000 << "s" << std::endl;
             recording_file << "Memory usage after assigning vectors: " << r_usage.ru_ixrss << " / " << r_usage.ru_isrss << " / " << r_usage.ru_idrss << " / " << r_usage.ru_maxrss << std::endl;
         }
         //*******************************************************//
@@ -204,11 +208,11 @@ int main(){
         std::cout << "Saving index to " << path_index << std::endl;
         index->write(path_index);
         //*******************************************************//
-        std::cout << "Time for constructing index: " << stopw.getElapsedTimeMicro() / 1000000 << std::endl;
+        std::cout << "Time for constructing index: " << stopw.getElapsedTimeMicro() / 1000000 << "s" << std::endl;
         getrusage(RUSAGE_SELF,&r_usage);
         std::cout << std::endl << "Memory usage after loading index: " << r_usage.ru_ixrss << " / " << r_usage.ru_isrss << " / " << r_usage.ru_idrss << " / " << r_usage.ru_maxrss << std::endl;
         if (is_recording){
-        recording_file << "Time for constructing index: " << stopw.getElapsedTimeMicro() / 1000000 << std::endl;
+        recording_file << "Time for constructing index: " << stopw.getElapsedTimeMicro() / 1000000 << "s" << std::endl;
         recording_file << "Memory usage after loading index: " << r_usage.ru_ixrss << " / " << r_usage.ru_isrss << " / " << r_usage.ru_idrss << " / " << r_usage.ru_maxrss << std::endl;
         }
         //*******************************************************//
