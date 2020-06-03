@@ -68,9 +68,8 @@ namespace bslib_VQ_LQ{
         virtual void build_quantizer(const char * centroid_path);
         virtual void assign(size_t n, const float * x, idx_t * label, size_t k = 1);
         virtual void train_pq(size_t n, const float * x, bool train_pq, bool train_norm_pq);
-        virtual void compute_residuals(size_t n, const float * x, float * residuals, const idx_t * keys);
         virtual void reconstruct(size_t n, float * x, const float * decoded_residuals, const float * subcentroids, const idx_t * keys);
-        virtual void add_group(size_t centroid_idx, size_t group_size, const float * data, const idx_t * idxs);
+        virtual void add_group(size_t centroid_idx, size_t group_size, const float * data, const idx_t * idxs, bool use_quantized_dis);
         virtual void search(size_t nq, size_t k, const float * x, float * distances, idx_t * labels);
         virtual float pq_L2sqr(const uint8_t *code);
         virtual void write(const char * path_index);

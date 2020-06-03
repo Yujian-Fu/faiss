@@ -181,7 +181,7 @@ int main(){
                 for (size_t k = 0; k < group_size * dimension ; k++)
                     group_data[k] = 1.0 * data[i][k];
                 
-                index->add_group(ngroups_added + i, group_size, group_data.data(), ids[i].data());
+                index->add_group(ngroups_added + i, group_size, group_data.data(), ids[i].data(), use_quantized_distance);
             }
         }
         std::cout << "Compputing centroid norms" << std::endl;

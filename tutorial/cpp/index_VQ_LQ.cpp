@@ -223,13 +223,14 @@ namespace bslib_VQ_LQ{
     }
 
     void BS_LIB_VQ_LQ::reconstruct(size_t n, float * x, const float * decoded_residuals, const float * subcentroids, const idx_t * keys){
+#pragma omp parallel for        
         for (size_t i = 0; i < n; i++){
             const float * subcentroid = subcentroids  + dimension * keys[i];
             faiss::fvec_madd(dimension, decoded_residuals + i * dimension, 1.0, subcentroid, x + i * dimension);
         }
     }
 
-    void BS_LIB_VQ_LQ::add_group(size_t centroid_idx, size_t group_size, const float * data, const idx_t * idxs){
+    void BS_LIB_VQ_LQ::add_group(size_t centroid_idx, size_t group_size, const float * data, const idx_t * idxs, bool use_quantized_dis){
         const float * centroid = quantizer->xb.data() + centroid_idx * dimension;
         std::vector<idx_t> searching_idxs(nsubc + 1);
         std::vector<float> searching_distance(nsubc+1);
@@ -273,7 +274,7 @@ namespace bslib_VQ_LQ{
 
         //Compute the residuals
         std::vector<float> residuals(group_size * dimension);
-        compute_residuals(group_size, data, residuals.data(), subcentroid_idxs.data());
+        compute_residuals(group_size, data, residuals.data(), subcentroids.data(), subcentroid_idxs.data());
 
         //Encode the base residuals
         std::vector<uint8_t> residual_codes(group_size * code_size);
@@ -291,21 +292,43 @@ namespace bslib_VQ_LQ{
         std::vector<float> norms(group_size);
         faiss::fvec_norms_L2sqr(norms.data(), reconstructed_x.data(), dimension, group_size);
 
-        //Compute norm codes
-        std::vector<uint8_t> xnorm_codes(group_size);
-        this->norm_pq->compute_codes(norms.data(), xnorm_codes.data(), group_size);
+        if (use_quantized_dis){
+            //Compute norm codes
+            std::vector<uint8_t> xnorm_codes(group_size);
+            this->norm_pq->compute_codes(norms.data(), xnorm_codes.data(), group_size);
+
+
+            std::vector<std::vector<uint8_t>> construction_norm_codes(nsubc);
+            for (size_t i = 0; i < group_size; i++){
+                idx_t subcentroid_idx = subcentroid_idxs[i];
+                construction_norm_codes[subcentroid_idx].push_back(xnorm_codes[i]);
+            }
+            for (size_t subc = 0; subc < nsubc; subc++){
+                for(size_t i = 0; i < group_size; i++){
+                    base_norm_codes[centroid_idx].push_back(construction_norm_codes[subc][i]);
+                }
+            }
+        }
+        else{
+            std::vector<std::vector<float>> construction_norm(nsubc);
+            for (size_t i = 0; i < group_size; i++){
+                idx_t subcentroid_idx = subcentroid_idxs[i];
+                construction_norm[subcentroid_idx].push_back(norms[i]);
+            }
+            for (size_t subc = 0; subc < nsubc; subc++){
+                for(size_t i = 0; i < group_size; i++){
+                    base_norms[centroid_idx].push_back(construction_norm[subc][i]);
+                }
+            }
+        }
 
         //Assign the code to the index
         std::vector<std::vector<idx_t>> construction_ids(nsubc);
         std::vector<std::vector<uint8_t>> construction_codes(nsubc);
-        std::vector<std::vector<uint8_t>> construction_norm_codes(nsubc);
-
         for (size_t i = 0; i < group_size; i++){
             idx_t idx = idxs[i];
             idx_t subcentroid_idx = subcentroid_idxs[i];
-
             construction_ids[subcentroid_idx].push_back[idx];
-            construction_norm_codes[subcentroid_idx].push_back(xnorm_codes[i]);
             for (size_t j = 0 ; j < code_size; j++)
                 construction_codes[subcentroid_idx].push_back(residual_codes[i *code_size + j]);
             
@@ -320,7 +343,6 @@ namespace bslib_VQ_LQ{
                 ids[centroid_idx].push_back(construction_ids[subc][i]);
                 for (size_t j = 0; j < code_size; j++)
                     base_codes[centroid_idx].push_back(construction_codes[subc][i * code_size + j]);
-                base_norm_codes[centroid_idx].push_back(construction_norm_codes[subc][i]);
             }
         }
     }
