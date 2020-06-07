@@ -175,7 +175,7 @@ namespace bslib{
             }
         }
         for (size_t i = 0; i < k; i++){
-            std::cout << labels[i] << " ";
+            std::cout << labels[i] << "_" << dists[i] << " ";
         }
         std::cout << std::endl;
     }
