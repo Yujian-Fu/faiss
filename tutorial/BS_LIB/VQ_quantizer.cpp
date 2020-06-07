@@ -56,10 +56,6 @@ namespace bslib{
             this->quantizers[group_id[i]].search(1, instances + i * dimension, k, query_dists.data() + i * k, query_labels.data() + i * k);
         }
         
-        for (size_t i = 0; i < k; i++){
-            std::cout << query_labels[i] << " ";
-        }
-        std::cout << std::endl;
 
         for (size_t i = 0; i < n; i++){
             size_t base_idx = CentroidDistributionMap[group_id[i]];
@@ -68,6 +64,10 @@ namespace bslib{
                 dists[i] = query_dists[i * k + j];
             }
         }
+        for (size_t i = 0; i < k; i++){
+            std::cout << labels[i] << "_" << query_labels[i];
+        }
+        std::cout << std::endl;
 
 
     }
