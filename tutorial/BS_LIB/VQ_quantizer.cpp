@@ -67,6 +67,11 @@ namespace bslib{
                 dists[i] = query_dists[i * k + j];
             }
         }
+
+        for (size_t i = 0; i < 100; i++){
+            std::cout << labels[i] << " ";
+        }
+        std::cout << std::endl;
     }
 
     void VQ_quantizer::compute_final_centroid(idx_t label, float * final_centroid){
