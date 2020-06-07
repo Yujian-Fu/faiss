@@ -80,8 +80,8 @@ namespace bslib{
                 const float * nn_centroid = this->upper_centroids.data() + this->nn_centroid_idxs[i][j] * dimension;
                 faiss::fvec_madd(dimension, nn_centroid, -1.0, centroid, centroid_vectors.data()+ j * dimension);
             }
-            std::cout << std::endl;
             size_t group_size = train_set[i].size() / this->dimension;
+            if ( i % 100 == 0)
             std::cout << "Computing alpha for [ " << i << " / " << nc_upper << " ]" << std::endl;
             this->alphas[i] = compute_alpha(centroid_vectors.data(), train_set[i].data(), centroid, nn_centroid_dists[i].data(), group_size);
         }

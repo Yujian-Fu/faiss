@@ -24,7 +24,7 @@ namespace bslib{
         for (size_t i = 0; i < nc_upper; i++){
             assert(vq_quantizer.quantizers[i].xb.size() == nc_per_group * dimension);
         }
-        if (!update_idxs){
+        if (update_idxs){
             assert(vq_quantizer.all_quantizer.xb.size() == vq_quantizer.nc * dimension);
         }
         this->vq_quantizer_index.push_back(vq_quantizer);
@@ -35,7 +35,7 @@ namespace bslib{
         ShowMessage("Building centroids for lq quantizer");
         lq_quantizer.build_centroids(this->train_data.data(), this->nt, this->train_data_idxs.data(), update_idxs);
         //Check whether all centroids are added in all_quantizer correctly 
-        if (!update_idxs){
+        if (update_idxs){
             ShowMessage("Checking whether all centroids are added correctly");
             assert(lq_quantizer.all_quantizer.xb.size() == nc_upper * nc_per_group * dimension);
         }
