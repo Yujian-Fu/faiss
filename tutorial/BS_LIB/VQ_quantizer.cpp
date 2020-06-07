@@ -6,6 +6,7 @@ namespace bslib{
 
 
     void VQ_quantizer::build_centroids(const float * train_data, size_t train_set_size, idx_t * train_data_idxs){
+        std::cout << "Adding " << train_set_size << " train set data into " << nc_upper << " group ";
         std::vector<std::vector<float>> train_set;
         train_set.resize(nc_upper);
 
@@ -14,6 +15,7 @@ namespace bslib{
             train_set[idx].push_back(train_data[i]);
         }
 
+        std::cout << "Building all_quantizer and group quantizers for vq_quantizer " << std::endl;
         this->all_quantizer = faiss::IndexFlatL2(dimension);
         for (size_t i = 0; i < nc_upper; i++){
             std::vector<float> centroids(dimension * nc_per_group);
@@ -25,6 +27,7 @@ namespace bslib{
             this->quantizers.push_back(centroid_quantizer);
         }
 
+        std::cout << "Finding the centroid idxs for train vectors for futher quantizer construction " << std::endl;
         //Find the centroid idxs for train vectors
         std::vector<float> centroid_distances(train_set_size);
         std::vector<faiss::Index::idx_t> centroid_idxs(train_set_size);

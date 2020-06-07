@@ -16,6 +16,10 @@ int main(){
     time_recorder Trecorder = time_recorder();
     std::string message;
 
+/*Prepare the work space*/
+    PrepareFolder(folder_model);
+    PrepareFolder((char *) (std::string(folder_model)+"/SIFT1B").c_str());
+
     //For recording 
     std::ofstream record_file;
     if (is_recording){
@@ -29,10 +33,6 @@ int main(){
     }
 
 
-/*Prepare the work space*/
-    PrepareFolder(folder_model);
-    PrepareFolder((char *) (std::string(folder_model)+"/SIFT1B").c_str());
-
 /*Train the residual PQ and norm PQ*/
     
     //Initialize the index
@@ -43,7 +43,7 @@ int main(){
     index->subnt = subnt;
     index->build_quantizers(ncentroids, path_quantizers, path_learn);
     index->get_final_nc();
-    message = "Initializing the index, ";
+    message = "Initialized the index, ";
     Mrecorder.print_memory_usage(message);
     Mrecorder.record_memory_usage(record_file,  message);
     Trecorder.print_time_usage(message);

@@ -19,6 +19,7 @@ namespace bslib{
         ShowMessage("Building centroids for vq quantizer");
         vq_quantizer.build_centroids(this->train_data.data(), this->nt, this->train_data_idxs.data());
         //Check whether all quantizer vectors are added correctly
+        ShowMessage("Checking whether all centroids are added correctly");
         for (size_t i = 0; i < nc_upper; i++){
             assert(vq_quantizer.quantizers[i].xb.size() == nc_per_group * dimension);
         }
@@ -114,6 +115,7 @@ namespace bslib{
             read_quantizers(path_quantizers);
         }
         else{
+        ShowMessage("No preconstructed quantizers, constructing quantizers");
         //Load the train set into the index
         bool use_subset = true;
         this->train_data.resize(this->nt * this->dimension);
@@ -124,6 +126,7 @@ namespace bslib{
             this->train_data_idxs[i] = 0;
         }
         if (use_subset){
+            ShowMessage("Using subset of the train set, saving sub train set");
             std::vector<float> train_subset(this->subnt * this->dimension);
             RandomSubset(this->train_data.data(), train_subset.data(), this->dimension, this->nt, this->subnt);
             train_data.resize(this->subnt * this->dimension);
