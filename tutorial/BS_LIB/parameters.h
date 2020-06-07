@@ -34,21 +34,3 @@ size_t keep_space[4] = {5, 5, 5, 5};
 
 
 bool is_recording = true;
-// Folder path
-const char * folder_model = "/home/y/yujianfu/ivf-hnsw/models_VQ_VQ_VQ_LQ";
-const char * folder_data = "/home/y/yujianfu/ivf-hnsw/data";
-
-//File paths
-const char * path_learn = (char *) (std::string(folder_data) + "/SIFT1B/bigann_learn.bvecs").c_str();
-const char * path_pq = (char *) ((std::string(folder_model) + "/SIFT1B/PQ16.pq").c_str());
-const char * path_pq_norm = (char *) ((std::string (folder_model) + "SIFT1B/PQ_NORM.pq").c_str());
-
-const char * path_base = (char *) (std::string(folder_data) + "/SIFT1B/bigann_base.bvecs").c_str();
-const char * path_idxs = (char *) (std::string(folder_model) + "/SIFT1B/base_idxs.ivecs").c_str();
-
-const char * path_index = (char *) (std::string(folder_model) + "/SIFT1B/PQ16.index").c_str();
-
-const char * path_gt = (char *) (std::string(folder_data) + "/SIFT1B/gnd/idx_1000M.ivecs").c_str();
-const char * path_query = (char *) (std::string(folder_data) + "/SIFT1B/bigann_learn.bvecs").c_str();
-
-const char * path_record = (char *) (std::string(folder_model) + "/SIFT1B/recording.txt").c_str();
