@@ -148,11 +148,13 @@ namespace bslib{
 
     void LQ_quantizer::search_in_group(size_t n, const float * queries, size_t k, float * dists, idx_t * labels, const idx_t * group_id){
         for (size_t i = 0; i < n; i++){
+            
             std::vector<float> query_dists(k);
             std::vector<faiss::Index::idx_t> query_labels(k);
             const float * query = queries + i * dimension;
             faiss::IndexFlatL2 group_quantizer(dimension);
             size_t query_group_id = group_id[i];
+            std::cout << "The group id is " << query_group_id <<std::endl;
             std::vector<float> sub_centroids(nc_per_group * dimension);
             for (size_t label = CentroidDistributionMap[query_group_id]; label < CentroidDistributionMap[query_group_id] + this->nc_per_group; label++){
                 compute_final_centroid(label, sub_centroids.data() + (label - CentroidDistributionMap[query_group_id]) * dimension);
