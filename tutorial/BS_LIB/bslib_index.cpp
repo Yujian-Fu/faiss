@@ -115,6 +115,7 @@ namespace bslib{
         encode(this->nt, this->train_data.data(), group_ids.data(), residuals.data());
         this->pq.verbose = true;
         this->pq.train(nt, residuals.data());
+        faiss::write_ProductQuantizer(& this->pq, path_pq);
 
         std::vector<float> reconstructed_x(dimension * this->nt);
         decode(this->nt, residuals.data(), group_ids.data(), reconstructed_x.data());
@@ -124,7 +125,6 @@ namespace bslib{
         }
         this->norm_pq.verbose = true;
         this->norm_pq.train(this->nt, xnorm.data());
-        faiss::write_ProductQuantizer(& this->pq, path_pq);
         faiss::write_ProductQuantizer(& this->norm_pq, path_norm_pq);
     }
 
