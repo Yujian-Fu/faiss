@@ -8,8 +8,8 @@ namespace bslib{
             size_t num_centroids = 0;
             for (size_t i = 0; i < nc_upper; i++){
                 size_t group_size = nc_per_group;
-                num_centroids += group_size;
                 this->CentroidDistributionMap[i] = num_centroids;
+                num_centroids += group_size;
             }
         }
 }
