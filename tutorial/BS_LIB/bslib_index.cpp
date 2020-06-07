@@ -364,12 +364,13 @@ namespace bslib{
             for (size_t i = 0; i < k; i++){
                 sub_ids[i] = ids[k-i-1];
                 sub_dists[i] = dists[k-i-1];
+                std::cout << sub_ids[i] << "_" << sub_dists[i] << " ";
             }
+            std::cout << std::endl;
         }
-        std::cout << "Finished keep kmin function " << std::endl;
     }
 
-    
+
     float Bslib_Index::pq_L2sqr(const uint8_t *code)
     {
         float result = 0.;
@@ -427,8 +428,6 @@ namespace bslib{
                     }
                     n_lq ++;
                 }
-
-                std::cout << "Finished " << j << " th level search " << std::endl;
                 
                 keep_k_min(search_result_space, keep_result_space, resuld_q_c_dists.data(), result_ids.data(), search_q_c_dists.data(), search_ids.data());
             }
