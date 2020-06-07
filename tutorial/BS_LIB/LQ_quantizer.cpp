@@ -147,6 +147,8 @@ namespace bslib{
     }
 
     void LQ_quantizer::search_in_group(size_t n, size_t k, float * dists, idx_t * labels, const idx_t * group_id, const float * query_centroid_dists){
+        std::cout << "The query group id is " << group_id[0] << std::endl;
+
         std::vector<float> query_dists(k);
         std::vector<faiss::Index::idx_t> query_labels(k);
         faiss::maxheap_heapify(k, query_dists.data(), query_labels.data());
@@ -166,12 +168,13 @@ namespace bslib{
                 }
             }
             size_t base_idx = CentroidDistributionMap[group_id[i]];
+            std::cout << "The base idx is " << base_idx << std::endl;
             for (size_t j = 0; j < k; j++){
-                dists[i * k + j] = query_dists[k-1-j];
-                labels[i * k + j] = base_idx + query_labels[k-1-j];
+                dists[i * k + j] = query_dists[j];
+                labels[i * k + j] = base_idx + query_labels[j];
             }
         }
-        for (size_t i = 0; i < 100; i++){
+        for (size_t i = 0; i < k; i++){
             std::cout << labels[i] << " ";
         }
         std::cout << std::endl;

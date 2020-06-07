@@ -361,9 +361,10 @@ namespace bslib{
                 }
             }
 
+            std::cout << "The kept choices " << std::endl;
             for (size_t i = 0; i < k; i++){
-                sub_ids[i] = ids[k-i-1];
-                sub_dists[i] = dists[k-i-1];
+                sub_ids[i] = ids[i];
+                sub_dists[i] = dists[i];
                 std::cout << ids[i] << "_" << dists[i] << " ";
             }
             std::cout << std::endl;
