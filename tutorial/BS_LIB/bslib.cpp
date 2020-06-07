@@ -116,6 +116,11 @@ int main(){
     }
     else{
         ShowMessage("Constructing the index");
+        index->base_codes.resize(index->final_nc);
+        index->base_norm_codes.resize(index->final_nc);
+        index->origin_ids.resize(index->final_nc);
+
+
         Trecorder.reset();
         std::ifstream base_input(path_base, std::ios::binary);
         std::ifstream idx_input(path_idxs, std::ios::binary);
@@ -138,6 +143,9 @@ int main(){
                 Trecorder.print_time_usage("");
             }
         }
+
+        index->centroid_norms.resize(index->final_nc);
+        index->centroid_norm_codes.resize(index->final_nc * index->norm_code_size);
 
         index->compute_centroid_norm();
         index->write_index(path_index);

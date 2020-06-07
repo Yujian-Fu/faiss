@@ -131,27 +131,9 @@ namespace bslib{
     void LQ_quantizer::compute_residual_group_id(size_t n, const idx_t * labels, const float * x, float * residuals){
         for (size_t i = 0; i < n; i++){
             std::vector<float> final_centroid(dimension);
-            if (i == 999999){
-                std::cout << labels[i] << " " << i << " " << std::endl;;
-                for (size_t j = 0; j < dimension; j++){
-                    std::cout << x[i * dimension + j] << " ";
-                }
-                std::cout << std::endl;
-            }
-
             compute_final_centroid(labels[i], final_centroid.data());
-            
-            if (i == 999999){
-                std::cout << "Finished compute one final centroid " << std::endl;
-                std::cout << labels[i] << " " << i << " " << std::endl;;
-                for (size_t j = 0; j < dimension; j++){
-                    std::cout << x[i * dimension + j] << " ";
-                }
-                std::cout << std::endl;
-            }
             faiss::fvec_madd(dimension, x + i * dimension, -1.0, final_centroid.data(), residuals + i * dimension);
         }
-        std::cout << "Finished computing lq residuals" << std::endl;
     }
 
     void LQ_quantizer::recover_residual_group_id(size_t n, const idx_t * labels, const float * residuals, float * x){

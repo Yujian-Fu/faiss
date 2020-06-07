@@ -235,18 +235,15 @@ namespace bslib{
     void Bslib_Index::add_batch(size_t n, const float * data, const idx_t * ids, idx_t * encoded_ids){
         std::cout << "Adding a batch " << std::endl;
         std::vector<float> residuals(n * dimension);
-        
         encode(n, data, encoded_ids, residuals.data());
         std::vector<uint8_t> batch_codes(n * this->code_size);
 
         this->pq.compute_codes(residuals.data(), batch_codes.data(), n);
-
         std::vector<float> xnorms (n);
         std::vector<uint8_t> xnorm_codes (n * norm_code_size);
         for (size_t i = 0; i < n; i++){
             xnorms[i] =  faiss::fvec_norm_L2sqr(data + i * dimension, dimension);
         }
-
         this->norm_pq.compute_codes(xnorms.data(), xnorm_codes.data(), n);
         for (size_t i = 0 ; i < n; i++){
             for (size_t j = 0; j < this->code_size; j++){
@@ -263,8 +260,6 @@ namespace bslib{
     }
 
     void Bslib_Index::compute_centroid_norm(){
-        this->centroid_norms.resize(this->final_nc);
-        this->centroid_norm_codes.resize(this->final_nc * this->norm_code_size);
         if (this->index_type[layers -1] == "VQ"){
             size_t n_vq = vq_quantizer_index.size();
             
