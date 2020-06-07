@@ -60,7 +60,6 @@ namespace bslib{
             for (size_t j = 0; j < k; j++){
                 labels[i * k + j] = base_idx + query_labels[i * k + j];
                 dists[i * k + j] = query_dists[i * k + j];
-                std::cout << labels[i * k + j] << "_" << dists[i * k + j] << " ";
             }
         }
         std::cout << std::endl;
