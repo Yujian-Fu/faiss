@@ -450,13 +450,19 @@ namespace bslib{
                 std::vector<float> base_norms(group_size);
                 assert(group_size == base_norm_codes[group_id].size() / this->norm_code_size);
                 this->norm_pq.decode(base_norm_codes[group_id].data(), base_norms.data());
+                std::cout << "Checking the base norms " << std::endl;
+                for (size_t temp = 0; temp < base_norms.size(); temp++){
+                    std::cout << base_norms[temp] << " ";
+                }
+                std::cout << std::endl;
                 const uint8_t * code = base_codes[group_id].data();
 
+                std::cout << "visiting the vectors: " << std::endl;
                 for (size_t m = 0; m < group_size; m++){
                     float term2 = base_norms[m];
                     float term3 = 2 * pq_L2sqr(code + m * code_size);
                     float dist = term1 + term2 - term3;
-                    std::cout << "The distance elements: dist: " << dist << " term1: " << term1 << " term2: " << term2 << " term3: " << term3 << std::endl;
+                    //std::cout << "The distance elements: dist: " << dist << " term1: " << term1 << " term2: " << term2 << " term3: " << term3 << std::endl;
                     if (dist < query_dists[i * result_k]){
                         faiss::maxheap_heapify(result_k, query_dists + i * result_k, query_ids + i * result_k);
                         faiss::maxheap_push(result_k, query_dists + i * result_k, query_ids + i * result_k, dist, this->origin_ids[group_id][m]);
