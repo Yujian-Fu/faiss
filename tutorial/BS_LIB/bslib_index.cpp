@@ -609,7 +609,7 @@ namespace bslib{
     void Bslib_Index::read_index(const char * path_index){
         std::ifstream input(path_index, std::ios::binary);
         size_t final_nc_input;
-        size_t group_size_input;
+        
         this->base_codes.resize(this->final_nc);
         this->base_norm_codes.resize(this->final_nc);
         this->origin_ids.resize(this->final_nc);
@@ -622,6 +622,7 @@ namespace bslib{
         std::cout << "The input final_nc is "  << final_nc_input << std::endl;
         std::cout << "The norm code size is " << this->norm_code_size <<std::endl;;
         for (size_t i = 0; i < this->final_nc; i++){
+            size_t group_size_input;
             std::cout << "reading group size input " << std::endl;
             input.read((char *) & group_size_input, sizeof(size_t));
             std::cout << group_size_input << " ";
@@ -634,6 +635,7 @@ namespace bslib{
         std::cout << "The input final nc is" << final_nc_input << std::endl;
         assert(final_nc_input == this->final_nc);
         for (size_t i = 0; i < this->final_nc; i++){
+            size_t group_size_input;
             input.read((char *) & group_size_input, sizeof(size_t));
             input.read((char *) base_codes[i].data(), group_size_input * code_size * sizeof(uint8_t));
         }
@@ -642,6 +644,7 @@ namespace bslib{
         std::cout << "The input final nc is" << final_nc_input << std::endl;
         assert(final_nc_input == this->final_nc);
         for (size_t i = 0; i < this->final_nc; i++){
+            size_t group_size_input;
             input.read((char *) & group_size_input, sizeof(size_t));
             input.read((char *) origin_ids[i].data(), group_size_input * sizeof(idx_t));
         }
