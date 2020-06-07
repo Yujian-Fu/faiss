@@ -17,7 +17,7 @@ namespace bslib{
         
         VQ_quantizer vq_quantizer (this->dimension, nc_upper, nc_per_group);
         ShowMessage("Building centroids for vq quantizer with train data idxs");
-        std::cout << this->train_data_idxs[0] << " " << this->train_data_idxs[1] << " " << this->train_data_idxs[2];
+        std::cout << this->train_data_idxs[0] << " " << this->train_data_idxs[1] << " " << this->train_data_idxs[2] << std::endl;;
         vq_quantizer.build_centroids(this->train_data.data(), this->nt, this->train_data_idxs.data());
         //Check whether all quantizer vectors are added correctly
         ShowMessage("Checking whether all centroids are added correctly");
