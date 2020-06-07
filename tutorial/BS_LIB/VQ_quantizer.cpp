@@ -50,11 +50,14 @@ namespace bslib{
     }
 
     void VQ_quantizer::search_in_group(size_t n, const float * instances, size_t k, float * dists, idx_t * labels, const idx_t * group_id){
+        std::cout << "The quantizers size: "<< this->quantizers.size() << std::endl;
         std::vector<float> query_dists(k);
         std::vector<faiss::Index::idx_t> query_labels(k);
         for (size_t i = 0; i < n; i++){
+
             this->quantizers[group_id[i]].search(1, instances + i * dimension, k, query_dists.data() + i * k, query_labels.data() + i * k);
         }
+        std::cout << "Finish VQ search in group " << std::endl;
         
         for (size_t i = 0; i < n; i++){
             size_t base_idx = CentroidDistributionMap[group_id[i]];

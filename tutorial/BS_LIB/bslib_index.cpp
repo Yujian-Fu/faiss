@@ -316,7 +316,7 @@ namespace bslib{
         for (size_t i = 0; i < this->layers; i++){
             assert(n_lq + n_vq == i);
             if (index_type[i] == "VQ"){
-                std::cout << "Searching in VQ layer " << std::endl;
+                std::cout << "Searching in VQ layer for " << n << " data vectors " << std::endl;
                 vq_quantizer_index[n_vq].search_in_group(n, assign_data, 1, dists.data(), labels.data(), group_id.data());
                 n_vq ++;
             }
