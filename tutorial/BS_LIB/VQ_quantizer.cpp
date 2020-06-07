@@ -22,6 +22,7 @@ namespace bslib{
             size_t nt_sub = centroid_train_set[i].size();
             std::cout << "Running kmeans for " << i << " th group with " << nt_sub << " points to generate " << nc_per_group << " centroids " << std::endl;
             faiss::kmeans_clustering(dimension, nt_sub, nc_per_group, centroid_train_set[i].data(), centroids.data());
+            std::cout << "Finished kmeans, add centroids to quantizers" << std::endl;
             faiss::IndexFlatL2 centroid_quantizer(dimension);
             centroid_quantizer.add(nc_per_group, centroids.data());
             this->all_quantizer.add(nc_per_group, centroids.data());
