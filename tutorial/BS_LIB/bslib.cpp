@@ -189,8 +189,6 @@ int main(){
     }
 
     std::cout << "The recall is: " << correct / (result_k * nq) << std::endl;
-
-    
 }
 
 

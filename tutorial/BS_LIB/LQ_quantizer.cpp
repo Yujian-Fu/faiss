@@ -129,6 +129,7 @@ namespace bslib{
 
 
     void LQ_quantizer::compute_residual_group_id(size_t n, const idx_t * labels, const float * x, float * residuals){
+#pragma omp parallel for
         for (size_t i = 0; i < n; i++){
             std::vector<float> final_centroid(dimension);
             compute_final_centroid(labels[i], final_centroid.data());
@@ -137,6 +138,7 @@ namespace bslib{
     }
 
     void LQ_quantizer::recover_residual_group_id(size_t n, const idx_t * labels, const float * residuals, float * x){
+#pragma omp parallel for
         for (size_t i = 0; i < n; i++){
             std::vector<float> final_centroid(dimension);
             compute_final_centroid(labels[i], final_centroid.data());
@@ -169,6 +171,10 @@ namespace bslib{
                 labels[i * k + j] = base_idx + query_labels[k-1-j];
             }
         }
+        for (size_t i = 0; i < 100; i++){
+            std::cout << labels[i] << " ";
+        }
+        std::cout << std::endl;
     }
 
     void LQ_quantizer::compute_nn_centroids(size_t k, float * nn_centroids, float * nn_dists, idx_t * labels){

@@ -19,8 +19,7 @@ namespace bslib{
         ShowMessage("Building centroids for vq quantizer with train data idxs");
         std::cout << this->train_data_idxs[0] << " " << this->train_data_idxs[1] << " " << this->train_data_idxs[2] << std::endl;;
         vq_quantizer.build_centroids(this->train_data.data(), this->nt, this->train_data_idxs.data(), update_idxs);
-        //Check whether all quantizer vectors are added correctly
-        ShowMessage("Checking whether all centroids are added correctly");
+        ShowMessage("Checking whether all vq centroids are added correctly");
         for (size_t i = 0; i < nc_upper; i++){
             assert(vq_quantizer.quantizers[i].xb.size() == nc_per_group * dimension);
         }
@@ -36,7 +35,7 @@ namespace bslib{
         lq_quantizer.build_centroids(this->train_data.data(), this->nt, this->train_data_idxs.data(), update_idxs);
         //Check whether all centroids are added in all_quantizer correctly 
         if (update_idxs){
-            ShowMessage("Checking whether all centroids are added correctly");
+            ShowMessage("Checking whether all lq centroids are added correctly");
             assert(lq_quantizer.all_quantizer.xb.size() == nc_upper * nc_per_group * dimension);
         }
         ShowMessage("Showing samples of alpha");
@@ -50,20 +49,23 @@ namespace bslib{
 
 
     void Bslib_Index::encode(size_t n, const float * encode_data, idx_t * encoded_ids, float * encoded_data){
-        std::cout << "Assigning vectors " << std::endl;
-        assign(n, encode_data, encoded_ids);
-
+        std::cout << "encoding data" << std::endl;
         if (index_type[layers-1] == "VQ"){
             std::cout << "Computing VQ residuals" << std::endl;
-            vq_quantizer_index[vq_quantizer_index.size()-1].compute_residual_group_id(n, encoded_ids, train_data.data(), encoded_data);
+            vq_quantizer_index[vq_quantizer_index.size()-1].compute_residual_group_id(n, encoded_ids, encode_data, encoded_data);
         }
         else if(index_type[layers-1] == "LQ"){
             std::cout << "Computing LQ residuals " << std::endl;
-            lq_quantizer_index[lq_quantizer_index.size()-1].compute_residual_group_id(n, encoded_ids, train_data.data(), encoded_data);
+            lq_quantizer_index[lq_quantizer_index.size()-1].compute_residual_group_id(n, encoded_ids, encode_data, encoded_data);
+        }
+        else{
+            std::cout << "The type name is wrong with " << index_type[layers - 1] << "!" << std::endl;
+            exit(0);
         }
     }
 
     void Bslib_Index::decode(size_t n, const float * encoded_data, const idx_t * encoded_ids, float * decoded_data){
+        std::cout << "decoding data" << std::endl;
         if (index_type[layers-1] == "VQ"){
             vq_quantizer_index[vq_quantizer_index.size()-1].recover_residual_group_id(n, encoded_ids, encoded_data, decoded_data);
         }
@@ -112,6 +114,7 @@ namespace bslib{
         std::cout << "Encoding the train dataset to compute residual" << std::endl;
         std::vector<float> residuals(dimension * this->nt);
         std::vector<idx_t> group_ids(this->nt);
+        assign(this->nt, this->train_data.data(), group_ids.data());
         encode(this->nt, this->train_data.data(), group_ids.data(), residuals.data());
         this->pq.verbose = true;
         this->pq.train(nt, residuals.data());
@@ -229,10 +232,14 @@ namespace bslib{
         }
     }
 
-    void Bslib_Index::add_batch(size_t n, const float * data, const idx_t * origin_ids, idx_t * encoded_ids){
+    void Bslib_Index::add_batch(size_t n, const float * data, const idx_t * ids, idx_t * encoded_ids){
+        std::cout << "Adding a batch " << std::endl;
         std::vector<float> residuals(n * dimension);
-        //std::vector<idx_t> encoded_ids(n);
-        
+        std::cout << "Sample idxs for a batch " << std::endl;
+        for (size_t i = 0 ; i < 100; i++){
+            std::cout << encoded_ids[i] << " ";
+        }
+        std::cout << std::endl;
         encode(n, data, encoded_ids, residuals.data());
         std::vector<uint8_t> batch_codes(n * this->code_size);
 
@@ -254,8 +261,9 @@ namespace bslib{
                 this->base_norm_codes[encoded_ids[i]].push_back(xnorm_codes[i * this->norm_code_size +j]);
             }
 
-            this->origin_ids[encoded_ids[i]].push_back(origin_ids[origin_ids[i]]);
+            this->origin_ids[encoded_ids[i]].push_back(ids[i]);
         }
+
     }
 
     void Bslib_Index::compute_centroid_norm(){
@@ -332,22 +340,12 @@ namespace bslib{
             if (index_type[i] == "VQ"){
                 std::cout << "Searching in VQ layer for " << n << " data vectors " << std::endl;
                 vq_quantizer_index[n_vq].search_in_group(n, assign_data, 1, dists.data(), labels.data(), group_id.data());
-                std::cout << "The sample group id " << std::endl;
-                for (size_t j = 0; j < 10; j++){
-                    std::cout << labels[j] << " ";
-                }
-                std::cout << std::endl;
                 n_vq ++;
             }
 
             else if(index_type[i] == "LQ"){
                 std::cout << "Searching in LQ layer " << std::endl;
                 lq_quantizer_index[n_lq].search_in_group(n, 1, dists.data(), labels.data(), group_id.data(), upper_q_c_dists.data());
-                std::cout << "The sample group id " << std::endl;
-                for (size_t j = 0; j < 10; j++){
-                    std::cout << labels[j] << " ";
-                }
-                std::cout << std::endl;
                 n_lq ++;
             }
             else{

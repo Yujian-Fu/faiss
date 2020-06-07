@@ -31,8 +31,6 @@ namespace bslib{
             }
         }
 
-        std::cout << "all centroids added" << std::endl;
-
         if (update_idxs){
             std::cout << "Finding the centroid idxs for train vectors for futher quantizer construction " << std::endl;
             //Find the centroid idxs for train vectors
@@ -46,7 +44,6 @@ namespace bslib{
                 train_data_idxs[i] = centroid_idxs[i];
             }
         }
-
     }
 
     void VQ_quantizer::search_in_group(size_t n, const float * instances, size_t k, float * dists, idx_t * labels, const idx_t * group_id){
@@ -59,7 +56,6 @@ namespace bslib{
         for (size_t i = 0; i < n; i++){
             this->quantizers[group_id[i]].search(1, instances + i * dimension, k, query_dists.data() + i * k, query_labels.data() + i * k);
         }
-        std::cout << "Finish VQ search in group and construct the return idxs" << std::endl;
         
         for (size_t i = 0; i < n; i++){
             size_t base_idx = CentroidDistributionMap[group_id[i]];
@@ -91,6 +87,7 @@ namespace bslib{
 
 
     void VQ_quantizer::compute_residual_group_id(size_t n,  const idx_t * labels, const float * x, float * residuals){
+#pragma omp parallel for
         for (size_t i = 0; i < n; i++){
             std::vector<float> final_centroid;
             compute_final_centroid(labels[i], final_centroid.data());
@@ -99,6 +96,7 @@ namespace bslib{
     }
 
     void VQ_quantizer::recover_residual_group_id(size_t n, const idx_t * labels, const float * residuals, float * x){
+#pragma omp parallel for
         for (size_t i = 0; i < n; i++){
             std::vector<float> final_centroid;
             compute_final_centroid(labels[i], final_centroid.data());
