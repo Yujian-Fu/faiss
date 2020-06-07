@@ -521,10 +521,12 @@ namespace bslib{
                     faiss::IndexFlatL2 centroid_quantizer(dimension);
                     centroid_quantizer.add(nc_per_group, centroids.data());
                     vq_quantizer.quantizers.push_back(centroid_quantizer);
-                    std::cout << "The number of quantizer centroid size in VQ quantizer2: " << vq_quantizer.quantizers[j].xb.size() / dimension << std::endl;
+                    for (size_t id = 0; id < 10 * dimension; id++){
+                        std::cout << centroids[id] << " ";
+                    }
+                    std::cout << std::endl;
                 }
                 this->vq_quantizer_index.push_back(vq_quantizer);
-                std::cout << "The number of quantizer centroid size in VQ quantizer1: " << vq_quantizer.quantizers[0].xb.size() / dimension << std::endl;
             }
 
             else if (index_type[i] == "LQ"){
