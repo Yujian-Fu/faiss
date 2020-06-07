@@ -619,12 +619,16 @@ namespace bslib{
 
         input.read((char *) & final_nc_input, sizeof(size_t));
         assert(final_nc_input == this->final_nc);
+        std::cout << "The input final nc is" << final_nc_input << std::endl;
+        std::cout << "The norm code size is " << this->norm_code_size;
         for (size_t i = 0; i < this->final_nc; i++){
             input.read((char *) & group_size_input, sizeof(size_t));
             input.read((char *) base_norm_codes[i].data(), group_size_input * norm_code_size * sizeof(uint8_t));
         }
 
+
         input.read((char *) & final_nc_input, sizeof(size_t));
+        std::cout << "The input final nc is" << final_nc_input << std::endl;
         assert(final_nc_input == this->final_nc);
         for (size_t i = 0; i < this->final_nc; i++){
             input.read((char *) & group_size_input, sizeof(size_t));
@@ -632,6 +636,7 @@ namespace bslib{
         }
 
         input.read((char *) & final_nc_input, sizeof(size_t));
+        std::cout << "The input final nc is" << final_nc_input << std::endl;
         assert(final_nc_input == this->final_nc);
         for (size_t i = 0; i < this->final_nc; i++){
             input.read((char *) & group_size_input, sizeof(size_t));
@@ -639,6 +644,7 @@ namespace bslib{
         }
 
         input.read((char *) & final_nc_input, sizeof(size_t));
+        std::cout << "The input final nc is" << final_nc_input << std::endl;
         assert(final_nc_input == this->final_nc);
         input.read((char *) centroid_norms.data(), this->final_nc * sizeof(float));
         input.read((char *) centroid_norm_codes.data(), this->final_nc * this->norm_code_size * sizeof(uint8_t));
