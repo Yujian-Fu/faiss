@@ -179,6 +179,7 @@ namespace bslib{
                     ShowMessage("Adding VQ quantizer with VQ front layer");
                     size_t last_vq = vq_quantizer_index.size() - 1;
                     ShowMessage("VQ computing nn centroids");
+                    assert(vq_quantizer_index[last_vq].nc > nc_per_group);
                     vq_quantizer_index[last_vq].compute_nn_centroids(nc_per_group, upper_centroids.data(), nn_centroids_dists.data(), nn_centroids_idxs.data());
                     add_lq_quantizer(nc_upper, nc_per_group, upper_centroids.data(), nn_centroids_idxs.data(), nn_centroids_dists.data(), update_idxs);
                 }
@@ -186,6 +187,7 @@ namespace bslib{
                     ShowMessage("Adding LQ quantizer with LQ front layer");
                     size_t last_lq = lq_quantizer_index.size() - 1;
                     ShowMessage("LQ computing nn centroids");
+                    assert(lq_quantizer_index[last_lq].nc > nc_per_group);
                     lq_quantizer_index[last_lq].compute_nn_centroids(nc_per_group, upper_centroids.data(), nn_centroids_dists.data(), nn_centroids_idxs.data());
                     add_lq_quantizer(nc_upper, nc_per_group, upper_centroids.data(), nn_centroids_idxs.data(), nn_centroids_dists.data(), update_idxs);
                 }

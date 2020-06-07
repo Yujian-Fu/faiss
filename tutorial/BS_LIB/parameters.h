@@ -4,10 +4,10 @@
 /* Parameter setting: */
 //Exp parameters
 //For index initialization
-const size_t layers = 3;
-const std::string index_type[layers] = {"VQ", "LQ", "VQ"};
-const uint32_t ncentroids[layers] = {100, 100, 100};
-const char * path_quantizers = "/home/y/yujianfu/ivf-hnsw/models_VQ_LQ_VQ/SIFT1B/quantizer_100_100_100.qt";;
+const size_t layers = 2;
+const std::string index_type[layers] = {"VQ", "LQ"};
+const uint32_t ncentroids[layers] = {1000, 100};
+const char * path_quantizers = "/home/y/yujianfu/ivf-hnsw/models_VQ_LQ/SIFT1B/quantizer_1000_100.qt";;
 
 //For train PQ
 const size_t bytes_per_code = 16;
@@ -29,27 +29,27 @@ const size_t ngt = 1000;
 const size_t nq = 10000;
 const size_t result_k = 1;
 const size_t max_vectors = 10000;
-size_t search_space[layers] = {20, 20, 20};
-size_t keep_space[layers] = {10, 10, 10};
+size_t search_space[layers] = {200, 20};
+size_t keep_space[layers] = {100, 10};
 
 
 bool is_recording = true;
 
 // Folder path
-const char * folder_model = "/home/y/yujianfu/ivf-hnsw/models_VQ_LQ_VQ";
+const char * folder_model = "/home/y/yujianfu/ivf-hnsw/models_VQ_LQ";
 const char * folder_data = "/home/y/yujianfu/ivf-hnsw/data";
 
 //File paths
 const char * path_learn = "/home/y/yujianfu/ivf-hnsw/data/SIFT1B/bigann_learn.bvecs";
-const char * path_pq = "/home/y/yujianfu/ivf-hnsw/models_VQ_LQ_VQ/SIFT1B/PQ16_100_100_100.pq";
-const char * path_pq_norm = "/home/y/yujianfu/ivf-hnsw/models_VQ_LQ_VQ/SIFT1B/PQ_NORM16_100_100_100.pq";
+const char * path_pq = "/home/y/yujianfu/ivf-hnsw/models_VQ_LQ/SIFT1B/PQ16_1000_100.pq";
+const char * path_pq_norm = "/home/y/yujianfu/ivf-hnsw/models_VQ_LQ/SIFT1B/PQ_NORM16_1000_100.pq";
 
 const char * path_base = "/home/y/yujianfu/ivf-hnsw/data/SIFT1B/bigann_base.bvecs";
-const char * path_idxs = "/home/y/yujianfu/ivf-hnsw/models_VQ_LQ_VQ/SIFT1B/base_idxs_100_100_100.ivecs";
+const char * path_idxs = "/home/y/yujianfu/ivf-hnsw/models_VQ_LQ/SIFT1B/base_idxs_1000_100.ivecs";
 
-const char * path_index = "/home/y/yujianfu/ivf-hnsw/models_VQ_LQ_VQ/SIFT1B/PQ16_100_100_100.index";
+const char * path_index = "/home/y/yujianfu/ivf-hnsw/models_VQ_LQ/SIFT1B/PQ16_1000_100.index";
 
 const char * path_gt = "/home/y/yujianfu/ivf-hnsw/data/SIFT1B/gnd/idx_1000M.ivecs";
 const char * path_query = "/home/y/yujianfu/ivf-hnsw/data/SIFT1B/bigann_learn.bvecs";
 
-const char * path_record = "/home/y/yujianfu/ivf-hnsw/models_VQ_LQ_VQ/SIFT1B/recording_100_100_100.txt";
+const char * path_record = "/home/y/yujianfu/ivf-hnsw/models_VQ_LQ/SIFT1B/recording_1000_100.txt";
