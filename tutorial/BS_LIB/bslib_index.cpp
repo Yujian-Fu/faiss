@@ -518,6 +518,11 @@ namespace bslib{
                 std::vector<float> centroids(nc_per_group * this->dimension);
                 for (size_t j = 0; j < nc_upper; j++){
                     quantizer_input.read((char * ) centroids.data(), nc_per_group * this->dimension * sizeof(float));
+                    for (size_t id = 0; id < nc_per_group * this->dimension; id++){
+                        std::cout << centroids[i] << " ";
+                        if (id % dimension == 0)
+                            std::cout << std::endl;
+                    }
                     vq_quantizer.quantizers[j].add(nc_per_group * this->dimension, centroids.data());
                 }
                 this->vq_quantizer_index.push_back(vq_quantizer);
