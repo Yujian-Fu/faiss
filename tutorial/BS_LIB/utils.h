@@ -55,25 +55,13 @@ namespace bslib{
     template<typename T>
     void CheckResult(T * data, const size_t dimension){
         std::cout << "Printing sample (1 vector) of the dataset " << std::endl;
-        for (size_t i= 0; i < 10 * dimension; i++)
+        for (size_t i= 0; i < 10; i++)
         {
-            std::cout << (float)data[i];
-            if (!i)
-            {
-                std::cout << " ";
-                continue;
+            for (size_t j = 0; j < dimension; j++){
+                std::cout << data[i * dimension + j] << " ";
             }
-
-            if (i % (dimension - 1) != 0)
-            {
-                std::cout << " ";
-            }
-            else
-            {
-                std::cout << std::endl << std::endl;
-            }
+            std::cout << std::endl << std::endl;
         }
-        std::cout << std::endl;
     }
 
     template<typename T>
