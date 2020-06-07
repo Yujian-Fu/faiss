@@ -35,7 +35,7 @@ namespace bslib_VQ_LQ{
     faiss::IndexFlatL2 * quantizer;
 
     size_t nprobe;
-    size_t max_codes;
+    size_t max_vectors;
 
 
     std::vector<std::vector<idx_t> > nn_centroid_idxs;    ///< Indices of the <nsubc> nearest centroids for each centroid
@@ -50,6 +50,7 @@ namespace bslib_VQ_LQ{
     std::vector<std::vector<uint8_t>> base_norm_codes;
     //This is the PQ codes of norms of reconstructed base vectors
     std::vector<std::vector<float>> base_norms;
+    //This is the norms of reconstructed base vectors
 
     protected:
         std::vector<float> norms;
@@ -69,7 +70,7 @@ namespace bslib_VQ_LQ{
         virtual void assign(size_t n, const float * x, idx_t * label, size_t k = 1);
         virtual void train_pq(size_t n, const float * x, bool train_pq, bool train_norm_pq);
         virtual void reconstruct(size_t n, float * x, const float * decoded_residuals, const float * subcentroids, const idx_t * keys);
-        virtual void add_group(size_t centroid_idx, size_t group_size, const float * data, const idx_t * idxs, bool use_quantized_dis);
+        virtual void add_group(size_t centroid_idx, size_t group_size, const float * data, const idx_t * idxs);
         virtual void search(size_t nq, size_t k, const float * x, float * distances, idx_t * labels);
         virtual float pq_L2sqr(const uint8_t *code);
         virtual void write(const char * path_index);

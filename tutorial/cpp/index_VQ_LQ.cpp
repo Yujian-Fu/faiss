@@ -10,9 +10,8 @@ namespace bslib_VQ_LQ{
 
         code_size = pq->code_size;
 
-
-        norms.resize(65536);
         precomputed_table.resize(pq->ksub * pq->M);
+        base_norms.resize(nc);
         base_codes.resize(nc);
         base_norm_codes.resize(nc);
         ids.resize(nc);
@@ -230,7 +229,7 @@ namespace bslib_VQ_LQ{
         }
     }
 
-    void BS_LIB_VQ_LQ::add_group(size_t centroid_idx, size_t group_size, const float * data, const idx_t * idxs, bool use_quantized_dis){
+    void BS_LIB_VQ_LQ::add_group(size_t centroid_idx, size_t group_size, const float * data, const idx_t * idxs){
         const float * centroid = quantizer->xb.data() + centroid_idx * dimension;
         std::vector<idx_t> searching_idxs(nsubc + 1);
         std::vector<float> searching_distance(nsubc+1);
@@ -292,7 +291,7 @@ namespace bslib_VQ_LQ{
         std::vector<float> norms(group_size);
         faiss::fvec_norms_L2sqr(norms.data(), reconstructed_x.data(), dimension, group_size);
 
-        if (use_quantized_dis){
+        if (use_quantized_distance){
             //Compute norm codes
             std::vector<uint8_t> xnorm_codes(group_size);
             this->norm_pq->compute_codes(norms.data(), xnorm_codes.data(), group_size);
@@ -425,5 +424,138 @@ namespace bslib_VQ_LQ{
         for (size_t i = 0; i < nc; i++)
             write_vector(output, inter_centroid_dists[i]);
     }
-    
+
+    void BS_LIB_VQ_LQ::search(size_t nq, size_t k, const float * x, float * distances, idx_t * labels){
+        
+#pragma omp parallel for
+        for (size_t query_id = 0; query_id < nq; query_id++){
+            float query_dis[k];
+            idx_t query_labels[k];
+
+            //Distance to all subcentroids
+            const float * query = x + query_id * dimension;
+            std::vector<float> query_subcentroid_dists;
+
+            //
+            std::vector<idx_t> used_centroid_idxs;
+            used_centroid_idxs.reserve(nsubc * nprobe);
+            idx_t centroid_idxs[nprobe];
+
+            //Find the nearest coarse centroids to the query
+            this->quantizer->search(nprobe, x, k, query_centroid_dists.data(), centroid_idxs);
+
+            for (size_t i = 0; i < nprobe; i++){
+                idx_t centroid_idx = centroid_idxs[i];
+                used_centroid_idxs.push_back(centroid_idx);
+            }
+            float threshold = 0.0;
+
+            size_t visited_vectors = 0;
+            size_t nsubgroups = 0;
+
+            query_subcentroid_dists.resize(nsubc * nprobe);
+            float * qsd = query_subcentroid_dists.data();
+
+            for (size_t i = 0; i < nprobe; i++){
+                const idx_t centroid_idx = centroid_idxs[i];
+                const size_t group_size = use_quantized_distance ? base_norm_codes[centroid_idx].size() : base_norms[centroid_idx].size();
+                if (group_size == 0)
+                    continue;
+                
+                const float alpha = alphas[centroid_idx];
+                const float term1 = (1 - alpha) * query_subcentroid_dists[centroid_idx];
+
+                for (size_t subc; subc < nsubc; subc++){
+                    if (subgroup_sizes[centroid_idx][subc] == 0)
+                        continue;
+                    
+                    const idx_t nn_centroid_idx = nn_centroid_idxs[centroid_idx][subc];
+                    // Compute the distance to the coarse centroid if it is not computed
+                    qsd[subc] = term1 - ((1- alpha) * inter_centroid_dists[centroid_idx][subc]
+                                            - query_subcentroid_dists[nn_centroid_idx]);
+                    threshold += qsd[subc];
+                    nsubgroups ++;
+                }
+                visited_vectors += group_size;
+                qsd += nsubc;
+                if (visited_vectors >= 2 * max_vectors)
+                    break;
+            }
+            threshold /= nsubgroups;
+
+
+            this->pq->compute_inner_prod_table(query, precomputed_table.data());
+
+            //Prepare the max heap 
+            faiss::maxheap_heapify(k, query_dis, query_labels);
+
+            visited_vectors = 0;
+            qsd = query_subcentroid_dists.data();
+
+            for(size_t i = 0; i < nprobe; i++){
+                const idx_t centroid_idx = centroid_idxs[i];
+                const size_t group_size = use_quantized_distance ? base_norm_codes[centroid_idx].size() : base_norms[centroid_idx].size();
+                if (group_size == 0)
+                    continue;
+                
+                const float alpha = alphas[centroid_idx];
+                const float term1 = (1 - alpha) * (query_subcentroid_dists[centroid_idx] - centroid_norms[centroid_idx]);
+
+                const uint8_t * code = base_codes[centroid_idx].data();
+                const idx_t * id = ids[centroid_idx].data();
+                const uint8_t * base_norm_code = base_norm_codes[centroid_idx].data();
+                const float * base_norm = base_norms[centroid_idx].data();
+
+                for (size_t subc = 0; subc < nsubc; subc++){
+                    const size_t subgroup_size = subgroup_sizes[centroid_idx][subc];
+                    if (subgroup_size == 0)
+                        continue;
+                    
+                    //Check pruning condition
+                    if (qsd[subc] < threshold){
+                        const idx_t nn_centroid_idx = nn_centroid_idxs[centroid_idx][subc];
+
+                        const float term2 = alpha * (query_centroid_dists[nn_centroid_idx] - centroid_norms[nn_centroid_idx]);
+                        if (use_quantized_distance){
+                            norm_pq->decode(base_norm_code, norms.data(), subgroup_size);
+                        }
+
+                        for (size_t j = 0; j < subgroup_size; j++){
+                            const float term4 = 2 * pq_L2sqr(code + j * code_size);
+                            float term3;
+                            if (use_quantized_distance)
+                                term3 = norms[j];
+                            else
+                                term3 = base_norm[j];
+
+                            const float dist = term1 + term2 + term3 - term4;
+                            if (dist < query_dis[0]){
+                                faiss::maxheap_pop(k, query_dis, labels);
+                                faiss::maxheap_push(k, query_dis, query_labels, dist, id[j]);
+                            }
+                        }
+                        visited_vectors += subgroup_size;
+                    }
+                    code += subgroup_size * code_size;
+                    if (use_quantized_distance)
+                        base_norm_code += subgroup_size;
+                    else
+                        base_norm += subgroup_size;
+                    id += subgroup_size;
+                }
+                if (visited_vectors >= max_vectors)
+                    break;
+                qsd += nsubc;
+            }
+
+            for (idx_t used_centroid_idx : used_centroid_idxs)
+                query_centroid_dists[used_centroid_idx] = 0;
+
+
+            for (size_t i = 0; i < k; i++){
+                distances[query_id * k + i] = query_dis[i];
+                labels[query_id * k + i] = query_labels[i];
+            }
+        }
+    }
 }

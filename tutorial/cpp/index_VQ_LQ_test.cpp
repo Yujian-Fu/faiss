@@ -24,23 +24,31 @@ int main(){
     const char * path_query = "/home/y/yujianfu/ivf-hnsw/data/SIFT1B/bigann_learn.bvecs";
 
     
-
-    size_t ngt = 1000;
-    size_t nq = 10000;
+    //Part 1:
     size_t bytes_per_codes = 16;
     size_t nbits_per_idx = 8;
-    bool use_quantized_distance = true;
-    size_t nc = 993127;
-    size_t max_group_size = 100000;
     size_t nt = 10000000;
     size_t nsubt = 65536;
-    size_t nb = 1000000000;
-    size_t k = 1;
-    size_t groups_per_iter = 250000;
     size_t dimension = 128;
+    bool use_quantized_distance = true;
 
+    //Part 2:
+    size_t nc = 993127;
+
+    //Part 3:
+    size_t nb = 1000000000;
     const uint32_t batch_size = 1000000;
     const size_t nbatches = nb / batch_size;
+    size_t groups_per_iter = 250000;
+
+    //Part 4:
+    size_t ngt = 1000;
+    size_t nq = 10000;
+    size_t k = 1;
+    size_t nprobe = 100;
+    size_t max_vectors = 10000;
+    
+    
     struct rusage r_usage;
 
     if (use_quantized_distance)
@@ -184,7 +192,7 @@ int main(){
                 for (size_t k = 0; k < group_size * dimension ; k++)
                     group_data[k] = 1.0 * data[i][k];
                 
-                index->add_group(ngroups_added + i, group_size, group_data.data(), ids[i].data(), use_quantized_distance);
+                index->add_group(ngroups_added + i, group_size, group_data.data(), ids[i].data());
             }
         }
         std::cout << "Compputing centroid norms" << std::endl;
@@ -214,30 +222,32 @@ int main(){
         readXvecFvec<uint8_t>(query_input, query.data(), dimension, nq, true, true);
     }
 
+    //Search
+    index->nprobe = nprobe;
+    index->max_vectors = max_vectors;
 
+    std::cout << "Starting Searching" << std::endl;
+    std::vector<float> distances (nq * k);
+    std::vector<idx_t> labels(nq * k);
+    size_t correct = 0;
+    StopW searching_stopw = StopW();
+    index->search(nq, k, query.data(), distances.data(), labels.data());
 
+    const float time_us_per_query = searching_stopw.getElapsedTimeMicro() / nq;
 
+    for (size_t i = 0; i < nq; i++){
+        std::unordered_set<idx_t> gt;
 
+        for (size_t j = 0; j < k; j++)
+            gt.insert(groundtruth[ngt * i + j]);
+        
+        assert(gt.size() == k);
+        for(size_t j = 0; j < k; j++){
+            if (gt.count(labels[i * nq + j]))
+                correct ++;
+        }
+    }
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+    std::cout << "Recall@ " << k << " : " << correct / (nq * k) << std::endl;
+    std::cout << "Time per query " << time_us_per_query << " us " << std::endl;
 }

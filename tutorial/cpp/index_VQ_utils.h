@@ -24,8 +24,8 @@ class StopW{
         void reset(){
             time_begin = std::chrono::steady_clock::now();
         }
-
 };
+
 
 template<typename T>
 void PrintVector(T *data, const size_t dimension){

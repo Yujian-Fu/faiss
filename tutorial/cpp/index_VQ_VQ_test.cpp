@@ -11,20 +11,19 @@ typedef faiss::Index::idx_t idx_t;
 
 int main(){
     const char * path_learn = "/home/y/yujianfu/ivf-hnsw/data/SIFT1B/bigann_learn.bvecs";
-    const char * path_gt = "/home/y/yujianfu/ivf-hnsw/data/SIFT1B/gnd/idx_1000M.ivecs";
-
-    const char * path_query = "/home/y/yujianfu/ivf-hnsw/data/SIFT1B/bigann_learn.bvecs";
-    const char * path_base = "/home/y/yujianfu/ivf-hnsw/data/SIFT1B/bigann_base.bvecs";
-    
-    
-    const char * path_centroids = "/home/y/yujianfu/ivf-hnsw/models_VQ_VQ/SIFT1B/nc1_10000_nt_10000000.fvecs";
-    const char * path_subcentroids = "/home/y/yujianfu/ivf-hnsw/models_VQ_VQ/SIFT1B/nc2_200_nt_10000000.fvecs";
     const char * path_pq = "/home/y/yujianfu/ivf-hnsw/models_VQ_VQ/SIFT1B/PQ16.pq";
 
+    const char * path_base = "/home/y/yujianfu/ivf-hnsw/data/SIFT1B/bigann_base.bvecs";
+    const char * path_centroids = "/home/y/yujianfu/ivf-hnsw/models_VQ_VQ/SIFT1B/nc1_10000_nt_10000000.fvecs";
+    const char * path_subcentroids = "/home/y/yujianfu/ivf-hnsw/models_VQ_VQ/SIFT1B/nc2_200_nt_10000000.fvecs";
     const char * path_idxs = "/home/y/yujianfu/ivf-hnsw/models_VQ_VQ/SIFT1B/precomputed_idxs_level1.ivecs";
     const char * path_sub_idxs = "/home/y/yujianfu/ivf-hnsw/models_VQ_VQ/SIFT1B/precomputed_idxs_level2.ivecs";
 
     const char * path_index = "/home/y/yujianfu/ivf-hnsw/models_VQ_VQ/SIFT1B/PQ16_quantized.index";
+    
+    const char * path_gt = "/home/y/yujianfu/ivf-hnsw/data/SIFT1B/gnd/idx_1000M.ivecs";
+    const char * path_query = "/home/y/yujianfu/ivf-hnsw/data/SIFT1B/bigann_learn.bvecs";
+    
     const char * path_record = "/home/y/yujianfu/ivf-hnsw/models_VQ_VQ/SIFT1B/recording.txt";
 
     //Part 1:
