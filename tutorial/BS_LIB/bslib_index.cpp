@@ -13,27 +13,37 @@ namespace bslib{
         }
     
 
-    void Bslib_Index::add_vq_quantizer(size_t nc_upper, size_t nc_per_group){
+    void Bslib_Index::add_vq_quantizer(size_t nc_upper, size_t nc_per_group, bool update_idxs){
         
         VQ_quantizer vq_quantizer (this->dimension, nc_upper, nc_per_group);
         ShowMessage("Building centroids for vq quantizer with train data idxs");
         std::cout << this->train_data_idxs[0] << " " << this->train_data_idxs[1] << " " << this->train_data_idxs[2] << std::endl;;
-        vq_quantizer.build_centroids(this->train_data.data(), this->nt, this->train_data_idxs.data());
+        vq_quantizer.build_centroids(this->train_data.data(), this->nt, this->train_data_idxs.data(), update_idxs);
         //Check whether all quantizer vectors are added correctly
         ShowMessage("Checking whether all centroids are added correctly");
         for (size_t i = 0; i < nc_upper; i++){
             assert(vq_quantizer.quantizers[i].xb.size() == nc_per_group * dimension);
         }
-        assert(vq_quantizer.all_quantizer.xb.size() == vq_quantizer.nc * dimension);
+        if (!update_idxs){
+            assert(vq_quantizer.all_quantizer.xb.size() == vq_quantizer.nc * dimension);
+        }
         this->vq_quantizer_index.push_back(vq_quantizer);
     }
 
-    void Bslib_Index::add_lq_quantizer(size_t nc_upper, size_t nc_per_group, const float * upper_centroids, const idx_t * upper_nn_centroid_idxs, const float * upper_nn_centroid_dists){
+    void Bslib_Index::add_lq_quantizer(size_t nc_upper, size_t nc_per_group, const float * upper_centroids, const idx_t * upper_nn_centroid_idxs, const float * upper_nn_centroid_dists, bool update_idxs){
         LQ_quantizer lq_quantizer (dimension, nc_upper, nc_per_group, upper_centroids, upper_nn_centroid_idxs, upper_nn_centroid_dists);
         ShowMessage("Building centroids for lq quantizer");
-        lq_quantizer.build_centroids(this->train_data.data(), this->nt, this->train_data_idxs.data());
+        lq_quantizer.build_centroids(this->train_data.data(), this->nt, this->train_data_idxs.data(), update_idxs);
         //Check whether all centroids are added in all_quantizer correctly 
-        assert(lq_quantizer.all_quantizer.xb.size() == nc_upper * nc_per_group * dimension);
+        if (!update_idxs){
+            ShowMessage("Checking whether all centroids are added correctly");
+            assert(lq_quantizer.all_quantizer.xb.size() == nc_upper * nc_per_group * dimension);
+        }
+        ShowMessage("Showing samples of alpha");
+        for(size_t i = 0; i < 20; i++){
+            std::cout << lq_quantizer.alphas[i] << " " << std::endl;
+        }
+        std::cout << std::endl;
         this->lq_quantizer_index.push_back(lq_quantizer);
     }
 
@@ -122,7 +132,7 @@ namespace bslib{
         this->train_data.resize(this->nt * this->dimension);
         std::cout << "Loading learn set from " << path_learn << std::endl;
         std::ifstream learn_input(path_learn, std::ios::binary);
-        readXvecFvec<uint8_t>(learn_input, this->train_data.data(), this->dimension, this->nt, true, true);
+        readXvecFvec<uint8_t>(learn_input, this->train_data.data(), this->dimension, this->nt, true);
         this->train_data_idxs.resize(this->nt);
         for (size_t i = 0; i < this->nt; i++){
             this->train_data_idxs[i] = 0;
@@ -152,10 +162,14 @@ namespace bslib{
             nc_per_group = ncentroids[i];
             if (index_type[i] == "VQ"){
                 ShowMessage("Adding VQ quantizer");
-                add_vq_quantizer(nc_upper, nc_per_group);
+                bool update_idxs = (i == layers-1) ? false:true;
+                add_vq_quantizer(nc_upper, nc_per_group, update_idxs);
+                std::cout << "VQ quantizer added, check it " << std::endl;
+                std::cout << "The vq quantizer size is: " <<  vq_quantizer_index.size() << " the num of quantizers: " << vq_quantizer_index[vq_quantizer_index.size()-1].quantizers.size();
             }
             else if(index_type[i] == "LQ"){
                 assert (i >= 1);
+                bool update_idxs = (i == layers-1) ? false:true;
 
                 upper_centroids.resize(nc_upper * dimension);
                 nn_centroids_idxs.resize(nc_upper * nc_per_group);
@@ -164,22 +178,25 @@ namespace bslib{
                 if (index_type[i-1] == "VQ"){
                     ShowMessage("Adding VQ quantizer with VQ front layer");
                     size_t last_vq = vq_quantizer_index.size() - 1;
+                    ShowMessage("VQ computing nn centroids");
                     vq_quantizer_index[last_vq].compute_nn_centroids(nc_per_group, upper_centroids.data(), nn_centroids_dists.data(), nn_centroids_idxs.data());
-                    add_lq_quantizer(nc_upper, nc_per_group, upper_centroids.data(), nn_centroids_idxs.data(), nn_centroids_dists.data());
+                    add_lq_quantizer(nc_upper, nc_per_group, upper_centroids.data(), nn_centroids_idxs.data(), nn_centroids_dists.data(), update_idxs);
                 }
                 else if (index_type[i-1] == "LQ"){
                     ShowMessage("Adding LQ quantizer with LQ front layer");
                     size_t last_lq = lq_quantizer_index.size() - 1;
+                    ShowMessage("LQ computing nn centroids");
                     lq_quantizer_index[last_lq].compute_nn_centroids(nc_per_group, upper_centroids.data(), nn_centroids_dists.data(), nn_centroids_idxs.data());
-                    add_lq_quantizer(nc_upper, nc_per_group, upper_centroids.data(), nn_centroids_idxs.data(), nn_centroids_dists.data());
+                    add_lq_quantizer(nc_upper, nc_per_group, upper_centroids.data(), nn_centroids_idxs.data(), nn_centroids_dists.data(), update_idxs);
                 }
+
+                std::cout << "lq quantizer added, check it " << std::endl;
+                std::cout << "The lq quantizer size is: " <<  lq_quantizer_index.size() << " the num of alphas: " << lq_quantizer_index[lq_quantizer_index.size()-1].alphas.size();
             }
             nc_upper  = nc_upper * nc_per_group;
         }
         write_quantizers(path_quantizers);
-        }
-
-        
+        }  
     }
     
     void Bslib_Index::get_final_nc(){

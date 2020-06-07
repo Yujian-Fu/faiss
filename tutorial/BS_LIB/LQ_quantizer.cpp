@@ -59,7 +59,7 @@ namespace bslib{
     }
 
 
-    void LQ_quantizer::build_centroids(const float * train_data, size_t train_set_size, idx_t * train_data_idxs){
+    void LQ_quantizer::build_centroids(const float * train_data, size_t train_set_size, idx_t * train_data_idxs, bool update_idxs){
         std::vector<std::vector<float>> train_set;
         train_set.resize(nc_upper);
 
@@ -68,6 +68,7 @@ namespace bslib{
             train_set[idx].push_back(train_data[i]);
         }
 
+        std::cout << "Computing alphas for lq_quantizer " << std::endl;
         for (size_t i = 0; i < nc_upper; i++){
             std::vector<float> centroid_vectors(nc_per_group * dimension);
             const float * centroid = this->upper_centroids.data() + i * dimension;
@@ -78,20 +79,26 @@ namespace bslib{
             size_t group_size = train_set[i].size();
             this->alphas[i] = compute_alpha(centroid_vectors.data(), train_set[i].data(), centroid, nn_centroid_dists[i].data(), group_size);
         }
+        
+        std::cout << "finished computing centoids" <<std::endl;
 
-        this->all_quantizer = faiss::IndexFlatL2(dimension);
-        std::vector<float> final_centroids(this->nc * dimension);
-        for (size_t i = 0; i < this->nc; i++){
-            compute_final_centroid(i, final_centroids.data() + i * dimension);
-        }
-        all_quantizer.add(this->nc, final_centroids.data());
+        if (update_idxs){
+            std::cout << "Initializing all_quantizer for lq-quantizer" <<std::endl;
+            this->all_quantizer = faiss::IndexFlatL2(dimension);
+            std::vector<float> final_centroids(this->nc * dimension);
+            for (size_t i = 0; i < this->nc; i++){
+                compute_final_centroid(i, final_centroids.data() + i * dimension);
+            }
+            all_quantizer.add(this->nc, final_centroids.data());
 
-        //Find the centroid idxs for train vectors
-        std::vector<float> centroid_distances(train_set_size);
-        std::vector<faiss::Index::idx_t> centroid_idxs(train_set_size);
-        all_quantizer.search(train_set_size, train_data, 1, centroid_distances.data(), centroid_idxs.data());
-        for (size_t i = 0; i < train_set_size; i++){
-            train_data_idxs[i] = centroid_idxs[i];
+            std::cout << "searching the idxs for train vectors " << std::endl;
+            //Find the centroid idxs for train vectors
+            std::vector<float> centroid_distances(train_set_size);
+            std::vector<faiss::Index::idx_t> centroid_idxs(train_set_size);
+            all_quantizer.search(train_set_size, train_data, 1, centroid_distances.data(), centroid_idxs.data());
+            for (size_t i = 0; i < train_set_size; i++){
+                train_data_idxs[i] = centroid_idxs[i];
+            }
         }
     }
 

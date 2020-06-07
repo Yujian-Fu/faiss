@@ -45,8 +45,8 @@ struct Bslib_Index{
 
     explicit Bslib_Index(const size_t dimension, const size_t layers, const std::string * index_type);
     void build_quantizers(const uint32_t * ncentroids, const char * path_quantizers, const char * path_learn);
-    void add_vq_quantizer(size_t nc_upper, size_t nc_per_group);
-    void add_lq_quantizer(size_t nc_upper, size_t nc_per_group, const float * upper_centroids, const idx_t * upper_nn_centroid_idxs, const float * upper_nn_centroid_dists);
+    void add_vq_quantizer(size_t nc_upper, size_t nc_per_group, bool update_idxs);
+    void add_lq_quantizer(size_t nc_upper, size_t nc_per_group, const float * upper_centroids, const idx_t * upper_nn_centroid_idxs, const float * upper_nn_centroid_dists, bool update_idxs);
     void train_pq(const char * path_pq, const char * path_norm_pq, const char * path_learn);
     void encode(size_t n, const float * data, idx_t * encoded_ids, float * encoded_data);
     void decode(size_t n, const float * encoded_data, const idx_t * encoded_ids, float * decoded_data);

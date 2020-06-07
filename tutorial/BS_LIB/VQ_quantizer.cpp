@@ -5,7 +5,7 @@ namespace bslib{
         Base_quantizer(dimension, nc_upper, nc_per_group){}
 
 
-    void VQ_quantizer::build_centroids(const float * train_data, size_t train_set_size, idx_t * train_data_idxs){
+    void VQ_quantizer::build_centroids(const float * train_data, size_t train_set_size, idx_t * train_data_idxs, bool update_idxs){
         std::cout << "Adding " << train_set_size << " train set data into " << nc_upper << " group " << std::endl;
         std::vector<std::vector<float>> centroid_train_set;
         centroid_train_set.resize(nc_upper);
@@ -21,40 +21,32 @@ namespace bslib{
         for (size_t i = 0; i < nc_upper; i++){
             std::vector<float> centroids(dimension * nc_per_group);
             size_t nt_sub = centroid_train_set[i].size() / this->dimension;
-            std::cout << "Running kmeans for " << i << " th group with " << nt_sub << " points to generate " << nc_per_group << " centroids " << std::endl;
+            std::cout << "Running kmeans for [ " << i << " / " << nc_upper << " ] th group with " << nt_sub << " points to generate " << nc_per_group << " centroids " << std::endl;
             faiss::kmeans_clustering(dimension, nt_sub, nc_per_group, centroid_train_set[i].data(), centroids.data());
-            std::cout << "Finished kmeans, add centroids to quantizers" << std::endl;
             faiss::IndexFlatL2 centroid_quantizer(dimension);
             centroid_quantizer.add(nc_per_group, centroids.data());
-            this->all_quantizer.add(nc_per_group, centroids.data());
             this->quantizers.push_back(centroid_quantizer);
+            if (update_idxs){
+                this->all_quantizer.add(nc_per_group, centroids.data());
+            }
+        }
+        
+        std::cout << "all centroids added" << std::endl;
+
+        if (update_idxs){
+            std::cout << "Finding the centroid idxs for train vectors for futher quantizer construction " << std::endl;
+            //Find the centroid idxs for train vectors
+            std::vector<float> centroid_distances(train_set_size);
+            std::vector<faiss::Index::idx_t> centroid_idxs(train_set_size);
+            std::cout << "searching the train idxs for train vectors " << std::endl;
+            all_quantizer.search(train_set_size, train_data, 1, centroid_distances.data(), centroid_idxs.data());
+            std::cout << "Showing the idxs samples:" << std::endl;
+            std::cout << centroid_idxs[0] << " " << centroid_idxs[1] << " " << centroid_idxs[2] << " " << centroid_idxs[3] << std::endl;
+            for (size_t i = 0; i < train_set_size; i++){
+                train_data_idxs[i] = centroid_idxs[i];
+            }
         }
 
-        std::cout << "checking the centroids" << std::endl;
-        for (size_t i = 0; i < 10; i++){
-            for (size_t j = 0; j < dimension; j++){
-                std::cout << this->all_quantizer.xb[i * dimension + j] << " ";
-            }
-            std::cout << std::endl;
-        }
-        std::cout << "checking the train data" << std::endl;
-        for (size_t i = 0; i < 10; i++){
-            for (size_t j = 0; j < dimension; j++){
-                std::cout << train_data[i * dimension + j] << " ";
-            }
-            std::cout << std::endl;
-        }
-
-        std::cout << "Finding the centroid idxs for train vectors for futher quantizer construction " << std::endl;
-        //Find the centroid idxs for train vectors
-        std::vector<float> centroid_distances(train_set_size);
-        std::vector<faiss::Index::idx_t> centroid_idxs(train_set_size);
-        std::cout << "searching the train idxs for train vectors " << std::endl;
-        all_quantizer.search(train_set_size, train_data, 1, centroid_distances.data(), centroid_idxs.data());
-        std::cout << centroid_idxs[0] << " " << centroid_idxs[1] << " " << centroid_idxs[2] << " " << centroid_idxs[3] << std::endl;
-        for (size_t i = 0; i < train_set_size; i++){
-            train_data_idxs[i] = centroid_idxs[i];
-        }
     }
 
     void VQ_quantizer::search_in_group(size_t n, const float * instances, size_t k, float * dists, idx_t * labels, const idx_t * group_id){

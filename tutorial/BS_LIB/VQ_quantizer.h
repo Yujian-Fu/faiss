@@ -13,7 +13,7 @@ namespace bslib{
         faiss::IndexFlatL2 all_quantizer; //The quantizer for all subcentroids
         std::vector<idx_t> train_data_idxs; // The size should be train_set_size, the max size is nc_upper
         explicit VQ_quantizer(size_t dimension, size_t nc_upper, size_t nc_per_group);
-        void build_centroids(const float * train_data, size_t train_set_size, idx_t * train_data_idx);
+        void build_centroids(const float * train_data, size_t train_set_size, idx_t * train_data_idx, bool update_idxs);
         void compute_final_centroid(idx_t label, float * sub_centroid);
         void compute_residual_group_id(size_t n, const idx_t * labels, const float * x, float * residuals); 
         void recover_residual_group_id(size_t n, const idx_t * labels, const float * residuals, float * x);
