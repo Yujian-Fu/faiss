@@ -233,28 +233,29 @@ namespace bslib{
         std::vector<float> residuals(n * dimension);
         encode(n, data, encoded_ids, residuals.data());
 
-        //std::cout << "encoded the data " << std::endl;
         std::vector<uint8_t> batch_codes(n * this->code_size);
         this->pq.compute_codes(residuals.data(), batch_codes.data(), n);
 
-        std::vector<float> reconstructed_x(dimension * this->nt);
+        //std::vector<float> reconstructed_x(dimension * this->nt);
 
         /*
         Todo: should we use the decoded reconstructed_x for exp? actually we may use
         the distance in full precision for exp?
         */
+       
+        //decode(this->nt, residuals.data(), encoded_ids, reconstructed_x.data());
 
-        decode(n, residuals.data(), encoded_ids, reconstructed_x.data());
-        //std::cout << "decoded the data" << std::endl;
+        /*
+        Use the origin distance can save time?
+        */
         std::vector<float> xnorms (n);
         for (size_t i = 0; i < n; i++){
-            xnorms[i] =  faiss::fvec_norm_L2sqr(reconstructed_x.data() + i * dimension, dimension);
+            xnorms[i] =  faiss::fvec_norm_L2sqr(data + i * dimension, dimension);
         }
 
         std::vector<uint8_t> xnorm_codes (n * norm_code_size);
-        this->norm_pq.compute_codes(xnorms.data(), xnorm_codes.data(), n);
 
-        //std::cout << "Finished compute the code and add them to index" << std::endl;
+        this->norm_pq.compute_codes(xnorms.data(), xnorm_codes.data(), n);
     
         for (size_t i = 0 ; i < n; i++){
             for (size_t j = 0; j < this->code_size; j++){
@@ -267,7 +268,6 @@ namespace bslib{
 
             this->origin_ids[encoded_ids[i]].push_back(ids[i]);
         }
-        //std::cout << "Finished add a batch" <<std::endl;
 
     }
 
