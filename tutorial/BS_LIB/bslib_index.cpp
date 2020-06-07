@@ -235,11 +235,6 @@ namespace bslib{
     void Bslib_Index::add_batch(size_t n, const float * data, const idx_t * ids, idx_t * encoded_ids){
         std::cout << "Adding a batch " << std::endl;
         std::vector<float> residuals(n * dimension);
-        std::cout << "Sample idxs for a batch " << std::endl;
-        for (size_t i = 0 ; i < 100; i++){
-            std::cout << encoded_ids[i] << " ";
-        }
-        std::cout << std::endl;
         encode(n, data, encoded_ids, residuals.data());
         std::vector<uint8_t> batch_codes(n * this->code_size);
 

@@ -134,7 +134,7 @@ int main(){
 
             index->add_batch(batch_size, batch.data(), origin_ids.data(), idxs.data());
             if (i % 10 == 0){
-                std::cout << " [ " << i << " / " << nbatches << " ]";
+                std::cout << " adding batches [ " << i << " / " << nbatches << " ]";
                 Trecorder.print_time_usage("");
             }
         }
