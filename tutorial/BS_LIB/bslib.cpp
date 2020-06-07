@@ -11,24 +11,7 @@ using namespace bslib;
 typedef uint32_t idx_t;
 
 int main(){
-// Folder path
-const char * folder_model = "/home/y/yujianfu/ivf-hnsw/models_VQ_VQ_VQ_LQ";
-const char * folder_data = "/home/y/yujianfu/ivf-hnsw/data";
 
-//File paths
-const char * path_learn = "/home/y/yujianfu/ivf-hnsw/data/SIFT1B/bigann_learn.bvecs";
-const char * path_pq = (char *) ((std::string(folder_model) + "/SIFT1B/PQ16.pq").c_str());
-const char * path_pq_norm = (char *) ((std::string (folder_model) + "SIFT1B/PQ_NORM.pq").c_str());
-
-const char * path_base = (char *) (std::string(folder_data) + "/SIFT1B/bigann_base.bvecs").c_str();
-const char * path_idxs = (char *) (std::string(folder_model) + "/SIFT1B/base_idxs.ivecs").c_str();
-
-const char * path_index = (char *) (std::string(folder_model) + "/SIFT1B/PQ16.index").c_str();
-
-const char * path_gt = (char *) (std::string(folder_data) + "/SIFT1B/gnd/idx_1000M.ivecs").c_str();
-const char * path_query = (char *) (std::string(folder_data) + "/SIFT1B/bigann_learn.bvecs").c_str();
-
-const char * path_record = (char *) (std::string(folder_model) + "/SIFT1B/recording.txt").c_str();
 
     memory_recorder Mrecorder = memory_recorder();
     time_recorder Trecorder = time_recorder();
@@ -55,8 +38,8 @@ const char * path_record = (char *) (std::string(folder_model) + "/SIFT1B/record
     
     //Initialize the index
     ShowMessage("Initializing the index");
-    std::cout << "Loading dataset "<< (path_learn) << std::endl;
-    std::ifstream learn_input(path_learn, std::ios::binary);
+    std::cout << "Loading dataset "<< (path_base) << std::endl;
+    std::ifstream learn_input(path_base, std::ios::binary);
     std::vector<float> trainvecs(nt * dimension);
     readXvecFvecHNSW<uint8_t>(learn_input, trainvecs.data(), dimension, 20);
     exit(0);

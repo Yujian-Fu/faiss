@@ -34,3 +34,22 @@ size_t keep_space[4] = {5, 5, 5, 5};
 
 
 bool is_recording = true;
+
+// Folder path
+const char * folder_model = "/home/y/yujianfu/ivf-hnsw/models_VQ_VQ_VQ_LQ";
+const char * folder_data = "/home/y/yujianfu/ivf-hnsw/data";
+
+//File paths
+const char * path_learn = "/home/y/yujianfu/ivf-hnsw/data/SIFT1B/bigann_learn.bvecs";
+const char * path_pq = "/home/y/yujianfu/ivf-hnsw/models_VQ_VQ_VQ_LQ/SIFT1B/PQ16.pq";
+const char * path_pq_norm = "/home/y/yujianfu/ivf-hnsw/models_VQ_VQ_VQ_LQ/SIFT1B/PQ_NORM.pq";
+
+const char * path_base = "/home/y/yujianfu/ivf-hnsw/data/SIFT1B/bigann_base.bvecs";
+const char * path_idxs = "/home/y/yujianfu/ivf-hnsw/models_VQ_VQ_VQ_LQ/SIFT1B/base_idxs.ivecs";
+
+const char * path_index = "/home/y/yujianfu/ivf-hnsw/models_VQ_VQ_VQ_LQ/SIFT1B/PQ16.index";
+
+const char * path_gt = "/home/y/yujianfu/ivf-hnsw/data/SIFT1B/gnd/idx_1000M.ivecs";
+const char * path_query = "/home/y/yujianfu/ivf-hnsw/data/SIFT1B/bigann_learn.bvecs";
+
+const char * path_record = "/home/y/yujianfu/ivf-hnsw/models_VQ_VQ_VQ_LQ/SIFT1B/recording.txt";
