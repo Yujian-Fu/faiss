@@ -34,9 +34,11 @@ namespace bslib{
         //Find the centroid idxs for train vectors
         std::vector<float> centroid_distances(train_set_size);
         std::vector<faiss::Index::idx_t> centroid_idxs(train_set_size);
+        std::cout << "searching the train idxs for train vectors " << std::endl;
         all_quantizer.search(train_set_size, train_data, 1, centroid_distances.data(), centroid_idxs.data());
         for (size_t i = 0; i < train_set_size; i++){
             train_data_idxs[i] = centroid_idxs[i];
+            std::cout << centroid_idxs[i] << " ";
         }
     }
 
