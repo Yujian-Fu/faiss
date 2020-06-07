@@ -16,7 +16,7 @@ const char * folder_model = "/home/y/yujianfu/ivf-hnsw/models_VQ_VQ_VQ_LQ";
 const char * folder_data = "/home/y/yujianfu/ivf-hnsw/data";
 
 //File paths
-const char * path_learn = (char *) (std::string(folder_data) + "/SIFT1B/bigann_learn.bvecs").c_str();
+const char * path_learn = "/home/y/yujianfu/ivf-hnsw/data/SIFT1B/bigann_learn.bvecs";
 const char * path_pq = (char *) ((std::string(folder_model) + "/SIFT1B/PQ16.pq").c_str());
 const char * path_pq_norm = (char *) ((std::string (folder_model) + "SIFT1B/PQ_NORM.pq").c_str());
 
@@ -55,7 +55,7 @@ const char * path_record = (char *) (std::string(folder_model) + "/SIFT1B/record
     
     //Initialize the index
     ShowMessage("Initializing the index");
-    std::cout << "Loading dataset "<< std::string(path_learn) << std::endl;
+    std::cout << "Loading dataset "<< (path_learn) << std::endl;
     std::ifstream learn_input(path_learn, std::ios::binary);
     std::vector<float> trainvecs(nt * dimension);
     readXvecFvecHNSW<uint8_t>(learn_input, trainvecs.data(), dimension, 20);
