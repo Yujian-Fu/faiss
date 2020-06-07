@@ -112,7 +112,7 @@ namespace bslib{
             in.read((char * ) & origin_data, dim * sizeof(T));
             for (size_t j = 0; j < dimension; j++){
                 data[i * dim + j] = 1.0 * origin_data[j];
-                std::cout << origin_data[j] << " ";
+                std::cout << (float) origin_data[j] << " ";
             }
             std::cout << std::endl;
             if ( ShowProcess && print_every != 0 && i % (print_every) == 0)
