@@ -129,6 +129,18 @@ namespace bslib{
     void Bslib_Index::build_quantizers(const uint32_t * ncentroids, const char * path_quantizers, const char * path_learn){
         if (exists(path_quantizers)){
             read_quantizers(path_quantizers);
+            std::cout << "Checking the quantizers read from file " << std::endl;
+            std::cout << "The number of quantizers: " << this->vq_quantizer_index.size() << " " << this->lq_quantizer_index.size();
+            std::cout  << "The number of centroids in each quantizer: ";
+            for (size_t i = 0 ; i < this->vq_quantizer_index[0].quantizers.size(); i++){
+                std::cout << vq_quantizer_index[0].quantizers[i].xb.size() << " ";
+            }
+            std::cout << std::endl << "The alpha in lq quantizer: ";
+            for (size_t i = 0; i < this->lq_quantizer_index[0].alphas.size(); i++){
+                std::cout << this->lq_quantizer_index[0].alphas[i] << " ";
+            }
+            std::cout << std::endl;
+
         }
         else{
         ShowMessage("No preconstructed quantizers, constructing quantizers");
