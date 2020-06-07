@@ -50,6 +50,7 @@ namespace bslib{
 
 
     void Bslib_Index::encode(size_t n, const float * encode_data, idx_t * encoded_ids, float * encoded_data){
+        std::cout << "Assigning vectors " << std::endl;
         assign(n, encode_data, encoded_ids);
 
         if (index_type[layers-1] == "VQ"){
@@ -76,6 +77,7 @@ namespace bslib{
     void Bslib_Index::train_pq(const char * path_pq, const char * path_norm_pq, const char * path_learn){
         // If the train dataset is not loaded
         if (this->train_data.size() != this->nt * dimension){
+            std::cout << "Load the train set for PQ training" << std::endl;
             bool use_subset = true;
             this->train_data.resize(this-> nt * dimension);
             std::ifstream learn_input(path_learn, std::ios::binary);
@@ -85,6 +87,7 @@ namespace bslib{
                 this->train_data_idxs[i] = 0;
             }
             if (use_subset){
+                assert (this->nt != this->subnt);
                 std::vector<float> train_subset(subnt * dimension);
                 RandomSubset(this->train_data.data(), train_subset.data(), dimension, this->nt, this->subnt);
                 train_data.resize(subnt * dimension);
@@ -98,11 +101,13 @@ namespace bslib{
                 this->nt = this->subnt;
             }
         }
+        std::cout << "Initilizing index " << std::endl;
         this->pq = faiss::ProductQuantizer(this->dimension, this->M, this->nbits);
         this->norm_pq = faiss::ProductQuantizer(1, this->norm_M, this->nbits);
         this->code_size = this->pq.code_size;
         this->norm_code_size = this->norm_pq.code_size;
 
+        std::cout << "Encoding the train dataset to compute residual" << std::endl;
         std::vector<float> residuals(dimension * this->nt);
         std::vector<idx_t> group_ids(this->nt);
         encode(this->nt, this->train_data.data(), group_ids.data(), residuals.data());
@@ -311,11 +316,13 @@ namespace bslib{
         for (size_t i = 0; i < this->layers; i++){
             assert(n_lq + n_vq == i);
             if (index_type[i] == "VQ"){
+                std::cout << "Searching in VQ layer " << std::endl;
                 vq_quantizer_index[n_vq].search_in_group(n, assign_data, 1, dists.data(), labels.data(), group_id.data());
                 n_vq ++;
             }
 
             else if(index_type[i] == "LQ"){
+                std::cout << "Searching in LQ layer " << std::endl;
                 lq_quantizer_index[n_lq].search_in_group(n, 1, dists.data(), labels.data(), group_id.data(), upper_q_c_dists.data());
                 n_lq ++;
             }
@@ -489,6 +496,7 @@ namespace bslib{
 
         for(size_t i = 0; i < this->layers; i++){
             if (index_type[i] == "VQ"){
+                std::cout << "Reading VQ layer" << std::endl;
                 quantizer_input.read((char *) & nc, sizeof(size_t));
                 quantizer_input.read((char *) & nc_upper, sizeof(size_t));
                 quantizer_input.read((char *) & nc_per_group, sizeof(size_t));
@@ -503,6 +511,7 @@ namespace bslib{
                 this->vq_quantizer_index.push_back(vq_quantizer);
             }
             else if (index_type[i] == "LQ"){
+                std::cout << "Reading LQ layer " << std::endl;
                 quantizer_input.read((char *) & nc, sizeof(size_t));
                 quantizer_input.read((char *) & nc_upper, sizeof(size_t));
                 quantizer_input.read((char *) & nc_per_group, sizeof(size_t));

@@ -28,8 +28,8 @@ int main(){
 
         time_t now = time(0);
         char* dt = ctime(&now);
-        record_file << "The time now is " << dt << std::endl;
-        record_file << "The memory usage format is ixrss， isrss， idrss， maxrss" << std::endl;
+        record_file << std::endl << "The time now is " << dt << std::endl;
+        record_file << "The memory usage format is ixrss, isrss, idrss, maxrss" << std::endl;
         record_file << "Now starting the indexing process " << std::endl;
     }
 
@@ -61,6 +61,7 @@ int main(){
         index->norm_code_size = index->norm_pq.code_size;
     }
     else{
+        index->nt = nt;
         index->M = bytes_per_code;
         index->norm_M = bytes_per_norm_code;
         index->nbits = nbits;
