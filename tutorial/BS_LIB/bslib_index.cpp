@@ -444,9 +444,11 @@ namespace bslib{
                 size_t group_size = this->origin_ids[group_id].size();
                 assert(group_size == this->base_codes[group_id].size() / this->code_size);
 
+                std::cout << "Computing the distance" << std::endl;
                 float term1 = q_c_dist - centroid_norms[group_id];
 
                 std::vector<float> base_norms(group_size);
+                assert(group_size == base_norm_codes[group_id].size() / this->norm_code_size);
                 this->norm_pq.decode(base_norm_codes[group_id].data(), base_norms.data());
                 const uint8_t * code = base_codes[group_id].data();
 
