@@ -72,11 +72,12 @@ namespace bslib{
         uint32_t dim = dimension;
         size_t print_every = n / 10;
         for (size_t i = 0; i < n; i++){
-            in.read((char *) &dim, sizeof(uint32_t));
+            in.read((char *) & dim, sizeof(uint32_t));
             if (dim != dimension){
                 std::cout << dim << " " << dimension << " dimension error \n";
                 exit(1);
             }
+            in.read((char *) (data + i * dim), dim * sizeof(T));
             if ( ShowProcess && print_every != 0 && i % print_every == 0)
                 std::cout << "[Finished loading " << i << " / " << n << "]"  << std::endl; 
         }

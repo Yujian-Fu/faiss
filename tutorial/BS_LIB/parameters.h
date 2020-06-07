@@ -39,7 +39,7 @@ const char * folder_model = "/home/y/yujianfu/ivf-hnsw/models_VQ_VQ_VQ_LQ";
 const char * folder_data = "/home/y/yujianfu/ivf-hnsw/data";
 
 //File paths
-const char * path_learn = (char *) (std::string(folder_data) + "/SIFT1B/bigann_base.bvecs").c_str();
+const char * path_learn = (char *) (std::string(folder_data) + "/SIFT1B/bigann_learn.bvecs").c_str();
 const char * path_pq = (char *) ((std::string(folder_model) + "/SIFT1B/PQ16.pq").c_str());
 const char * path_pq_norm = (char *) ((std::string (folder_model) + "SIFT1B/PQ_NORM.pq").c_str());
 
