@@ -60,13 +60,17 @@ namespace bslib{
         for (size_t i = 0; i < n; i++){
             size_t base_idx = CentroidDistributionMap[group_id[i]];
             for (size_t j = 0; j < k; j++){
-                labels[i] = base_idx + query_labels[i * k + j];
-                dists[i] = query_dists[i * k + j];
+                labels[i * k + j] = base_idx + query_labels[i * k + j];
+                dists[i * k + j] = query_dists[i * k + j];
             }
         }
         for (size_t i = 0; i < k; i++){
             std::cout << labels[i] << "_" << query_labels[i] << "   ";
         }
+        std::cout << std::endl;
+        for (size_t i = 0 ; i < this->nc; i++){
+            std::cout << CentroidDistributionMap[i] << " ";
+        } 
         std::cout << std::endl;
 
 
