@@ -70,8 +70,14 @@ namespace bslib{
         }
 
         std::cout << "Computing alphas for lq_quantizer with upper centroids: " << this->upper_centroids.size() << " nc_per_group: " << this->nc_per_group << std::endl;
-        std::cout << "The size of upper_centroids: " << upper_centroids.size() / this->dimension << std::endl;
+        std::cout << "The size of upper_centroids: " << this->upper_centroids.size() / this->dimension << std::endl;
         std::cout << "The size if nn_centroid_idxs: " << nn_centroid_idxs.size() << std::endl;
+        for (size_t i = 0; i < nc_upper; i++){
+            for (size_t j = 0; j < nc_per_group; j++){
+                std::cout << this->nn_centroid_idxs[i][j] << " ";
+            }
+        }
+        std::cout << std::endl;
         for (size_t i = 0; i < nc_upper; i++){
             std::vector<float> centroid_vectors(nc_per_group * dimension);
             const float * centroid = this->upper_centroids.data() + i * dimension;
