@@ -69,16 +69,19 @@ namespace bslib{
             train_set[idx].push_back(train_data[i * dimension + j]);
         }
 
-        std::cout << "Computing alphas for lq_quantizer with upper centroids: " << this->upper_centroids.size() << "nc_per_group: " << this->nc_per_group << std::endl;
+        std::cout << "Computing alphas for lq_quantizer with upper centroids: " << this->upper_centroids.size() << " nc_per_group: " << this->nc_per_group << std::endl;
         std::cout << "The size of upper_centroids: " << upper_centroids.size() / this->dimension << std::endl;
         std::cout << "The size if nn_centroid_idxs: " << nn_centroid_idxs.size() << std::endl;
         for (size_t i = 0; i < nc_upper; i++){
             std::vector<float> centroid_vectors(nc_per_group * dimension);
             const float * centroid = this->upper_centroids.data() + i * dimension;
+            std::cout << "computing centroid vectors for " << i << " th centroid with nn_centroid)idx size: " << this->nn_centroid_idxs[i].size() << std::endl;
             for (size_t j = 0; j < nc_per_group; j++){
+                std::cout << this->nn_centroid_idxs[i][j] << " ";
                 const float * nn_centroid = this->upper_centroids.data() + this->nn_centroid_idxs[i][j] * dimension;
                 faiss::fvec_madd(dimension, nn_centroid, -1.0, centroid, centroid_vectors.data()+ j * dimension);
             }
+            std::cout << std::endl;
             size_t group_size = train_set[i].size() / this->dimension;
             std::cout << "Computing alpha for [ " << i << " / " << nc_upper << " ]" << std::endl;
             this->alphas[i] = compute_alpha(centroid_vectors.data(), train_set[i].data(), centroid, nn_centroid_dists[i].data(), group_size);
