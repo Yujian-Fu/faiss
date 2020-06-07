@@ -147,6 +147,16 @@ namespace bslib{
     }
 
     void LQ_quantizer::search_in_group(size_t n, size_t k, float * dists, idx_t * labels, const idx_t * group_id, const float * query_centroid_dists){
+        std::cout << "Showing the nn_centroids_dists and nn_centroids_idxs " << std::endl;
+        for (size_t i = 0; i < this->nc_upper; i++){
+            for (size_t j = 0; j < this->nc_per_group; j++){
+                std::cout << this->nn_centroid_idxs[i][j] << "_" << this->nn_centroid_dists[i][j] << " ";
+            }
+            std::cout << std::endl;
+        }
+        exit(0);
+        
+        
         std::cout << "The query group id is " << group_id[0] << std::endl;
 
         std::vector<float> query_dists(k);
