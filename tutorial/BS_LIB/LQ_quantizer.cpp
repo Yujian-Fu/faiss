@@ -147,16 +147,6 @@ namespace bslib{
     }
 
     void LQ_quantizer::search_in_group(size_t n, size_t k, float * dists, idx_t * labels, const idx_t * group_id, const float * query_centroid_dists){
-        std::cout << "Showing the nn_centroids_dists and nn_centroids_idxs " << std::endl;
-        for (size_t i = 0; i < this->nc_upper; i++){
-            for (size_t j = 0; j < this->nc_per_group; j++){
-                std::cout << this->nn_centroid_idxs[i][j] << "_" << this->nn_centroid_dists[i][j] << " ";
-            }
-            std::cout << std::endl;
-        }
-        exit(0);
-        
-        
         std::cout << "The query group id is " << group_id[0] << std::endl;
 
         std::vector<float> query_dists(k);
@@ -172,6 +162,10 @@ namespace bslib{
                 const float term2 = alpha * (1 - alpha) * nn_centroid_dists[group_id[i]][nn_centroid_idx] * nn_centroid_dists[group_id[i]][nn_centroid_idx];
                 const float term3 = alpha * query_centroid_dists[nn_centroid_idx] * query_centroid_dists[nn_centroid_idx];
                 float dist = sqrt(term1 + term2 + term3);
+                if (dist == 0){
+                    std::cout << "getting a zero: " << term1 << " " << term2 << " " << term3 << " " << std::endl;
+                    std::cout << "alpha: " << alpha << " " << nn_centroid_idx << " " << query_centroid_dists[group_id[i]] << " " << nn_centroid_dists[group_id[i]][nn_centroid_idx] << " " << query_centroid_dists[nn_centroid_idx] << std::endl;
+                }
                 if (dist < query_dists[0]){
                     faiss::maxheap_pop(k, query_dists.data(), query_labels.data());
                     faiss::maxheap_push(k, query_dists.data(), query_labels.data(), dist, j);
