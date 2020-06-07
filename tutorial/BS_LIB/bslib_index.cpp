@@ -236,10 +236,11 @@ namespace bslib{
         std::cout << "Adding a batch " << std::endl;
         std::vector<float> residuals(n * dimension);
         std::cout << "Sample idxs for a batch " << std::endl;
-        for (size_t i = 0 ; i < 100; i++){
+        for (size_t i = 0 ; i < 1000; i++){
             std::cout << encoded_ids[i] << " ";
         }
         std::cout << std::endl;
+        exit(0);
         encode(n, data, encoded_ids, residuals.data());
         std::vector<uint8_t> batch_codes(n * this->code_size);
 
