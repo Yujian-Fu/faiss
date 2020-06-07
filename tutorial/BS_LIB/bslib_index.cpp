@@ -355,7 +355,7 @@ namespace bslib{
             std::vector<faiss::Index::idx_t> ids(k);
             faiss::maxheap_heapify(k, dists.data(), ids.data());
             for (size_t i = 0; i < m; i++){
-                if (all_dists[i] > dists[0]){
+                if (all_dists[i] < dists[0]){
                     faiss::maxheap_pop(k, dists.data(), ids.data());
                     faiss::maxheap_push(k, dists.data(), ids.data(), all_dists[i], all_ids[i]);
                 }
