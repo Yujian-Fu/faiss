@@ -515,14 +515,13 @@ namespace bslib{
                 std::cout << nc << " " << nc_upper << " " << nc_per_group << " " << std::endl;
                 assert(nc_per_group * nc_upper == nc);
                 VQ_quantizer vq_quantizer = VQ_quantizer(this->dimension, nc_upper, nc_per_group);
-                vq_quantizer.quantizers.resize(nc_upper);
                 std::vector<float> centroids(nc_per_group * this->dimension);
                 for (size_t j = 0; j < nc_upper; j++){
                     quantizer_input.read((char * ) centroids.data(), nc_per_group * this->dimension * sizeof(float));
                     faiss::IndexFlatL2 centroid_quantizer(dimension);
                     centroid_quantizer.add(nc_per_group, centroids.data());
                     vq_quantizer.quantizers.push_back(centroid_quantizer);
-                    std::cout << "The number of quantizer centroid size in VQ quantizer1: " << vq_quantizer.quantizers[j].xb.size() / dimension << std::endl;
+                    std::cout << "The number of quantizer centroid size in VQ quantizer2: " << vq_quantizer.quantizers[j].xb.size() / dimension << std::endl;
                 }
                 this->vq_quantizer_index.push_back(vq_quantizer);
                 std::cout << "The number of quantizer centroid size in VQ quantizer1: " << vq_quantizer.quantizers[0].xb.size() / dimension << std::endl;
