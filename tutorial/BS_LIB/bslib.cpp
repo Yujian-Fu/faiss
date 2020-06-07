@@ -88,16 +88,12 @@ int main(){
         for (size_t i = 0; i < nbatches; i++){
             readXvecFvec<uint8_t> (input, batch.data(), dimension, batch_size);
             index->assign(batch_size, batch.data(), assigned_idxs.data());
-            if (i % 10 == 0){
-                std::cout << " [ " << i << " / " << nbatches << " ]";
-                Trecorder.print_time_usage("");
-                for (size_t temp = 0; temp < 1000; temp++){
-                    std::cout << assigned_idxs[temp] << " ";
-                }
-                std::cout << std::endl;
-            }
             output.write((char * ) & batch_size, sizeof(uint32_t));
             output.write((char *) assigned_idxs.data(), batch_size * sizeof(idx_t));
+            if (i % 10 == 0){
+                std::cout << " assigned batches [ " << i << " / " << nbatches << " ]";
+                Trecorder.print_time_usage("");
+            }
         }
         input.close();
         output.close();

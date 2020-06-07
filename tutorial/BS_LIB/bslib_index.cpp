@@ -17,7 +17,6 @@ namespace bslib{
         
         VQ_quantizer vq_quantizer (this->dimension, nc_upper, nc_per_group);
         ShowMessage("Building centroids for vq quantizer with train data idxs");
-        std::cout << this->train_data_idxs[0] << " " << this->train_data_idxs[1] << " " << this->train_data_idxs[2] << std::endl;;
         vq_quantizer.build_centroids(this->train_data.data(), this->nt, this->train_data_idxs.data(), update_idxs);
         ShowMessage("Checking whether all vq centroids are added correctly");
         for (size_t i = 0; i < nc_upper; i++){
@@ -39,10 +38,6 @@ namespace bslib{
             assert(lq_quantizer.all_quantizer.xb.size() == nc_upper * nc_per_group * dimension);
         }
         ShowMessage("Showing samples of alpha");
-        for(size_t i = 0; i < 20; i++){
-            std::cout << lq_quantizer.alphas[i] << " " << std::endl;
-        }
-        std::cout << std::endl;
         this->lq_quantizer_index.push_back(lq_quantizer);
     }
 
@@ -312,13 +307,11 @@ namespace bslib{
         for (size_t i = 0; i < this->layers; i++){
             assert(n_lq + n_vq == i);
             if (index_type[i] == "VQ"){
-                std::cout << "Searching in VQ layer for " << n << " data vectors " << std::endl;
                 vq_quantizer_index[n_vq].search_in_group(n, assign_data, 1, dists.data(), labels.data(), group_id.data());
                 n_vq ++;
             }
 
             else if(index_type[i] == "LQ"){
-                std::cout << "Searching in LQ layer " << std::endl;
                 lq_quantizer_index[n_lq].search_in_group(n, assign_data, 1, dists.data(), labels.data(), group_id.data());
                 n_lq ++;
             }
