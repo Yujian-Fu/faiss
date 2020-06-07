@@ -619,13 +619,11 @@ namespace bslib{
 
         input.read((char *) & final_nc_input, sizeof(size_t));
         assert(final_nc_input == this->final_nc);
-        std::cout << "The input final_nc is "  << final_nc_input << std::endl;
-        std::cout << "The norm code size is " << this->norm_code_size <<std::endl;;
         for (size_t i = 0; i < this->final_nc; i++){
             size_t group_size_input;
             std::cout << "reading group size input " << std::endl;
             input.read((char *) & group_size_input, sizeof(size_t));
-            std::cout << group_size_input << " ";
+            std::cout << "The group size input is: " << std::endl;
             input.read((char *) base_norm_codes[i].data(), group_size_input * norm_code_size * sizeof(uint8_t));
         }
         std::cout << std::endl;
