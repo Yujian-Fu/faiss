@@ -6,21 +6,22 @@ namespace bslib{
 
 
     void VQ_quantizer::build_centroids(const float * train_data, size_t train_set_size, idx_t * train_data_idxs){
-        std::cout << "Adding " << train_set_size << " train set data into " << nc_upper << " group ";
-        std::vector<std::vector<float>> train_set;
-        train_set.resize(nc_upper);
+        std::cout << "Adding " << train_set_size << " train set data into " << nc_upper << " group " << std::endl;
+        std::vector<std::vector<float>> centroid_train_set;
+        centroid_train_set.resize(nc_upper);
 
         for (size_t i = 0; i < train_set_size; i++){
             idx_t idx = train_data_idxs[i];
-            train_set[idx].push_back(train_data[i]);
+            centroid_train_set[idx].push_back(train_data[i]);
         }
 
         std::cout << "Building all_quantizer and group quantizers for vq_quantizer " << std::endl;
         this->all_quantizer = faiss::IndexFlatL2(dimension);
         for (size_t i = 0; i < nc_upper; i++){
             std::vector<float> centroids(dimension * nc_per_group);
-            size_t nt_sub = train_set[i].size();
-            faiss::kmeans_clustering(dimension, nt_sub, nc_per_group, train_set[i].data(), centroids.data());
+            size_t nt_sub = centroid_train_set[i].size();
+            std::cout << "Running kmeans for " << i << " th group with " << nt_sub << " points to generate " << nc_per_group << " centroids " << std::endl;
+            faiss::kmeans_clustering(dimension, nt_sub, nc_per_group, centroid_train_set[i].data(), centroids.data());
             faiss::IndexFlatL2 centroid_quantizer(dimension);
             centroid_quantizer.add(nc_per_group, centroids.data());
             this->all_quantizer.add(nc_per_group, centroids.data());
