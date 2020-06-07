@@ -125,7 +125,7 @@ int main(){
         std::vector<idx_t> origin_ids(batch_size);
 
         for (size_t i = 0; i < batch_size; i++){
-            readXvec<uint32_t>(idx_input, idxs.data(), batch_size, batch_size, true);
+            readXvec<uint32_t>(idx_input, idxs.data(), batch_size, batch_size);
             readXvecFvec<uint8_t> (base_input, batch.data(), dimension, batch_size, true);
 
             for (size_t j = 0; j < batch_size; j++){
