@@ -135,6 +135,14 @@ namespace bslib{
                 this->train_data[i] = train_subset[i];
             }
             this->nt = subnt;
+            std::cout << "Check whether the random subset is selected correctly" << std::endl;
+            for (size_t i = 0; i < 10; i++){
+                for (size_t j = 0; j < dimension; j++){
+                    std::cout << this->train_data[i * dimension + j] << std::endl;
+                }
+                std::cout << std::endl;
+            }
+            exit(0);
         }
 
         assert(index_type.size() == layers && index_type[0] != "LQ");
