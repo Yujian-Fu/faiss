@@ -75,9 +75,9 @@ namespace bslib{
         for (size_t i = 0; i < nc_upper; i++){
             std::vector<float> centroid_vectors(nc_per_group * dimension);
             const float * centroid = this->upper_centroids.data() + i * dimension;
-            std::cout << "computing centroid vectors for " << i << " th centroid with nn_centroid)idx size: " << this->nn_centroid_idxs[i].size() << std::endl;
+            std::cout << "computing centroid vectors for " << i << " th centroid with nn_centroid_idx size: " << this->nn_centroid_idxs[i].size() << std::endl;
             for (size_t j = 0; j < nc_per_group; j++){
-                std::cout << this->nn_centroid_idxs[i][j] << " ";
+                std::cout << "The idx is " << this->nn_centroid_idxs[i][j] << " ";
                 const float * nn_centroid = this->upper_centroids.data() + this->nn_centroid_idxs[i][j] * dimension;
                 faiss::fvec_madd(dimension, nn_centroid, -1.0, centroid, centroid_vectors.data()+ j * dimension);
             }

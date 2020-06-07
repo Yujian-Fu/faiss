@@ -38,6 +38,16 @@ int main(){
     
     //Initialize the index
     ShowMessage("Initializing the index");
+    std::vector<std::vector<idx_t>> nn_centroid_idxs(5);
+    for (size_t i = 0; i < 5; i++){
+        for (size_t j = 0; j < 10; j++){
+            nn_centroid_idxs[i].push_back(j);
+        }
+    }
+    for (size_t i = 0; i < 10; i++){
+        std::cout << nn_centroid_idxs[0][i] << " ";
+    }
+    std::cout << std::endl;
     Trecorder.reset();
     Bslib_Index * index = new Bslib_Index(dimension, layers, index_type);
     index->nt = nt;
