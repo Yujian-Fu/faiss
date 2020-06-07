@@ -535,6 +535,7 @@ namespace bslib{
                 quantizer_input.read((char *) & nc_per_group, sizeof(size_t));
 
                 assert(nc_per_group * nc_upper == nc);
+                std::cout << nc << " " << nc_upper << " " << nc_per_group << " " << std::endl;
                 std::vector<float> alphas(nc_upper);
                 std::vector<float> upper_centroids(nc_upper * dimension);
                 std::vector<idx_t> nn_centroid_idxs(nc_upper * nc_per_group);
