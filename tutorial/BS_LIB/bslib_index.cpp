@@ -364,7 +364,7 @@ namespace bslib{
             for (size_t i = 0; i < k; i++){
                 sub_ids[i] = ids[k-i-1];
                 sub_dists[i] = dists[k-i-1];
-                std::cout << sub_ids[i] << "_" << sub_dists[i] << " ";
+                std::cout << ids[i] << "_" << dists[i] << " ";
             }
             std::cout << std::endl;
         }
