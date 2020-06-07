@@ -120,8 +120,9 @@ namespace bslib{
         //Load the train set into the index
         bool use_subset = true;
         this->train_data.resize(this->nt * this->dimension);
+        std::cout << "Loading learn set from " << path_learn << std::endl;
         std::ifstream learn_input(path_learn, std::ios::binary);
-        readXvecFvec<uint8_t>(learn_input, this->train_data.data(), this->dimension, 20, true, true);
+        readXvecFvec<uint8_t>(learn_input, this->train_data.data(), this->dimension, this->nt, true, true);
         this->train_data_idxs.resize(this->nt);
         for (size_t i = 0; i < this->nt; i++){
             this->train_data_idxs[i] = 0;
@@ -135,14 +136,7 @@ namespace bslib{
                 this->train_data[i] = train_subset[i];
             }
             this->nt = subnt;
-            std::cout << "Check whether the random subset is selected correctly" << std::endl;
-            for (size_t i = 0; i < 10; i++){
-                for (size_t j = 0; j < dimension; j++){
-                    std::cout << this->train_data[i * dimension + j];
-                }
-                std::cout << std::endl;
-            }
-            exit(0);
+            CheckResult<float>(this->train_data.data(), this->dimension);
         }
 
         assert(index_type.size() == layers && index_type[0] != "LQ");

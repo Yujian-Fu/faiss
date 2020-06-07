@@ -55,7 +55,7 @@ namespace bslib{
     template<typename T>
     void CheckResult(T * data, const size_t dimension){
         std::cout << "Printing sample (1 vector) of the dataset " << std::endl;
-        for (size_t i= 0; i < 10; i++)
+        for (size_t i= 0; i < 2; i++)
         {
             for (size_t j = 0; j < dimension; j++){
                 std::cout << data[i * dimension + j] << " ";
@@ -122,24 +122,6 @@ namespace bslib{
             CheckResult<float>(data, dimension);
     }
 
-    template<typename T>
-    void readXvecFvecHNSW(std::ifstream &in, float *data, const size_t d, const size_t n = 1)
-    {
-        uint32_t dim = d;
-        T mass[d];
-
-        for (size_t i = 0; i < n; i++) {
-            in.read((char *) &dim, sizeof(uint32_t));
-            if (dim != d) {
-                std::cout << "file error\n";
-                exit(1);
-            }
-            in.read((char *) mass, dim * sizeof(T));
-            for (size_t j = 0; j < d; j++)
-                data[i * dim + j] = 1. * mass[j];
-        }
-        CheckResult<float>(data, d);
-    }
 
     inline bool exists(const char * FilePath){
         std::ifstream f (FilePath);

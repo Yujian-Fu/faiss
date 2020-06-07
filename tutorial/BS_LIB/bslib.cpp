@@ -38,11 +38,6 @@ int main(){
     
     //Initialize the index
     ShowMessage("Initializing the index");
-    std::cout << "Loading dataset "<< (path_base) << std::endl;
-    std::ifstream learn_input(path_base, std::ios::binary);
-    std::vector<float> trainvecs(nt * dimension);
-    readXvecFvecHNSW<uint8_t>(learn_input, trainvecs.data(), dimension, 20);
-    exit(0);
     Trecorder.reset();
     Bslib_Index * index = new Bslib_Index(dimension, layers, index_type);
     index->nt = nt;
