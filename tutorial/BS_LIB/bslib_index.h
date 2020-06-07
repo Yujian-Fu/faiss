@@ -36,7 +36,7 @@ struct Bslib_Index{
     std::vector<std::vector<uint8_t>> base_codes;
     std::vector<std::vector<idx_t>> origin_ids;
 
-    std::vector<float> precomputed_table;
+    std::vector<float> precomputed_table; 
 
     std::vector<float> train_data; // Initialized in build_quantizers (without reading)
     std::vector<idx_t> train_data_idxs; // Initialized in build_quantizers (without reading)
