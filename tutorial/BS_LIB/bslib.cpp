@@ -91,6 +91,10 @@ int main(){
             if (i % 10 == 0){
                 std::cout << " [ " << i << " / " << nbatches << " ]";
                 Trecorder.print_time_usage("");
+                for (size_t temp = 0; temp < 1000; temp++){
+                    std::cout << assigned_idxs[temp] << " ";
+                }
+                std::cout << std::endl;
             }
             output.write((char * ) & batch_size, sizeof(uint32_t));
             output.write((char *) assigned_idxs.data(), batch_size * sizeof(idx_t));
