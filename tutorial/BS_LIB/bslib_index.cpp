@@ -525,8 +525,10 @@ namespace bslib{
                             std::cout << std::endl;
                     }
                     vq_quantizer.quantizers[j].add(nc_per_group * this->dimension, centroids.data());
+                    std::cout << "The number of quantizer centroid size in VQ quantizer1: " << vq_quantizer.quantizers[0].xb.size() << std::endl;
                 }
                 this->vq_quantizer_index.push_back(vq_quantizer);
+                std::cout << "The number of quantizer centroid size in VQ quantizer2: " << vq_quantizer_index[0].quantizers[0].xb.size() << std::endl;
             }
             else if (index_type[i] == "LQ"){
                 std::cout << "Reading LQ layer " << std::endl;
@@ -552,9 +554,10 @@ namespace bslib{
                 }
                 this->lq_quantizer_index.push_back(lq_quantizer);
             }
+            std::cout << "The number of quantizer centroid size in VQ quantizer3: " << vq_quantizer_index[0].quantizers[0].xb.size() << std::endl;
         }
         quantizer_input.close();
-        std::cout << "The number of quantizer centroid size in VQ quantizer: " << vq_quantizer_index[0].quantizers[0].xb.size() << std::endl;
+        std::cout << "The number of quantizer centroid size in VQ quantizer4: " << vq_quantizer_index[0].quantizers[0].xb.size() << std::endl;
     }
 
     void Bslib_Index::write_index(const char * path_index){
