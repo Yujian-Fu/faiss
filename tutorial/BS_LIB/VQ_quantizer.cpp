@@ -31,7 +31,7 @@ namespace bslib{
         }
 
         std::cout << "checking the centroids" << std::endl;
-        for (size_t i = 0; i < this->nc; i++){
+        for (size_t i = 0; i < 10; i++){
             for (size_t j = 0; j < dimension; j++){
                 std::cout << this->all_quantizer.xb[i * dimension + j] << " ";
             }
@@ -52,7 +52,6 @@ namespace bslib{
         std::cout << "searching the train idxs for train vectors " << std::endl;
         all_quantizer.search(train_set_size, train_data, 1, centroid_distances.data(), centroid_idxs.data());
         std::cout << centroid_idxs[0] << " " << centroid_idxs[1] << " " << centroid_idxs[2] << " " << centroid_idxs[3] << std::endl;
-        exit(0);
         for (size_t i = 0; i < train_set_size; i++){
             train_data_idxs[i] = centroid_idxs[i];
         }
