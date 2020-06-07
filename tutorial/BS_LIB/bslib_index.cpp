@@ -623,8 +623,10 @@ namespace bslib{
         std::cout << "The norm code size is " << this->norm_code_size <<std::endl;;
         for (size_t i = 0; i < this->final_nc; i++){
             input.read((char *) & group_size_input, sizeof(size_t));
+            std::cout << group_size_input << " ";
             input.read((char *) base_norm_codes[i].data(), group_size_input * norm_code_size * sizeof(uint8_t));
         }
+        std::cout << std::endl;
 
 
         input.read((char *) & final_nc_input, sizeof(size_t));
@@ -650,7 +652,4 @@ namespace bslib{
         input.read((char *) centroid_norm_codes.data(), this->final_nc * this->norm_code_size * sizeof(uint8_t));
         input.close();
     }
-    
-
-
 }
