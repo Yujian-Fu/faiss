@@ -236,14 +236,14 @@ namespace bslib{
         std::vector<uint8_t> batch_codes(n * this->code_size);
         this->pq.compute_codes(residuals.data(), batch_codes.data(), n);
 
-        //std::vector<float> reconstructed_x(dimension * this->nt);
+        std::vector<float> reconstructed_x(n * dimension);
 
         /*
         Todo: should we use the decoded reconstructed_x for exp? actually we may use
         the distance in full precision for exp?
         */
        
-        //decode(this->nt, residuals.data(), encoded_ids, reconstructed_x.data());
+        decode(this->nt, residuals.data(), encoded_ids, reconstructed_x.data());
 
         /*
         Use the origin distance can save time?
