@@ -52,11 +52,15 @@ namespace bslib{
         std::cout << "The centroid size in quantizer 0 is: " << this->quantizers[0].xb.size() / this->dimension << std::endl;
         std::vector<float> query_dists(n * k);
         std::vector<faiss::Index::idx_t> query_labels(n * k);
-#pragma omp parallel for
         for (size_t i = 0; i < n; i++){
             this->quantizers[group_id[i]].search(1, instances + i * dimension, k, query_dists.data() + i * k, query_labels.data() + i * k);
         }
         
+        for (size_t i = 0; i < k; i++){
+            std::cout << query_labels[i] << " ";
+        }
+        std::cout << std::endl;
+
         for (size_t i = 0; i < n; i++){
             size_t base_idx = CentroidDistributionMap[group_id[i]];
             for (size_t j = 0; j < k; j++){
@@ -65,10 +69,7 @@ namespace bslib{
             }
         }
 
-        for (size_t i = 0; i < 100; i++){
-            std::cout << labels[i] << " ";
-        }
-        std::cout << std::endl;
+
     }
 
     void VQ_quantizer::compute_final_centroid(idx_t label, float * final_centroid){

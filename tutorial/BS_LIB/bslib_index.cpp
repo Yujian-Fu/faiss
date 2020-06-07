@@ -297,34 +297,6 @@ namespace bslib{
         }
     }
 
-
-    void Bslib_Index::keep_k_min(size_t m, size_t k, float * all_dists, idx_t * all_ids, float * sub_dists, idx_t * sub_ids){
-        assert(m >= k);
-        if (m == k){
-            for (size_t i = 0; i < m; i++){
-                sub_dists[i] = all_dists[i];
-                sub_ids[i] = all_ids[i];
-            }
-        }
-        else{
-            std::vector<float> dists(k);
-            std::vector<faiss::Index::idx_t> ids(k);
-            faiss::maxheap_heapify(k, dists.data(), ids.data());
-            for (size_t i = 0; i < m; i++){
-                if (all_dists[i] > dists[0]){
-                    faiss::maxheap_pop(k, dists.data(), ids.data());
-                    faiss::maxheap_push(k, dists.data(), ids.data(), all_dists[i], ids[i]);
-                }
-            }
-
-            for (size_t i = 0; i < k; i++){
-                sub_ids[i] = ids[k-i-1];
-                sub_dists[i] = dists[k-i-1];
-            }
-        }
-        std::cout << "Finished keep kmin function " << std::endl;
-    }
-
     void Bslib_Index::assign(size_t n, const float * assign_data, idx_t * assigned_ids){
 
         std::vector<idx_t> group_id (n);
@@ -369,6 +341,35 @@ namespace bslib{
         }
     }
 
+
+    void Bslib_Index::keep_k_min(size_t m, size_t k, float * all_dists, idx_t * all_ids, float * sub_dists, idx_t * sub_ids){
+        assert(m >= k);
+        if (m == k){
+            for (size_t i = 0; i < m; i++){
+                sub_dists[i] = all_dists[i];
+                sub_ids[i] = all_ids[i];
+            }
+        }
+        else{
+            std::vector<float> dists(k);
+            std::vector<faiss::Index::idx_t> ids(k);
+            faiss::maxheap_heapify(k, dists.data(), ids.data());
+            for (size_t i = 0; i < m; i++){
+                if (all_dists[i] > dists[0]){
+                    faiss::maxheap_pop(k, dists.data(), ids.data());
+                    faiss::maxheap_push(k, dists.data(), ids.data(), all_dists[i], ids[i]);
+                }
+            }
+
+            for (size_t i = 0; i < k; i++){
+                sub_ids[i] = ids[k-i-1];
+                sub_dists[i] = dists[k-i-1];
+            }
+        }
+        std::cout << "Finished keep kmin function " << std::endl;
+    }
+
+    
     float Bslib_Index::pq_L2sqr(const uint8_t *code)
     {
         float result = 0.;
@@ -424,7 +425,6 @@ namespace bslib{
                     for (size_t m = 0; m < search_ids.size(); m++){
                         lq_quantizer_index[n_lq].search_in_group(1, search_space[j], resuld_q_c_dists.data()+ m * search_space[j], result_ids.data()+ m * search_space[j], search_ids.data()+m, search_q_c_dists.data()+m);
                     }
-
                     n_lq ++;
                 }
 
@@ -632,7 +632,6 @@ namespace bslib{
 
 
         input.read((char *) & final_nc_input, sizeof(size_t));
-        std::cout << "The input final nc is" << final_nc_input << std::endl;
         assert(final_nc_input == this->final_nc);
         for (size_t i = 0; i < this->final_nc; i++){
             input.read((char *) & group_size_input, sizeof(size_t));
@@ -641,7 +640,6 @@ namespace bslib{
         }
 
         input.read((char *) & final_nc_input, sizeof(size_t));
-        std::cout << "The input final nc is" << final_nc_input << std::endl;
         assert(final_nc_input == this->final_nc);
         for (size_t i = 0; i < this->final_nc; i++){
             input.read((char *) & group_size_input, sizeof(size_t));
@@ -650,7 +648,6 @@ namespace bslib{
         }
 
         input.read((char *) & final_nc_input, sizeof(size_t));
-        std::cout << "The input final nc is" << final_nc_input << std::endl;
         assert(final_nc_input == this->final_nc);
         input.read((char *) centroid_norms.data(), this->final_nc * sizeof(float));
         input.read((char *) centroid_norm_codes.data(), this->final_nc * this->norm_code_size * sizeof(uint8_t));
