@@ -512,13 +512,14 @@ namespace bslib{
                 quantizer_input.read((char *) & nc, sizeof(size_t));
                 quantizer_input.read((char *) & nc_upper, sizeof(size_t));
                 quantizer_input.read((char *) & nc_per_group, sizeof(size_t));
+                std::cout << nc << " " << nc_upper << " " << nc_per_group << " " << std::endl;
                 assert(nc_per_group * nc_upper == nc);
                 VQ_quantizer vq_quantizer = VQ_quantizer(this->dimension, nc_upper, nc_per_group);
                 vq_quantizer.quantizers.resize(nc_upper);
                 std::vector<float> centroids(nc_per_group * this->dimension);
                 for (size_t j = 0; j < nc_upper; j++){
                     quantizer_input.read((char * ) centroids.data(), nc_per_group * this->dimension * sizeof(float));
-                    for (size_t id = 0; id < nc_per_group * this->dimension; id++){
+                    for (size_t id = 0; id < 10 * this->dimension; id++){
                         std::cout << centroids[i] << " ";
                         if (id % dimension == 0)
                             std::cout << std::endl;
