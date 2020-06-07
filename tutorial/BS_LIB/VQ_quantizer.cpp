@@ -30,7 +30,7 @@ namespace bslib{
                 this->all_quantizer.add(nc_per_group, centroids.data());
             }
         }
-        
+
         std::cout << "all centroids added" << std::endl;
 
         if (update_idxs){
@@ -100,17 +100,28 @@ namespace bslib{
         std::vector<faiss::Index::idx_t>  search_nn_idxs(this->nc * (k + 1));
         std::vector<float> search_nn_dists ( this->nc * (k+1));
         this->all_quantizer.search(this->nc, this->all_quantizer.xb.data(), k+1, search_nn_dists.data(), search_nn_idxs.data());
+        std::cout << "VQ nn centroids idxs results: " << std::endl;
+        for (size_t i = 0; i < this->nc; i++){
+            for(size_t j = 0; j < (k+1); j++){
+                std::cout << search_nn_idxs[i * (k+1) + j] << " ";
+            }
+            std::cout << std::endl;
+        }
         
         for (size_t i = 0; i < this->nc; i++){
             for (size_t j = 0; j < k; j++){
                 nn_dists[i * k + j] = search_nn_dists[i * (k + 1) + j + 1];
                 labels[i * k + j] = search_nn_idxs[i * (k + 1) + j + 1];
+                std::cout << labels[i * k + j] << " ";
             }
+            std::cout << std::endl;
             for (size_t j = 0; j < dimension; j++){
                 nn_centroids[i * dimension + j] = all_quantizer.xb[i * dimension + j];
             }
         }
     }
+
+
 
 
 

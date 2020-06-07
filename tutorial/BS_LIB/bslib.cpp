@@ -38,7 +38,6 @@ int main(){
     
     //Initialize the index
     ShowMessage("Initializing the index");
-    std::cout << std::endl;
     Trecorder.reset();
     Bslib_Index * index = new Bslib_Index(dimension, layers, index_type);
     index->nt = nt;
