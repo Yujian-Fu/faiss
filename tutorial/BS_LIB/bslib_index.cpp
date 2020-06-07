@@ -67,9 +67,11 @@ namespace bslib{
     void Bslib_Index::decode(size_t n, const float * encoded_data, const idx_t * encoded_ids, float * decoded_data){
         std::cout << "decoding data" << std::endl;
         if (index_type[layers-1] == "VQ"){
+            std::cout << "Recovering VQ residuals" << std::endl;
             vq_quantizer_index[vq_quantizer_index.size()-1].recover_residual_group_id(n, encoded_ids, encoded_data, decoded_data);
         }
         else if (index_type[layers-1] == "LQ"){
+            std::cout << "Recovering LQ residuals" << std::endl;
             lq_quantizer_index[lq_quantizer_index.size()-1].recover_residual_group_id(n, encoded_ids, encoded_data, decoded_data);
         }
         else{
@@ -233,7 +235,6 @@ namespace bslib{
     }
 
     void Bslib_Index::add_batch(size_t n, const float * data, const idx_t * ids, idx_t * encoded_ids){
-        std::cout << "Adding a batch " << std::endl;
         std::vector<float> residuals(n * dimension);
         encode(n, data, encoded_ids, residuals.data());
         std::vector<uint8_t> batch_codes(n * this->code_size);

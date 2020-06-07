@@ -129,9 +129,9 @@ int main(){
         std::vector<float> batch(batch_size * dimension);
         std::vector<idx_t> origin_ids(batch_size);
 
-        for (size_t i = 0; i < batch_size; i++){
+        for (size_t i = 0; i < nbatches; i++){
             readXvec<uint32_t>(idx_input, idxs.data(), batch_size, 1);
-            readXvecFvec<uint8_t> (base_input, batch.data(), dimension, batch_size, true);
+            readXvecFvec<uint8_t> (base_input, batch.data(), dimension, batch_size);
 
             for (size_t j = 0; j < batch_size; j++){
                 origin_ids[i] = batch_size * i + j;
