@@ -55,6 +55,7 @@ namespace bslib{
         std::cout << "The centroid size in quantizer 0 is: " << this->quantizers[0].xb.size() / this->dimension << std::endl;
         std::vector<float> query_dists(n * k);
         std::vector<faiss::Index::idx_t> query_labels(n * k);
+#pragma omp parallel for
         for (size_t i = 0; i < n; i++){
             this->quantizers[group_id[i]].search(1, instances + i * dimension, k, query_dists.data() + i * k, query_labels.data() + i * k);
         }

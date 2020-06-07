@@ -54,9 +54,11 @@ namespace bslib{
         assign(n, encode_data, encoded_ids);
 
         if (index_type[layers-1] == "VQ"){
+            std::cout << "Computing VQ residuals" << std::endl;
             vq_quantizer_index[vq_quantizer_index.size()-1].compute_residual_group_id(n, encoded_ids, train_data.data(), encoded_data);
         }
         else if(index_type[layers-1] == "LQ"){
+            std::cout << "Computing LQ residuals " << std::endl;
             lq_quantizer_index[lq_quantizer_index.size()-1].compute_residual_group_id(n, encoded_ids, train_data.data(), encoded_data);
         }
     }
@@ -330,12 +332,22 @@ namespace bslib{
             if (index_type[i] == "VQ"){
                 std::cout << "Searching in VQ layer for " << n << " data vectors " << std::endl;
                 vq_quantizer_index[n_vq].search_in_group(n, assign_data, 1, dists.data(), labels.data(), group_id.data());
+                std::cout << "The sample group id " << std::endl;
+                for (size_t j = 0; j < 10; j++){
+                    std::cout << labels[j] << " ";
+                }
+                std::cout << std::endl;
                 n_vq ++;
             }
 
             else if(index_type[i] == "LQ"){
                 std::cout << "Searching in LQ layer " << std::endl;
                 lq_quantizer_index[n_lq].search_in_group(n, 1, dists.data(), labels.data(), group_id.data(), upper_q_c_dists.data());
+                std::cout << "The sample group id " << std::endl;
+                for (size_t j = 0; j < 10; j++){
+                    std::cout << labels[j] << " ";
+                }
+                std::cout << std::endl;
                 n_lq ++;
             }
             else{
