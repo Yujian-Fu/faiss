@@ -663,7 +663,7 @@ namespace bslib{
         input.read((char *) centroid_norm_codes.data(), this->final_nc * this->norm_code_size * sizeof(uint8_t));
         std::cout << "Checking base norm: " ;
         for (size_t i = 0; i < this->base_norm_codes[0].size(); i++){
-            std::cout << this->base_norm_codes[0][i] << " ";
+            std::cout << (float)this->base_norm_codes[0][i] << " ";
         }
         exit(0);
         input.close();
