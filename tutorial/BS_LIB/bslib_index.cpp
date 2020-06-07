@@ -49,13 +49,10 @@ namespace bslib{
 
 
     void Bslib_Index::encode(size_t n, const float * encode_data, const idx_t * encoded_ids, float * encoded_data){
-        std::cout << "encoding data" << std::endl;
         if (index_type[layers-1] == "VQ"){
-            std::cout << "Computing VQ residuals" << std::endl;
             vq_quantizer_index[vq_quantizer_index.size()-1].compute_residual_group_id(n, encoded_ids, encode_data, encoded_data);
         }
         else if(index_type[layers-1] == "LQ"){
-            std::cout << "Computing LQ residuals " << std::endl;
             lq_quantizer_index[lq_quantizer_index.size()-1].compute_residual_group_id(n, encoded_ids, encode_data, encoded_data);
         }
         else{
@@ -65,13 +62,10 @@ namespace bslib{
     }
 
     void Bslib_Index::decode(size_t n, const float * encoded_data, const idx_t * encoded_ids, float * decoded_data){
-        std::cout << "decoding data" << std::endl;
         if (index_type[layers-1] == "VQ"){
-            std::cout << "Recovering VQ residuals" << std::endl;
             vq_quantizer_index[vq_quantizer_index.size()-1].recover_residual_group_id(n, encoded_ids, encoded_data, decoded_data);
         }
         else if (index_type[layers-1] == "LQ"){
-            std::cout << "Recovering LQ residuals" << std::endl;
             lq_quantizer_index[lq_quantizer_index.size()-1].recover_residual_group_id(n, encoded_ids, encoded_data, decoded_data);
         }
         else{
@@ -117,6 +111,7 @@ namespace bslib{
         std::vector<float> residuals(dimension * this->nt);
         std::vector<idx_t> group_ids(this->nt);
         assign(this->nt, this->train_data.data(), group_ids.data());
+
         encode(this->nt, this->train_data.data(), group_ids.data(), residuals.data());
         this->pq.verbose = true;
         this->pq.train(nt, residuals.data());
@@ -237,15 +232,25 @@ namespace bslib{
     void Bslib_Index::add_batch(size_t n, const float * data, const idx_t * ids, idx_t * encoded_ids){
         std::vector<float> residuals(n * dimension);
         encode(n, data, encoded_ids, residuals.data());
-        std::vector<uint8_t> batch_codes(n * this->code_size);
 
+        std::vector<uint8_t> batch_codes(n * this->code_size);
         this->pq.compute_codes(residuals.data(), batch_codes.data(), n);
+
+        std::vector<float> reconstructed_x(dimension * this->nt);
+
+        /*
+        Todo: should we use the decoded reconstructed_x for exp? actually we may use
+        the distance in full precision for exp?
+        */
+
+        decode(this->nt, residuals.data(), encoded_ids, reconstructed_x.data());
         std::vector<float> xnorms (n);
-        std::vector<uint8_t> xnorm_codes (n * norm_code_size);
         for (size_t i = 0; i < n; i++){
-            xnorms[i] =  faiss::fvec_norm_L2sqr(data + i * dimension, dimension);
+            xnorms[i] =  faiss::fvec_norm_L2sqr(reconstructed_x.data() + i * dimension, dimension);
         }
+        std::vector<uint8_t> xnorm_codes (n * norm_code_size);
         this->norm_pq.compute_codes(xnorms.data(), xnorm_codes.data(), n);
+    
         for (size_t i = 0 ; i < n; i++){
             for (size_t j = 0; j < this->code_size; j++){
                 this->base_codes[encoded_ids[i]].push_back(batch_codes[i * this->code_size + j]);
