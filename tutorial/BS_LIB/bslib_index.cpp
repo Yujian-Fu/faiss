@@ -429,6 +429,8 @@ namespace bslib{
                     n_lq ++;
                 }
                 
+                search_q_c_dists.resize(keep_result_space);
+                search_ids.resize(keep_result_space);
                 keep_k_min(search_result_space, keep_result_space, resuld_q_c_dists.data(), result_ids.data(), search_q_c_dists.data(), search_ids.data());
             }
             assert((n_vq + n_lq) == this->layers);
