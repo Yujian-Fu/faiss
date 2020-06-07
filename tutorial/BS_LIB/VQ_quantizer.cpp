@@ -65,7 +65,7 @@ namespace bslib{
             }
         }
         for (size_t i = 0; i < k; i++){
-            std::cout << labels[i] << "_" << query_labels[i];
+            std::cout << labels[i] << "_" << query_labels[i] << "   ";
         }
         std::cout << std::endl;
 
