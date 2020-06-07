@@ -121,7 +121,7 @@ namespace bslib{
         bool use_subset = true;
         this->train_data.resize(this->nt * this->dimension);
         std::ifstream learn_input(path_learn, std::ios::binary);
-        readXvecFvec<uint8_t>(learn_input, this->train_data.data(), this->dimension, this->nt, true, true);
+        readXvecFvec<uint8_t>(learn_input, this->train_data.data(), this->dimension, 20, true, true);
         this->train_data_idxs.resize(this->nt);
         for (size_t i = 0; i < this->nt; i++){
             this->train_data_idxs[i] = 0;
