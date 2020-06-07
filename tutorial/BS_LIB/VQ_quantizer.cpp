@@ -47,9 +47,6 @@ namespace bslib{
     }
 
     void VQ_quantizer::search_in_group(size_t n, const float * instances, size_t k, float * dists, idx_t * labels, const idx_t * group_id){
-        std::cout << "The quantizers size: "<< this->quantizers.size() << std::endl;
-
-        std::cout << "The centroid size in quantizer 0 is: " << this->quantizers[0].xb.size() / this->dimension << std::endl;
         std::vector<float> query_dists(n * k);
         std::vector<faiss::Index::idx_t> query_labels(n * k);
 #pragma omp parallel for

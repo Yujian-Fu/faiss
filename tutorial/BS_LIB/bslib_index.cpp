@@ -408,7 +408,6 @@ namespace bslib{
                 keep_result_space = search_ids.size() * keep_space[j];
                 result_ids.resize(search_result_space);
                 resuld_q_c_dists.resize(search_result_space);
-                std::cout << "Parameters: " << search_result_space << " " << keep_result_space << std::endl;;
 
                 if (index_type[j] == "VQ"){
                     for (size_t m = 0; m < search_ids.size(); m++){
@@ -430,34 +429,24 @@ namespace bslib{
             }
 
             assert((n_vq + n_lq) == this->layers);
-            std::cout << "Computing inner_prod_table " << std::endl;
             this->pq.compute_inner_prod_table(query, this->precomputed_table.data());
             size_t visited_vectors = 0;
             
-            std::cout << "Visiting vectors with keep result space" << keep_result_space << std::endl;
             for (size_t j = 0; j < keep_result_space; j++){
                 
                 size_t group_id = search_ids[j];
                 
                 float q_c_dist = search_q_c_dists[j];
-                std::cout << "Group_id and q_c_dis are: " << group_id << " " << q_c_dist << std::endl;
                 size_t group_size = this->origin_ids[group_id].size();
                 assert(group_size == this->base_codes[group_id].size() / this->code_size);
 
-                std::cout << "Computing the distance" << std::endl;
                 float term1 = q_c_dist - centroid_norms[group_id];
 
                 std::vector<float> base_norms(group_size);
                 assert(group_size == base_norm_codes[group_id].size() / this->norm_code_size);
                 this->norm_pq.decode(base_norm_codes[group_id].data(), base_norms.data(), group_size);
-                std::cout << "Checking the base norms " << std::endl;
-                for (size_t temp = 0; temp < base_norms.size(); temp++){
-                    std::cout << base_norms[temp] << " ";
-                }
-                std::cout << std::endl;
                 const uint8_t * code = base_codes[group_id].data();
 
-                std::cout << "visiting the vectors: " << std::endl;
                 for (size_t m = 0; m < group_size; m++){
                     float term2 = base_norms[m];
                     float term3 = 2 * pq_L2sqr(code + m * code_size);
