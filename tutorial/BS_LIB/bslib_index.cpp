@@ -553,6 +553,7 @@ namespace bslib{
             }
         }
         quantizer_input.close();
+        std::cout << "The number of quantizer centroid size in VQ quantizer: " << vq_quantizer_index[0].quantizers[0].xb.size() << std::endl;
     }
 
     void Bslib_Index::write_index(const char * path_index){
