@@ -431,10 +431,12 @@ namespace bslib{
                 search_ids.resize(keep_result_space);
                 keep_k_min(search_result_space, keep_result_space, resuld_q_c_dists.data(), result_ids.data(), search_q_c_dists.data(), search_ids.data());
             }
-            
+
             assert((n_vq + n_lq) == this->layers);
+            std::cout << "Computing inner_prod_table " << std::endl;
             pq.compute_inner_prod_table(query, precomputed_table.data());
             
+            std::cout << "Visiting vectors with keep result space" << keep_result_space << std::endl;
             for (size_t j = 0; j < keep_result_space; j++){
                 size_t group_id = search_ids[j];
                 float q_c_dist = search_q_c_dists[j];
