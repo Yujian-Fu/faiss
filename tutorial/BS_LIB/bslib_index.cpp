@@ -48,7 +48,7 @@ namespace bslib{
 
 
 
-    void Bslib_Index::encode(size_t n, const float * encode_data, idx_t * encoded_ids, float * encoded_data){
+    void Bslib_Index::encode(size_t n, const float * encode_data, const idx_t * encoded_ids, float * encoded_data){
         std::cout << "encoding data" << std::endl;
         if (index_type[layers-1] == "VQ"){
             std::cout << "Computing VQ residuals" << std::endl;
@@ -235,12 +235,7 @@ namespace bslib{
     void Bslib_Index::add_batch(size_t n, const float * data, const idx_t * ids, idx_t * encoded_ids){
         std::cout << "Adding a batch " << std::endl;
         std::vector<float> residuals(n * dimension);
-        std::cout << "Sample idxs for a batch " << std::endl;
-        for (size_t i = 0 ; i < 1000; i++){
-            std::cout << encoded_ids[i] << " ";
-        }
-        std::cout << std::endl;
-        exit(0);
+        
         encode(n, data, encoded_ids, residuals.data());
         std::vector<uint8_t> batch_codes(n * this->code_size);
 

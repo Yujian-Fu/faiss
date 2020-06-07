@@ -48,7 +48,7 @@ struct Bslib_Index{
     void add_vq_quantizer(size_t nc_upper, size_t nc_per_group, bool update_idxs);
     void add_lq_quantizer(size_t nc_upper, size_t nc_per_group, const float * upper_centroids, const idx_t * upper_nn_centroid_idxs, const float * upper_nn_centroid_dists, bool update_idxs);
     void train_pq(const char * path_pq, const char * path_norm_pq, const char * path_learn);
-    void encode(size_t n, const float * data, idx_t * encoded_ids, float * encoded_data);
+    void encode(size_t n, const float * data, const idx_t * encoded_ids, float * encoded_data);
     void decode(size_t n, const float * encoded_data, const idx_t * encoded_ids, float * decoded_data);
     void assign(size_t n, const float * data, idx_t * assigned_ids);
     void add_batch(size_t n, const float * data, const idx_t * origin_ids, idx_t * encoded_ids);
