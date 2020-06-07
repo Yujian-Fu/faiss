@@ -584,14 +584,14 @@ namespace bslib{
             assert((base_norm_codes[i].size() == base_codes[i].size() / this->code_size) && (base_norm_codes[i].size() == origin_ids[i].size()));
             size_t group_size = base_norm_codes[i].size();
             output.write((char *) & group_size, sizeof(size_t));
-            output.write((char *) base_norm_codes[i].data(), group_size * norm_code_size * sizeof(uint8_t));
+            output.write((char *) base_norm_codes[i].data(), group_size * sizeof(uint8_t));
         }
 
         output.write((char *) & this->final_nc, sizeof(size_t));
         for (size_t i = 0; i < this->final_nc; i++){
             size_t group_size = base_codes[i].size();
             output.write((char *) & group_size, sizeof(size_t));
-            output.write((char *) base_codes[i].data(), group_size * code_size * sizeof(uint8_t));
+            output.write((char *) base_codes[i].data(), group_size * sizeof(uint8_t));
         }
 
         output.write((char *) & this->final_nc, sizeof(size_t));
@@ -601,15 +601,19 @@ namespace bslib{
             output.write((char *) origin_ids[i].data(), group_size * sizeof(idx_t));
         }
         output.write((char *) & this->final_nc, sizeof(size_t));
+        assert(centroid_norms.size() == this->final_nc);
         output.write((char *) centroid_norms.data(), this->final_nc * sizeof(float));
+        assert(centroid_norm_codes.size() == this->final_nc * this->norm_code_size);
         output.write((char *) centroid_norm_codes.data(), this->final_nc * this->norm_code_size * sizeof(uint8_t));
         output.close();
     }
 
+
     void Bslib_Index::read_index(const char * path_index){
         std::ifstream input(path_index, std::ios::binary);
         size_t final_nc_input;
-        
+        size_t group_size_input;
+
         this->base_codes.resize(this->final_nc);
         this->base_norm_codes.resize(this->final_nc);
         this->origin_ids.resize(this->final_nc);
@@ -620,11 +624,9 @@ namespace bslib{
         input.read((char *) & final_nc_input, sizeof(size_t));
         assert(final_nc_input == this->final_nc);
         for (size_t i = 0; i < this->final_nc; i++){
-            size_t group_size_input;
-            std::cout << "reading group size input " << std::endl;
             input.read((char *) & group_size_input, sizeof(size_t));
-            std::cout << "The group size input is: " << std::endl;
-            input.read((char *) base_norm_codes[i].data(), group_size_input * norm_code_size * sizeof(uint8_t));
+            this->base_norm_codes[i].resize(group_size_input);
+            input.read((char *) base_norm_codes[i].data(), group_size_input * sizeof(uint8_t));
         }
         std::cout << std::endl;
 
@@ -633,17 +635,17 @@ namespace bslib{
         std::cout << "The input final nc is" << final_nc_input << std::endl;
         assert(final_nc_input == this->final_nc);
         for (size_t i = 0; i < this->final_nc; i++){
-            size_t group_size_input;
             input.read((char *) & group_size_input, sizeof(size_t));
-            input.read((char *) base_codes[i].data(), group_size_input * code_size * sizeof(uint8_t));
+            base_codes[i].resize(group_size_input);
+            input.read((char *) base_codes[i].data(), group_size_input * sizeof(uint8_t));
         }
 
         input.read((char *) & final_nc_input, sizeof(size_t));
         std::cout << "The input final nc is" << final_nc_input << std::endl;
         assert(final_nc_input == this->final_nc);
         for (size_t i = 0; i < this->final_nc; i++){
-            size_t group_size_input;
             input.read((char *) & group_size_input, sizeof(size_t));
+            origin_ids[i].resize(group_size_input);
             input.read((char *) origin_ids[i].data(), group_size_input * sizeof(idx_t));
         }
 
