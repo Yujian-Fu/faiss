@@ -322,6 +322,7 @@ namespace bslib{
                 sub_dists[i] = dists[k-i-1];
             }
         }
+        std::cout << "Finished keep kmin function " << std::endl;
     }
 
     void Bslib_Index::assign(size_t n, const float * assign_data, idx_t * assigned_ids){
@@ -410,6 +411,7 @@ namespace bslib{
                 keep_result_space = search_ids.size() * keep_space[j];
                 result_ids.resize(search_result_space);
                 resuld_q_c_dists.resize(search_result_space);
+                std::cout << "Parameters: " << search_result_space << " " << keep_result_space << std::endl;;
 
                 if (index_type[j] == "VQ"){
                     for (size_t m = 0; m < search_ids.size(); m++){
@@ -425,6 +427,8 @@ namespace bslib{
 
                     n_lq ++;
                 }
+
+                std::cout << "Finished " << j << " th level search " << std::endl;
                 
                 keep_k_min(search_result_space, keep_result_space, resuld_q_c_dists.data(), result_ids.data(), search_q_c_dists.data(), search_ids.data());
             }
