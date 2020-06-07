@@ -243,7 +243,7 @@ namespace bslib{
         the distance in full precision for exp?
         */
        
-        decode(this->nt, residuals.data(), encoded_ids, reconstructed_x.data());
+        decode(n, residuals.data(), encoded_ids, reconstructed_x.data());
 
         /*
         Use the origin distance can save time?
