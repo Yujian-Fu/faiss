@@ -12,7 +12,8 @@ namespace bslib{
 
         for (size_t i = 0; i < train_set_size; i++){
             idx_t idx = train_data_idxs[i];
-            centroid_train_set[idx].push_back(train_data[i]);
+            for (size_t j = 0; j < dimension; j++)
+                centroid_train_set[idx].push_back(train_data[i*dimension + j]);
         }
 
         std::cout << "Building all_quantizer and group quantizers for vq_quantizer " << std::endl;
@@ -20,7 +21,7 @@ namespace bslib{
         for (size_t i = 0; i < nc_upper; i++){
             std::vector<float> centroids(dimension * nc_per_group);
             size_t nt_sub = centroid_train_set[i].size();
-            std::cout << "Running kmeans for " << i << " th group with " << nt_sub << " points to generate " << nc_per_group << " centroids " << std::endl;
+            std::cout << "Running kmeans for " << i << " th group with " << nt_sub / dimension << " points to generate " << nc_per_group << " centroids " << std::endl;
             faiss::kmeans_clustering(dimension, nt_sub, nc_per_group, centroid_train_set[i].data(), centroids.data());
             std::cout << "Finished kmeans, add centroids to quantizers" << std::endl;
             faiss::IndexFlatL2 centroid_quantizer(dimension);
