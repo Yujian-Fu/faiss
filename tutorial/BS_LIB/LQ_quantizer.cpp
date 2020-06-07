@@ -154,7 +154,7 @@ namespace bslib{
             const float * query = queries + i * dimension;
             faiss::IndexFlatL2 group_quantizer(dimension);
             size_t query_group_id = group_id[i];
-            std::cout << "The group id is " << query_group_id <<std::endl;
+            //std::cout << "The group id is " << query_group_id <<std::endl;
             std::vector<float> sub_centroids(nc_per_group * dimension);
             for (size_t label = CentroidDistributionMap[query_group_id]; label < CentroidDistributionMap[query_group_id] + this->nc_per_group; label++){
                 compute_final_centroid(label, sub_centroids.data() + (label - CentroidDistributionMap[query_group_id]) * dimension);
@@ -165,9 +165,7 @@ namespace bslib{
             for (size_t j = 0; j < k; j++){
                 dists[i * k + j] = query_dists[j];
                 labels[i * k + j] = CentroidDistributionMap[query_group_id] + query_labels[j];
-                std::cout << labels[i * k + j] << "_" << dists[i * k + j] << " ";
             }
-            std::cout << std::endl;
         }
     }
 

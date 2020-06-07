@@ -449,7 +449,7 @@ namespace bslib{
 
                 std::vector<float> base_norms(group_size);
                 assert(group_size == base_norm_codes[group_id].size() / this->norm_code_size);
-                this->norm_pq.decode(base_norm_codes[group_id].data(), base_norms.data());
+                this->norm_pq.decode(base_norm_codes[group_id].data(), base_norms.data(), group_size);
                 std::cout << "Checking the base norms " << std::endl;
                 for (size_t temp = 0; temp < base_norms.size(); temp++){
                     std::cout << base_norms[temp] << " ";
