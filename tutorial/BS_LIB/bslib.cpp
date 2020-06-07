@@ -121,11 +121,11 @@ int main(){
         std::ifstream idx_input(path_idxs, std::ios::binary);
 
         std::vector<idx_t> idxs(batch_size);
-        std::vector<float> batch(batch_size);
+        std::vector<float> batch(batch_size * dimension);
         std::vector<idx_t> origin_ids(batch_size);
 
         for (size_t i = 0; i < batch_size; i++){
-            readXvec<uint32_t>(idx_input, idxs.data(), batch_size, batch_size);
+            readXvec<uint32_t>(idx_input, idxs.data(), batch_size, 1);
             readXvecFvec<uint8_t> (base_input, batch.data(), dimension, batch_size, true);
 
             for (size_t j = 0; j < batch_size; j++){
