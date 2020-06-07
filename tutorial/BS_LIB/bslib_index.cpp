@@ -357,7 +357,7 @@ namespace bslib{
             for (size_t i = 0; i < m; i++){
                 if (all_dists[i] > dists[0]){
                     faiss::maxheap_pop(k, dists.data(), ids.data());
-                    faiss::maxheap_push(k, dists.data(), ids.data(), all_dists[i], ids[i]);
+                    faiss::maxheap_push(k, dists.data(), ids.data(), all_dists[i], all_ids[i]);
                 }
             }
 
