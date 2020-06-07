@@ -300,10 +300,8 @@ namespace bslib{
     void Bslib_Index::assign(size_t n, const float * assign_data, idx_t * assigned_ids){
 
         std::vector<idx_t> group_id (n);
-        std::vector<float> upper_q_c_dists(n);
         for (size_t i = 0; i < n; i++){
             group_id[i] = 0;
-            upper_q_c_dists[i] = 0.0;
         }
 
         size_t n_vq = 0;
@@ -321,7 +319,7 @@ namespace bslib{
 
             else if(index_type[i] == "LQ"){
                 std::cout << "Searching in LQ layer " << std::endl;
-                lq_quantizer_index[n_lq].search_in_group(n, 1, dists.data(), labels.data(), group_id.data(), upper_q_c_dists.data());
+                lq_quantizer_index[n_lq].search_in_group(n, assign_data, 1, dists.data(), labels.data(), group_id.data());
                 n_lq ++;
             }
             else{
@@ -330,7 +328,6 @@ namespace bslib{
             }
             for (size_t j = 0; j < n; j++){
                 group_id[j] = labels[j];
-                upper_q_c_dists[j] = dists[j];
                 labels[j] = 0;
                 dists[j] = 0;
             }
@@ -425,7 +422,7 @@ namespace bslib{
 
                 else{
                     for (size_t m = 0; m < search_ids.size(); m++){
-                        lq_quantizer_index[n_lq].search_in_group(1, search_space[j], resuld_q_c_dists.data()+ m * search_space[j], result_ids.data()+ m * search_space[j], search_ids.data()+m, search_q_c_dists.data()+m);
+                        lq_quantizer_index[n_lq].search_in_group(1, query, search_space[j], resuld_q_c_dists.data() + m*search_space[j], result_ids.data() + m * search_space[j], search_ids.data() + m);
                     }
                     n_lq ++;
                 }
@@ -434,6 +431,7 @@ namespace bslib{
                 search_ids.resize(keep_result_space);
                 keep_k_min(search_result_space, keep_result_space, resuld_q_c_dists.data(), result_ids.data(), search_q_c_dists.data(), search_ids.data());
             }
+            
             assert((n_vq + n_lq) == this->layers);
             pq.compute_inner_prod_table(query, precomputed_table.data());
             

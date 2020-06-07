@@ -16,7 +16,7 @@ namespace bslib{
         void compute_final_centroid(idx_t label, float * sub_centroid);
         void compute_residual_group_id(size_t n, const idx_t * labels, const float * x, float * residuals);
         void recover_residual_group_id(size_t n, const idx_t * labels, const float * residuals, float * x);
-        void search_in_group(size_t n, size_t k, float * dists, idx_t * labels, const idx_t * group_id, const float * query_nn_dists);
+        void search_in_group(size_t n, const float * queries, size_t k, float * dists, idx_t * labels, const idx_t * group_id);
         void search_all(size_t n, const float * instance, size_t k, float * dists, idx_t * labels);
         void compute_nn_centroids(size_t k, float * nn_centroids, float * nn_centroid_dists, idx_t * labels);
     };

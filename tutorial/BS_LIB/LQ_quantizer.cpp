@@ -146,42 +146,27 @@ namespace bslib{
         }
     }
 
-    void LQ_quantizer::search_in_group(size_t n, size_t k, float * dists, idx_t * labels, const idx_t * group_id, const float * query_centroid_dists){
-        std::cout << "The query group id is " << group_id[0] << std::endl;
-
-        std::vector<float> query_dists(k);
-        std::vector<faiss::Index::idx_t> query_labels(k);
-        faiss::maxheap_heapify(k, query_dists.data(), query_labels.data());
-
+    void LQ_quantizer::search_in_group(size_t n, const float * queries, size_t k, float * dists, idx_t * labels, const idx_t * group_id){
         for (size_t i = 0; i < n; i++){
-            float alpha = this->alphas[group_id[i]];
-            // The distance equation is dis = sqrt((1-alpha)* dis_q_c^2 + alpha(1-alpha)*dis_c_n^2+alpha*dis_q_n^2)
-            for (size_t j = 0; j < nc_per_group; j++){
-                idx_t nn_centroid_idx = nn_centroid_idxs[group_id[i]][j];
-                const float term1 = (1 - alpha) * query_centroid_dists[group_id[i]] * query_centroid_dists[group_id[i]];
-                const float term2 = alpha * (1 - alpha) * nn_centroid_dists[group_id[i]][nn_centroid_idx] * nn_centroid_dists[group_id[i]][nn_centroid_idx];
-                const float term3 = alpha * query_centroid_dists[nn_centroid_idx] * query_centroid_dists[nn_centroid_idx];
-                float dist = sqrt(term1 + term2 + term3);
-                if (dist == 0){
-                    std::cout << "getting a zero: " << term1 << " " << term2 << " " << term3 << " " << std::endl;
-                    std::cout << "alpha: " << alpha << " " << nn_centroid_idx << " " << query_centroid_dists[group_id[i]] << " " << nn_centroid_dists[group_id[i]][nn_centroid_idx] << " " << query_centroid_dists[nn_centroid_idx] << std::endl;
-                }
-                if (dist < query_dists[0]){
-                    faiss::maxheap_pop(k, query_dists.data(), query_labels.data());
-                    faiss::maxheap_push(k, query_dists.data(), query_labels.data(), dist, j);
-                }
+            std::vector<float> query_dists(k);
+            std::vector<faiss::Index::idx_t> query_labels(k);
+            const float * query = queries + i * dimension;
+            faiss::IndexFlatL2 group_quantizer(dimension);
+            size_t query_group_id = group_id[i];
+            std::vector<float> sub_centroids(nc_per_group * dimension);
+            for (size_t label = CentroidDistributionMap[query_group_id]; label < CentroidDistributionMap[query_group_id] + this->nc_per_group; label++){
+                compute_final_centroid(label, sub_centroids.data() + (label - CentroidDistributionMap[query_group_id]) * dimension);
             }
-            size_t base_idx = CentroidDistributionMap[group_id[i]];
-            std::cout << "The base idx is " << base_idx << std::endl;
+            group_quantizer.add(nc_per_group, sub_centroids.data());
+            group_quantizer.search(1, query, k, query_dists.data(), query_labels.data());
+            
             for (size_t j = 0; j < k; j++){
                 dists[i * k + j] = query_dists[j];
-                labels[i * k + j] = base_idx + query_labels[j];
+                labels[i * k + j] = CentroidDistributionMap[query_group_id] + query_labels[j];
+                std::cout << labels[i * k + j] << "_" << dists[i * k + j] << " ";
             }
+            std::cout << std::endl;
         }
-        for (size_t i = 0; i < k; i++){
-            std::cout << labels[i] << "_" << dists[i] << " ";
-        }
-        std::cout << std::endl;
     }
 
     void LQ_quantizer::compute_nn_centroids(size_t k, float * nn_centroids, float * nn_dists, idx_t * labels){
