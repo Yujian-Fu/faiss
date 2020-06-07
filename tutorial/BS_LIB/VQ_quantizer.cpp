@@ -20,8 +20,8 @@ namespace bslib{
         this->all_quantizer = faiss::IndexFlatL2(dimension);
         for (size_t i = 0; i < nc_upper; i++){
             std::vector<float> centroids(dimension * nc_per_group);
-            size_t nt_sub = centroid_train_set[i].size();
-            std::cout << "Running kmeans for " << i << " th group with " << nt_sub / dimension << " points to generate " << nc_per_group << " centroids " << std::endl;
+            size_t nt_sub = centroid_train_set[i].size() / this->dimension;
+            std::cout << "Running kmeans for " << i << " th group with " << nt_sub << " points to generate " << nc_per_group << " centroids " << std::endl;
             faiss::kmeans_clustering(dimension, nt_sub, nc_per_group, centroid_train_set[i].data(), centroids.data());
             std::cout << "Finished kmeans, add centroids to quantizers" << std::endl;
             faiss::IndexFlatL2 centroid_quantizer(dimension);
