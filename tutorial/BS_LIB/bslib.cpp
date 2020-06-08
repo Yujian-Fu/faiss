@@ -4,7 +4,7 @@
 #include <sys/resource.h>
 
 #include "bslib_index.h"
-#include "parameters_VQ_VQ_LQ_LQ.h"
+#include "parameters_VQ_VQ_VQ_LQ.h"
 
 
 using namespace bslib;
