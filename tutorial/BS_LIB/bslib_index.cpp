@@ -313,7 +313,7 @@ namespace bslib{
             assert(n_lq + n_vq == i);
             size_t group_size;
             if (index_type[i] == "VQ"){
-                std::cout << "searching in VQ layer with sample group idx" << std::endl;
+                std::cout << "searching in VQ layer" << std::endl;
                 for (size_t temp = 0; temp < 100; temp++){
                     std::cout << group_idxs[temp] << " ";
                 }
@@ -321,9 +321,7 @@ namespace bslib{
 
                 group_size = vq_quantizer_index[n_vq].nc_per_group;
                 result_dists.resize(group_size * n);
-                std::cout << "Searching in group" << std::endl;
                 vq_quantizer_index[n_vq].search_in_group(n, assign_data, group_idxs.data(), result_dists.data());
-                std::cout << "finished search and building the labels" << std::endl;
                 result_labels.resize(group_size * n);
                 for (size_t j = 0; j < n; j++){
                     for (size_t m = 0; m < group_size; m++){
@@ -334,11 +332,7 @@ namespace bslib{
             }
 
             else if(index_type[i] == "LQ"){
-                std::cout << "searching in LQ layer with sample group idx" << std::endl;
-                for (size_t temp = 0; temp < 100; temp++){
-                    std::cout << group_idxs[temp] << " ";
-                }
-                std::cout << std::endl;
+                std::cout << "searching in LQ layer" << std::endl;
 
                 group_size = lq_quantizer_index[n_lq].nc_per_group;
                 result_dists.resize(group_size * n);
@@ -403,7 +397,6 @@ namespace bslib{
         std::cout << "The correct number is " << correct << " The dist proportion is: " << dist_proportion / n << std::endl;
         std::cout << "The time comparison: " << (endtime1 - starttime1) / CLOCKS_PER_SEC << " " << (endtime2 - starttime2)/ CLOCKS_PER_SEC << std::endl;
         exit(0);
-
     }
 
 
