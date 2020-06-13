@@ -66,10 +66,10 @@ namespace bslib{
         if (exists(path_quantizers)){
             read_quantizers(path_quantizers);
             std::cout << "Checking the quantizers read from file " << std::endl;
-            std::cout << "The number of quantizers: " << this->vq_quantizer_index.size() << " " << this->lq_quantizer_index.size();
+            std::cout << "The number of quantizers: " << this->vq_quantizer_index.size() << " " << this->lq_quantizer_index.size() << std::endl;
             std::cout  << "The number of centroids in each quantizer: ";
             for (size_t i = 0 ; i < this->vq_quantizer_index[0].quantizers.size(); i++){
-                std::cout << vq_quantizer_index[0].quantizers[i].xb.size() << " ";
+                std::cout << vq_quantizer_index[0].quantizers[i].xb.size() / dimension << " ";
             }
             std::cout << std::endl << "The alpha in lq quantizer: ";
             for (size_t i = 0; i < this->lq_quantizer_index[0].alphas.size(); i++){
@@ -313,6 +313,7 @@ namespace bslib{
 
                 group_size = vq_quantizer_index[n_vq].nc_per_group;
                 result_dists.resize(group_size * n);
+                std::cout << "Searching in group" << std::endl;
                 vq_quantizer_index[n_vq].search_in_group(n, assign_data, group_idxs.data(), result_dists.data());
                 std::cout << "finished search and building the labels" << std::endl;
                 result_labels.resize(group_size * n);
