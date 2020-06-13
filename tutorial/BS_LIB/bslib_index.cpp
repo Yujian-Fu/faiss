@@ -353,9 +353,6 @@ namespace bslib{
             if (i < this->layers-1 && index_type[i+1] == "LQ"){
                 std::cout << "The next layer is LQ, load the query centroid distsnaces" << std::endl;
                 for (size_t j = 0; j < n; j++){
-                    if(j % 10 == 0){
-                        std::cout << " [ " << j << " / " << n << " ] " <<std::endl;
-                     }
                     for (size_t m = 0; m < group_size; m++)
                         queries_upper_centroid_dists[j].insert(std::pair<idx_t, float>(result_labels[j*group_size+m], result_dists[j*group_size+m]));
                 }
