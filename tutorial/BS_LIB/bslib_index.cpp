@@ -101,6 +101,7 @@ namespace bslib{
         //}
 
         assert(index_type.size() == layers && index_type[0] != "LQ");
+        std::cout << "adding layers to the index structure " << std::endl;
         // The number of centroids in the upper layer
         uint32_t nc_upper = 1; 
         // The number of centroids in each group (one upper centroid) 
