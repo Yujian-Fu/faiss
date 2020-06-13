@@ -28,7 +28,7 @@ const uint32_t batch_size = 100000;
 const size_t nbatches = nb / batch_size; //1000
 
 //For searching
-const size_t ngt = 1000;
+const size_t ngt = 100;
 const size_t nq = 10000;
 const size_t result_k = 1;
 const size_t max_vectors = 50000;
