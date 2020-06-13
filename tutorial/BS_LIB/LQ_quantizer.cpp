@@ -132,22 +132,7 @@ namespace bslib{
             const float * nn_centroid = this->upper_centroids.data() + nn_centroid_idx * dimension;
             const float * centroid = this->upper_centroids.data() + j * dimension;
             faiss::fvec_madd(dimension, nn_centroid, -1.0, centroid, centroid_vector.data());
-            std::cout << "The centroid vector norm is " << faiss::fvec_norm_L2sqr(centroid_vector.data(), 3) << " with alpha: " << alpha << std::endl;
             faiss::fvec_madd(dimension, centroid, alpha, centroid_vector.data(), sub_centroid);
-
-            std::vector<float> sub_centroid_vector(dimension);
-            faiss::fvec_madd(dimension, sub_centroid, -1, centroid, sub_centroid_vector.data());
-            std::cout << "The sub centroid vector norm is: " << faiss::fvec_norm_L2sqr(sub_centroid_vector.data(), 3) << std::endl;
-
-            std::cout << "The centroid vector and the sub centroid vector is: " << std::endl;
-            for (size_t i = 0; i < dimension; i++){
-                std::cout << centroid_vector[i] << " ";
-            }
-            std::cout << std::endl;
-            for (size_t i = 0; i < dimension; i++){
-                std::cout << sub_centroid_vector[i] << " ";
-            }
-            std::cout << std::endl;
     }
 
 
@@ -200,63 +185,31 @@ namespace bslib{
                     idx_t sequence_id = query_sequence_set[i][j];
 
                     std::vector<float> query_sub_centroids_dists(this->nc_per_group);
-                    std::cout << "Computing distance to all sub centroids " << std::endl;
-                    std::cout << "showing the query centroid distances " << std::endl;
-                    for (idx_t temp = 0; temp < 1000; temp++){
-                        std::map<idx_t, float> query_map = queries_upper_centroid_dists[sequence_id];
-                        std::cout << query_map[temp] << " ";
-                    }
                     std::cout << std::endl;
                     for (size_t m = 0; m < this->nc_per_group; m++){
                         idx_t nn_idx = this->nn_centroid_idxs[i][m];
                         float query_nn_dist = search_in_map(queries_upper_centroid_dists[sequence_id], nn_idx);
-                        float term1, term2, term3, easy_dist = 0;
+                        float easy_dist;
                         if (query_nn_dist != Not_Found){
                             float query_group_dist = search_in_map(queries_upper_centroid_dists[sequence_id], i);
                             assert (query_group_dist != Not_Found);
                             float group_nn_dist = this->nn_centroid_dists[i][m];
-                            std::cout << "Computing easy distance " << query_group_dist << " " << query_nn_dist << " " << group_nn_dist << " " << alpha << " " <<  i << " " << m << " " << nn_idx << " " << alpha * group_nn_dist<< std::endl;
-
-                            term1 = alpha*(alpha-1)*group_nn_dist*group_nn_dist;
-                            term2 = (1-alpha)*query_group_dist*query_group_dist;
-                            term3 = alpha*query_nn_dist*query_nn_dist;
                             easy_dist = alpha*(alpha-1)*group_nn_dist + (1-alpha)*query_group_dist + alpha*query_nn_dist;
                         }
                         //else{
-                        std::cout << "Computing normal distance from sequence id to label " << sequence_id << " " << base_idx+m << std::endl;
-                        //if (sub_centroids[m].size() == 0){
+                        if (sub_centroids[m].size() == 0){
                             idx_t label = base_idx + m;
                             sub_centroids[m].resize(dimension);
                             compute_final_centroid(label, sub_centroids[m].data());
-                        //}
+                        }
                         
                         const float * query = queries + sequence_id * dimension;
                         std::vector<float> query_sub_centroid_vector(dimension);
                         faiss::fvec_madd(dimension, sub_centroids[m].data(), -1.0, query, query_sub_centroid_vector.data());
                         query_sub_centroids_dists[m] = faiss::fvec_norm_L2sqr(query_sub_centroid_vector.data(), dimension);
+                        assert(easy_dist == query_sub_centroids_dists[m]);
+                        std::cout << easy_dist << " " << query_sub_centroids_dists[m] << " ";
 
-                        size_t nn_centroid_idx = nn_centroid_idxs[i][m];
-                        const float * nn_centroid = this->upper_centroids.data() + nn_centroid_idx * dimension;
-                        const float * centroid = this->upper_centroids.data() + i * dimension;
-                        std::vector<float> query_centroid_vector(dimension);
-                        std::vector<float> query_nn_centroid_vector(dimension);
-                        faiss::fvec_madd(dimension, centroid, -1, query, query_centroid_vector.data());
-                        faiss::fvec_madd(dimension, nn_centroid, -1, query, query_nn_centroid_vector.data());
-                        float query_centroid_dist = faiss::fvec_norm_L2sqr(query_centroid_vector.data(), dimension);
-                        float query_nn_centroid_dist = faiss::fvec_norm_L2sqr(query_nn_centroid_vector.data(), dimension);
-
-                        std::vector<float> sub_centroid_vector(dimension);
-                        faiss::fvec_madd(dimension, sub_centroids[m].data(), -1, centroid, sub_centroid_vector.data());
-                        float alpha_centroid_dist = faiss::fvec_norm_L2sqr(sub_centroid_vector.data(), dimension);
-
-                        std::vector<float> centroid_vector(dimension);
-                        faiss::fvec_madd(dimension, centroid, -1, nn_centroid, centroid_vector.data());
-                        float centroid_dist = faiss::fvec_norm_L2sqr(centroid_vector.data(), dimension);
-
-
-                        if (query_nn_dist != Not_Found){
-                            std::cout << term1 << " " << term2 << " " << term3 << " " << easy_dist << " " << query_sub_centroids_dists[m] << " " << query_centroid_dist << " " << query_nn_centroid_dist << " " << alpha_centroid_dist << " " << centroid_dist <<  std::endl;
-                        }
                         //}
                     }
 
