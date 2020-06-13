@@ -82,7 +82,6 @@ namespace bslib{
                 }
                 std::cout << std::endl;
             }
-            exit(0);
         }
         else
         {
