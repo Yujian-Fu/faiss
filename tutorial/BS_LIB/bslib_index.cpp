@@ -387,9 +387,9 @@ namespace bslib{
         std::vector<float> final_dist(n);
         final_quantizer.search(n, assign_data, 1, final_dist.data(), final_idx.data());
         size_t correct = 0;
-        size_t dist_proportion = 0.0;
+        float dist_proportion = 0.0;
         for (size_t i = 0; i < n; i++){
-            if (assigned_ids[i] == final_idx[i]){
+            if (assigned_ids[i] - final_idx[i] == 0){
                 correct ++;
             }
             dist_proportion += group_dists[i] / final_dist[i];
