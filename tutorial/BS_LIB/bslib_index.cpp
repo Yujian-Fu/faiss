@@ -72,17 +72,6 @@ namespace bslib{
             for (size_t i = 0 ; i < this->vq_quantizer_index[0].quantizers.size(); i++){
                 std::cout << vq_quantizer_index[0].quantizers[i].xb.size() / dimension << " ";
             }
-            std::cout << std::endl << "The alpha in lq quantizer: ";
-            for (size_t i = 0; i < this->lq_quantizer_index[0].alphas.size(); i++){
-                std::cout << this->lq_quantizer_index[0].alphas[i] << " ";
-            }
-            std::cout << "The nn_ids in lq quantizer: " << std::endl;
-            for (size_t i = 0; i < 1000; i ++){
-                for (size_t j = 0; j < 10; j++){
-                    std::cout << this->lq_quantizer_index[0].nn_centroid_idxs[i][j] << " ";
-                }
-                std::cout << std::endl;
-            }
         }
         else
         {
@@ -314,11 +303,6 @@ namespace bslib{
             size_t group_size;
             if (index_type[i] == "VQ"){
                 std::cout << "searching in VQ layer" << std::endl;
-                for (size_t temp = 0; temp < 100; temp++){
-                    std::cout << group_idxs[temp] << " ";
-                }
-                std::cout << std::endl;
-
                 group_size = vq_quantizer_index[n_vq].nc_per_group;
                 result_dists.resize(group_size * n);
                 vq_quantizer_index[n_vq].search_in_group(n, assign_data, group_idxs.data(), result_dists.data());
