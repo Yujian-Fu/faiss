@@ -62,7 +62,7 @@ int main(){
         std::vector<idx_t> assigned_idxs(batch_size);
 
         for (size_t i = 0; i < nbatches; i++){
-            readXvecFvec<origin_data_type> (base_input, batch.data(), dimension, batch_size);
+            readXvecFvec<origin_data_type> (base_input, batch.data(), dimension, batch_size, true, true);
             index->assign(batch_size, batch.data(), assigned_idxs.data());
             base_output.write((char * ) & batch_size, sizeof(uint32_t));
             base_output.write((char *) assigned_idxs.data(), batch_size * sizeof(idx_t));

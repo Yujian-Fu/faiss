@@ -283,7 +283,8 @@ namespace bslib{
     }
 
     void Bslib_Index::assign(const size_t n, const float * assign_data, idx_t * assigned_ids){
-
+        
+        std::cout << "assigning vectors " << std::endl;
         std::vector<idx_t> group_idxs (n);
         std::vector<float> group_dists(n);
         for (size_t i = 0; i < n; i++){
@@ -302,6 +303,7 @@ namespace bslib{
             assert(n_lq + n_vq == i);
             size_t group_size;
             if (index_type[i] == "VQ"){
+                std::cout << "searching in VQ layer " << std::endl;
                 group_size = vq_quantizer_index[n_vq].nc_per_group;
                 result_dists.resize(group_size * n);
                 vq_quantizer_index[n_vq].search_in_group(n, assign_data, group_idxs.data(), result_dists.data());
@@ -315,6 +317,7 @@ namespace bslib{
             }
 
             else if(index_type[i] == "LQ"){
+                std::cout << "searching in LQ layer " << std::endl;
                 group_size = lq_quantizer_index[n_lq].nc_per_group;
                 result_dists.resize(group_size * n);
                 assert(queries_upper_centroid_dists[0].size() > 0);

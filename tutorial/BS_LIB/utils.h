@@ -119,7 +119,7 @@ namespace bslib{
                 std::cout << "[Finished loading " << i << " / " << n << "]" << std::endl; 
         }
         if (CheckFlag)
-            CheckResult<float>(data, dimension);
+            CheckResult<float>(data, dimension, n);
     }
 
 
