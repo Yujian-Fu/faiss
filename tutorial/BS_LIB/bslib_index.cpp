@@ -386,7 +386,6 @@ namespace bslib{
         std::vector<float> final_dist(n);
         final_quantizer.search(n, assign_data, 1, final_dist.data(), final_idx.data());
         for (size_t i = 0; i < n; i++){
-            assert(assigned_ids[i] == final_idx[i]);
             std::cout << assigned_ids[i] << "_" << final_idx[i] << " " << group_dists[i] << "_" << final_dist[i] << " ";
         }
         std::cout << "Checing finished" << std::endl;
