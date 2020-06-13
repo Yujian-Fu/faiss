@@ -63,7 +63,7 @@ namespace bslib{
     }
 
     void Bslib_Index::build_quantizers(const uint32_t * ncentroids, const char * path_quantizers, const char * path_learn){
-        /*if (exists(path_quantizers)){
+        if (exists(path_quantizers)){
             read_quantizers(path_quantizers);
             std::cout << "Checking the quantizers read from file " << std::endl;
             std::cout << "The number of quantizers: " << this->vq_quantizer_index.size() << " " << this->lq_quantizer_index.size();
@@ -76,8 +76,8 @@ namespace bslib{
                 std::cout << this->lq_quantizer_index[0].alphas[i] << " ";
             }
             std::cout << std::endl;
-        }*/
-        //else
+        }
+        else
         {
         ShowMessage("No preconstructed quantizers, constructing quantizers");
         //Load the train set into the index
@@ -352,6 +352,9 @@ namespace bslib{
             if (i < this->layers-1 && index_type[i+1] == "LQ"){
                 std::cout << "The next layer is LQ, load the query centroid distsnaces" << std::endl;
                 for (size_t j = 0; j < n; j++){
+                    if(j % 10 == 0){
+                        std::cout << " [ " << j << " / " << n << " ] " <<std::endl;
+                     }
                     for (size_t m = 0; m < group_size; m++)
                         queries_upper_centroid_dists[n].insert(std::pair<idx_t, float>(result_labels[j*group_size+m], result_dists[j*group_size+m]));
                 }
