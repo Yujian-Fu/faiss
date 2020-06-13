@@ -132,8 +132,11 @@ namespace bslib{
             const float * nn_centroid = this->upper_centroids.data() + nn_centroid_idx * dimension;
             const float * centroid = this->upper_centroids.data() + j * dimension;
             faiss::fvec_madd(dimension, nn_centroid, -1.0, centroid, centroid_vector.data());
-            std::cout << "The centroid vector norm is " << faiss::fvec_norm_L2sqr(centroid_vector.data(), dimension) << std::endl;;
+            std::cout << "The centroid vector norm is " << faiss::fvec_norm_L2sqr(centroid_vector.data(), dimension) << " with alpha: " << alpha << std::endl;
             faiss::fvec_madd(dimension, centroid, alpha, centroid_vector.data(), sub_centroid);
+            std::vector<float> sub_centroid_vector(dimension);
+            faiss::fvec_madd(dimension, centroid, -1, sub_centroid, sub_centroid_vector.data());
+            std::cout << "The sub centroid vector norm is: " << faiss::fvec_norm_L2sqr(sub_centroid_vector.data(), dimension) << std::endl;
             
     }
 
@@ -211,11 +214,11 @@ namespace bslib{
                         }
                         //else{
                         std::cout << "Computing normal distance from sequence id to label " << sequence_id << " " << base_idx+m << std::endl;
-                        if (sub_centroids[m].size() == 0){
+                        //if (sub_centroids[m].size() == 0){
                             idx_t label = base_idx + m;
                             sub_centroids[m].resize(dimension);
                             compute_final_centroid(label, sub_centroids[m].data());
-                        }
+                        //}
                         
                         const float * query = queries + sequence_id * dimension;
                         std::vector<float> query_sub_centroid_vector(dimension);
