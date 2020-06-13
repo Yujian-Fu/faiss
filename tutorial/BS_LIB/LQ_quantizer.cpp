@@ -171,6 +171,7 @@ namespace bslib{
 
         for (size_t i = 0; i < n; i++){
             idx_t idx = group_idxs[i];
+            std::cout << "The idx found is " << idx << std::endl;
             query_sequence_set[idx].push_back(i);
         }
         std::cout << "Query sequence set built " << std::endl;

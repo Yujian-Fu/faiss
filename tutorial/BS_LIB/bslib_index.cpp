@@ -556,7 +556,10 @@ namespace bslib{
                 group_idxs.resize(keep_result_space);
                 group_dists.resize(keep_result_space);
                 keep_k_min(group_size * group_idxs.size(), keep_result_space, result_dists.data(), result_labels.data(), group_dists.data(), group_idxs.data());
-
+                for (size_t temp = 0; temp < keep_result_space; temp++){
+                    std::cout << group_idxs[temp] << "_" << group_dists[temp] << "    ";
+                }
+                std::cout << std::endl;
             }
 
             std::cout << "Finished assigned query data, start computing the distance to base vectors" << std::endl;
