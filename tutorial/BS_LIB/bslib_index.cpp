@@ -1,4 +1,5 @@
 #include "bslib_index.h"
+#include "time.h"
 
 namespace bslib{
 
@@ -307,6 +308,7 @@ namespace bslib{
         std::vector<idx_t> result_labels;
         std::vector<std::map<idx_t, float>>  queries_upper_centroid_dists(n);
 
+        clock_t starttime1 = clock();
         for (size_t i = 0; i < this->layers; i++){
             assert(n_lq + n_vq == i);
             size_t group_size;
@@ -340,7 +342,6 @@ namespace bslib{
 
                 group_size = lq_quantizer_index[n_lq].nc_per_group;
                 result_dists.resize(group_size * n);
-                assert(queries_upper_centroid_dists[0].size() > 0);
                 lq_quantizer_index[n_lq].search_in_group(n, assign_data, queries_upper_centroid_dists, group_idxs.data(), result_dists.data());
                 result_labels.resize(group_size * n);
                 for (size_t j = 0; j < n; j++){
@@ -369,6 +370,7 @@ namespace bslib{
                 keep_k_min(group_size, 1, result_dists.data()+j*group_size, result_labels.data()+j*group_size, group_dists.data()+j, group_idxs.data()+j);
             }
         }
+        clock_t endtime1 = clock();
 
         assert((n_vq + n_lq) == this->layers);
         for (size_t i = 0; i < n; i++){
@@ -383,9 +385,11 @@ namespace bslib{
             final_quantizer.add(1, final_centroid.data());
         }
 
+        clock_t starttime2 = clock();
         std::vector<faiss::Index::idx_t> final_idx(n);
         std::vector<float> final_dist(n);
         final_quantizer.search(n, assign_data, 1, final_dist.data(), final_idx.data());
+        clock_t endtime2 = clock();
         size_t correct = 0;
         float dist_proportion = 0.0;
         for (size_t i = 0; i < n; i++){
@@ -395,8 +399,9 @@ namespace bslib{
             dist_proportion += group_dists[i] / final_dist[i];
             std::cout << group_idxs[i] - final_idx[i] << "_" << group_idxs[i] << "_" << final_idx[i] << " " << group_dists[i] << "_" << final_dist[i] << " ";
         }
-        std::cout << "Checing finished" << std::endl;
+        std::cout << "Checking finished" << std::endl;
         std::cout << "The correct number is " << correct << " The dist proportion is: " << dist_proportion / n;
+        std::cout << "The time comparison: " << endtime1 - starttime1 << " " << endtime2 - starttime2 << std::endl;
         exit(0);
 
     }
