@@ -2,8 +2,9 @@
 
 namespace bslib{
 
-    Bslib_Index::Bslib_Index(const size_t dimension, const size_t layers, const std::string * index_type):
+    Bslib_Index::Bslib_Index(const size_t dimension, const size_t layers, const std::string * index_type, const bool use_subset):
         dimension(dimension), layers(layers){
+            this->use_subset = use_subset;
             this->index_type.resize(layers);
             for (size_t i = 0; i < layers; i++){
                 this->index_type[i] = index_type[i];
@@ -12,7 +13,6 @@ namespace bslib{
             this->subnt = 0;
         }
     
-
     void Bslib_Index::add_vq_quantizer(size_t nc_upper, size_t nc_per_group, bool update_idxs){
         
         VQ_quantizer vq_quantizer (this->dimension, nc_upper, nc_per_group);
@@ -22,9 +22,6 @@ namespace bslib{
         for (size_t i = 0; i < nc_upper; i++){
             assert(vq_quantizer.quantizers[i].xb.size() == nc_per_group * dimension);
         }
-        if (update_idxs){
-            assert(vq_quantizer.all_quantizer.xb.size() == vq_quantizer.nc * dimension);
-        }
         this->vq_quantizer_index.push_back(vq_quantizer);
     }
 
@@ -33,10 +30,6 @@ namespace bslib{
         ShowMessage("Building centroids for lq quantizer");
         lq_quantizer.build_centroids(this->train_data.data(), this->nt, this->train_data_idxs.data(), update_idxs);
         //Check whether all centroids are added in all_quantizer correctly 
-        if (update_idxs){
-            ShowMessage("Checking whether all lq centroids are added correctly");
-            assert(lq_quantizer.all_quantizer.xb.size() == nc_upper * nc_per_group * dimension);
-        }
         ShowMessage("Showing samples of alpha");
         this->lq_quantizer_index.push_back(lq_quantizer);
     }
@@ -69,60 +62,6 @@ namespace bslib{
         }
     }
 
-    void Bslib_Index::train_pq(const char * path_pq, const char * path_norm_pq, const char * path_learn){
-        // If the train dataset is not loaded
-        if (this->train_data.size() != this->nt * dimension){
-            std::cout << "Load the train set for PQ training" << std::endl;
-            bool use_subset = true;
-            this->train_data.resize(this-> nt * dimension);
-            std::ifstream learn_input(path_learn, std::ios::binary);
-            readXvecFvec<uint8_t>(learn_input, this->train_data.data(), this->dimension, this->nt, true);
-            this->train_data_idxs.resize(nt);
-            for (size_t i = 0; i < nt; i++){
-                this->train_data_idxs[i] = 0;
-            }
-            if (use_subset){
-                assert (this->nt != this->subnt);
-                std::vector<float> train_subset(subnt * dimension);
-                RandomSubset(this->train_data.data(), train_subset.data(), dimension, this->nt, this->subnt);
-                train_data.resize(subnt * dimension);
-                train_data_idxs.resize(subnt);
-                for (size_t i = 0; i < subnt * dimension; i++){
-                    this->train_data[i] = train_subset[i];
-                }
-                for (size_t i = 0; i < subnt; i++){
-                    this->train_data_idxs[i] = 0;
-                }
-                this->nt = this->subnt;
-            }
-        }
-        std::cout << "Initilizing index " << std::endl;
-        this->pq = faiss::ProductQuantizer(this->dimension, this->M, this->nbits);
-        this->norm_pq = faiss::ProductQuantizer(1, this->norm_M, this->nbits);
-        this->code_size = this->pq.code_size;
-        this->norm_code_size = this->norm_pq.code_size;
-
-        std::cout << "Encoding the train dataset to compute residual" << std::endl;
-        std::vector<float> residuals(dimension * this->nt);
-        std::vector<idx_t> group_ids(this->nt);
-        assign(this->nt, this->train_data.data(), group_ids.data());
-
-        encode(this->nt, this->train_data.data(), group_ids.data(), residuals.data());
-        this->pq.verbose = true;
-        this->pq.train(nt, residuals.data());
-        faiss::write_ProductQuantizer(& this->pq, path_pq);
-
-        std::vector<float> reconstructed_x(dimension * this->nt);
-        decode(this->nt, residuals.data(), group_ids.data(), reconstructed_x.data());
-        std::vector<float> xnorm(this->nt);
-        for (size_t i = 0; i < this->nt; i++){
-            xnorm[i] = faiss::fvec_norm_L2sqr(reconstructed_x.data() + i * dimension, dimension);
-        }
-        this->norm_pq.verbose = true;
-        this->norm_pq.train(this->nt, xnorm.data());
-        faiss::write_ProductQuantizer(& this->norm_pq, path_norm_pq);
-    }
-
     void Bslib_Index::build_quantizers(const uint32_t * ncentroids, const char * path_quantizers, const char * path_learn){
         if (exists(path_quantizers)){
             read_quantizers(path_quantizers);
@@ -137,21 +76,19 @@ namespace bslib{
                 std::cout << this->lq_quantizer_index[0].alphas[i] << " ";
             }
             std::cout << std::endl;
-
         }
         else{
         ShowMessage("No preconstructed quantizers, constructing quantizers");
         //Load the train set into the index
-        bool use_subset = true;
         this->train_data.resize(this->nt * this->dimension);
         std::cout << "Loading learn set from " << path_learn << std::endl;
         std::ifstream learn_input(path_learn, std::ios::binary);
-        readXvecFvec<uint8_t>(learn_input, this->train_data.data(), this->dimension, this->nt, true);
+        readXvecFvec<float>(learn_input, this->train_data.data(), this->dimension, this->nt, true);
         this->train_data_idxs.resize(this->nt);
         for (size_t i = 0; i < this->nt; i++){
             this->train_data_idxs[i] = 0;
         }
-        if (use_subset){
+        if (this->use_subset){
             ShowMessage("Using subset of the train set, saving sub train set");
             std::vector<float> train_subset(this->subnt * this->dimension);
             RandomSubset(this->train_data.data(), train_subset.data(), this->dimension, this->nt, this->subnt);
@@ -213,6 +150,59 @@ namespace bslib{
         }
         write_quantizers(path_quantizers);
         }  
+    }
+
+    void Bslib_Index::train_pq(const char * path_pq, const char * path_norm_pq, const char * path_learn){
+        // If the train dataset is not loaded
+        if (this->train_data.size() != this->nt * dimension){
+            std::cout << "Load the train set for PQ training" << std::endl;
+            this->train_data.resize(this-> nt * dimension);
+            std::ifstream learn_input(path_learn, std::ios::binary);
+            readXvecFvec<uint8_t>(learn_input, this->train_data.data(), this->dimension, this->nt, true);
+            this->train_data_idxs.resize(nt);
+            for (size_t i = 0; i < nt; i++){
+                this->train_data_idxs[i] = 0;
+            }
+            if (this->use_subset){
+                assert (this->nt != this->subnt);
+                std::vector<float> train_subset(subnt * dimension);
+                RandomSubset(this->train_data.data(), train_subset.data(), dimension, this->nt, this->subnt);
+                train_data.resize(subnt * dimension);
+                train_data_idxs.resize(subnt);
+                for (size_t i = 0; i < subnt * dimension; i++){
+                    this->train_data[i] = train_subset[i];
+                }
+                for (size_t i = 0; i < subnt; i++){
+                    this->train_data_idxs[i] = 0;
+                }
+                this->nt = this->subnt;
+            }
+        }
+        std::cout << "Initilizing index " << std::endl;
+        this->pq = faiss::ProductQuantizer(this->dimension, this->M, this->nbits);
+        this->norm_pq = faiss::ProductQuantizer(1, this->norm_M, this->nbits);
+        this->code_size = this->pq.code_size;
+        this->norm_code_size = this->norm_pq.code_size;
+
+        std::cout << "Encoding the train dataset to compute residual" << std::endl;
+        std::vector<float> residuals(dimension * this->nt);
+        std::vector<idx_t> group_ids(this->nt);
+        assign(this->nt, this->train_data.data(), group_ids.data());
+
+        encode(this->nt, this->train_data.data(), group_ids.data(), residuals.data());
+        this->pq.verbose = true;
+        this->pq.train(nt, residuals.data());
+        faiss::write_ProductQuantizer(& this->pq, path_pq);
+
+        std::vector<float> reconstructed_x(dimension * this->nt);
+        decode(this->nt, residuals.data(), group_ids.data(), reconstructed_x.data());
+        std::vector<float> xnorm(this->nt);
+        for (size_t i = 0; i < this->nt; i++){
+            xnorm[i] = faiss::fvec_norm_L2sqr(reconstructed_x.data() + i * dimension, dimension);
+        }
+        this->norm_pq.verbose = true;
+        this->norm_pq.train(this->nt, xnorm.data());
+        faiss::write_ProductQuantizer(& this->norm_pq, path_norm_pq);
     }
     
     void Bslib_Index::get_final_nc(){
@@ -292,47 +282,77 @@ namespace bslib{
         }
     }
 
-    void Bslib_Index::assign(size_t n, const float * assign_data, idx_t * assigned_ids){
+    void Bslib_Index::assign(const size_t n, const float * assign_data, idx_t * assigned_ids){
 
-        std::vector<idx_t> group_id (n);
+        std::vector<idx_t> group_idxs (n);
+        std::vector<float> group_dists(n);
         for (size_t i = 0; i < n; i++){
-            group_id[i] = 0;
+            group_idxs[i] = 0;
+            group_dists[i] = 0.0;
         }
 
         size_t n_vq = 0;
         size_t n_lq = 0;
 
-        std::vector<float> dists(n);
-        std::vector<idx_t> labels(n);
+        std::vector<float> result_dists;
+        std::vector<idx_t> result_labels;
+        std::vector<std::map<idx_t, float>>  queries_upper_centroid_dists(n);
+
         for (size_t i = 0; i < this->layers; i++){
             assert(n_lq + n_vq == i);
+            size_t group_size;
             if (index_type[i] == "VQ"){
-                vq_quantizer_index[n_vq].search_in_group(n, assign_data, 1, dists.data(), labels.data(), group_id.data());
+                group_size = vq_quantizer_index[n_vq].nc_per_group;
+                result_dists.resize(group_size * n);
+                vq_quantizer_index[n_vq].search_in_group(n, assign_data, group_idxs.data(), result_dists.data());
+                result_labels.resize(group_size * n);
+                for (size_t j = 0; j < n; j++){
+                    for (size_t m = 0; m < group_size; m++){
+                        result_labels[j * group_size + m] = group_idxs[j] * group_size + m;
+                    }
+                }
                 n_vq ++;
             }
 
             else if(index_type[i] == "LQ"){
-                lq_quantizer_index[n_lq].search_in_group(n, assign_data, 1, dists.data(), labels.data(), group_id.data());
+                group_size = lq_quantizer_index[n_lq].nc_per_group;
+                result_dists.resize(group_size * n);
+                assert(queries_upper_centroid_dists[0].size() > 0);
+                lq_quantizer_index[n_lq].search_in_group(n, assign_data, queries_upper_centroid_dists, group_idxs.data(), result_dists.data());
+                result_labels.resize(group_size * n);
+                for (size_t j = 0; j < n; j++){
+                    queries_upper_centroid_dists[j].clear();
+                    for (size_t m = 0; m < group_size; m++){
+                        result_labels[j * group_size + m] = group_idxs[j] * group_size + m;
+                    }
+                }
                 n_lq ++;
             }
             else{
                 std::cout << "The type name is wrong with " << index_type[i] << "!" << std::endl;
                 exit(0); 
             }
+
+            if (i < this->layers-1 && index_type[i+1] == "LQ"){
+                for (size_t j = 0; j < n; j++){
+                    for (size_t m = 0; m < group_size; m++)
+                        queries_upper_centroid_dists[n].insert(std::pair<idx_t, float>(result_labels[j*group_size+m], result_dists[j*group_size+m]));
+                }
+            }
+
             for (size_t j = 0; j < n; j++){
-                group_id[j] = labels[j];
-                labels[j] = 0;
-                dists[j] = 0;
+                keep_k_min(group_size, 1, result_dists.data()+j*group_size, result_labels.data()+j*group_size, group_dists.data()+j, group_idxs.data()+j);
             }
         }
+
         assert((n_vq + n_lq) == this->layers);
         for (size_t i = 0; i < n; i++){
-            assigned_ids[i] = group_id[i];
+            assigned_ids[i] = group_idxs[i];
         }
     }
 
 
-    void Bslib_Index::keep_k_min(size_t m, size_t k, float * all_dists, idx_t * all_ids, float * sub_dists, idx_t * sub_ids){
+    void Bslib_Index::keep_k_min(const size_t m, const size_t k, const float * all_dists, const idx_t * all_ids, float * sub_dists, idx_t * sub_ids){
         assert(m >= k);
         if (m == k){
             for (size_t i = 0; i < m; i++){
@@ -375,50 +395,80 @@ namespace bslib{
       *                     term 1                   term 2           term 3
       */
 
-    void Bslib_Index::search(size_t n, size_t result_k, float * queries, float * query_dists, faiss::Index::idx_t * query_ids, size_t * search_space, size_t * keep_space){
+    void Bslib_Index::search(size_t n, size_t result_k, float * queries, float * query_dists, faiss::Index::idx_t * query_ids, size_t * keep_space){
 
         for (size_t i = 0; i < n; i++){
             faiss::maxheap_heapify(result_k, query_dists + i * result_k, query_ids + i * result_k);
             const float * query = queries + i * dimension;
-            std::vector<idx_t> search_ids(1);
-            std::vector<float> search_q_c_dists(1);
-            search_ids[0] = 0;
-            search_q_c_dists[0] = 0;
 
-            std::vector<idx_t> result_ids;
-            std::vector<float> resuld_q_c_dists; 
+            std::vector<idx_t> group_idxs(1);
+            std::vector<float> group_dists(1);
 
+            group_idxs[0] = 0;
+            group_dists[0] = 0;
+
+            std::vector<float> result_dists; 
+            std::vector<idx_t> result_labels;
+            std::vector<std::map<idx_t, float>> query_upper_centroid_dists(1);
+            
             size_t n_vq = 0;
             size_t n_lq = 0;
 
-            size_t search_result_space;
             size_t keep_result_space;
-
 
             for (size_t j = 0; j < layers; j++){
 
-                search_result_space = search_ids.size() * search_space[j];
-                keep_result_space = search_ids.size() * keep_space[j];
-                result_ids.resize(search_result_space);
-                resuld_q_c_dists.resize(search_result_space);
-
+                keep_result_space = group_idxs.size() * keep_space[j];
+                assert(n_vq+ n_lq == i);
+                size_t group_size;
+                
                 if (index_type[j] == "VQ"){
-                    for (size_t m = 0; m < search_ids.size(); m++){
-                        vq_quantizer_index[n_vq].search_in_group(1, query, search_space[j], resuld_q_c_dists.data()+m * search_space[j], result_ids.data()+ m * search_space[j], search_ids.data()+m);
+                    group_size = vq_quantizer_index[n_vq].nc_per_group;
+                    result_dists.resize(group_idxs.size()*group_size);
+                    for (size_t m = 0; m < group_idxs.size(); m++){
+                        vq_quantizer_index[n_vq].search_in_group(1, query, group_idxs.data()+m, result_dists.data()+m*group_size);
+                    }
+                    result_labels.resize(group_idxs.size()*group_size);
+                    for(size_t m = 0; m < group_idxs.size(); m++){
+                        for (size_t n = 0; n < group_size; n++){
+                            result_labels[m * group_size + n] = group_idxs[m] * group_size + n;
+                        }
                     }
                     n_vq ++;
                 }
 
-                else{
-                    for (size_t m = 0; m < search_ids.size(); m++){
-                        lq_quantizer_index[n_lq].search_in_group(1, query, search_space[j], resuld_q_c_dists.data() + m*search_space[j], result_ids.data() + m * search_space[j], search_ids.data() + m);
+                else if(index_type[i] == "LQ") {
+                    group_size = lq_quantizer_index[n_lq].nc_per_group;
+                    result_dists.resize(group_size * n);
+                    assert(query_upper_centroid_dists[0].size() > 0);
+
+                    for (size_t m = 0; m < group_idxs.size(); m++){
+                        lq_quantizer_index[n_lq].search_in_group(1, query, query_upper_centroid_dists, group_idxs.data(), result_dists.data()+m*group_size);
                     }
+                    result_labels.resize(group_idxs.size()*group_size);
+                    for (size_t m = 0; m < group_idxs.size(); m++){
+                        for (size_t n = 0; n < group_size; n++){
+                            result_labels[m * group_size + n] = group_idxs[m] * group_size + n;
+                        }
+                    }
+                    query_upper_centroid_dists[0].clear();
                     n_lq ++;
                 }
+                else{
+                    std::cout << "The type name is wrong with " << index_type[j] << "!" << std::endl;
+                    exit(0);
+                }
                 
-                search_q_c_dists.resize(keep_result_space);
-                search_ids.resize(keep_result_space);
-                keep_k_min(search_result_space, keep_result_space, resuld_q_c_dists.data(), result_ids.data(), search_q_c_dists.data(), search_ids.data());
+                if (j < this->layers-1 && index_type[j+1] == "LQ"){
+                    for (size_t m = 0; m < group_idxs.size()*group_size; m++){
+                        query_upper_centroid_dists[0].insert(std::pair<idx_t, float>(result_labels[m], result_dists[m]));
+                    }
+                }
+
+                group_idxs.resize(keep_result_space);
+                group_dists.resize(keep_result_space);
+                keep_k_min(group_size * group_idxs.size(), keep_result_space, result_dists.data(), result_labels.data(), group_dists.data(), group_idxs.data());
+
             }
 
             assert((n_vq + n_lq) == this->layers);
@@ -427,9 +477,9 @@ namespace bslib{
             
             for (size_t j = 0; j < keep_result_space; j++){
                 
-                size_t group_id = search_ids[j];
-                
-                float q_c_dist = search_q_c_dists[j];
+                size_t group_id = group_idxs[j];
+                float q_c_dist = group_dists[j];
+
                 size_t group_size = this->origin_ids[group_id].size();
                 assert(group_size == this->base_codes[group_id].size() / this->code_size);
 

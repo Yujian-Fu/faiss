@@ -3,7 +3,6 @@
 namespace bslib{
     struct LQ_quantizer : Base_quantizer
     {
-        faiss::IndexFlatL2 all_quantizer; 
         std::vector<float> alphas; // Initialized in read_quantizer
         std::vector<float> upper_centroids; // Initialized in constructor
         std::vector<std::vector<idx_t>> nn_centroid_idxs; // Initialized in constructor
@@ -16,8 +15,9 @@ namespace bslib{
         void compute_final_centroid(idx_t label, float * sub_centroid);
         void compute_residual_group_id(size_t n, const idx_t * labels, const float * x, float * residuals);
         void recover_residual_group_id(size_t n, const idx_t * labels, const float * residuals, float * x);
-        void search_in_group(size_t n, const float * queries, size_t k, float * dists, idx_t * labels, const idx_t * group_id);
+        void search_in_group(size_t n, const float * queries, const std::vector<std::map<idx_t, float>> queries_upper_centroid_dists, const idx_t * group_idxs, float * result_dists);
         void search_all(size_t n, const float * instance, size_t k, float * dists, idx_t * labels);
         void compute_nn_centroids(size_t k, float * nn_centroids, float * nn_centroid_dists, idx_t * labels);
+        float search_in_map(std::map<idx_t, float> dist_map, idx_t key);
     };
 }

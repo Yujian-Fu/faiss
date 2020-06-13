@@ -13,6 +13,7 @@ struct Bslib_Index{
     std::vector<std::string> index_type; // Initialized in constructer
     size_t nt; //Initialized in constructer by 0, assigned in main
     size_t subnt; //Initialized in constructer by 0, assigned in main 
+    bool use_subset;
 
     size_t M; // Initialized by training pq
     size_t norm_M;
@@ -43,19 +44,19 @@ struct Bslib_Index{
 
 
 
-    explicit Bslib_Index(const size_t dimension, const size_t layers, const std::string * index_type);
+    explicit Bslib_Index(const size_t dimension, const size_t layers, const std::string * index_type, const bool use_subset);
     void build_quantizers(const uint32_t * ncentroids, const char * path_quantizers, const char * path_learn);
     void add_vq_quantizer(size_t nc_upper, size_t nc_per_group, bool update_idxs);
     void add_lq_quantizer(size_t nc_upper, size_t nc_per_group, const float * upper_centroids, const idx_t * upper_nn_centroid_idxs, const float * upper_nn_centroid_dists, bool update_idxs);
     void train_pq(const char * path_pq, const char * path_norm_pq, const char * path_learn);
     void encode(size_t n, const float * data, const idx_t * encoded_ids, float * encoded_data);
     void decode(size_t n, const float * encoded_data, const idx_t * encoded_ids, float * decoded_data);
-    void assign(size_t n, const float * data, idx_t * assigned_ids);
+    void assign(const size_t n, const float * assign_data, idx_t * assigned_ids);
     void add_batch(size_t n, const float * data, const idx_t * origin_ids, idx_t * encoded_ids);
     void get_final_nc();
     void compute_centroid_norm();
-    void search(size_t n, size_t result_k, float * queries, float * query_dists, faiss::Index::idx_t * query_ids, size_t * search_space, size_t * keep_space);
-    void keep_k_min(size_t m, size_t k, float * all_dists, idx_t * all_ids, float * sub_dists, idx_t * sub_ids);
+    void search(size_t n, size_t result_k, float * queries, float * query_dists, faiss::Index::idx_t * query_ids, size_t * keep_space);
+    void keep_k_min(const size_t m, const size_t k, const float * all_dists, const idx_t * all_ids, float * sub_dists, idx_t * sub_ids);
     float pq_L2sqr(const uint8_t *code);
 
     void read_quantizers(const char * path_quantizers);

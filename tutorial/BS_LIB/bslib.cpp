@@ -4,7 +4,7 @@
 #include <sys/resource.h>
 
 #include "bslib_index.h"
-#include "parameters_VQ_VQ_VQ_LQ.h"
+#include "parameters_millions.h"
 
 
 using namespace bslib;
@@ -12,14 +12,13 @@ typedef uint32_t idx_t;
 
 int main(){
 
-
     memory_recorder Mrecorder = memory_recorder();
     time_recorder Trecorder = time_recorder();
     std::string message;
 
 /*Prepare the work space*/
     PrepareFolder(folder_model);
-    PrepareFolder((char *) (std::string(folder_model)+"/SIFT1B").c_str());
+    PrepareFolder((char *) (std::string(folder_model)+"/SIFT1M").c_str());
     std::cout << "Preparing work space: " << folder_model << std::endl;
 
     //For recording 
@@ -36,13 +35,14 @@ int main(){
 
 
 /*Train the residual PQ and norm PQ*/
-    
+
     //Initialize the index
     ShowMessage("Initializing the index");
     Trecorder.reset();
-    Bslib_Index * index = new Bslib_Index(dimension, layers, index_type);
+    Bslib_Index * index = new Bslib_Index(dimension, layers, index_type, use_subset);
     index->nt = nt;
     index->subnt = subnt;
+
     index->build_quantizers(ncentroids, path_quantizers, path_learn);
     index->get_final_nc();
     message = "Initialized the index, ";
@@ -178,7 +178,7 @@ int main(){
     std::vector<faiss::Index::idx_t> query_labels(nq * result_k);
     size_t correct = 0;
     size_t k = 1;
-    index->search(nq, result_k, query.data(), query_distances.data(), query_labels.data(), search_space, keep_space);
+    index->search(nq, result_k, query.data(), query_distances.data(), query_labels.data(), keep_space);
     std::cout << "The qps for searching is: " << Trecorder.getTimeConsumption() / nq << " us " << std::endl;
     message = "Finish Search";
     Trecorder.print_time_usage(message);

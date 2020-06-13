@@ -7,71 +7,57 @@ namespace bslib{
 
     void VQ_quantizer::build_centroids(const float * train_data, size_t train_set_size, idx_t * train_data_idxs, bool update_idxs){
         std::cout << "Adding " << train_set_size << " train set data into " << nc_upper << " group " << std::endl;
-        std::vector<std::vector<float>> centroid_train_set;
-        centroid_train_set.resize(nc_upper);
+        std::vector<std::vector<float>> train_set(this->nc_upper);
 
         for (size_t i = 0; i < train_set_size; i++){
             idx_t idx = train_data_idxs[i];
             for (size_t j = 0; j < dimension; j++)
-                centroid_train_set[idx].push_back(train_data[i*dimension + j]);
+                train_set[idx].push_back(train_data[i*dimension + j]);
         }
 
         std::cout << "Building all_quantizer and group quantizers for vq_quantizer " << std::endl;
-        this->all_quantizer = faiss::IndexFlatL2(dimension);
         for (size_t i = 0; i < nc_upper; i++){
             std::vector<float> centroids(dimension * nc_per_group);
-            size_t nt_sub = centroid_train_set[i].size() / this->dimension;
-            faiss::kmeans_clustering(dimension, nt_sub, nc_per_group, centroid_train_set[i].data(), centroids.data());
+            size_t nt_sub = train_set[i].size() / this->dimension;
+            faiss::kmeans_clustering(dimension, nt_sub, nc_per_group, train_set[i].data(), centroids.data());
             faiss::IndexFlatL2 centroid_quantizer(dimension);
             centroid_quantizer.add(nc_per_group, centroids.data());
             this->quantizers.push_back(centroid_quantizer);
-            if (update_idxs){
-                this->all_quantizer.add(nc_per_group, centroids.data());
-            }
         }
 
+        std::cout << "finished computing centoids" <<std::endl;
         if (update_idxs){
             std::cout << "Finding the centroid idxs for train vectors for futher quantizer construction " << std::endl;
             //Find the centroid idxs for train vectors
-            std::vector<float> centroid_distances(train_set_size);
-            std::vector<faiss::Index::idx_t> centroid_idxs(train_set_size);
-            std::cout << "searching the train idxs for train vectors " << std::endl;
-            all_quantizer.search(train_set_size, train_data, 1, centroid_distances.data(), centroid_idxs.data());
-            std::cout << "Showing the idxs samples:" << std::endl;
-            std::cout << centroid_idxs[0] << " " << centroid_idxs[1] << " " << centroid_idxs[2] << " " << centroid_idxs[3] << std::endl;
-            for (size_t i = 0; i < train_set_size; i++){
-                train_data_idxs[i] = centroid_idxs[i];
+            for (size_t i = 0; i < this->nc_upper; i++){
+                size_t base_idx = CentroidDistributionMap[i];
+                size_t group_size = train_set[i].size() / dimension;
+                std::vector<float> centroid_distances(group_size);
+                std::vector<faiss::Index::idx_t> centroid_idxs(group_size);
+                this->quantizers[i].search(group_size, train_set[i].data(), 1, centroid_distances.data(), centroid_idxs.data());
+                for (size_t j = 0; j < group_size; j++){
+                    train_data_idxs[i * nc_per_group + j] = centroid_idxs[j] + base_idx;
+                }
             }
         }
     }
 
-    void VQ_quantizer::search_in_group(size_t n, const float * instances, size_t k, float * dists, idx_t * labels, const idx_t * group_id){
-        std::vector<float> query_dists(n * k);
-        std::vector<faiss::Index::idx_t> query_labels(n * k);
+    void VQ_quantizer::search_in_group(size_t n, const float * queries, const idx_t * group_idxs, float * result_dists){
 #pragma omp parallel for
         for (size_t i = 0; i < n; i++){
-            this->quantizers[group_id[i]].search(1, instances + i * dimension, k, query_dists.data() + i * k, query_labels.data() + i * k);
-        }
-
-
-        for (size_t i = 0; i < n; i++){
-            size_t base_idx = CentroidDistributionMap[group_id[i]];
-            for (size_t j = 0; j < k; j++){
-                labels[i * k + j] = base_idx + query_labels[i * k + j];
-                dists[i * k + j] = query_dists[i * k + j];
+            idx_t idx = group_idxs[i];
+            for (size_t j = 0; j < this->nc_per_group; j++){
+                std::vector<float> query_sub_centroid_vector(dimension);
+                const float * sub_centroid = this->quantizers[idx].xb.data() + j * this->nc_per_group;
+                const float * query = queries + i * dimension;
+                faiss::fvec_madd(dimension, sub_centroid, -1.0, query, query_sub_centroid_vector.data());
+                result_dists[i * this->nc_per_group + j] = faiss::fvec_norm_L2sqr(query_sub_centroid_vector.data(), dimension);
             }
         }
     }
 
     void VQ_quantizer::compute_final_centroid(idx_t label, float * final_centroid){
         size_t j = size_t (label / nc_per_group);
-        /*
-        for (j = 0; j < nc_upper; j++){
-            if (CentroidDistributionMap[j+1] >= label){
-                break;
-            }
-        }
-        */
         size_t group_label = label - CentroidDistributionMap[j];
         for (size_t i = 0; i < dimension; i++)
             final_centroid[i] = this->quantizers[group_label].xb[group_label * this->dimension + i];
@@ -97,24 +83,27 @@ namespace bslib{
     }
 
     void VQ_quantizer::compute_nn_centroids(size_t k, float * nn_centroids, float * nn_dists, idx_t * labels){
+        faiss::IndexFlatL2 all_quantizer(dimension);
+
+        for (size_t i = 0; i < this->nc_upper; i++){
+            all_quantizer.add(this->nc_per_group, this->quantizers[i].xb.data());
+        }
+
+        for (size_t i = 0; i < this->nc * this->dimension; i++){
+            nn_centroids[i] = all_quantizer.xb[i];
+        }
+
         std::vector<faiss::Index::idx_t>  search_nn_idxs(this->nc * (k + 1));
         std::vector<float> search_nn_dists ( this->nc * (k+1));
-        this->all_quantizer.search(this->nc, this->all_quantizer.xb.data(), k+1, search_nn_dists.data(), search_nn_idxs.data());
-        std::cout << "VQ nn centroids idxs results: " << std::endl;
-        
+        all_quantizer.search(this->nc, all_quantizer.xb.data(), k+1, search_nn_dists.data(), search_nn_idxs.data());
+
         for (size_t i = 0; i < this->nc; i++){
             for (size_t j = 0; j < k; j++){
                 nn_dists[i * k + j] = search_nn_dists[i * (k + 1) + j + 1];
                 labels[i * k + j] = search_nn_idxs[i * (k + 1) + j + 1];
             }
-            for (size_t j = 0; j < dimension; j++){
-                nn_centroids[i * dimension + j] = all_quantizer.xb[i * dimension + j];
-            }
         }
     }
-
-
-
 
 
 

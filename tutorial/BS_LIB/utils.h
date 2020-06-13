@@ -121,6 +121,7 @@ namespace bslib{
     }
 
 
+
     inline bool exists(const char * FilePath){
         std::ifstream f (FilePath);
         return f.good();

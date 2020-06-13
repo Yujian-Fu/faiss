@@ -5,6 +5,7 @@
 #include <cstdio>
 #include <queue>
 #include <math.h>
+#include <map>
 
 #include <faiss/index_io.h>
 #include <faiss/utils/Heap.h>
@@ -28,10 +29,10 @@ struct Base_quantizer
     size_t nc;
     
     
-    std::vector<int32_t> CentroidDistributionMap;
+    
+    std::vector<idx_t> CentroidDistributionMap;
     
     explicit Base_quantizer(size_t dimension, size_t nc_upper, size_t nc_per_group);
-
 };
 }
 #endif
