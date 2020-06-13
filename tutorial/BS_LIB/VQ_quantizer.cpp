@@ -43,9 +43,9 @@ namespace bslib{
     }
 
     void VQ_quantizer::search_in_group(size_t n, const float * queries, const idx_t * group_idxs, float * result_dists){
+#pragma omp parallel for
         for (size_t i = 0; i < n; i++){
             idx_t idx = group_idxs[i];
-
             for (size_t j = 0; j < this->nc_per_group; j++){
                 std::vector<float> query_sub_centroid_vector(dimension);
                 const float * sub_centroid = this->quantizers[idx].xb.data() + j * this->dimension;

@@ -344,6 +344,8 @@ namespace bslib{
             }
 
             std::cout << "Choosing k instances with smallest distances " << std::endl;
+
+#pragma omp parallel for
             for (size_t j = 0; j < n; j++){
                 keep_k_min(group_size, 1, result_dists.data()+j*group_size, result_labels.data()+j*group_size, group_dists.data()+j, group_idxs.data()+j);
             }
