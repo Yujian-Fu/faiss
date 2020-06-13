@@ -208,7 +208,7 @@ namespace bslib{
                         faiss::fvec_madd(dimension, sub_centroids[m].data(), -1.0, query, query_sub_centroid_vector.data());
                         query_sub_centroids_dists[m] = faiss::fvec_norm_L2sqr(query_sub_centroid_vector.data(), dimension);
                         std::cout << easy_dist << " " << query_sub_centroids_dists[m] << " ";
-                        assert(easy_dist == query_sub_centroids_dists[m]);
+                        //assert(easy_dist == query_sub_centroids_dists[m]);
 
                         //}
                     }
