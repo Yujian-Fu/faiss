@@ -77,7 +77,8 @@ namespace bslib{
             }
             std::cout << std::endl;
         }*/
-        //else{
+        //else
+        {
         ShowMessage("No preconstructed quantizers, constructing quantizers");
         //Load the train set into the index
         this->train_data.resize(this->nt * this->dimension);
@@ -98,7 +99,7 @@ namespace bslib{
             }
             this->nt = subnt;
             CheckResult<float>(this->train_data.data(), this->dimension);
-        //}
+        }
 
         assert(index_type.size() == layers && index_type[0] != "LQ");
         std::cout << "adding layers to the index structure " << std::endl;
