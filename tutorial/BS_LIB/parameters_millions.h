@@ -24,7 +24,7 @@ const size_t dimension = 128;
 
 //For building index
 const size_t nb = 1000000;
-const uint32_t batch_size = 10000;
+const uint32_t batch_size = 100000;
 const size_t nbatches = nb / batch_size; //1000
 
 //For searching
@@ -33,7 +33,6 @@ const size_t nq = 10000;
 const size_t result_k = 1;
 const size_t max_vectors = 50000;
 size_t keep_space[layers] = {50, 10};
-
 
 bool is_recording = true;
 

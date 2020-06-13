@@ -55,7 +55,7 @@ namespace bslib{
             }
         }
         clock_t endtime = clock();
-        std::cout << "Search time in VQ " << (endtime - starttime) / CLOCKS_PER_SEC << std::endl;
+        std::cout << "Search time in VQ " << float(endtime - starttime) / CLOCKS_PER_SEC << std::endl;
     }
 
     void VQ_quantizer::compute_final_centroid(idx_t label, float * final_centroid){

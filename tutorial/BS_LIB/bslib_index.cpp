@@ -349,7 +349,7 @@ namespace bslib{
                 keep_k_min(group_size, 1, result_dists.data()+j*group_size, result_labels.data()+j*group_size, group_dists.data()+j, group_idxs.data()+j);
             }
             clock_t endtime = clock();
-            std::cout << "Time in selct k min: " << (endtime - starttime) / CLOCKS_PER_SEC << std::endl;
+            std::cout << "Time in selct k min: " << float(endtime - starttime) / CLOCKS_PER_SEC << std::endl;
         }
         clock_t endtime1 = clock();
 
@@ -383,8 +383,8 @@ namespace bslib{
         }
         std::cout << "Checking finished" << std::endl;
         std::cout << "The correct number is " << correct << " The dist proportion is: " << dist_proportion / n << std::endl;
-        std::cout << "Origin search time: " << (endtime1 - starttime1) / CLOCKS_PER_SEC << std::endl;
-        std::cout << "Test search time: " << " " << (endtime2 - starttime2)/ CLOCKS_PER_SEC << std::endl;
+        std::cout << "Origin search time: " << float(endtime1 - starttime1) / CLOCKS_PER_SEC << std::endl;
+        std::cout << "Test search time: " << " " << float(endtime2 - starttime2)/ CLOCKS_PER_SEC << std::endl;
         */
         
         
