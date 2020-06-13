@@ -163,22 +163,22 @@ int main(){
         Trecorder.record_time_usage(record_file, message);
     }
 
-    exit(0);
     record_file.close();
     ShowMessage("Loading groundtruth");
     std::vector<uint32_t> groundtruth(nq * ngt);
     {
         std::ifstream gt_input(path_gt, std::ios::binary);
-        readXvec<uint32_t>(gt_input, groundtruth.data(), ngt, nq, false, true);
+        readXvec<uint32_t>(gt_input, groundtruth.data(), ngt, nq, true, false);
     }
 
     ShowMessage("Loading queries");
     std::vector<float> query(nq * dimension);
     {
         std::ifstream query_input(path_query, std::ios::binary);
-        readXvecFvec<origin_data_type>(query_input, query.data(), dimension, nq, true, true);
+        readXvecFvec<origin_data_type>(query_input, query.data(), dimension, nq, true, false);
     }
 
+    exit(0);
     index->max_visited_vectors = max_vectors;
     index->precomputed_table.resize(index->pq.M * index->pq.ksub);
     std::vector<float> query_distances(nq * result_k);
