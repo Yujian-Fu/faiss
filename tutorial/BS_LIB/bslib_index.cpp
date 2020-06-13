@@ -297,7 +297,6 @@ namespace bslib{
         std::vector<idx_t> result_labels;
         std::vector<std::map<idx_t, float>>  queries_upper_centroid_dists(n);
 
-        clock_t starttime1 = clock();
         for (size_t i = 0; i < this->layers; i++){
             assert(n_lq + n_vq == i);
             size_t group_size;
@@ -348,7 +347,6 @@ namespace bslib{
                 keep_k_min(group_size, 1, result_dists.data()+j*group_size, result_labels.data()+j*group_size, group_dists.data()+j, group_idxs.data()+j);
             }
         }
-        clock_t endtime1 = clock();
 
         assert((n_vq + n_lq) == this->layers);
         for (size_t i = 0; i < n; i++){
@@ -382,7 +380,6 @@ namespace bslib{
         std::cout << "The correct number is " << correct << " The dist proportion is: " << dist_proportion / n << std::endl;
         std::cout << "Test search time " << " " << (endtime2 - starttime2)/ CLOCKS_PER_SEC << std::endl;
         */
-        std::cout << "The time consumption: " << (endtime1 - starttime1) / CLOCKS_PER_SEC << std::endl;
     }
 
 
