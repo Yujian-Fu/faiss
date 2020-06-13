@@ -46,9 +46,10 @@ namespace bslib{
 #pragma omp parallel for
         for (size_t i = 0; i < n; i++){
             idx_t idx = group_idxs[i];
+
             for (size_t j = 0; j < this->nc_per_group; j++){
                 std::vector<float> query_sub_centroid_vector(dimension);
-                const float * sub_centroid = this->quantizers[idx].xb.data() + j * this->nc_per_group;
+                const float * sub_centroid = this->quantizers[idx].xb.data() + j * this->dimension;
                 const float * query = queries + i * dimension;
                 faiss::fvec_madd(dimension, sub_centroid, -1.0, query, query_sub_centroid_vector.data());
                 result_dists[i * this->nc_per_group + j] = faiss::fvec_norm_L2sqr(query_sub_centroid_vector.data(), dimension);
