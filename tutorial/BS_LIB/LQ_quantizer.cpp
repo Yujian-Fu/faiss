@@ -209,7 +209,6 @@ namespace bslib{
                         }
                     }
 
-                    std::cout << "Adding distance to the result distances " << std::endl;
                     for (size_t m = 0; m < this->nc_per_group; m++){
                         result_dists[sequence_id * this->nc_per_group + m] = query_sub_centroids_dists[m];
                     }

@@ -368,18 +368,28 @@ namespace bslib{
             for (size_t j = 0; j < n; j++){
                 keep_k_min(group_size, 1, result_dists.data()+j*group_size, result_labels.data()+j*group_size, group_dists.data()+j, group_idxs.data()+j);
             }
-            std::cout << "Showing 100 examples " << std::endl;
-            for (size_t temp = 0; temp < 100; temp++){
-                std::cout << group_idxs[temp] << "_" << group_dists[temp] << " ";
-            }
-            std::cout << std::endl;
-
         }
 
         assert((n_vq + n_lq) == this->layers);
         for (size_t i = 0; i < n; i++){
             assigned_ids[i] = group_idxs[i];
         }
+
+        std::cout << "Checking whether the ids are correct " << std::endl;
+        faiss::IndexFlatL2 final_quantizer(dimension);
+        for (size_t i = 0; i < this->final_nc; i++){
+            std::vector<float> final_centroid(dimension);
+            this->lq_quantizer_index[0].compute_final_centroid(i, final_centroid.data());
+            final_quantizer.add(1, final_centroid.data());
+        }
+        std::vector<faiss::Index::idx_t> final_idx(n);
+        std::vector<float> final_dist(n);
+        final_quantizer.search(n, assign_data, 1, final_dist.data(), final_idx.data());
+        for (size_t i = 0; i < n; i++){
+            std::cout << assigned_ids[i] << "_" << final_idx[i] << " " << group_dists.data() << "_" << final_dist[i] << " ";
+        }
+        std::cout << "Checing finished" << std::endl;
+
     }
 
 
