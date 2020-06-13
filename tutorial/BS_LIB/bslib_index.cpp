@@ -389,14 +389,14 @@ namespace bslib{
         size_t correct = 0;
         float dist_proportion = 0.0;
         for (size_t i = 0; i < n; i++){
-            if (size_t(assigned_ids[i] - final_idx[i]) == 0){
+            if ((group_idxs[i] - final_idx[i]) == 0){
                 correct ++;
             }
             dist_proportion += group_dists[i] / final_dist[i];
-            std::cout << assigned_ids[i] - final_idx[i] << "_" << assigned_ids[i] << "_" << final_idx[i] << " " << group_dists[i] << "_" << final_dist[i] << " ";
+            std::cout << group_idxs[i] - final_idx[i] << "_" << group_idxs[i] << "_" << final_idx[i] << " " << group_dists[i] << "_" << final_dist[i] << " ";
         }
         std::cout << "Checing finished" << std::endl;
-        std::cout << "The correct proportion is " << float(correct / n) << " The dist proportion is: " << dist_proportion / n;
+        std::cout << "The correct number is " << correct << " The dist proportion is: " << dist_proportion / n;
         exit(0);
 
     }
