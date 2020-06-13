@@ -167,7 +167,7 @@ namespace bslib{
     void LQ_quantizer::search_in_group(size_t n, const float * queries, const std::vector<std::map<idx_t, float>> queries_upper_centroid_dists, const idx_t * group_idxs, float * result_dists){
         //clock_t starttime = clock();
         std::vector<std::vector<idx_t>> query_sequence_set(this->nc_upper);
-#pragma omp parallel for
+        
         for (size_t i = 0; i < n; i++){
             idx_t idx = group_idxs[i];
             query_sequence_set[idx].push_back(i);
