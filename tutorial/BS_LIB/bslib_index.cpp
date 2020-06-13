@@ -188,6 +188,18 @@ namespace bslib{
         assign(this->nt, this->train_data.data(), group_ids.data());
 
         encode(this->nt, this->train_data.data(), group_ids.data(), residuals.data());
+        std::cout << "Checking the residual data " << std::endl;
+        for (size_t i = 0; i < 10; i++){
+            std::cout << group_ids[i] << " ";
+        }
+        std::cout << std::endl;
+        std::vector<float> centroid(dimension);
+        this->lq_quantizer_index[0].compute_final_centroid(group_ids[0], centroid.data());
+        for (size_t i = 0; i < dimension; i++){
+            std::cout << train_data[i] << " " << residuals[i] << " " << centroid[i] << "          ";
+        }
+        std::cout << std::endl;
+
         this->pq.verbose = true;
         this->pq.train(nt, residuals.data());
         faiss::write_ProductQuantizer(& this->pq, path_pq);
@@ -297,7 +309,7 @@ namespace bslib{
         std::vector<idx_t> result_labels;
         std::vector<std::map<idx_t, float>>  queries_upper_centroid_dists(n);
 
-        clock_t starttime1 = clock();
+        //clock_t starttime1 = clock();
         for (size_t i = 0; i < this->layers; i++){
             assert(n_lq + n_vq == i);
             size_t group_size;
@@ -351,7 +363,7 @@ namespace bslib{
             clock_t endtime = clock();
             std::cout << "Time in selct k min: " << float(endtime - starttime) / CLOCKS_PER_SEC << std::endl;
         }
-        clock_t endtime1 = clock();
+        //clock_t endtime1 = clock();
 
         assert((n_vq + n_lq) == this->layers);
         for (size_t i = 0; i < n; i++){

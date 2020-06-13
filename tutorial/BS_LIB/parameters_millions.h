@@ -10,14 +10,14 @@ const size_t layers = 2;
 const std::string index_type[layers] = {"VQ", "LQ"};
 const uint32_t ncentroids[layers] = {1000, 10};
 const char * path_quantizers = "/home/y/yujianfu/ivf-hnsw/models_VQ_LQ/SIFT1M/quantizer_1500_500.qt";
-const bool use_subset = false;
+const bool use_subset = true;
 
 //For train PQ
 const size_t bytes_per_code = 16;
 const size_t bytes_per_norm_code = 1;
 const size_t nbits = 8; //Or 16
 const size_t nt = 100000;
-const size_t subnt = 100000;
+const size_t subnt = 10000;
 const size_t dimension = 128;
 
 //For assigning ID
