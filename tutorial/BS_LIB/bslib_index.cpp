@@ -282,7 +282,7 @@ namespace bslib{
 
     void Bslib_Index::assign(const size_t n, const float * assign_data, idx_t * assigned_ids){
         
-        std::cout << "assigning vectors " << std::endl;
+        //std::cout << "assigning vectors " << std::endl;
         std::vector<idx_t> group_idxs (n);
         std::vector<float> group_dists(n);
         for (size_t i = 0; i < n; i++){
@@ -302,7 +302,7 @@ namespace bslib{
             assert(n_lq + n_vq == i);
             size_t group_size;
             if (index_type[i] == "VQ"){
-                std::cout << "searching in VQ layer" << std::endl;
+                //std::cout << "searching in VQ layer" << std::endl;
                 group_size = vq_quantizer_index[n_vq].nc_per_group;
                 result_dists.resize(group_size * n);
                 vq_quantizer_index[n_vq].search_in_group(n, assign_data, group_idxs.data(), result_dists.data());
@@ -316,8 +316,7 @@ namespace bslib{
             }
 
             else if(index_type[i] == "LQ"){
-                std::cout << "searching in LQ layer" << std::endl;
-
+                //std::cout << "searching in LQ layer" << std::endl;
                 group_size = lq_quantizer_index[n_lq].nc_per_group;
                 result_dists.resize(group_size * n);
                 lq_quantizer_index[n_lq].search_in_group(n, assign_data, queries_upper_centroid_dists, group_idxs.data(), result_dists.data());
@@ -336,14 +335,14 @@ namespace bslib{
             }
 
             if (i < this->layers-1 && index_type[i+1] == "LQ"){
-                std::cout << "The next layer is LQ, load the query centroid distsnaces" << std::endl;
+                //std::cout << "The next layer is LQ, load the query centroid distsnaces" << std::endl;
                 for (size_t j = 0; j < n; j++){
                     for (size_t m = 0; m < group_size; m++)
                         queries_upper_centroid_dists[j].insert(std::pair<idx_t, float>(result_labels[j*group_size+m], result_dists[j*group_size+m]));
                 }
             }
 
-            std::cout << "Choosing k instances with smallest distances " << std::endl;
+            //std::cout << "Choosing k instances with smallest distances " << std::endl;
 
             for (size_t j = 0; j < n; j++){
                 keep_k_min(group_size, 1, result_dists.data()+j*group_size, result_labels.data()+j*group_size, group_dists.data()+j, group_idxs.data()+j);
@@ -356,6 +355,7 @@ namespace bslib{
             assigned_ids[i] = group_idxs[i];
         }
 
+        /*
         std::cout << "Checking whether the ids are correct " << std::endl;
         faiss::IndexFlatL2 final_quantizer(dimension);
         for (size_t i = 0; i < this->final_nc; i++){
@@ -380,7 +380,9 @@ namespace bslib{
         }
         std::cout << "Checking finished" << std::endl;
         std::cout << "The correct number is " << correct << " The dist proportion is: " << dist_proportion / n << std::endl;
-        std::cout << "The time comparison: " << (endtime1 - starttime1) / CLOCKS_PER_SEC << " " << (endtime2 - starttime2)/ CLOCKS_PER_SEC << std::endl;
+        std::cout << "Test search time " << " " << (endtime2 - starttime2)/ CLOCKS_PER_SEC << std::endl;
+        */
+        std::cout << "The time consumption: " << (endtime1 - starttime1) / CLOCKS_PER_SEC << std::endl;
     }
 
 
