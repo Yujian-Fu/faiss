@@ -172,7 +172,7 @@ namespace bslib{
             idx_t idx = group_idxs[i];
             query_sequence_set[idx].push_back(i);
         }
-
+#pragma omp parallel for
         for (size_t i = 0; i < this->nc_upper; i++){
             if (query_sequence_set[i].size() == 0)
                 continue;
