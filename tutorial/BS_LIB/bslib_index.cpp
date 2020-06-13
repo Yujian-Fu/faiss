@@ -452,13 +452,17 @@ namespace bslib{
                 if (all_dists[i] < dists[0]){
                     faiss::maxheap_pop(k, dists.data(), ids.data());
                     faiss::maxheap_push(k, dists.data(), ids.data(), all_dists[i], all_ids[i]);
+                    for (size_t j = 0; j < k; j++){
+                        std::cout << ids[j] << " " << dists[j] << " "; 
+                    }
+                    std::cout << std::endl;
                 }
             }
 
             for (size_t i = 0; i < k; i++){
                 sub_ids[i] = ids[i];
                 sub_dists[i] = dists[i];
-                std::cout << ids[i] << " " << dists[i] << " " << sub_ids[i] << " " << sub_dists[i] << std::endl;
+                std::cout << ids[i] << " " << dists[i] << " " << sub_ids[i] << " " << sub_dists[i] << "    ";
             }
             std::cout << std::endl;
         }
