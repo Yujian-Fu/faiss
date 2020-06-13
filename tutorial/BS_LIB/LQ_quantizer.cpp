@@ -188,6 +188,12 @@ namespace bslib{
 
                     std::vector<float> query_sub_centroids_dists(this->nc_per_group);
                     std::cout << "Computing distance to all sub centroids " << std::endl;
+                    std::cout << "showing the query centroid distances " << std::endl;
+                    for (idx_t temp = 0; temp < 1000; temp++){
+                        std::map<idx_t, float> query_map = queries_upper_centroid_dists[sequence_id];
+                        std::cout << query_map[temp] << " ";
+                    }
+                    std::cout << std::endl;
                     for (size_t m = 0; m < this->nc_per_group; m++){
                         idx_t nn_idx = this->nn_centroid_idxs[i][m];
                         float query_nn_dist = search_in_map(queries_upper_centroid_dists[sequence_id], nn_idx);
