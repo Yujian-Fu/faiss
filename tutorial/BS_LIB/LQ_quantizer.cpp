@@ -202,7 +202,7 @@ namespace bslib{
                             float query_group_dist = search_in_map(queries_upper_centroid_dists[sequence_id], i);
                             assert (query_group_dist != Not_Found);
                             float group_nn_dist = this->nn_centroid_dists[i][m];
-                            std::cout << "Computing easy distance " << query_group_dist << " " << query_nn_dist << " " << group_nn_dist << " " << alpha << " " <<  i << " " << m << " " << nn_idx << std::endl;
+                            std::cout << "Computing easy distance " << query_group_dist << " " << query_nn_dist << " " << group_nn_dist << " " << alpha << " " <<  i << " " << m << " " << nn_idx << " " << alpha * group_nn_dist<< std::endl;
 
                             term1 = alpha*(alpha-1)*group_nn_dist*group_nn_dist;
                             term2 = (1-alpha)*query_group_dist*query_group_dist;
@@ -232,9 +232,15 @@ namespace bslib{
                         float query_centroid_dist = faiss::fvec_norm_L2sqr(query_centroid_vector.data(), dimension);
                         float query_nn_centroid_dist = faiss::fvec_norm_L2sqr(query_nn_centroid_vector.data(), dimension);
 
+                        std::vector<float> sub_centroid_vector(dimension);
+                        faiss::fvec_madd(dimension, sub_centroids[m].data(), -1, centroid, sub_centroid_vector.data());
+                        float alpha_centroid_dist = faiss::fvec_norm_L2sqr(sub_centroid_vector.data(), dimension);
+
+
+
 
                         if (query_nn_dist != Not_Found){
-                            std::cout << term1 << " " << term2 << " " << term3 << " " << easy_dist << "_" << query_sub_centroids_dists[m] << " " << query_centroid_dist << " " << query_nn_centroid_dist << std::endl;
+                            std::cout << term1 << " " << term2 << " " << term3 << " " << easy_dist << " " << query_sub_centroids_dists[m] << " " << query_centroid_dist << " " << query_nn_centroid_dist << " " << alpha_centroid_dist << std::endl;
                         }
                         //}
                     }
