@@ -297,6 +297,7 @@ namespace bslib{
         std::vector<idx_t> result_labels;
         std::vector<std::map<idx_t, float>>  queries_upper_centroid_dists(n);
 
+        clock_t starttime1 = clock();
         for (size_t i = 0; i < this->layers; i++){
             assert(n_lq + n_vq == i);
             size_t group_size;
@@ -343,10 +344,14 @@ namespace bslib{
 
             //std::cout << "Choosing k instances with smallest distances " << std::endl;
 
+            clock_t starttime = clock();
             for (size_t j = 0; j < n; j++){
                 keep_k_min(group_size, 1, result_dists.data()+j*group_size, result_labels.data()+j*group_size, group_dists.data()+j, group_idxs.data()+j);
             }
+            clock_t endtime = clock();
+            std::cout << "Time in selct k min: " << (endtime - starttime) / CLOCKS_PER_SEC << std::endl;
         }
+        clock_t endtime1 = clock();
 
         assert((n_vq + n_lq) == this->layers);
         for (size_t i = 0; i < n; i++){
@@ -354,7 +359,7 @@ namespace bslib{
         }
 
         /*
-        std::cout << "Checking whether the ids are correct " << std::endl;
+        std::cout << "Checking whether the ids are correctly assigned " << std::endl;
         faiss::IndexFlatL2 final_quantizer(dimension);
         for (size_t i = 0; i < this->final_nc; i++){
             std::vector<float> final_centroid(dimension);
@@ -378,8 +383,11 @@ namespace bslib{
         }
         std::cout << "Checking finished" << std::endl;
         std::cout << "The correct number is " << correct << " The dist proportion is: " << dist_proportion / n << std::endl;
-        std::cout << "Test search time " << " " << (endtime2 - starttime2)/ CLOCKS_PER_SEC << std::endl;
+        std::cout << "Origin search time: " << (endtime1 - starttime1) / CLOCKS_PER_SEC << std::endl;
+        std::cout << "Test search time: " << " " << (endtime2 - starttime2)/ CLOCKS_PER_SEC << std::endl;
         */
+        
+        
     }
 
 

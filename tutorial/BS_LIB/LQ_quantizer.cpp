@@ -165,6 +165,7 @@ namespace bslib{
     }
 
     void LQ_quantizer::search_in_group(size_t n, const float * queries, const std::vector<std::map<idx_t, float>> queries_upper_centroid_dists, const idx_t * group_idxs, float * result_dists){
+        clock_t starttime = clock();
         std::vector<std::vector<idx_t>> query_sequence_set(this->nc_upper);
 
         for (size_t i = 0; i < n; i++){
@@ -214,6 +215,8 @@ namespace bslib{
                 }
             }
         }
+        clock_t endtime = clock();
+        std::cout << "Search time in LQ layer: " << (endtime - starttime) / CLOCKS_PER_SEC << std::endl;
     }
 
     void LQ_quantizer::compute_nn_centroids(size_t k, float * nn_centroids, float * nn_dists, idx_t * labels){
