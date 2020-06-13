@@ -1,6 +1,8 @@
 #include <cstdio>
 #include <iostream>
 
+typedef float origin_data_type;
+
 /* Parameter setting: */
 //Exp parameters
 //For index initialization

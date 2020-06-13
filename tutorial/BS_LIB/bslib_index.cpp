@@ -83,7 +83,7 @@ namespace bslib{
         this->train_data.resize(this->nt * this->dimension);
         std::cout << "Loading learn set from " << path_learn << std::endl;
         std::ifstream learn_input(path_learn, std::ios::binary);
-        readXvecFvec<float>(learn_input, this->train_data.data(), this->dimension, this->nt, true);
+        readXvecFvec<learn_data_type>(learn_input, this->train_data.data(), this->dimension, this->nt, true);
         this->train_data_idxs.resize(this->nt);
         for (size_t i = 0; i < this->nt; i++){
             this->train_data_idxs[i] = 0;
@@ -158,7 +158,7 @@ namespace bslib{
             std::cout << "Load the train set for PQ training" << std::endl;
             this->train_data.resize(this-> nt * dimension);
             std::ifstream learn_input(path_learn, std::ios::binary);
-            readXvecFvec<uint8_t>(learn_input, this->train_data.data(), this->dimension, this->nt, true);
+            readXvecFvec<learn_data_type>(learn_input, this->train_data.data(), this->dimension, this->nt, true);
             this->train_data_idxs.resize(nt);
             for (size_t i = 0; i < nt; i++){
                 this->train_data_idxs[i] = 0;
@@ -414,7 +414,7 @@ namespace bslib{
             size_t n_vq = 0;
             size_t n_lq = 0;
 
-            size_t keep_result_space;
+            size_t keep_result_space = 1;
 
             for (size_t j = 0; j < layers; j++){
 

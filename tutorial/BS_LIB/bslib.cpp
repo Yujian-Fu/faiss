@@ -8,7 +8,7 @@
 
 
 using namespace bslib;
-typedef uint32_t idx_t;
+
 
 int main(){
 
@@ -51,6 +51,37 @@ int main(){
     Trecorder.print_time_usage(message);
     Trecorder.record_time_usage(record_file, message);
 
+    //Precompute the base vector idxs
+    if (!exists(path_idxs)){
+        Trecorder.reset();
+        ShowMessage("Assigning the points");
+        std::ifstream base_input (path_base, std::ios::binary);
+        std::ofstream base_output (path_idxs, std::ios::binary);
+
+        std::vector <float> batch(batch_size * dimension);
+        std::vector<idx_t> assigned_idxs(batch_size);
+
+        for (size_t i = 0; i < nbatches; i++){
+            readXvecFvec<origin_data_type> (base_input, batch.data(), dimension, batch_size);
+            index->assign(batch_size, batch.data(), assigned_idxs.data());
+            base_output.write((char * ) & batch_size, sizeof(uint32_t));
+            base_output.write((char *) assigned_idxs.data(), batch_size * sizeof(idx_t));
+            if (i % 10 == 0){
+                std::cout << " assigned batches [ " << i << " / " << nbatches << " ]";
+                Trecorder.print_time_usage("");
+            }
+        }
+        base_input.close();
+        base_output.close();
+        message = "Assigned the base vectors";
+        Mrecorder.print_memory_usage(message);
+        Mrecorder.record_memory_usage(record_file,  message);
+        Trecorder.print_time_usage(message);
+        Trecorder.record_time_usage(record_file, message);
+    }
+
+    exit(0);
+
     //Train the PQ quantizer
     ShowMessage("Training the PQ");
     Trecorder.reset();
@@ -77,34 +108,8 @@ int main(){
     Trecorder.print_time_usage(message);
     Trecorder.record_time_usage(record_file, message);
 
-    if (!exists(path_idxs)){
-        Trecorder.reset();
-        ShowMessage("Assigning the points");
-        std::ifstream input (path_base, std::ios::binary);
-        std::ofstream output (path_idxs, std::ios::binary);
 
-        std::vector <float> batch(batch_size * dimension);
-        std::vector<idx_t> assigned_idxs(batch_size);
-
-        for (size_t i = 0; i < nbatches; i++){
-            readXvecFvec<uint8_t> (input, batch.data(), dimension, batch_size);
-            index->assign(batch_size, batch.data(), assigned_idxs.data());
-            output.write((char * ) & batch_size, sizeof(uint32_t));
-            output.write((char *) assigned_idxs.data(), batch_size * sizeof(idx_t));
-            if (i % 10 == 0){
-                std::cout << " assigned batches [ " << i << " / " << nbatches << " ]";
-                Trecorder.print_time_usage("");
-            }
-        }
-        input.close();
-        output.close();
-        message = "Assigned the base vectors";
-        Mrecorder.print_memory_usage(message);
-        Mrecorder.record_memory_usage(record_file,  message);
-        Trecorder.print_time_usage(message);
-        Trecorder.record_time_usage(record_file, message);
-    }
-
+    //Build the index
     if (exists(path_index)){
         ShowMessage("Loading index");
         Trecorder.reset();
@@ -132,7 +137,7 @@ int main(){
 
         for (size_t i = 0; i < nbatches; i++){
             readXvec<uint32_t>(idx_input, idxs.data(), batch_size, 1);
-            readXvecFvec<uint8_t> (base_input, batch.data(), dimension, batch_size);
+            readXvecFvec<origin_data_type> (base_input, batch.data(), dimension, batch_size);
 
             for (size_t j = 0; j < batch_size; j++){
                 origin_ids[i] = batch_size * i + j;
@@ -169,7 +174,7 @@ int main(){
     std::vector<float> query(nq * dimension);
     {
         std::ifstream query_input(path_query, std::ios::binary);
-        readXvecFvec<uint8_t>(query_input, query.data(), dimension, nq, true, true);
+        readXvecFvec<origin_data_type>(query_input, query.data(), dimension, nq, true, true);
     }
 
     index->max_visited_vectors = max_vectors;
