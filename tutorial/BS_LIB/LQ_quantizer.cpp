@@ -220,7 +220,7 @@ namespace bslib{
                             term1 = alpha*(alpha-1)*group_nn_dist*group_nn_dist;
                             term2 = (1-alpha)*query_group_dist*query_group_dist;
                             term3 = alpha*query_nn_dist*query_nn_dist;
-                            easy_dist = sqrt(term1 + term2 + term3);
+                            easy_dist = alpha*(alpha-1)*group_nn_dist + (1-alpha)*query_group_dist + alpha*query_nn_dist;
                         }
                         //else{
                         std::cout << "Computing normal distance from sequence id to label " << sequence_id << " " << base_idx+m << std::endl;
