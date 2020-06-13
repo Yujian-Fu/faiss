@@ -136,7 +136,7 @@ namespace bslib{
             faiss::fvec_madd(dimension, centroid, alpha, centroid_vector.data(), sub_centroid);
 
             std::vector<float> sub_centroid_vector(dimension);
-            faiss::fvec_madd(dimension, centroid, -1, sub_centroid, sub_centroid_vector.data());
+            faiss::fvec_madd(dimension, sub_centroid, -1, centroid, sub_centroid_vector.data());
             std::cout << "The sub centroid vector norm is: " << faiss::fvec_norm_L2sqr(sub_centroid_vector.data(), dimension) << std::endl;
 
             std::cout << "The centroid vector and the sub centroid vector is: " << std::endl;
