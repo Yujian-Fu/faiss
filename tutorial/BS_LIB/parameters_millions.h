@@ -8,7 +8,7 @@ typedef float origin_data_type;
 //For index initialization
 const size_t layers = 2;
 const std::string index_type[layers] = {"VQ", "LQ"};
-const uint32_t ncentroids[layers] = {10, 1000};
+const uint32_t ncentroids[layers] = {1000, 10};
 const char * path_quantizers = "/home/y/yujianfu/ivf-hnsw/models_VQ_LQ/SIFT1M/quantizer_1500_500.qt";
 const bool use_subset = false;
 
