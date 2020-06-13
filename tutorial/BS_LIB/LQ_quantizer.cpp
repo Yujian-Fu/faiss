@@ -199,12 +199,12 @@ namespace bslib{
                             easy_dist = sqrt(alpha*(alpha-1)*group_nn_dist*group_nn_dist+(1-alpha)*query_group_dist*query_group_dist+alpha*query_nn_dist);
                         }
                         //else{
-                        
+                        std::cout << "Computing normal distance from sequence id to label" << sequence_id << " " << base_idx+m << std::endl;
                         if (sub_centroids[m].size() == 0){
                             idx_t label = base_idx + m;
                             compute_final_centroid(label, sub_centroids[m].data());
                         }
-                        std::cout << "Computing normal distance from sequence id to label" << sequence_id << " " << base_idx+m << std::endl;
+                        
                         const float * query = queries + sequence_id * dimension;
                         std::vector<float> query_sub_centroid_vector(dimension);
                         faiss::fvec_madd(dimension, sub_centroids[m].data(), -1.0, query, query_sub_centroid_vector.data());
