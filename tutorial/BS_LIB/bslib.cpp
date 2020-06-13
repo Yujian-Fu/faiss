@@ -52,7 +52,7 @@ int main(){
     Trecorder.record_time_usage(record_file, message);
 
     //Precompute the base vector idxs
-    if (!exists(path_idxs)){
+    //if (!exists(path_idxs)){
         Trecorder.reset();
         ShowMessage("Assigning the points");
         std::ifstream base_input (path_base, std::ios::binary);
@@ -78,7 +78,7 @@ int main(){
         Mrecorder.record_memory_usage(record_file,  message);
         Trecorder.print_time_usage(message);
         Trecorder.record_time_usage(record_file, message);
-    }
+    //}
 
     exit(0);
 
