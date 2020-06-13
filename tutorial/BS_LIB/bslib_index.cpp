@@ -75,7 +75,14 @@ namespace bslib{
             for (size_t i = 0; i < this->lq_quantizer_index[0].alphas.size(); i++){
                 std::cout << this->lq_quantizer_index[0].alphas[i] << " ";
             }
-            std::cout << std::endl;
+            std::cout << "The nn_dists in lq quantizer: " << std::endl;
+            for (size_t i = 0; i < 1000; i ++){
+                for (size_t j = 0; j < 10; j++){
+                    std::cout << this->lq_quantizer_index[0].nn_centroid_dists[i][j] << " ";
+                }
+                std::cout << std::endl;
+            }
+            exit(0);
         }
         else
         {
