@@ -389,7 +389,7 @@ namespace bslib{
         size_t correct = 0;
         float dist_proportion = 0.0;
         for (size_t i = 0; i < n; i++){
-            if (assigned_ids[i] - final_idx[i] == 0){
+            if (size_t(assigned_ids[i] - final_idx[i]) == 0){
                 correct ++;
             }
             dist_proportion += group_dists[i] / final_dist[i];
