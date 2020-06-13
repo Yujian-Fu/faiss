@@ -521,7 +521,7 @@ namespace bslib{
                     n_vq ++;
                 }
 
-                else if(index_type[i] == "LQ") {
+                else if(index_type[j] == "LQ") {
                     group_size = lq_quantizer_index[n_lq].nc_per_group;
                     result_dists.resize(group_size * n);
                     assert(query_upper_centroid_dists[0].size() > 0);
