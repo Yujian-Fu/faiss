@@ -193,11 +193,12 @@ namespace bslib{
                         float query_nn_dist = search_in_map(queries_upper_centroid_dists[sequence_id], nn_idx);
                         float easy_dist = 0;
                         if (query_nn_dist != Not_Found){
-                            std::cout << "Computing easy distance" << std::endl;
+                            
                             idx_t group_idx = group_idxs[sequence_id];
                             float query_group_dist = search_in_map(queries_upper_centroid_dists[sequence_id], group_idx);
                             assert (query_group_dist != Not_Found);
                             float group_nn_dist = this->nn_centroid_dists[group_idx][nn_idx];
+                            std::cout << "Computing easy distance " << query_group_dist << " " << query_nn_dist << " " << group_nn_dist << " " << alpha << std::endl;
 
                             easy_dist = sqrt(alpha*(alpha-1)*group_nn_dist*group_nn_dist+(1-alpha)*query_group_dist*query_group_dist+alpha*query_nn_dist);
                         }
