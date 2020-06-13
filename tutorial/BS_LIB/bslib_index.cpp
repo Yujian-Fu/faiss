@@ -63,7 +63,7 @@ namespace bslib{
     }
 
     void Bslib_Index::build_quantizers(const uint32_t * ncentroids, const char * path_quantizers, const char * path_learn){
-        if (exists(path_quantizers)){
+        /*if (exists(path_quantizers)){
             read_quantizers(path_quantizers);
             std::cout << "Checking the quantizers read from file " << std::endl;
             std::cout << "The number of quantizers: " << this->vq_quantizer_index.size() << " " << this->lq_quantizer_index.size();
@@ -76,8 +76,8 @@ namespace bslib{
                 std::cout << this->lq_quantizer_index[0].alphas[i] << " ";
             }
             std::cout << std::endl;
-        }
-        else{
+        }*/
+        //else{
         ShowMessage("No preconstructed quantizers, constructing quantizers");
         //Load the train set into the index
         this->train_data.resize(this->nt * this->dimension);
@@ -98,7 +98,7 @@ namespace bslib{
             }
             this->nt = subnt;
             CheckResult<float>(this->train_data.data(), this->dimension);
-        }
+        //}
 
         assert(index_type.size() == layers && index_type[0] != "LQ");
         // The number of centroids in the upper layer
