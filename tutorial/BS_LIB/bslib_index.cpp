@@ -555,6 +555,8 @@ namespace bslib{
 
             }
 
+            std::cout << "Finished assigned query data, start computing the distance to base vectors" << std::endl;
+            exit(0);
             assert((n_vq + n_lq) == this->layers);
             this->pq.compute_inner_prod_table(query, this->precomputed_table.data());
             size_t visited_vectors = 0;
