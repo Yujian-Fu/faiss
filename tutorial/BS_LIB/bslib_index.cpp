@@ -396,7 +396,7 @@ namespace bslib{
             std::cout << assigned_ids[i] << "_" << final_idx[i] << " " << group_dists[i] << "_" << final_dist[i] << " ";
         }
         std::cout << "Checing finished" << std::endl;
-        std::cout << "The correct proportion is " << correct / n << " The dist proportion is: " << dist_proportion / n;
+        std::cout << "The correct proportion is " << float(correct / n) << " The dist proportion is: " << dist_proportion / n;
         exit(0);
 
     }
