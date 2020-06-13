@@ -107,7 +107,7 @@ int main(){
     Trecorder.print_time_usage(message);
     Trecorder.record_time_usage(record_file, message);
     
-    exit(0);
+
 
 
     //Build the index
@@ -163,6 +163,7 @@ int main(){
         Trecorder.record_time_usage(record_file, message);
     }
 
+    exit(0);
     record_file.close();
     ShowMessage("Loading groundtruth");
     std::vector<uint32_t> groundtruth(nq * ngt);
