@@ -133,6 +133,7 @@ namespace bslib{
             const float * centroid = this->upper_centroids.data() + j * dimension;
             faiss::fvec_madd(dimension, nn_centroid, -1.0, centroid, centroid_vector.data());
             faiss::fvec_madd(dimension, centroid, alpha, centroid_vector.data(), sub_centroid);
+            std::cout << "Finished compue sub centroid " << std::endl;
     }
 
 
