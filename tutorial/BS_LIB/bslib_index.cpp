@@ -529,7 +529,7 @@ namespace bslib{
                     assert(query_upper_centroid_dists[0].size() > 0);
 
                     for (size_t m = 0; m < group_idxs.size(); m++){
-                        lq_quantizer_index[n_lq].search_in_group(1, query, query_upper_centroid_dists, group_idxs.data(), result_dists.data()+m*group_size);
+                        lq_quantizer_index[n_lq].search_in_group(1, query, query_upper_centroid_dists, group_idxs.data()+m, result_dists.data()+m*group_size);
                     }
                     result_labels.resize(group_idxs.size()*group_size);
                     for (size_t m = 0; m < group_idxs.size(); m++){

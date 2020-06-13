@@ -167,24 +167,25 @@ namespace bslib{
     void LQ_quantizer::search_in_group(size_t n, const float * queries, const std::vector<std::map<idx_t, float>> queries_upper_centroid_dists, const idx_t * group_idxs, float * result_dists){
         //clock_t starttime = clock();
         std::vector<std::vector<idx_t>> query_sequence_set(this->nc_upper);
-        
+
         for (size_t i = 0; i < n; i++){
             idx_t idx = group_idxs[i];
             query_sequence_set[idx].push_back(i);
         }
+        std::cout << "Start searching in LQ" << std::endl;
 #pragma omp parallel for
         for (size_t i = 0; i < this->nc_upper; i++){
             if (query_sequence_set[i].size() == 0)
                 continue;
             else{
-
+                std::cout << "Query found, search in group " << i << std::endl;
                 std::vector<std::vector<float>> sub_centroids(this->nc_per_group);
                 idx_t base_idx = CentroidDistributionMap[i];
                 float alpha = this->alphas[i];
 
                 for (size_t j = 0; j < query_sequence_set[i].size(); j++){
                     idx_t sequence_id = query_sequence_set[i][j];
-
+                    std::cout << "Searching for sequence id " << sequence_id << std::endl;
                     std::vector<float> query_sub_centroids_dists(this->nc_per_group);
                     for (size_t m = 0; m < this->nc_per_group; m++){
                         idx_t nn_idx = this->nn_centroid_idxs[i][m];
