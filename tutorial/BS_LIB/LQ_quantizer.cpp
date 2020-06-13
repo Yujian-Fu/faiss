@@ -132,12 +132,12 @@ namespace bslib{
             const float * nn_centroid = this->upper_centroids.data() + nn_centroid_idx * dimension;
             const float * centroid = this->upper_centroids.data() + j * dimension;
             faiss::fvec_madd(dimension, nn_centroid, -1.0, centroid, centroid_vector.data());
-            std::cout << "The centroid vector norm is " << faiss::fvec_norm_L2sqr(centroid_vector.data(), dimension) << " with alpha: " << alpha << std::endl;
+            std::cout << "The centroid vector norm is " << faiss::fvec_norm_L2sqr(centroid_vector.data(), 3) << " with alpha: " << alpha << std::endl;
             faiss::fvec_madd(dimension, centroid, alpha, centroid_vector.data(), sub_centroid);
 
             std::vector<float> sub_centroid_vector(dimension);
             faiss::fvec_madd(dimension, sub_centroid, -1, centroid, sub_centroid_vector.data());
-            std::cout << "The sub centroid vector norm is: " << faiss::fvec_norm_L2sqr(sub_centroid_vector.data(), dimension) << std::endl;
+            std::cout << "The sub centroid vector norm is: " << faiss::fvec_norm_L2sqr(sub_centroid_vector.data(), 3) << std::endl;
 
             std::cout << "The centroid vector and the sub centroid vector is: " << std::endl;
             for (size_t i = 0; i < dimension; i++){
