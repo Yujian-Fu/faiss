@@ -503,7 +503,7 @@ namespace bslib{
             for (size_t j = 0; j < layers; j++){
 
                 keep_result_space = group_idxs.size() * keep_space[j];
-                assert(n_vq+ n_lq == i);
+                assert(n_vq+ n_lq == j);
                 size_t group_size;
                 
                 if (index_type[j] == "VQ"){
