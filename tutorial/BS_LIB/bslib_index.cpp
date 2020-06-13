@@ -357,7 +357,7 @@ namespace bslib{
                         std::cout << " [ " << j << " / " << n << " ] " <<std::endl;
                      }
                     for (size_t m = 0; m < group_size; m++)
-                        queries_upper_centroid_dists[n].insert(std::pair<idx_t, float>(result_labels[j*group_size+m], result_dists[j*group_size+m]));
+                        queries_upper_centroid_dists[j].insert(std::pair<idx_t, float>(result_labels[j*group_size+m], result_dists[j*group_size+m]));
                 }
             }
 
@@ -365,6 +365,11 @@ namespace bslib{
             for (size_t j = 0; j < n; j++){
                 keep_k_min(group_size, 1, result_dists.data()+j*group_size, result_labels.data()+j*group_size, group_dists.data()+j, group_idxs.data()+j);
             }
+            std::cout << "Showing 100 examples " << std::endl;
+            for (size_t temp = 0; temp < 100; temp++){
+                std::cout << group_idxs[temp] << "_" << group_dists[temp] << " ";
+            }
+            std::cout << std::endl;
 
         }
 
