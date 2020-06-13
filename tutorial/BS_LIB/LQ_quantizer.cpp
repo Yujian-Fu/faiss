@@ -170,7 +170,7 @@ namespace bslib{
             idx_t idx = group_idxs[i];
             query_sequence_set[idx].push_back(i);
         }
-        std::cout << "Showing distance computed bt two methods " << std::endl;
+        std::cout << "Showing distance computed by two methods " << std::endl;
 #pragma omp parallel for
         for (size_t i = 0; i < this->nc_upper; i++){
             if (query_sequence_set[i].size() == 0)
@@ -196,6 +196,7 @@ namespace bslib{
                             faiss::fvec_madd(dimension, sub_centroids[m].data(), -1.0, query, query_sub_centroid_vector.data());
                             query_sub_centroids_dists[m] = faiss::fvec_norm_L2sqr(query_sub_centroid_vector.data(), dimension);
                         //}
+                        std::cout << "Compute by sqrt " << std::endl;
                         float query_nn_dist = search_in_map(queries_upper_centroid_dists[sequence_id], nn_idx);
                         if (query_nn_dist != Not_Found){
                             idx_t group_idx = group_idxs[sequence_id];
@@ -206,7 +207,6 @@ namespace bslib{
                             query_sub_centroids_dists[m] = sqrt(alpha*(alpha-1)*group_nn_dist*group_nn_dist+(1-alpha)*query_group_dist*query_group_dist+alpha*query_nn_dist);
                             std::cout << query_sub_centroids_dists[m] << " ";
                         }
-
                     }
 
                     for (size_t m = 0; m < this->nc_per_group; m++){
