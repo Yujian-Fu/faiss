@@ -128,6 +128,7 @@ namespace bslib{
             size_t nn_centroid_idx = nn_centroid_idxs[j][group_label];
             float alpha = alphas[j];
             std::vector<float> centroid_vector(dimension);
+            std::cout << "The centroid idx and nn centroid idx is " << j << " " << group_label << " " << nn_centroid_idx << std::endl;
             const float * nn_centroid = this->upper_centroids.data() + nn_centroid_idx * dimension;
             const float * centroid = this->upper_centroids.data() + j * dimension;
             faiss::fvec_madd(dimension, nn_centroid, -1.0, centroid, centroid_vector.data());
@@ -199,7 +200,7 @@ namespace bslib{
                             easy_dist = sqrt(alpha*(alpha-1)*group_nn_dist*group_nn_dist+(1-alpha)*query_group_dist*query_group_dist+alpha*query_nn_dist);
                         }
                         //else{
-                        std::cout << "Computing normal distance from sequence id to label" << sequence_id << " " << base_idx+m << std::endl;
+                        std::cout << "Computing normal distance from sequence id to label " << sequence_id << " " << base_idx+m << std::endl;
                         if (sub_centroids[m].size() == 0){
                             idx_t label = base_idx + m;
                             compute_final_centroid(label, sub_centroids[m].data());
