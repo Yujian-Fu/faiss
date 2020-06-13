@@ -132,7 +132,7 @@ namespace bslib{
             const float * nn_centroid = this->upper_centroids.data() + nn_centroid_idx * dimension;
             const float * centroid = this->upper_centroids.data() + j * dimension;
             faiss::fvec_madd(dimension, nn_centroid, -1.0, centroid, centroid_vector.data());
-
+            std::cout << "The centroid vector norm is " << faiss::fvec_norm_L2sqr(centroid_vector.data(), dimension) << std::endl;;
             faiss::fvec_madd(dimension, centroid, alpha, centroid_vector.data(), sub_centroid);
             
     }
@@ -197,14 +197,17 @@ namespace bslib{
                     for (size_t m = 0; m < this->nc_per_group; m++){
                         idx_t nn_idx = this->nn_centroid_idxs[i][m];
                         float query_nn_dist = search_in_map(queries_upper_centroid_dists[sequence_id], nn_idx);
-                        float easy_dist = 0;
+                        float term1, term2, term3, easy_dist = 0;
                         if (query_nn_dist != Not_Found){
                             float query_group_dist = search_in_map(queries_upper_centroid_dists[sequence_id], i);
                             assert (query_group_dist != Not_Found);
                             float group_nn_dist = this->nn_centroid_dists[i][m];
                             std::cout << "Computing easy distance " << query_group_dist << " " << query_nn_dist << " " << group_nn_dist << " " << alpha << " " <<  i << " " << m << " " << nn_idx << std::endl;
 
-                            easy_dist = sqrt(alpha*(alpha-1)*group_nn_dist*group_nn_dist+(1-alpha)*query_group_dist*query_group_dist+alpha*query_nn_dist);
+                            term1 = alpha*(alpha-1)*group_nn_dist*group_nn_dist;
+                            term2 = (1-alpha)*query_group_dist*query_group_dist;
+                            term3 = alpha*query_nn_dist;
+                            easy_dist = sqrt(term1 + term2 + term3);
                         }
                         //else{
                         std::cout << "Computing normal distance from sequence id to label " << sequence_id << " " << base_idx+m << std::endl;
@@ -220,7 +223,7 @@ namespace bslib{
                         query_sub_centroids_dists[m] = faiss::fvec_norm_L2sqr(query_sub_centroid_vector.data(), dimension);
 
                         if (query_nn_dist != Not_Found){
-                            std::cout << easy_dist << "_" << query_sub_centroids_dists[m] << std::endl;
+                            std::cout << term1 << " " << term2 << " " << term3 << " " << easy_dist << "_" << query_sub_centroids_dists[m] << std::endl;
                         }
                         //}
                     }
