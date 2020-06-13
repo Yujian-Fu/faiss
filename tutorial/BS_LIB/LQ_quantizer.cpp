@@ -128,12 +128,15 @@ namespace bslib{
             size_t nn_centroid_idx = nn_centroid_idxs[j][group_label];
             float alpha = alphas[j];
             std::vector<float> centroid_vector(dimension);
-            std::cout << "The centroid idx and nn centroid idx is " << j << " " << group_label << " " << nn_centroid_idx << std::endl;
+            
             const float * nn_centroid = this->upper_centroids.data() + nn_centroid_idx * dimension;
             const float * centroid = this->upper_centroids.data() + j * dimension;
+            std::cout << "The centroid idx and nn centroid idx is " << j << " " << group_label << " " << nn_centroid_idx << std::endl;
             faiss::fvec_madd(dimension, nn_centroid, -1.0, centroid, centroid_vector.data());
+            std::cout << "Test 1" << std::endl;
             faiss::fvec_madd(dimension, centroid, alpha, centroid_vector.data(), sub_centroid);
-            std::cout << "Finished compue sub centroid " << std::endl;
+            std::cout << "Test 2 " << std::endl;
+            
     }
 
 
