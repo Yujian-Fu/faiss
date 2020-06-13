@@ -185,11 +185,13 @@ namespace bslib{
                     idx_t sequence_id = query_sequence_set[i][j];
 
                     std::vector<float> query_sub_centroids_dists(this->nc_per_group);
+                    std::cout << "Computing distance to all sub centroids " << std::endl;
                     for (size_t m = 0; m < this->nc_per_group; m++){
                         idx_t nn_idx = this->nn_centroid_idxs[i][m];
                         float query_nn_dist = search_in_map(queries_upper_centroid_dists[sequence_id], nn_idx);
                         float easy_dist = 0;
                         if (query_nn_dist != Not_Found){
+                            std::cout << "Computing easy distance" << std::endl;
                             idx_t group_idx = group_idxs[sequence_id];
                             float query_group_dist = search_in_map(queries_upper_centroid_dists[sequence_id], group_idx);
                             assert (query_group_dist != Not_Found);
@@ -198,20 +200,22 @@ namespace bslib{
                             easy_dist = sqrt(alpha*(alpha-1)*group_nn_dist*group_nn_dist+(1-alpha)*query_group_dist*query_group_dist+alpha*query_nn_dist);
                         }
                         //else{
-                            if (sub_centroids[m].size() == 0){
-                                idx_t label = base_idx + m;
-                                compute_final_centroid(label, sub_centroids[m].data());
-                            }
-                            const float * query = queries + sequence_id * dimension;
-                            std::vector<float> query_sub_centroid_vector(dimension);
-                            faiss::fvec_madd(dimension, sub_centroids[m].data(), -1.0, query, query_sub_centroid_vector.data());
-                            query_sub_centroids_dists[m] = faiss::fvec_norm_L2sqr(query_sub_centroid_vector.data(), dimension);
-                            if (query_nn_dist != Not_Found){
-                                std::cout << easy_dist << "_" << query_sub_centroids_dists[m] << std::endl;
-                            }
+                        std::cout << "Computing normal distance" << std::endl;
+                        if (sub_centroids[m].size() == 0){
+                            idx_t label = base_idx + m;
+                            compute_final_centroid(label, sub_centroids[m].data());
+                        }
+                        const float * query = queries + sequence_id * dimension;
+                        std::vector<float> query_sub_centroid_vector(dimension);
+                        faiss::fvec_madd(dimension, sub_centroids[m].data(), -1.0, query, query_sub_centroid_vector.data());
+                        query_sub_centroids_dists[m] = faiss::fvec_norm_L2sqr(query_sub_centroid_vector.data(), dimension);
+                        if (query_nn_dist != Not_Found){
+                            std::cout << easy_dist << "_" << query_sub_centroids_dists[m] << std::endl;
+                        }
                         //}
                     }
 
+                    std::cout << "Adding distance to the result distances " << std::endl;
                     for (size_t m = 0; m < this->nc_per_group; m++){
                         result_dists[sequence_id * this->nc_per_group + m] = query_sub_centroids_dists[m];
                     }
