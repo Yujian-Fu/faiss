@@ -206,7 +206,7 @@ namespace bslib{
 
                             term1 = alpha*(alpha-1)*group_nn_dist*group_nn_dist;
                             term2 = (1-alpha)*query_group_dist*query_group_dist;
-                            term3 = alpha*query_nn_dist;
+                            term3 = alpha*query_nn_dist*query_nn_dist;
                             easy_dist = sqrt(term1 + term2 + term3);
                         }
                         //else{
