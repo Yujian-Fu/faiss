@@ -207,6 +207,12 @@ namespace bslib{
 
         std::vector<float> reconstructed_x(dimension * this->nt);
         decode(this->nt, residuals.data(), group_ids.data(), reconstructed_x.data());
+        std::cout << "Checking the reconstructed data " << std::endl;
+        for (size_t i = 0; i < dimension; i++){
+            std::cout << train_data[i] << " "  << reconstructed_x[i] << "          ";
+        }
+        std::cout << std::endl;
+
         std::vector<float> xnorm(this->nt);
         for (size_t i = 0; i < this->nt; i++){
             xnorm[i] = faiss::fvec_norm_L2sqr(reconstructed_x.data() + i * dimension, dimension);
