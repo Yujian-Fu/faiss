@@ -382,6 +382,7 @@ namespace bslib{
             this->lq_quantizer_index[0].compute_final_centroid(i, final_centroid.data());
             final_quantizer.add(1, final_centroid.data());
         }
+
         std::vector<faiss::Index::idx_t> final_idx(n);
         std::vector<float> final_dist(n);
         final_quantizer.search(n, assign_data, 1, final_dist.data(), final_idx.data());
@@ -389,6 +390,7 @@ namespace bslib{
             std::cout << assigned_ids[i] << "_" << final_idx[i] << " " << group_dists[i] << "_" << final_dist[i] << " ";
         }
         std::cout << "Checing finished" << std::endl;
+        exit(0);
 
     }
 
