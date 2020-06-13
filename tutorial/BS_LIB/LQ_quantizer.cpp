@@ -222,8 +222,19 @@ namespace bslib{
                         faiss::fvec_madd(dimension, sub_centroids[m].data(), -1.0, query, query_sub_centroid_vector.data());
                         query_sub_centroids_dists[m] = faiss::fvec_norm_L2sqr(query_sub_centroid_vector.data(), dimension);
 
+                        size_t nn_centroid_idx = nn_centroid_idxs[i][m];
+                        const float * nn_centroid = this->upper_centroids.data() + nn_centroid_idx * dimension;
+                        const float * centroid = this->upper_centroids.data() + i * dimension;
+                        std::vector<float> query_centroid_vector(dimension);
+                        std::vector<float> query_nn_centroid_vector(dimension);
+                        faiss::fvec_madd(dimension, centroid, -1, query, query_centroid_vector.data());
+                        faiss::fvec_madd(dimension, nn_centroid, -1, query, query_nn_centroid_vector.data());
+                        float query_centroid_dist = faiss::fvec_norm_L2sqr(query_centroid_vector.data(), dimension);
+                        float query_nn_centroid_dist = faiss::fvec_norm_L2sqr(query_nn_centroid_vector.data(), dimension);
+
+
                         if (query_nn_dist != Not_Found){
-                            std::cout << term1 << " " << term2 << " " << term3 << " " << easy_dist << "_" << query_sub_centroids_dists[m] << std::endl;
+                            std::cout << term1 << " " << term2 << " " << term3 << " " << easy_dist << "_" << query_sub_centroids_dists[m] << " " << query_centroid_dist << " " << query_nn_centroid_dist << std::endl;
                         }
                         //}
                     }
