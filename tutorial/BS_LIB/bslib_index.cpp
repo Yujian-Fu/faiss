@@ -162,6 +162,7 @@ namespace bslib{
                 this->train_data_idxs[i] = 0;
             }
             if (this->use_subset){
+                std::cout << "Using subset for training " << std::endl;
                 assert (this->nt != this->subnt);
                 std::vector<float> train_subset(subnt * dimension);
                 RandomSubset(this->train_data.data(), train_subset.data(), dimension, this->nt, this->subnt);
