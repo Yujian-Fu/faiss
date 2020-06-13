@@ -400,8 +400,8 @@ namespace bslib{
             std::cout << group_idxs[i] - final_idx[i] << "_" << group_idxs[i] << "_" << final_idx[i] << " " << group_dists[i] << "_" << final_dist[i] << " ";
         }
         std::cout << "Checking finished" << std::endl;
-        std::cout << "The correct number is " << correct << " The dist proportion is: " << dist_proportion / n;
-        std::cout << "The time comparison: " << endtime1 - starttime1 << " " << endtime2 - starttime2 << std::endl;
+        std::cout << "The correct number is " << correct << " The dist proportion is: " << dist_proportion / n << std::endl;
+        std::cout << "The time comparison: " << (endtime1 - starttime1) / CLOCKS_PER_SEC << " " << (endtime2 - starttime2)/ CLOCKS_PER_SEC << std::endl;
         exit(0);
 
     }
