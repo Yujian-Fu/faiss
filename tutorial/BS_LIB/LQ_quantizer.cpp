@@ -236,11 +236,13 @@ namespace bslib{
                         faiss::fvec_madd(dimension, sub_centroids[m].data(), -1, centroid, sub_centroid_vector.data());
                         float alpha_centroid_dist = faiss::fvec_norm_L2sqr(sub_centroid_vector.data(), dimension);
 
-
+                        std::vector<float> centroid_vector(dimension);
+                        faiss::fvec_madd(dimension, centroid, -1, nn_centroid, centroid_vector.data());
+                        float centroid_dist = faiss::fvec_norm_L2sqr(centroid_vector.data(), dimension);
 
 
                         if (query_nn_dist != Not_Found){
-                            std::cout << term1 << " " << term2 << " " << term3 << " " << easy_dist << " " << query_sub_centroids_dists[m] << " " << query_centroid_dist << " " << query_nn_centroid_dist << " " << alpha_centroid_dist << std::endl;
+                            std::cout << term1 << " " << term2 << " " << term3 << " " << easy_dist << " " << query_sub_centroids_dists[m] << " " << query_centroid_dist << " " << query_nn_centroid_dist << " " << alpha_centroid_dist << " " << centroid_dist <<  std::endl;
                         }
                         //}
                     }
