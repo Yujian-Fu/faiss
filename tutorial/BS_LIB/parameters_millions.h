@@ -16,8 +16,8 @@ const bool use_subset = false;
 const size_t bytes_per_code = 16;
 const size_t bytes_per_norm_code = 1;
 const size_t nbits = 8; //Or 16
-const size_t nt = 1000000;
-const size_t subnt = 1000000;
+const size_t nt = 100000;
+const size_t subnt = 100000;
 const size_t dimension = 128;
 
 //For assigning ID

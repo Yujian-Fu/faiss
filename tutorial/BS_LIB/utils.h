@@ -53,15 +53,17 @@ namespace bslib{
     };
 
     template<typename T>
-    void CheckResult(T * data, const size_t dimension){
+    void CheckResult(T * data, const size_t dimension, size_t dataset_size = 2){
         std::cout << "Printing sample (1 vector) of the dataset " << std::endl;
-        for (size_t i= 0; i < 2; i++)
-        {
-            for (size_t j = 0; j < dimension; j++){
-                std::cout << data[i * dimension + j] << " ";
-            }
-            std::cout << std::endl << std::endl;
+
+        for (size_t i = 0; i < dimension; i++){
+            std::cout << data[i] << " ";
         }
+        std::cout << std::endl << std::endl;
+        for (size_t i = 0; i< dimension; i++){
+            std::cout << data[(dataset_size-1) * dimension+i] << " ";
+        }
+        std::cout << std::endl << std::endl;
     }
 
     template<typename T>
@@ -82,7 +84,7 @@ namespace bslib{
                 std::cout << "[Finished loading " << i << " / " << n << "]"  << std::endl; 
         }
         if (CheckFlag)
-            CheckResult<T>(data, dimension);
+            CheckResult<T>(data, dimension, n);
     }
 
     template<typename T>
