@@ -397,7 +397,7 @@ namespace bslib{
                 correct ++;
             }
             dist_proportion += group_dists[i] / final_dist[i];
-            std::cout << group_idxs[i] - final_idx[i] << "_" << group_idxs[i] << "_" << final_idx[i] << " " << group_dists[i] << "_" << final_dist[i] << " ";
+            //std::cout << group_idxs[i] - final_idx[i] << "_" << group_idxs[i] << "_" << final_idx[i] << " " << group_dists[i] << "_" << final_dist[i] << " ";
         }
         std::cout << "Checking finished" << std::endl;
         std::cout << "The correct number is " << correct << " The dist proportion is: " << dist_proportion / n << std::endl;
