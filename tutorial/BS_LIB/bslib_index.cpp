@@ -618,7 +618,7 @@ namespace bslib{
                     faiss::fvec_madd(dimension, base_vector, -1, query, distance_vector.data());
                     std::cout << "Using: " << dist << " Groundtruth: " << faiss::fvec_norm_L2sqr(distance_vector.data(), dimension) << std::endl;;
 
-                    std::cout << "Showing precomputed table: " << std::endl;
+                    std::cout << "Showing precomputed table: "  << this->precomputed_table.size() << std::endl;
                     for (size_t i = 0; i < this->precomputed_table.size(); i++){
                         std::cout << this->precomputed_table[i] << " ";
                     }
