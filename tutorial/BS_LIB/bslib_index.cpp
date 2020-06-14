@@ -296,7 +296,6 @@ namespace bslib{
 
             this->origin_ids[encoded_ids[i]].push_back(ids[i]);
         }
-
     }
 
     void Bslib_Index::compute_centroid_norm(){
