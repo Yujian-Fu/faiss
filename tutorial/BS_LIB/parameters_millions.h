@@ -1,6 +1,3 @@
-#ifndef PARA_MILLIONS_H
-#define PARA_MILLIONS_H
-
 #include <cstdio>
 #include <iostream>
 
@@ -32,10 +29,10 @@ const size_t nbatches = nb / batch_size; //1000
 
 //For searching
 const size_t ngt = 100;
-const size_t nq = 10;
-const size_t result_k = 10;
+const size_t nq = 1000;
+const size_t result_k = 1;
 const size_t max_vectors = 5000;
-size_t keep_space[layers] = {10, 2};
+size_t keep_space[layers] = {20, 1};
 
 bool is_recording = true;
 
@@ -54,4 +51,3 @@ const char * path_pq_norm =   "/home/y/yujianfu/ivf-hnsw/models_VQ_LQ/SIFT1M/PQ_
 const char * path_idxs =      "/home/y/yujianfu/ivf-hnsw/models_VQ_LQ/SIFT1M/base_idxs_10_1000.ivecs";
 const char * path_index =     "/home/y/yujianfu/ivf-hnsw/models_VQ_LQ/SIFT1M/PQ16_10_1000.index";
 
-#endif

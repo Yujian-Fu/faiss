@@ -508,7 +508,7 @@ namespace bslib{
       */
 
     void Bslib_Index::search(size_t n, size_t result_k, float * queries, float * query_dists, faiss::Index::idx_t * query_ids, size_t * keep_space, uint32_t * groundtruth){
-//#pragma omp parallel for
+#pragma omp parallel for
 /*
         std::cout << "Check the distribution of group:" << std::endl;
         for (size_t i = 0; i < this->final_nc; i ++){
@@ -592,27 +592,25 @@ namespace bslib{
                 group_idxs.resize(keep_result_space);
                 group_dists.resize(keep_result_space);
 
+
+                keep_k_min(search_space, keep_result_space, result_dists.data(), result_labels.data(), group_dists.data(), group_idxs.data());
+
+/*
                 std::cout << "The results found: " << std::endl;
                 for (size_t temp = 0; temp < search_space; temp ++){
                     std::cout << result_labels[temp] << " " << result_dists[temp] << " ";
                 }
                 std::cout << std::endl;
 
-                keep_k_min(search_space, keep_result_space, result_dists.data(), result_labels.data(), group_dists.data(), group_idxs.data());
+
                 std::cout << "The results kept: " << std::endl;
                 for (size_t temp = 0; temp < keep_result_space; temp ++){
                     std::cout << group_idxs[temp] << " " << group_dists[temp] << " ";
                 }
                 std::cout << std::endl;
+*/
             }
 
-            std::cout << "Checking the quality of assigning " << std::endl;
-
-
-            std::cout << "The assigned cluster and the centroids are: " << std::endl;
-            for (size_t temp = 0; temp < keep_result_space; temp++){
-                std::cout << group_idxs[temp] << " " << group_dists[temp] << " ";
-            }
 
             //std::cout << "Finished assigned query data, start computing the distance to base vectors" << std::endl;
 
@@ -627,7 +625,7 @@ namespace bslib{
 
                 
                 size_t group_id = get_next_group_idx(keep_result_space, group_idxs.data(), group_dists.data());
-                std::cout << std::endl << "Searching in " << group_id << std::endl;
+                //std::cout << std::endl << "Searching in " << group_id << std::endl;
                 float q_c_dist = group_dists[j];
 
                 size_t group_size = this->origin_ids[group_id].size();
@@ -646,7 +644,7 @@ namespace bslib{
                     float term3 = 2 * pq_L2sqr(code + m * code_size);
                     float dist = term1 + term2 - term3;
                     
-                    std::cout << group_id << " " << this->origin_ids[group_id][m] << " " << dist << " "; 
+                    //std::cout << group_id << " " << this->origin_ids[group_id][m] << " " << dist << " "; 
                     
 
                     //std::cout << "Labels: " << this->origin_ids[group_id][m] << " Distance: " << dist << " " << q_c_dist << " " << centroid_norms[group_id] << " " << term2 << " " << term3 << " " << " Query search result: ";
@@ -665,6 +663,12 @@ namespace bslib{
                 if (visited_vectors > this->max_visited_vectors)
                     break;
             }
+
+            for (size_t j = 0; j < result_k; j++){
+                query_dists[i * result_k + j] = query_search_dists[j];
+                query_ids[i * result_k + j] = query_search_labels[j];
+            }
+            /*
             std::cout << std::endl << "The final search result is: " << std::endl;
             for (size_t j = 0; j < 2 * result_k; j++){
                 std::cout << query_search_labels[j] << " " << query_search_dists[j] << " ";
@@ -708,10 +712,8 @@ namespace bslib{
 
 
             exit(0);
-            for (size_t j = 0; j < result_k; j++){
-                query_dists[i * result_k + j] = query_search_dists[j];
-                query_ids[i * result_k + j] = query_search_labels[j];
-            }
+            */
+
         }
     }
 
