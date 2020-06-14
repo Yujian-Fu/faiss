@@ -617,9 +617,9 @@ namespace bslib{
             assert((n_vq + n_lq) == this->layers);
             this->pq.compute_inner_prod_table(query, this->precomputed_table.data());
             size_t visited_vectors = 0;
-            std::vector<float> query_search_dists(2 * result_k);
+            std::vector<float> query_search_dists(result_k);
             std::vector<faiss::Index::idx_t> query_search_labels(2 * result_k);
-            faiss::maxheap_heapify(2 * result_k, query_search_dists.data(), query_search_labels.data());
+            faiss::maxheap_heapify(result_k, query_search_dists.data(), query_search_labels.data());
             
             for (size_t j = 0; j < keep_result_space; j++){
 
@@ -655,8 +655,8 @@ namespace bslib{
                     
                     //std::cout << "The distance elements: dist: " << dist << " term1: " << term1 << " term2: " << term2 << " term3: " << term3 << std::endl;
                     if (dist < query_search_dists[0]){
-                        faiss::maxheap_pop(2 * result_k, query_search_dists.data(), query_search_labels.data());
-                        faiss::maxheap_push(2 * result_k, query_search_dists.data(), query_search_labels.data(), dist, this->origin_ids[group_id][m]);
+                        faiss::maxheap_pop(result_k, query_search_dists.data(), query_search_labels.data());
+                        faiss::maxheap_push(result_k, query_search_dists.data(), query_search_labels.data(), dist, this->origin_ids[group_id][m]);
                     }
                 }
                 visited_vectors += group_size;
