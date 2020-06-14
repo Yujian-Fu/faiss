@@ -207,8 +207,8 @@ int main(){
 
         for (size_t j = 0; j < result_k; j++){
             gt.insert(groundtruth[ngt * i + j]);
-            std::cout << groundtruth[ngt * i + j] << " ";
-            float * nn = base_dataset.data() + groundtruth[ngt * i + j] * dimension;
+            std::cout << query_labels[i * result_k + j] << " ";
+            float * nn = base_dataset.data() + query_labels[i * result_k + j] * dimension;
             float * query = queries.data() + i * dimension;
             std::vector<float> distance_vector(dimension);
             faiss::fvec_madd(dimension, nn, -1, query, distance_vector.data());
