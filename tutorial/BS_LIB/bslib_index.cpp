@@ -481,7 +481,9 @@ namespace bslib{
     void Bslib_Index::search(size_t n, size_t result_k, float * queries, float * query_dists, faiss::Index::idx_t * query_ids, size_t * keep_space){
 //#pragma omp parallel for
         for (size_t i = 0; i < n; i++){
-            //std::cout << " [ " << i << " / " << n <<  " ] " << std::endl;
+            if (i % 10 == 0){
+                std::cout << " [ " << i << " / " << n <<  " ] " << std::endl;
+            }
             const float * query = queries + i * dimension;
 
             std::vector<idx_t> group_idxs(1);
