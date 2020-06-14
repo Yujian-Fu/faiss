@@ -630,7 +630,7 @@ namespace bslib{
 
                 
                 size_t group_id = get_next_group_idx(keep_result_space, group_idxs.data(), group_dists.data());
-                std::cout << "Searching in " << group_id << std::endl;
+                std::cout << std::endl << "Searching in " << group_id << std::endl;
                 float q_c_dist = group_dists[j];
 
                 size_t group_size = this->origin_ids[group_id].size();
