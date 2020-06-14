@@ -593,39 +593,6 @@ namespace bslib{
             readXvecFvec<float>(base_input, base_dataset.data(), dimension, nb);
             */
 
-            std::cout << "The assigned cluster and the centroids are: " << std::endl;
-            for (size_t temp = 0; temp < keep_result_space; temp++){
-                std::cout << group_idxs[temp] << " " << group_dists[temp] << " ";
-            }
-            std::cout << std::endl << std::endl;
-
-            faiss::IndexFlatL2 final_cluster_quantizer(dimension);
-            std::vector<float> centroid(dimension * this->final_nc);
-            for (size_t temp = 0; temp < this->final_nc; temp++){
-                this->lq_quantizer_index[0].compute_final_centroid(temp, centroid.data() + temp * dimension);
-            }
-            final_cluster_quantizer.add(this->final_nc, centroid.data());
-            std::vector<float> final_query_distance(keep_result_space);
-            std::vector<faiss::Index::idx_t> final_query_group_id(keep_result_space);
-            final_cluster_quantizer.search(1, query, keep_result_space, final_query_distance.data(), final_query_group_id.data());
-
-            for (size_t temp = 0; temp < keep_result_space; temp++){
-                std::cout << final_query_group_id[temp] << " " << final_query_distance[temp] << " ";
-            }
-            std::cout << std::endl << std::endl;
-            
-            size_t ngt = 100;
-            std::cout << "Find where are the top 10 groundtruth: " << std::endl;
-            for (size_t temp = 0; temp < 10; temp ++){
-                uint32_t groundtruth_label = groundtruth[i * ngt + temp];
-                for (size_t j = 0; j < this->final_nc; j++){
-                    for (size_t m = 0; m < this->origin_ids[j].size(); m++){
-                        if (this->origin_ids[j][m] == groundtruth_label)
-                            std::cout << j << " ";
-                    }
-                }
-            }
-            exit(0);
 
             //std::cout << "Finished assigned query data, start computing the distance to base vectors" << std::endl;
 
@@ -657,13 +624,13 @@ namespace bslib{
                     float term3 = 2 * pq_L2sqr(code + m * code_size);
                     float dist = term1 + term2 - term3;
                     
+                    std::cout << group_id << " " << origin_ids[group_id][m] << " " << dist << " "; 
 
-
-                    std::cout << "Labels: " << this->origin_ids[group_id][m] << " Distance: " << dist << " " << q_c_dist << " " << centroid_norms[group_id] << " " << term2 << " " << term3 << " " << " Query search result: ";
+                    //std::cout << "Labels: " << this->origin_ids[group_id][m] << " Distance: " << dist << " " << q_c_dist << " " << centroid_norms[group_id] << " " << term2 << " " << term3 << " " << " Query search result: ";
                     //for (size_t temp = 0; temp < result_k; temp++){
                     //    std::cout << " " << query_search_labels[temp] <<  " " << query_search_dists[temp] << " ";
                     //}
-                    std::cout << std::endl;
+                    //std::cout << std::endl;
                     
                     //std::cout << "The distance elements: dist: " << dist << " term1: " << term1 << " term2: " << term2 << " term3: " << term3 << std::endl;
                     if (dist < query_search_dists[0]){
@@ -675,7 +642,28 @@ namespace bslib{
                 if (visited_vectors > this->max_visited_vectors)
                     break;
             }
+            for (size_t j = 0; j < result_k; j++){
+                std::cout << query_search_labels[j] << " " << query_search_dists[j] << " ";
+            }
+            std::cout << std::endl;
 
+            std::cout << "The assigned cluster and the centroids are: " << std::endl;
+            for (size_t temp = 0; temp < keep_result_space; temp++){
+                std::cout << group_idxs[temp] << " " << group_dists[temp] << " ";
+            }
+
+            std::cout << "Find where are the top 10 groundtruth: " << std::endl;
+            for (size_t temp = 0; temp < 10; temp ++){
+                uint32_t groundtruth_label = groundtruth[i * 100 + temp];
+                for (size_t j = 0; j < this->final_nc; j++){
+                    for (size_t m = 0; m < this->origin_ids[j].size(); m++){
+                        if (this->origin_ids[j][m] == groundtruth_label)
+                            std::cout << j << " ";
+                    }
+                }
+            }
+
+            exit(0);
             for (size_t j = 0; j < result_k; j++){
                 query_dists[i * result_k + j] = query_search_dists[j];
                 query_ids[i * result_k + j] = query_search_labels[j];
@@ -905,3 +893,40 @@ if (m == 10)
     exit(0);
     */
 /***********************************/
+
+
+/*
+            std::cout << "The assigned cluster and the centroids are: " << std::endl;
+            for (size_t temp = 0; temp < keep_result_space; temp++){
+                std::cout << group_idxs[temp] << " " << group_dists[temp] << " ";
+            }
+            std::cout << std::endl << std::endl;
+
+            faiss::IndexFlatL2 final_cluster_quantizer(dimension);
+            std::vector<float> centroid(dimension * this->final_nc);
+            for (size_t temp = 0; temp < this->final_nc; temp++){
+                this->lq_quantizer_index[0].compute_final_centroid(temp, centroid.data() + temp * dimension);
+            }
+            final_cluster_quantizer.add(this->final_nc, centroid.data());
+            std::vector<float> final_query_distance(keep_result_space);
+            std::vector<faiss::Index::idx_t> final_query_group_id(keep_result_space);
+            final_cluster_quantizer.search(1, query, keep_result_space, final_query_distance.data(), final_query_group_id.data());
+
+            for (size_t temp = 0; temp < keep_result_space; temp++){
+                std::cout << final_query_group_id[temp] << " " << final_query_distance[temp] << " ";
+            }
+            std::cout << std::endl << std::endl;
+            
+            size_t ngt = 100;
+            std::cout << "Find where are the top 10 groundtruth: " << std::endl;
+            for (size_t temp = 0; temp < 10; temp ++){
+                uint32_t groundtruth_label = groundtruth[i * ngt + temp];
+                for (size_t j = 0; j < this->final_nc; j++){
+                    for (size_t m = 0; m < this->origin_ids[j].size(); m++){
+                        if (this->origin_ids[j][m] == groundtruth_label)
+                            std::cout << j << " ";
+                    }
+                }
+            }
+            exit(0);
+*/
