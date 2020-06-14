@@ -466,8 +466,13 @@ namespace bslib{
     float Bslib_Index::pq_L2sqr(const uint8_t *code)
     {
         float result = 0.;
-        for (size_t i = 0; i < this->code_size; i++) {
-            result += precomputed_table[pq.ksub * i + code[i]];
+        const size_t dim = code_size >> 2;
+        size_t m = 0;
+        for (size_t i = 0; i < dim; i++) {
+            result += precomputed_table[this->pq.ksub * m + code[m]]; m++;
+            result += precomputed_table[this->pq.ksub * m + code[m]]; m++;
+            result += precomputed_table[this->pq.ksub * m + code[m]]; m++;
+            result += precomputed_table[this->pq.ksub * m + code[m]]; m++;
         }
         return result;
     }
