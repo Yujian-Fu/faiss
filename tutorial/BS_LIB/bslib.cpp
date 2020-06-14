@@ -172,10 +172,10 @@ int main(){
     }
 
     ShowMessage("Loading queries");
-    std::vector<float> query(nq * dimension);
+    std::vector<float> queries(nq * dimension);
     {
         std::ifstream query_input(path_query, std::ios::binary);
-        readXvecFvec<origin_data_type>(query_input, query.data(), dimension, nq, true, false);
+        readXvecFvec<origin_data_type>(query_input, queries.data(), dimension, nq, true, false);
     }
 
     index->max_visited_vectors = max_vectors;
@@ -183,10 +183,10 @@ int main(){
     std::vector<float> query_distances(nq * result_k);
     std::vector<faiss::Index::idx_t> query_labels(nq * result_k);
     size_t correct = 0;
-    index->search(nq, result_k, query.data(), query_distances.data(), query_labels.data(), keep_space);
+    index->search(nq, result_k, queries.data(), query_distances.data(), query_labels.data(), keep_space);
     
     for (size_t i = 0; i < nq * result_k;i++){
-        std::cout << query_labels[i] << " ";
+        std::cout << query_labels[i] << " " << query_distances[i] << " ";
     }
     std::cout << std::endl;
     
@@ -195,13 +195,25 @@ int main(){
     Trecorder.print_time_usage(message);
     Mrecorder.print_memory_usage(message);
 
+    std::vector<float> base_dataset(nb * dimension);
+    std::ifstream base_input(path_base, std::ios::binary);
+    readXvecFvec<origin_data_type> (base_input, base_dataset.data(), dimension, nb);
+
+
     for (size_t i = 0; i < nq; i++){
         std::unordered_set<idx_t> gt;
 
         for (size_t j = 0; j < result_k; j++){
             gt.insert(groundtruth[ngt * i + j]);
             std::cout << groundtruth[ngt * i + j] << " ";
+            float * nn = base_dataset.data() + groundtruth[ngt * i + j] * dimension;
+            float * query = queries.data() + i * dimension;
+            std::vector<float> distance_vector(dimension);
+            faiss::fvec_madd(dimension, nn, -1, query, distance_vector.data());
+            std::cout << faiss::fvec_norm_L2sqr(distance_vector.data(), dimension) << " " << std::endl;
+
         }
+
 
         
         
