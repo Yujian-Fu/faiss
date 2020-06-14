@@ -217,12 +217,6 @@ int main(){
             std::cout << query_distances[i * result_k + j] << " " << faiss::fvec_norm_L2sqr(distance_vector.data(), dimension) << " ";
             */
         }
-        std::cout << std::endl;
-
-        for (size_t j = 0; j < result_k; j++){
-            std::cout << groundtruth[ngt * i + j] << " ";
-        }
-        std::cout << std::endl;
 
 
         assert (gt.size() == result_k);
