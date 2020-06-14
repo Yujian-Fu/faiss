@@ -184,6 +184,7 @@ int main(){
     std::vector<faiss::Index::idx_t> query_labels(nq * result_k);
     size_t correct = 0;
     index->search(nq, result_k, query.data(), query_distances.data(), query_labels.data(), keep_space);
+    
     for (size_t i = 0; i < nq * result_k;i++){
         std::cout << query_labels[i] << " ";
     }
