@@ -571,7 +571,19 @@ namespace bslib{
                 size_t search_space = group_size * group_idxs.size();
                 group_idxs.resize(keep_result_space);
                 group_dists.resize(keep_result_space);
+
+                std::cout << "The results found: " << std::endl;
+                for (size_t temp = 0; temp < search_space; temp ++){
+                    std::cout << result_labels[temp] << " " << result_dists[temp] << " ";
+                }
+                std::cout << std::endl;
+
                 keep_k_min(search_space, keep_result_space, result_dists.data(), result_labels.data(), group_dists.data(), group_idxs.data());
+                std::cout << "The results kept: " << std::endl;
+                for (size_t temp = 0; temp < keep_result_space; temp ++){
+                    std::cout << group_idxs[temp] << " " << group_dists[temp] << " ";
+                }
+                std::cout << std::endl;
             }
 
             std::cout << "Checking the quality of assigning " << std::endl;
