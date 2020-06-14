@@ -120,14 +120,6 @@ int main(){
         Mrecorder.record_memory_usage(record_file,  message);
         Trecorder.print_time_usage(message);
         Trecorder.record_time_usage(record_file, message);
-        std::cout << "Testing the origin ids: " << std::endl;
-        for (size_t i = 0; i < index->final_nc; i ++){
-            for (size_t j = 0; j < index->origin_ids[i].size(); j++){
-                std::cout << index->origin_ids[i][j] << " ";
-            }
-            std::cout << std::endl;
-        }
-        exit(0);
     }
     else{
         ShowMessage("Constructing the index");
@@ -171,7 +163,6 @@ int main(){
         Trecorder.record_time_usage(record_file, message);
     }
 
-    exit(0);
     record_file.close();
     ShowMessage("Loading groundtruth");
     std::vector<uint32_t> groundtruth(nq * ngt);
