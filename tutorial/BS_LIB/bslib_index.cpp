@@ -482,17 +482,19 @@ namespace bslib{
     idx_t Bslib_Index::get_next_group_idx(size_t keep_result_space, idx_t * group_ids, float * query_group_dists){
         idx_t min_label = INVALID_ID;
         float min_dist = MAX_DIST;
+        size_t min_i = -1;
         for (size_t i = 0; i < keep_result_space; i++){
             if (group_ids[i] != INVALID_ID){
                 if (query_group_dists[i] < min_dist){
                     min_label = group_ids[i];
                     min_dist = query_group_dists[i];
-                    group_ids[i] = INVALID_ID;
+                    min_i = i;
                 }
             }
         }
+        group_ids[min_i] = INVALID_ID;
         if (min_label == INVALID_ID){
-            std::cout << "No enough group ids for: " << keep_result_space << std::endl;
+            std::cout << std::endl <<  "No enough group ids for: " << keep_result_space << std::endl;
             exit(0);
         }
         return min_label;
