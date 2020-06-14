@@ -613,7 +613,8 @@ namespace bslib{
                     faiss::fvec_madd(dimension, base_vector, -1, query, distance_vector.data());
                     std::cout << "Using: " << dist << " Groundtruth: " << faiss::fvec_norm_L2sqr(distance_vector.data(), dimension);
 
-                    exit(0);
+                    if (m == 2)
+                        exit(0);
                     /***********************************/
 
                     std::cout << "Labels: " << this->origin_ids[group_id][m] << " Distance: " << dist << " " << q_c_dist << " " << centroid_norms[group_id] << " " << term2 << " " << term3 << " " << " Query search result: ";
