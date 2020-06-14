@@ -479,6 +479,25 @@ namespace bslib{
         return result;
     }
 
+    idx_t Bslib_Index::get_next_group_idx(size_t keep_result_space, idx_t * group_ids, float * query_group_dists){
+        idx_t min_label = INVALID_ID;
+        float min_dist = MAX_DIST;
+        for (size_t i = 0; i < keep_result_space; i++){
+            if (group_ids[i] != INVALID_ID){
+                if (query_group_dists[i] < min_dist){
+                    min_label = group_ids[i];
+                    min_dist = query_group_dists[i];
+                    group_ids[i] = INVALID_ID;
+                }
+            }
+        }
+        if (min_label == INVALID_ID){
+            std::cout << "No enough group ids for: " << keep_result_space << std::endl;
+            exit(0);
+        }
+        return min_label;
+    }
+
      /*
       *    d = || x - y_C - y_R ||^2
       *    d = || x - y_C ||^2 - || y_C ||^2 + || y_C + y_R ||^2 - 2 * (x|y_R)
@@ -593,6 +612,10 @@ namespace bslib{
             readXvecFvec<float>(base_input, base_dataset.data(), dimension, nb);
             */
 
+            std::cout << "The assigned cluster and the centroids are: " << std::endl;
+            for (size_t temp = 0; temp < keep_result_space; temp++){
+                std::cout << group_idxs[temp] << " " << group_dists[temp] << " ";
+            }
 
             //std::cout << "Finished assigned query data, start computing the distance to base vectors" << std::endl;
 
@@ -604,8 +627,9 @@ namespace bslib{
             faiss::maxheap_heapify(result_k, query_search_dists.data(), query_search_labels.data());
             
             for (size_t j = 0; j < keep_result_space; j++){
+
                 
-                size_t group_id = group_idxs[j];
+                size_t group_id = get_next_group_idx(keep_result_space, group_idxs.data(), group_dists.data());
                 std::cout << "Searching in " << group_id << std::endl;
                 float q_c_dist = group_dists[j];
 
@@ -662,10 +686,6 @@ namespace bslib{
                 }
             }
 
-            std::cout << "The assigned cluster and the centroids are: " << std::endl;
-            for (size_t temp = 0; temp < keep_result_space; temp++){
-                std::cout << group_idxs[temp] << " " << group_dists[temp] << " ";
-            }
 
             exit(0);
             for (size_t j = 0; j < result_k; j++){
