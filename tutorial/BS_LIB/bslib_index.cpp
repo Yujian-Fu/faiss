@@ -584,7 +584,7 @@ namespace bslib{
 
             std::cout << "The assigned cluster and the centroids are: " << std::endl;
             for (size_t temp = 0; temp < keep_result_space; temp++){
-                std::cout << result_labels[temp] << " " << result_dists[temp];
+                std::cout << result_labels[temp] << " " << result_dists[temp] << " ";
             }
             std::cout << std::endl << std::endl;
 
@@ -599,7 +599,7 @@ namespace bslib{
             final_cluster_quantizer.search(1, query, keep_result_space, final_query_distance.data(), final_query_group_id.data());
 
             for (size_t temp = 0; temp < keep_result_space; temp++){
-                std::cout << final_query_group_id[temp] << " " << final_query_distance[temp];
+                std::cout << final_query_group_id[temp] << " " << final_query_distance[temp] << " ";
             }
             std::cout << std::endl << std::endl;
 
