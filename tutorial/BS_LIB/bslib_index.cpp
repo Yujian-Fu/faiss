@@ -480,7 +480,7 @@ namespace bslib{
       */
 
     void Bslib_Index::search(size_t n, size_t result_k, float * queries, float * query_dists, faiss::Index::idx_t * query_ids, size_t * keep_space){
-#pragma omp parallel for
+//#pragma omp parallel for
         for (size_t i = 0; i < n; i++){
             //std::cout << " [ " << i << " / " << n <<  " ] " << std::endl;
             const float * query = queries + i * dimension;
@@ -587,7 +587,7 @@ namespace bslib{
                     float term2 = base_norms[m];
                     float term3 = 2 * pq_L2sqr(code + m * code_size);
                     float dist = term1 + term2 - term3;
-                    std::cout << "Labels: " << this->origin_ids[group_id][m] << " Distance: " << dist << " Query search result: " << query_search_dists[0] << " " << query_search_labels[0] << std::endl;
+                    std::cout << "Labels: " << this->origin_ids[group_id][m] << " Distance: " << dist << " " << term1 << " " << term2 << " " << term3 << " " << " Query search result: " << query_search_dists[0] << " " << query_search_labels[0] << std::endl;
                     //std::cout << "The distance elements: dist: " << dist << " term1: " << term1 << " term2: " << term2 << " term3: " << term3 << std::endl;
                     if (dist < query_search_dists[0]){
                         faiss::maxheap_heapify(result_k, query_search_dists.data(), query_search_labels.data());
