@@ -142,17 +142,17 @@ int main(){
 
         std::vector<idx_t> idxs(batch_size);
         std::vector<float> batch(batch_size * dimension);
-        std::vector<idx_t> origin_ids(batch_size);
+        std::vector<idx_t> ids(batch_size);
 
         for (size_t i = 0; i < nbatches; i++){
             readXvec<uint32_t>(idx_input, idxs.data(), batch_size, 1);
             readXvecFvec<origin_data_type> (base_input, batch.data(), dimension, batch_size);
 
             for (size_t j = 0; j < batch_size; j++){
-                origin_ids[i] = batch_size * i + j;
+                ids[j] = batch_size * i + j;
             }
 
-            index->add_batch(batch_size, batch.data(), origin_ids.data(), idxs.data());
+            index->add_batch(batch_size, batch.data(), ids.data(), idxs.data());
             if (i % 10 == 0){
                 std::cout << " adding batches [ " << i << " / " << nbatches << " ]";
                 Trecorder.print_time_usage("");
@@ -171,6 +171,7 @@ int main(){
         Trecorder.record_time_usage(record_file, message);
     }
 
+    exit(0);
     record_file.close();
     ShowMessage("Loading groundtruth");
     std::vector<uint32_t> groundtruth(nq * ngt);
