@@ -213,8 +213,15 @@ int main(){
             float * query = queries.data() + i * dimension;
             std::vector<float> distance_vector(dimension);
             faiss::fvec_madd(dimension, nn, -1, query, distance_vector.data());
-            std::cout << faiss::fvec_norm_L2sqr(distance_vector.data(), dimension) << " ";
+            std::cout << query_distances[i * result_k + j] << " " << faiss::fvec_norm_L2sqr(distance_vector.data(), dimension) << " ";
         }
+        std::cout << std::endl;
+
+        for (size_t j = 0; j < result_k; j++){
+            std::cout << groundtruth[ngt * i + j] << " ";
+        }
+        std::cout << std::endl;
+
 
 
         assert (gt.size() == result_k);
