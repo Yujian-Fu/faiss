@@ -625,6 +625,7 @@ namespace bslib{
                     float dist = term1 + term2 - term3;
                     
                     std::cout << group_id << " " << origin_ids[group_id][m] << " " << dist << " "; 
+                    
 
                     //std::cout << "Labels: " << this->origin_ids[group_id][m] << " Distance: " << dist << " " << q_c_dist << " " << centroid_norms[group_id] << " " << term2 << " " << term3 << " " << " Query search result: ";
                     //for (size_t temp = 0; temp < result_k; temp++){
@@ -642,6 +643,7 @@ namespace bslib{
                 if (visited_vectors > this->max_visited_vectors)
                     break;
             }
+            std::cout << std::endl;
             for (size_t j = 0; j < result_k; j++){
                 std::cout << query_search_labels[j] << " " << query_search_dists[j] << " ";
             }
