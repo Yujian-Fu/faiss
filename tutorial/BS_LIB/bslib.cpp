@@ -200,10 +200,11 @@ int main(){
 
         for (size_t j = 0; j < result_k; j++){
             gt.insert(groundtruth[ngt * i + j]);
+            std::cout << groundtruth[ngt * i + j] << " ";
         }
 
-        std::cout << groundtruth[ngt * i] << " ";
-            
+        
+        
         
         assert (gt.size() == result_k);
         for (size_t j = 0; j < result_k; j++){
