@@ -483,7 +483,6 @@ namespace bslib{
 #pragma omp parallel for
         for (size_t i = 0; i < n; i++){
             //std::cout << " [ " << i << " / " << n <<  " ] " << std::endl;
-            faiss::maxheap_heapify(result_k, query_dists + i * result_k, query_ids + i * result_k);
             const float * query = queries + i * dimension;
 
             std::vector<idx_t> group_idxs(1);
@@ -565,6 +564,9 @@ namespace bslib{
             assert((n_vq + n_lq) == this->layers);
             this->pq.compute_inner_prod_table(query, this->precomputed_table.data());
             size_t visited_vectors = 0;
+            std::vector<float> query_search_dists(result_k);
+            std::vector<faiss::Index::idx_t> query_search_labels(result_k);
+            faiss::maxheap_heapify(result_k, query_search_dists.data(), query_search_labels.data());
             
             for (size_t j = 0; j < keep_result_space; j++){
                 
@@ -585,15 +587,21 @@ namespace bslib{
                     float term2 = base_norms[m];
                     float term3 = 2 * pq_L2sqr(code + m * code_size);
                     float dist = term1 + term2 - term3;
+                    std::cout << "Labels: " << this->origin_ids[group_id][m] << " Distance: " << dist << " Query search result: " << query_search_dists[0] << " " << query_search_labels[0] << std::endl;
                     //std::cout << "The distance elements: dist: " << dist << " term1: " << term1 << " term2: " << term2 << " term3: " << term3 << std::endl;
-                    if (dist < query_dists[i * result_k]){
-                        faiss::maxheap_heapify(result_k, query_dists + i * result_k, query_ids + i * result_k);
-                        faiss::maxheap_push(result_k, query_dists + i * result_k, query_ids + i * result_k, dist, this->origin_ids[group_id][m]);
+                    if (dist < query_search_dists[0]){
+                        faiss::maxheap_heapify(result_k, query_search_dists.data(), query_search_labels.data());
+                        faiss::maxheap_push(result_k, query_search_dists.data(), query_search_labels.data(), dist, this->origin_ids[group_id][m]);
                     }
                 }
                 visited_vectors += group_size;
-                if (visited_vectors > max_visited_vectors)
+                if (visited_vectors > this->max_visited_vectors)
                     break;
+            }
+
+            for (size_t j = 0; j < result_k; j++){
+                query_dists[i * result_k + j] = query_search_dists[j];
+                query_ids[i * result_k + j] = query_ids[j];
             }
         }
     }
