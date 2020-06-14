@@ -489,7 +489,6 @@ namespace bslib{
     void Bslib_Index::search(size_t n, size_t result_k, float * queries, float * query_dists, faiss::Index::idx_t * query_ids, size_t * keep_space, uint32_t * groundtruth){
 //#pragma omp parallel for
 /*
-        size_t ngt = 100;
         std::cout << "Check the distribution of group:" << std::endl;
         for (size_t i = 0; i < this->final_nc; i ++){
             std::cout << this->origin_ids[i].size() << " ";
@@ -596,7 +595,7 @@ namespace bslib{
 
             std::cout << "The assigned cluster and the centroids are: " << std::endl;
             for (size_t temp = 0; temp < keep_result_space; temp++){
-                std::cout << result_labels[temp] << " " << result_dists[temp] << " ";
+                std::cout << group_idxs[temp] << " " << group_dists[temp] << " ";
             }
             std::cout << std::endl << std::endl;
 
@@ -614,7 +613,18 @@ namespace bslib{
                 std::cout << final_query_group_id[temp] << " " << final_query_distance[temp] << " ";
             }
             std::cout << std::endl << std::endl;
-
+            
+            size_t ngt = 100;
+            std::cout << "Find where are the top 10 groundtruth: " << std::endl;
+            for (size_t temp = 0; temp < 10; temp ++){
+                uint32_t groundtruth_label = groundtruth[i * ngt + temp];
+                for (size_t j = 0; j < this->final_nc; j++){
+                    for (size_t m = 0; m < this->origin_ids[j].size(); m++){
+                        if (this->origin_ids[j][m] == groundtruth_label)
+                            std::cout << j << " ";
+                    }
+                }
+            }
             exit(0);
 
             //std::cout << "Finished assigned query data, start computing the distance to base vectors" << std::endl;
