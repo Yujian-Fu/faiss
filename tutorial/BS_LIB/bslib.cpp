@@ -120,6 +120,10 @@ int main(){
         Mrecorder.record_memory_usage(record_file,  message);
         Trecorder.print_time_usage(message);
         Trecorder.record_time_usage(record_file, message);
+        for (size_t i = 0; i < index->final_nc; i++){
+            std::cout << index->centroid_norms[i] << " ";
+        }
+        exit(0);
     }
     else{
         ShowMessage("Constructing the index");
@@ -155,6 +159,7 @@ int main(){
         index->centroid_norm_codes.resize(index->final_nc * index->norm_code_size);
 
         index->compute_centroid_norm();
+
         index->write_index(path_index);
         message = "Constructed the index";
         Mrecorder.print_memory_usage(message);

@@ -7,6 +7,7 @@ namespace bslib{
         dimension(dimension), layers(layers){
             this->use_subset = use_subset;
             this->index_type.resize(layers);
+
             for (size_t i = 0; i < layers; i++){
                 this->index_type[i] = index_type[i];
             }
@@ -306,7 +307,7 @@ namespace bslib{
                 assert(final_nc == vq_quantizer_index[n_vq-1].nc);
                 std::vector<float> each_centroid(dimension);
                 vq_quantizer_index[n_vq-1].compute_final_centroid(i, each_centroid.data());
-                centroid_norms[i] = faiss::fvec_norm_L2sqr(each_centroid.data(), dimension);
+                this->centroid_norms[i] = faiss::fvec_norm_L2sqr(each_centroid.data(), dimension);
             }
             this->norm_pq.compute_codes(centroid_norms.data(), this->centroid_norm_codes.data(), this->final_nc);
         }
@@ -318,7 +319,7 @@ namespace bslib{
                 assert (final_nc == lq_quantizer_index[n_lq-1].nc);
                 std::vector<float> each_centroid(dimension);
                 lq_quantizer_index[n_lq-1].compute_final_centroid(i, each_centroid.data());
-                centroid_norms[i] = faiss::fvec_norm_L2sqr(each_centroid.data(), dimension);
+                this->centroid_norms[i] = faiss::fvec_norm_L2sqr(each_centroid.data(), dimension);
             }
             this->norm_pq.compute_codes(centroid_norms.data(), this->centroid_norm_codes.data(), this->final_nc);
         }
