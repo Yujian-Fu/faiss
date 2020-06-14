@@ -185,7 +185,8 @@ int main(){
     std::vector<float> query_distances(nq * result_k);
     std::vector<faiss::Index::idx_t> query_labels(nq * result_k);
     size_t correct = 0;
-    index->search(nq, result_k, queries.data(), query_distances.data(), query_labels.data(), keep_space);
+    
+    index->search(nq, result_k, queries.data(), query_distances.data(), query_labels.data(), keep_space, groundtruth.data());
     
     for (size_t i = 0; i < nq * result_k;i++){
         std::cout << query_labels[i] << " " << query_distances[i] << " ";
@@ -216,9 +217,6 @@ int main(){
         }
 
 
-        
-        
-        
         assert (gt.size() == result_k);
         for (size_t j = 0; j < result_k; j++){
             if (gt.count(query_labels[i * result_k + j]))
