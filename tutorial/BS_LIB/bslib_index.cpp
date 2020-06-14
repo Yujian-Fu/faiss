@@ -643,16 +643,12 @@ namespace bslib{
                 if (visited_vectors > this->max_visited_vectors)
                     break;
             }
-            std::cout << std::endl;
+            std::cout << std::endl << "The final search result is: " << std::endl;
             for (size_t j = 0; j < result_k; j++){
                 std::cout << query_search_labels[j] << " " << query_search_dists[j] << " ";
             }
-            std::cout << std::endl;
 
-            std::cout << "The assigned cluster and the centroids are: " << std::endl;
-            for (size_t temp = 0; temp < keep_result_space; temp++){
-                std::cout << group_idxs[temp] << " " << group_dists[temp] << " ";
-            }
+            std::cout << std::endl;
 
             std::cout << "Find where are the top 10 groundtruth: " << std::endl;
             for (size_t temp = 0; temp < 10; temp ++){
@@ -660,9 +656,14 @@ namespace bslib{
                 for (size_t j = 0; j < this->final_nc; j++){
                     for (size_t m = 0; m < this->origin_ids[j].size(); m++){
                         if (this->origin_ids[j][m] == groundtruth_label)
-                            std::cout << j << " ";
+                            std::cout << groundtruth_label << " " << j << " ";
                     }
                 }
+            }
+
+            std::cout << "The assigned cluster and the centroids are: " << std::endl;
+            for (size_t temp = 0; temp < keep_result_space; temp++){
+                std::cout << group_idxs[temp] << " " << group_dists[temp] << " ";
             }
 
             exit(0);
