@@ -184,6 +184,11 @@ int main(){
     std::vector<faiss::Index::idx_t> query_labels(nq * result_k);
     size_t correct = 0;
     index->search(nq, result_k, query.data(), query_distances.data(), query_labels.data(), keep_space);
+    for (size_t i = 0; i < nq * result_k;i++){
+        std::cout << query_labels[i] << " ";
+    }
+    std::cout << std::endl;
+    
     std::cout << "The qps for searching is: " << Trecorder.getTimeConsumption() / nq << " us " << std::endl;
     message = "Finish Search";
     Trecorder.print_time_usage(message);
@@ -192,8 +197,12 @@ int main(){
     for (size_t i = 0; i < nq; i++){
         std::unordered_set<idx_t> gt;
 
-        for (size_t j = 0; j < result_k; j++)
+        for (size_t j = 0; j < result_k; j++){
             gt.insert(groundtruth[ngt * i + j]);
+        }
+
+        std::cout << groundtruth[ngt * i] << " ";
+            
         
         assert (gt.size() == result_k);
         for (size_t j = 0; j < result_k; j++){
