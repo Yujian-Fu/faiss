@@ -166,39 +166,39 @@ namespace bslib{
 
     void LQ_quantizer::search_in_group(size_t n, const float * queries, const std::vector<std::map<idx_t, float>> queries_upper_centroid_dists, const idx_t * group_idxs, float * result_dists){
         //clock_t starttime = clock();
-        std::cout << "Start searching in LQ" << std::endl;
+        //std::cout << "Start searching in LQ" << std::endl;
         std::vector<std::vector<idx_t>> query_sequence_set(this->nc_upper);
 
         for (size_t i = 0; i < n; i++){
             idx_t idx = group_idxs[i];
-            std::cout << "The idx found is " << idx << std::endl;
+            //std::cout << "The idx found is " << idx << std::endl;
             query_sequence_set[idx].push_back(i);
         }
-        std::cout << "Query sequence set built " << std::endl;
+        //std::cout << "Query sequence set built " << std::endl;
 #pragma omp parallel for
         for (size_t i = 0; i < this->nc_upper; i++){
             if (query_sequence_set[i].size() == 0)
                 continue;
             else{
-                std::cout << "Query found, search in group " << i << std::endl;
+                //std::cout << "Query found, search in group " << i << std::endl;
                 std::vector<std::vector<float>> sub_centroids(this->nc_per_group);
                 idx_t base_idx = CentroidDistributionMap[i];
                 float alpha = this->alphas[i];
 
                 for (size_t j = 0; j < query_sequence_set[i].size(); j++){
                     idx_t sequence_id = query_sequence_set[i][j];
-                    std::cout << "Searching for sequence id " << sequence_id << std::endl;
+                    //std::cout << "Searching for sequence id " << sequence_id << std::endl;
                     std::vector<float> query_sub_centroids_dists(this->nc_per_group);
                     for (size_t m = 0; m < this->nc_per_group; m++){
                         idx_t nn_idx = this->nn_centroid_idxs[i][m];
                         float query_nn_dist = search_in_map(queries_upper_centroid_dists[sequence_id], nn_idx);
-                        std::cout << "Query nn dist found: " << query_nn_dist << std::endl;
+                        //std::cout << "Query nn dist found: " << query_nn_dist << std::endl;
 
                         if (query_nn_dist != Not_Found){
                             float query_group_dist = search_in_map(queries_upper_centroid_dists[sequence_id], i);
                             assert (query_group_dist != Not_Found);
                             float group_nn_dist = this->nn_centroid_dists[i][m];
-                            std::cout << "Computing easy distance" << std::endl;
+                            //std::cout << "Computing easy distance" << std::endl;
                             query_sub_centroids_dists[m] = alpha*(alpha-1)*group_nn_dist + (1-alpha)*query_group_dist + alpha*query_nn_dist;
                         }
                         else{
@@ -215,14 +215,13 @@ namespace bslib{
                         }
                     }
 
-                    std::cout << "Writing distance as output " << std::endl;
+                    //std::cout << "Writing distance as output " << std::endl;
                     for (size_t m = 0; m < this->nc_per_group; m++){
                         result_dists[sequence_id * this->nc_per_group + m] = query_sub_centroids_dists[m];
                     }
                 }
             }
         }
-        exit(0);
         //clock_t endtime = clock();
         //std::cout << "Search time in LQ layer: " << float(endtime - starttime) / CLOCKS_PER_SEC << std::endl;
     }

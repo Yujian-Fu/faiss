@@ -452,19 +452,13 @@ namespace bslib{
                 if (all_dists[i] < dists[0]){
                     faiss::maxheap_pop(k, dists.data(), ids.data());
                     faiss::maxheap_push(k, dists.data(), ids.data(), all_dists[i], all_ids[i]);
-                    for (size_t j = 0; j < k; j++){
-                        std::cout << ids[j] << " " << dists[j] << " "; 
-                    }
-                    std::cout << std::endl;
                 }
             }
 
             for (size_t i = 0; i < k; i++){
                 sub_ids[i] = ids[i];
                 sub_dists[i] = dists[i];
-                std::cout << ids[i] << " " << dists[i] << " " << sub_ids[i] << " " << sub_dists[i] << "    ";
             }
-            std::cout << std::endl;
         }
     }
 
@@ -513,7 +507,7 @@ namespace bslib{
                 size_t group_size;
                 
                 if (index_type[j] == "VQ"){
-                    std::cout << "searching in VQ layer" << std::endl;
+                    //std::cout << "searching in VQ layer" << std::endl;
                     group_size = vq_quantizer_index[n_vq].nc_per_group;
                     result_dists.resize(group_idxs.size()*group_size);
                     for (size_t m = 0; m < group_idxs.size(); m++){
@@ -529,7 +523,7 @@ namespace bslib{
                 }
 
                 else if(index_type[j] == "LQ") {
-                    std::cout << "searching in LQ layer" << std::endl;
+                    //std::cout << "searching in LQ layer" << std::endl;
                     group_size = lq_quantizer_index[n_lq].nc_per_group;
                     result_dists.resize(group_size * n);
                     assert(query_upper_centroid_dists[0].size() > 0);
@@ -552,18 +546,13 @@ namespace bslib{
                 }
                 
                 if (j < this->layers-1 && index_type[j+1] == "LQ"){
-                    std::cout << "The next layer is LQ, load the query centroid distsnaces" << std::endl;
+                    //std::cout << "The next layer is LQ, load the query centroid distsnaces" << std::endl;
                     for (size_t m = 0; m < group_idxs.size()*group_size; m++){
                         query_upper_centroid_dists[0].insert(std::pair<idx_t, float>(result_labels[m], result_dists[m]));
                     }
                 }
 
-                for (size_t temp = 0; temp < group_size * group_idxs.size(); temp++){
-                    std::cout << result_labels[temp] << "_" << result_dists[temp] << "    ";
-                }
-                std::cout << std::endl;
-
-                std::cout << "Choosing k instances with smallest distances " << std::endl;
+                //std::cout << "Choosing k instances with smallest distances " << std::endl;
                 size_t search_space = group_size * group_idxs.size();
                 group_idxs.resize(keep_result_space);
                 group_dists.resize(keep_result_space);
