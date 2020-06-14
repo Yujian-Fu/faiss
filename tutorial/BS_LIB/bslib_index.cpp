@@ -240,6 +240,7 @@ namespace bslib{
         std::vector<float> residuals(n * dimension);
         encode(n, data, encoded_ids, residuals.data());
 
+        //The code is for the residual between base vectors and their final neighbor centroids
         std::vector<uint8_t> batch_codes(n * this->code_size);
         this->pq.compute_codes(residuals.data(), batch_codes.data(), n);
         std::cout << "The sample codes " << std::endl;
@@ -249,6 +250,7 @@ namespace bslib{
             }
             std::cout << std::endl;
         }
+        
 
         std::vector<float> reconstructed_x(n * dimension);
 
@@ -281,7 +283,7 @@ namespace bslib{
         std::cout << "The sample codes " << std::endl;
         for (size_t i = 0; i < 10 ; i++){
             for (size_t j = 0; j < this->norm_code_size; j++){
-                std::cout << (float)batch_codes[i*code_size + j] << " ";
+                std::cout << (float)xnorm_codes[i*code_size + j] << " ";
             }
             std::cout << std::endl;
         }
@@ -486,6 +488,11 @@ namespace bslib{
 
     void Bslib_Index::search(size_t n, size_t result_k, float * queries, float * query_dists, faiss::Index::idx_t * query_ids, size_t * keep_space){
 //#pragma omp parallel for
+        std::cout << "Check the distribution of group:" << std::endl;
+        for (size_t i = 0; i < this->final_nc; i ++){
+            std::cout << this->origin_ids[i].size() << " ";
+        }
+        exit(0);
         for (size_t i = 0; i < n; i++){
             //if (i % 10 == 0){std::cout << " [ " << i << " / " << n <<  " ] " << std::endl;}
             const float * query = queries + i * dimension;
