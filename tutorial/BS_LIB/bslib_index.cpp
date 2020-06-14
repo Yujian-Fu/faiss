@@ -559,7 +559,7 @@ namespace bslib{
                 keep_k_min(search_space, keep_result_space, result_dists.data(), result_labels.data(), group_dists.data(), group_idxs.data());
             }
 
-            std::cout << "Finished assigned query data, start computing the distance to base vectors" << std::endl;
+            //std::cout << "Finished assigned query data, start computing the distance to base vectors" << std::endl;
 
             assert((n_vq + n_lq) == this->layers);
             this->pq.compute_inner_prod_table(query, this->precomputed_table.data());
