@@ -230,7 +230,7 @@ int main(){
         }
     }
 
-    std::cout << "The recall is: " << correct / (result_k * nq) << std::endl;
+    std::cout << "The recall is: " << float(correct) / (result_k * nq) << std::endl;
 }
 
 
