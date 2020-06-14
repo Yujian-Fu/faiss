@@ -208,12 +208,14 @@ int main(){
 
         for (size_t j = 0; j < result_k; j++){
             gt.insert(groundtruth[ngt * i + j]);
+            /*
             std::cout << query_labels[i * result_k + j] << " ";
             float * nn = base_dataset.data() + query_labels[i * result_k + j] * dimension;
             float * query = queries.data() + i * dimension;
             std::vector<float> distance_vector(dimension);
             faiss::fvec_madd(dimension, nn, -1, query, distance_vector.data());
             std::cout << query_distances[i * result_k + j] << " " << faiss::fvec_norm_L2sqr(distance_vector.data(), dimension) << " ";
+            */
         }
         std::cout << std::endl;
 
