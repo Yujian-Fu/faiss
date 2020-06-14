@@ -488,12 +488,14 @@ namespace bslib{
 
     void Bslib_Index::search(size_t n, size_t result_k, float * queries, float * query_dists, faiss::Index::idx_t * query_ids, size_t * keep_space, uint32_t * groundtruth){
 //#pragma omp parallel for
+/*
         size_t ngt = 100;
         std::cout << "Check the distribution of group:" << std::endl;
         for (size_t i = 0; i < this->final_nc; i ++){
             std::cout << this->origin_ids[i].size() << " ";
         }
         exit(0);
+*/
         for (size_t i = 0; i < n; i++){
             //if (i % 10 == 0){std::cout << " [ " << i << " / " << n <<  " ] " << std::endl;}
             const float * query = queries + i * dimension;
