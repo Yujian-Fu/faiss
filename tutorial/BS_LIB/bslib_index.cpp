@@ -682,6 +682,7 @@ namespace bslib{
                     }
                 }
             }
+            std::cout << std::endl;
 
             std::cout << "The actual distance of the search labels: " << std::endl;
             size_t nb = 1000000;
