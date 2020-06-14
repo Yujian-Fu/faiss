@@ -222,6 +222,7 @@ namespace bslib{
                 }
             }
         }
+        exit(0);
         //clock_t endtime = clock();
         //std::cout << "Search time in LQ layer: " << float(endtime - starttime) / CLOCKS_PER_SEC << std::endl;
     }

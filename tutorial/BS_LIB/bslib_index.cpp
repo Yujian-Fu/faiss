@@ -564,9 +564,10 @@ namespace bslib{
                 std::cout << std::endl;
 
                 std::cout << "Choosing k instances with smallest distances " << std::endl;
+                size_t search_space = group_size * group_idxs.size();
                 group_idxs.resize(keep_result_space);
                 group_dists.resize(keep_result_space);
-                keep_k_min(group_size * group_idxs.size(), keep_result_space, result_dists.data(), result_labels.data(), group_dists.data(), group_idxs.data());
+                keep_k_min(search_space, keep_result_space, result_dists.data(), result_labels.data(), group_dists.data(), group_idxs.data());
 
             }
 
