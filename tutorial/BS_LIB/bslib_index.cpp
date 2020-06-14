@@ -606,6 +606,7 @@ namespace bslib{
             for (size_t j = 0; j < keep_result_space; j++){
                 
                 size_t group_id = group_idxs[j];
+                std::cout << "Searching in " << group_id << std::endl;
                 float q_c_dist = group_dists[j];
 
                 size_t group_size = this->origin_ids[group_id].size();
@@ -624,7 +625,7 @@ namespace bslib{
                     float term3 = 2 * pq_L2sqr(code + m * code_size);
                     float dist = term1 + term2 - term3;
                     
-                    std::cout << group_id << " " << origin_ids[group_id][m] << " " << dist << " "; 
+                    std::cout << group_id << " " << this->origin_ids[group_id][m] << " " << dist << " "; 
                     
 
                     //std::cout << "Labels: " << this->origin_ids[group_id][m] << " Distance: " << dist << " " << q_c_dist << " " << centroid_norms[group_id] << " " << term2 << " " << term3 << " " << " Query search result: ";
