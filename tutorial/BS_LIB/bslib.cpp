@@ -223,10 +223,9 @@ int main(){
         std::cout << std::endl;
 
 
-
         assert (gt.size() == result_k);
         for (size_t j = 0; j < result_k; j++){
-            if (gt.count(query_labels[i * result_k + j]))
+            if (gt.count(query_labels[i * result_k + j]) != 0)
                 correct ++;
         }
     }
