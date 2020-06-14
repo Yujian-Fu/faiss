@@ -166,6 +166,7 @@ int main(){
         Mrecorder.record_memory_usage(record_file,  message);
         Trecorder.print_time_usage(message);
         Trecorder.record_time_usage(record_file, message);
+        exit(0);
     }
 
     record_file.close();
