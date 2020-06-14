@@ -586,15 +586,15 @@ namespace bslib{
                     float term2 = base_norms[m];
                     float term3 = 2 * pq_L2sqr(code + m * code_size);
                     float dist = term1 + term2 - term3;
-                    std::cout << "Labels: " << this->origin_ids[group_id][m] << " Distance: " << dist << " " << term1 << " " << term2 << " " << term3 << " " << " Query search result: ";
-                    for (size_t temp = 0; temp < result_k; temp++){
-                        std::cout << " " << query_search_labels[temp] <<  " " << query_search_dists[temp] << " ";
-                    }
-                    std::cout << std::endl;
+                    //std::cout << "Labels: " << this->origin_ids[group_id][m] << " Distance: " << dist << " " << term1 << " " << term2 << " " << term3 << " " << " Query search result: ";
+                    //for (size_t temp = 0; temp < result_k; temp++){
+                    //    std::cout << " " << query_search_labels[temp] <<  " " << query_search_dists[temp] << " ";
+                    //}
+                    //std::cout << std::endl;
                     
                     //std::cout << "The distance elements: dist: " << dist << " term1: " << term1 << " term2: " << term2 << " term3: " << term3 << std::endl;
                     if (dist < query_search_dists[0]){
-                        faiss::maxheap_heapify(result_k, query_search_dists.data(), query_search_labels.data());
+                        faiss::maxheap_pop(result_k, query_search_dists.data(), query_search_labels.data());
                         faiss::maxheap_push(result_k, query_search_dists.data(), query_search_labels.data(), dist, this->origin_ids[group_id][m]);
                     }
                 }
