@@ -1,3 +1,6 @@
+#ifndef PARA_MILLIONS_H
+#define PARA_MILLIONS_H
+
 #include <cstdio>
 #include <iostream>
 
@@ -51,3 +54,4 @@ const char * path_pq_norm =   "/home/y/yujianfu/ivf-hnsw/models_VQ_LQ/SIFT1M/PQ_
 const char * path_idxs =      "/home/y/yujianfu/ivf-hnsw/models_VQ_LQ/SIFT1M/base_idxs_10_1000.ivecs";
 const char * path_index =     "/home/y/yujianfu/ivf-hnsw/models_VQ_LQ/SIFT1M/PQ16_10_1000.index";
 
+#endif

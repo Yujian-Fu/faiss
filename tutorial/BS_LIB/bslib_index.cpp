@@ -578,6 +578,7 @@ namespace bslib{
 
                 float term1 = q_c_dist - centroid_norms[group_id];
 
+
                 std::vector<float> base_norms(group_size);
                 assert(group_size == base_norm_codes[group_id].size() / this->norm_code_size);
                 this->norm_pq.decode(base_norm_codes[group_id].data(), base_norms.data(), group_size);
@@ -587,6 +588,34 @@ namespace bslib{
                     float term2 = base_norms[m];
                     float term3 = 2 * pq_L2sqr(code + m * code_size);
                     float dist = term1 + term2 - term3;
+                    
+                    /***********************************/
+                    size_t nb = 1000000;
+                    std::vector<float> base_dataset(dimension * nb);
+                    std::ifstream base_input("/home/y/yujianfu/ivf-hnsw/data/SIFT1M/sift_base.fvecs", std::ios::binary);
+                    readXvecFvec<float>(base_input, base_dataset.data(), dimension, nb);
+
+                    std::cout << "Checking query centroid distance: " << std::endl;
+                    std::vector<float> group_centroid(dimension);
+                    this->lq_quantizer_index[0].compute_final_centroid(group_id, group_centroid.data());
+                    std::vector<float> distance_vector(dimension);
+                    faiss::fvec_madd(dimension, group_centroid.data(), -1 ,query, distance_vector.data());
+                    std::cout << "Using: " << q_c_dist << " Groundtruth: " << faiss::fvec_norm_L2sqr(distance_vector.data(), dimension) << std::endl;
+
+                    std::cout << "Checking centroid norm distance: " << std::endl;
+                    std::cout << "Using: " << centroid_norms[group_id] << " Groundtruth: " << faiss::fvec_norm_L2sqr(group_centroid.data(), dimension) << std::endl;
+
+                    std::cout << "Checking base norm distance: " << std::endl;
+                    float * base_vector = base_dataset.data() + origin_ids[group_id][m] * dimension;
+                    std::cout << "Using: " << base_norms[m] << " Groundtruth: " << faiss::fvec_norm_L2sqr(base_vector, dimension) << std::endl;
+
+                    std::cout << "Checking final distance: " << std::endl;
+                    faiss::fvec_madd(dimension, base_vector, -1, query, distance_vector.data());
+                    std::cout << "Using: " << dist << " Groundtruth: " << faiss::fvec_norm_L2sqr(distance_vector.data(), dimension);
+
+                    exit(0);
+                    /***********************************/
+
                     std::cout << "Labels: " << this->origin_ids[group_id][m] << " Distance: " << dist << " " << q_c_dist << " " << centroid_norms[group_id] << " " << term2 << " " << term3 << " " << " Query search result: ";
                     //for (size_t temp = 0; temp < result_k; temp++){
                     //    std::cout << " " << query_search_labels[temp] <<  " " << query_search_dists[temp] << " ";

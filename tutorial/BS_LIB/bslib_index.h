@@ -3,6 +3,7 @@
 #include "LQ_quantizer.h"
 #include "utils.h"
 
+
 namespace bslib{
 
 typedef uint32_t idx_t;

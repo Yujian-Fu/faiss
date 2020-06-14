@@ -213,7 +213,6 @@ int main(){
             std::vector<float> distance_vector(dimension);
             faiss::fvec_madd(dimension, nn, -1, query, distance_vector.data());
             std::cout << faiss::fvec_norm_L2sqr(distance_vector.data(), dimension) << " ";
-
         }
 
 
