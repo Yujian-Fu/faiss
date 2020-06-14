@@ -590,7 +590,7 @@ namespace bslib{
                     //for (size_t temp = 0; temp < result_k; temp++){
                     //    std::cout << " " << query_search_labels[temp] <<  " " << query_search_dists[temp] << " ";
                     //}
-                    //std::cout << std::endl;
+                    std::cout << std::endl;
                     
                     //std::cout << "The distance elements: dist: " << dist << " term1: " << term1 << " term2: " << term2 << " term3: " << term3 << std::endl;
                     if (dist < query_search_dists[0]){
