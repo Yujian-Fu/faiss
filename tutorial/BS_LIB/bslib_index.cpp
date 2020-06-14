@@ -607,12 +607,7 @@ namespace bslib{
             }
 
             std::cout << "Checking the quality of assigning " << std::endl;
-            /*
-            size_t nb = 1000000;
-            std::vector<float> base_dataset(dimension * nb);
-            std::ifstream base_input("/home/y/yujianfu/ivf-hnsw/data/SIFT1M/sift_base.fvecs", std::ios::binary);
-            readXvecFvec<float>(base_input, base_dataset.data(), dimension, nb);
-            */
+
 
             std::cout << "The assigned cluster and the centroids are: " << std::endl;
             for (size_t temp = 0; temp < keep_result_space; temp++){
@@ -624,9 +619,9 @@ namespace bslib{
             assert((n_vq + n_lq) == this->layers);
             this->pq.compute_inner_prod_table(query, this->precomputed_table.data());
             size_t visited_vectors = 0;
-            std::vector<float> query_search_dists(result_k);
-            std::vector<faiss::Index::idx_t> query_search_labels(result_k);
-            faiss::maxheap_heapify(result_k, query_search_dists.data(), query_search_labels.data());
+            std::vector<float> query_search_dists(2 * result_k);
+            std::vector<faiss::Index::idx_t> query_search_labels(2 * result_k);
+            faiss::maxheap_heapify(2 * result_k, query_search_dists.data(), query_search_labels.data());
             
             for (size_t j = 0; j < keep_result_space; j++){
 
@@ -662,8 +657,8 @@ namespace bslib{
                     
                     //std::cout << "The distance elements: dist: " << dist << " term1: " << term1 << " term2: " << term2 << " term3: " << term3 << std::endl;
                     if (dist < query_search_dists[0]){
-                        faiss::maxheap_pop(result_k, query_search_dists.data(), query_search_labels.data());
-                        faiss::maxheap_push(result_k, query_search_dists.data(), query_search_labels.data(), dist, this->origin_ids[group_id][m]);
+                        faiss::maxheap_pop(2 * result_k, query_search_dists.data(), query_search_labels.data());
+                        faiss::maxheap_push(2 * result_k, query_search_dists.data(), query_search_labels.data(), dist, this->origin_ids[group_id][m]);
                     }
                 }
                 visited_vectors += group_size;
@@ -671,7 +666,7 @@ namespace bslib{
                     break;
             }
             std::cout << std::endl << "The final search result is: " << std::endl;
-            for (size_t j = 0; j < result_k; j++){
+            for (size_t j = 0; j < 2 * result_k; j++){
                 std::cout << query_search_labels[j] << " " << query_search_dists[j] << " ";
             }
 
@@ -687,6 +682,28 @@ namespace bslib{
                     }
                 }
             }
+
+            std::cout << "The actual distance of the search labels: " << std::endl;
+            size_t nb = 1000000;
+            std::vector<float> base_dataset(dimension * nb);
+            std::ifstream base_input("/home/y/yujianfu/ivf-hnsw/data/SIFT1M/sift_base.fvecs", std::ios::binary);
+            readXvecFvec<float>(base_input, base_dataset.data(), dimension, nb);
+
+            std::vector<float> distance_vector(dimension);
+            for (size_t j = 0; j < 2 * result_k; j++){
+                float * base_vector = base_dataset.data() + query_search_labels[j] * dimension;
+                faiss::fvec_madd(dimension, base_vector, -1, query, distance_vector.data());
+                std::cout << query_search_labels[j] << " " <<  faiss::fvec_norm_L2sqr(distance_vector.data(), dimension) << " ";
+            }
+            std::cout << std::endl;
+
+            std::cout << "The actual distance of groundtruth " << std::endl;
+            for (size_t j = 0; j < result_k; j++){
+                float * base_vector = base_dataset.data() + groundtruth[i * 100 + j] * dimension;
+                faiss::fvec_madd(dimension, base_vector, -1, query, distance_vector.data());
+                std::cout << groundtruth[i * 100 + j] << " " <<  faiss::fvec_norm_L2sqr(distance_vector.data(), dimension) << " ";
+            }
+            std::cout << std::endl;
 
 
             exit(0);
