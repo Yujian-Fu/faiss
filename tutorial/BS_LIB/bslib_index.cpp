@@ -672,15 +672,11 @@ namespace bslib{
                     /**********************************************/
 
 
-                    if ((i == 2 && origin_ids[group_id][m] == 80543) || (i == 2 && origin_ids[group_id][m] == 408855)){
-                        for (size_t temp = 0; temp < layers; temp ++){std::cout << index_type[temp] << " ";}
-                        std::cout << std::endl;
+                    if ((i == 2 && origin_ids[group_id][m] == 80543)){
                         std::cout << term1 << " " << term2 << " " << term3 << " " << std::endl;
                         std::vector<uint8_t> vector_codes(this->code_size);
                         std::vector<float> group_centroid(dimension);
-                        assert(this->lq_quantizer_index[0].nc > origin_ids[group_id][m]);
-                        std::cout << "The lq number: " << this->lq_quantizer_index.size() << std::endl;
-                        this->lq_quantizer_index[0].compute_final_centroid(origin_ids[group_id][m], group_centroid.data());
+                        this->lq_quantizer_index[0].compute_final_centroid(group_id, group_centroid.data());
                         std::vector<float> distance_vector(dimension);
                         faiss::fvec_madd(dimension, query, -1, group_centroid.data(), distance_vector.data());
                         this->pq.compute_code(distance_vector.data(), vector_codes.data());
