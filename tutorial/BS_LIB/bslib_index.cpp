@@ -652,6 +652,7 @@ namespace bslib{
 
            overall_proportion += float(visited_gt) / result_k;
             time_consumption[this->layers]  = Trecorder.getTimeConsumption();
+            std::cout << "The visited vectors: " << visited_vectors << std::endl;
             std::cout << "The time consumption is: ";
             for (size_t j = 0; j < layers + 1; j++){
                 std::cout << time_consumption[j] << " ";    
