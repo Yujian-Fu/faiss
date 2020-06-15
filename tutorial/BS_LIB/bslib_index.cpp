@@ -667,6 +667,16 @@ namespace bslib{
                         std::cout << float(code[m * code_size + temp]) << " ";
                     }
                     std::cout << std::endl;
+
+
+                    std::vector<float> recovered_x(dimension);
+                    this->pq.decode(pq_code_vector.data(), recovered_x.data());
+                    float sum_product = 0;
+                    for (size_t temp = 0; temp < dimension; temp++){
+                        sum_product += recovered_x[temp] * query[temp];
+                    }
+                    std::cout << "The computed product: " << 2 * sum_product << std::endl;
+                    std::cout << "The origin term3: " << 2 * term3 << std::endl;
                     if (m == 3)
                     exit(0);
                     
