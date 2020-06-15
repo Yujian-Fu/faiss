@@ -40,9 +40,11 @@ namespace bslib{
 
     void Bslib_Index::encode(size_t n, const float * encode_data, const idx_t * encoded_ids, float * encoded_data){
         if (index_type[layers-1] == "VQ"){
+            std::cout << "Encoding in VQ layer " << std::endl;
             vq_quantizer_index[vq_quantizer_index.size()-1].compute_residual_group_id(n, encoded_ids, encode_data, encoded_data);
         }
         else if(index_type[layers-1] == "LQ"){
+            std::cout << "Encoding in LQ layer " << std::endl;
             lq_quantizer_index[lq_quantizer_index.size()-1].compute_residual_group_id(n, encoded_ids, encode_data, encoded_data);
         }
         else{
@@ -209,10 +211,12 @@ namespace bslib{
         std::cout << std::endl;
         */
 
+        std::cout << "Training the pq " << std::endl;
         this->pq.verbose = true;
         this->pq.train(nt, residuals.data());
         faiss::write_ProductQuantizer(& this->pq, path_pq);
 
+        std::cout << "decoding the residual data " << std::endl;
         std::vector<float> reconstructed_x(dimension * this->nt);
         decode(this->nt, residuals.data(), group_ids.data(), reconstructed_x.data());
         /*
@@ -227,6 +231,7 @@ namespace bslib{
         for (size_t i = 0; i < this->nt; i++){
             xnorm[i] = faiss::fvec_norm_L2sqr(reconstructed_x.data() + i * dimension, dimension);
         }
+        std::cout << "Training the norm pq" << std::endl;
         this->norm_pq.verbose = true;
         this->norm_pq.train(this->nt, xnorm.data());
         faiss::write_ProductQuantizer(& this->norm_pq, path_norm_pq);
