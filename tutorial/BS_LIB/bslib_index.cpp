@@ -518,7 +518,7 @@ namespace bslib{
         for (size_t i = 0; i < layers+1; i++){avg_time_consumption[i] = 0;}
         float avg_query_centroid_dist = 0;
 
-//#pragma omp parallel for
+#pragma omp parallel for
         for (size_t i = 0; i < n; i++){
             std::vector<float> time_consumption(layers+1);
             time_recorder Trecorder = time_recorder();
