@@ -514,6 +514,10 @@ namespace bslib{
             float overall_proportion = 0;
 #pragma omp parallel for
         for (size_t i = 0; i < n; i++){
+            std::vector<float> time_consumption(layers+1);
+            time_recorder Trecorder = time_recorder();
+
+
             std::unordered_set<uint32_t> grountruth_set;
             for (size_t j = 0; j < result_k; j++)
                 grountruth_set.insert(groundtruth[i * 100 + j]);
@@ -594,7 +598,8 @@ namespace bslib{
                 group_dists.resize(keep_result_space);
 
                 keep_k_min(search_space, keep_result_space, result_dists.data(), result_labels.data(), group_dists.data(), group_idxs.data());
-
+                time_consumption[j] = Trecorder.getTimeConsumption();
+                Trecorder.reset();
             }
 
             //std::cout << "Finished assigned query data, start computing the distance to base vectors" << std::endl;
@@ -646,7 +651,14 @@ namespace bslib{
             }
 
            overall_proportion += float(visited_gt) / result_k;
+            time_consumption[this->layers]  = Trecorder.getTimeConsumption();
+            std::cout << "The time consumption is: ";
+            for (size_t j = 0; j < layers + 1; j++){
+                std::cout << time_consumption[j] << " ";    
+            }
+            std::cout << std::endl;
         }
+
         std::cout << "The avarage groundtruth proportion is: " << overall_proportion / n << std::endl;
     }
 
