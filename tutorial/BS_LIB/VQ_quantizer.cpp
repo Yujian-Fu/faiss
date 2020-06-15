@@ -17,7 +17,7 @@ namespace bslib{
 
         this->quantizers.resize(this->nc_upper);
         std::cout << "Building group quantizers for vq_quantizer " << std::endl;
-//#pragma omp parallel for
+#pragma omp parallel for
         for (size_t i = 0; i < nc_upper; i++){
             std::vector<float> centroids(dimension * nc_per_group);
             size_t nt_sub = train_set[i].size() / this->dimension;
