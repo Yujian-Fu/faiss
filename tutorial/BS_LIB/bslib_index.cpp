@@ -655,7 +655,7 @@ namespace bslib{
                     std::vector<float> distance_vector(dimension);
                     faiss::fvec_madd(dimension, query, -1, base_vector, distance_vector.data());
                     float actual_dist = faiss::fvec_norm_L2sqr(distance_vector.data(), dimension);
-                    std::cout << dist << " " << actual_dist << " " << abs(dist - actual_dist) / actual_dist << "  " << std::endl;
+                    std::cout << this->origin_ids[group_id][m] << dist << " " << actual_dist << " " << abs(dist - actual_dist) / actual_dist << "  " << std::endl;
                     
                     //std::cout << group_id << " " << this->origin_ids[group_id][m] << " " << dist << " "; 
                     
