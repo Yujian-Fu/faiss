@@ -605,7 +605,7 @@ namespace bslib{
                 group_dists.resize(keep_result_space);
 
                 keep_k_min(search_space, keep_result_space, result_dists.data(), result_labels.data(), group_dists.data(), group_idxs.data());
-                time_consumption[j] = Trecorder.getTimeConsumption();
+                time_consumption[j] = Trecorder.getTimeConsumption() / (search_space / group_size);
                 Trecorder.reset();
             }
 
