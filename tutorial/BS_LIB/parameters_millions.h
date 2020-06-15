@@ -13,7 +13,7 @@ const char * path_quantizers = "/home/y/yujianfu/ivf-hnsw/models_VQ_VQ_LQ/SIFT1M
 const bool use_subset = false;
 const bool pq_use_subset = true;
 const bool use_reranking = true;
-const size_t rerank_space = 5;
+const size_t rerank_space = 2;
 
 //For train PQ
 const size_t bytes_per_code = 16;
