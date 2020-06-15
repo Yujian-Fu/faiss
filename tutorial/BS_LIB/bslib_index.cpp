@@ -184,11 +184,12 @@ namespace bslib{
         this->code_size = this->pq.code_size;
         this->norm_code_size = this->norm_pq.code_size;
 
-        std::cout << "Encoding the train dataset to compute residual" << std::endl;
+        std::cout << "Assigning the train dataset to compute residual" << std::endl;
         std::vector<float> residuals(dimension * this->nt);
         std::vector<idx_t> group_ids(this->nt);
         assign(this->nt, this->train_data.data(), group_ids.data());
 
+        std::cout << "Encoding the train dataset " << std::endl;
         encode(this->nt, this->train_data.data(), group_ids.data(), residuals.data());
         /*
         std::cout << "Checking the residual data " << std::endl;
