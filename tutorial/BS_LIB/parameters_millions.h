@@ -9,7 +9,7 @@ typedef float origin_data_type;
 const size_t layers = 4;
 const std::string index_type[layers] = {"VQ", "VQ", "LQ", "LQ"};
 const uint32_t ncentroids[layers] = {100, 10, 10, 100};
-const char * path_quantizers = "/home/y/yujianfu/ivf-hnsw/models_VQ_VQ_VQ_LQ_LQ/SIFT1M/quantizer_100_10_10_100.qt";
+const char * path_quantizers = "/home/y/yujianfu/ivf-hnsw/models_VQ_VQ_LQ_LQ/SIFT1M/quantizer_100_10_10_100.qt";
 const bool use_subset = false;
 const bool pq_use_subset = true;
 
