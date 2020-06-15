@@ -686,6 +686,8 @@ namespace bslib{
                 std::cout << query_search_dists[temp] << " " << actual_dist << " " << abs(query_search_dists[temp]  - actual_dist) / actual_dist << "  ";
             }
 
+            exit(0);
+
 
             for (size_t j = 0; j < result_k; j++){
                 query_dists[i * result_k + j] = query_search_dists[j];
