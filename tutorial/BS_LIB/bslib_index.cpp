@@ -656,7 +656,7 @@ namespace bslib{
                     faiss::fvec_madd(dimension, query, -1, base_vector, distance_vector.data());
                     float actual_dist = faiss::fvec_norm_L2sqr(distance_vector.data(), dimension);
                     //std::cout << this->origin_ids[group_id][m] <<" "<< dist << " " << actual_dist << " " << abs(dist - actual_dist) / actual_dist << "     ";
-                    std::cout << dist << ",";
+                    //std::cout << dist << ",";
 
                     //std::cout << group_id << " " << this->origin_ids[group_id][m] << " " << dist << " "; 
                     
@@ -676,6 +676,7 @@ namespace bslib{
                 if (visited_vectors > this->max_visited_vectors)
                     break;
             }
+            /*
             std::cout << std::endl;
 
             std::cout << "The search results: " << std::endl;
@@ -701,6 +702,7 @@ namespace bslib{
             std::cout << std::endl;
 
             exit(0);
+            */
 
 
             for (size_t j = 0; j < result_k; j++){
