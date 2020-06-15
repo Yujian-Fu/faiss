@@ -731,6 +731,10 @@ namespace bslib{
                     std::cout << query_search_labels[actual_dist_index[temp]] << " " << query_actual_dists[actual_dist_index[temp]] << " ";
                 }
                 std::cout << std::endl;
+                for (size_t temp = 0; temp < 100; temp++){
+                    std::cout << groundtruth[i * 100 + temp] << " ";
+                }
+                std::cout << std::endl;
                 exit(0);
             }
              
