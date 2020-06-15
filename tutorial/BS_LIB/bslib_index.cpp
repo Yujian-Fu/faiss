@@ -655,6 +655,7 @@ namespace bslib{
                     float dist = term1 + term2 - term3;
                     query_search_dists[visited_vectors] = dist;
 
+
                     //Compute the actual distance
                     /************************************************/
                     std::vector<float> base_vector(dimension);
@@ -669,6 +670,23 @@ namespace bslib{
                     float actual_dist =  faiss::fvec_norm_L2sqr(distance_vector.data(), dimension);
                     query_actual_dists[visited_vectors] = actual_dist;
                     /**********************************************/
+
+
+                    if (i == 2 && origin_ids[group_id][m] == 80543){
+                        std::cout << term1 << " " << term2 << " " << term3 << " ";
+                        std::vector<uint8_t> vector_codes(this->code_size);
+                        this->pq.compute_code(base_vector.data(), vector_codes.data());
+                        for (size_t temp = 0; temp < code_size; temp++){std::cout << vector_codes[temp] << " ";} 
+                        std::cout << std::endl;
+                        for (size_t temp = 0; temp < code_size; temp++){std::cout << code[m * code_size + temp] << " ";}
+                        std::cout << std::endl;
+                        float product_sum = 0;
+                        std::vector<float> reconstructed_x(dimension);
+                        this->pq.decode(vector_codes.data(), reconstructed_x.data());
+                        for (size_t temp = 0; temp < dimension; temp++){product_sum += reconstructed_x[temp]*query[temp];}
+                        std::cout << term3 / 2 << " " << product_sum << std::endl;
+                    }
+
 
                     query_search_labels[visited_vectors] = origin_ids[group_id][m];
                     visited_vectors ++;
