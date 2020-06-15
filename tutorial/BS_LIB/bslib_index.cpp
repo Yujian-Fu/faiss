@@ -686,6 +686,7 @@ namespace bslib{
                 float actual_dist = faiss::fvec_norm_L2sqr(distance_vector.data(), dimension);
                 std::cout << base_vector_id << query_search_dists[temp] << " " << actual_dist << " " << abs(query_search_dists[temp]  - actual_dist) / actual_dist << "  ";
             }
+            std::cout << std::endl;
 
             std::cout << "The groundtruth: " << std::endl;
             for (size_t temp = 0; temp < result_k; temp++){
@@ -696,6 +697,7 @@ namespace bslib{
                 float actual_dist = faiss::fvec_norm_L2sqr(distance_vector.data(), dimension);
                 std::cout << base_vector_id << " " << actual_dist << " ";
             }
+            std::cout << std::endl;
 
             exit(0);
 
