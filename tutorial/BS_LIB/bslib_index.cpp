@@ -518,7 +518,7 @@ namespace bslib{
         for (size_t i = 0; i < layers+1; i++){avg_time_consumption[i] = 0;}
         float avg_query_centroid_dist = 0;
 
-#pragma omp parallel for
+//#pragma omp parallel for
         for (size_t i = 0; i < n; i++){
             std::vector<float> time_consumption(layers+1);
             time_recorder Trecorder = time_recorder();
@@ -556,7 +556,7 @@ namespace bslib{
                     //std::cout << "searching in VQ layer" << std::endl;
                     group_size = vq_quantizer_index[n_vq].nc_per_group;
                     result_dists.resize(group_idxs.size()*group_size);
-//#pragma omp parallel for
+#pragma omp parallel for
                     for (size_t m = 0; m < group_idxs.size(); m++){
                         vq_quantizer_index[n_vq].search_in_group(1, query, group_idxs.data()+m, result_dists.data()+m*group_size);
                     }
@@ -574,7 +574,7 @@ namespace bslib{
                     group_size = lq_quantizer_index[n_lq].nc_per_group;
                     result_dists.resize(group_size * n);
                     assert(query_upper_centroid_dists[0].size() > 0);
-//#pragma omp parallel for
+#pragma omp parallel for
                     for (size_t m = 0; m < group_idxs.size(); m++){
                         lq_quantizer_index[n_lq].search_in_group(1, query, query_upper_centroid_dists, group_idxs.data()+m, result_dists.data()+m*group_size);
                     }
