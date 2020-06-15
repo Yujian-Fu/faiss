@@ -684,16 +684,18 @@ namespace bslib{
                     break;
             }
 
-            /*
+            
             for (size_t j = 0; j < result_k; j++){
                 query_dists[i * result_k + j] = query_search_dists[j];
                 query_ids[i * result_k + j] = query_search_labels[j];
             }
-            */
+            
+            /*
             for (size_t j = 0; j < result_k; j++){
                 query_dists[i * result_k + j] = actual_search_dists[j];
                 query_ids[i * result_k + j] = actual_search_labels[j];
             }
+            */
 
            overall_proportion += float(visited_gt) / result_k;
             time_consumption[this->layers]  = Trecorder.getTimeConsumption();
