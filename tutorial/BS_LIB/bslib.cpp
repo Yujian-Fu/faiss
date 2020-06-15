@@ -181,7 +181,7 @@ int main(){
     }
 
     index->use_reranking = use_reranking;
-    index->reraking_space = rerank_space;
+    index->reraking_space = reranking_space;
 
     index->max_visited_vectors = max_vectors;
     index->precomputed_table.resize(index->pq.M * index->pq.ksub);
