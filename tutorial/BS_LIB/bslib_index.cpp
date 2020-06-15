@@ -673,12 +673,12 @@ namespace bslib{
 
 
                     if (i == 2 && origin_ids[group_id][m] == 80543){
-                        std::cout << term1 << " " << term2 << " " << term3 << " ";
+                        std::cout << term1 << " " << term2 << " " << term3 << " " << std::endl;
                         std::vector<uint8_t> vector_codes(this->code_size);
                         this->pq.compute_code(base_vector.data(), vector_codes.data());
-                        for (size_t temp = 0; temp < code_size; temp++){std::cout << vector_codes[temp] << " ";} 
+                        for (size_t temp = 0; temp < code_size; temp++){std::cout << float(vector_codes[temp]) << " ";} 
                         std::cout << std::endl;
-                        for (size_t temp = 0; temp < code_size; temp++){std::cout << code[m * code_size + temp] << " ";}
+                        for (size_t temp = 0; temp < code_size; temp++){std::cout << float(code[m * code_size + temp]) << " ";}
                         std::cout << std::endl;
                         float product_sum = 0;
                         std::vector<float> reconstructed_x(dimension);
