@@ -741,7 +741,6 @@ namespace bslib{
                     std::cout << groundtruth[i * 100 + temp] << " ";
                 }
                 std::cout << std::endl;
-                exit(0);
             }
              
 
