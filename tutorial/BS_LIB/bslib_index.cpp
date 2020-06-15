@@ -719,7 +719,7 @@ namespace bslib{
             
             size_t correct = 0;
             if (use_reranking){
-                size_t re_ranking_range = this->reraking_space * result_k;
+                size_t re_ranking_range = this->reraking_space;
                 std::vector<float> reranking_dists(re_ranking_range);
                 std::vector<float> reranking_labels(re_ranking_range);
                 for (size_t j = 0; j < re_ranking_range; j++){
