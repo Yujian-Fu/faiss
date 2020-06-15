@@ -523,13 +523,8 @@ namespace bslib{
             std::vector<float> time_consumption(layers+1);
             time_recorder Trecorder = time_recorder();
 
-            /*
-            size_t nb = 1000000;
-            std::vector<float> base_dataset(dimension * nb);
             std::ifstream base_input("/home/y/yujianfu/ivf-hnsw/data/SIFT1M/sift_base.fvecs", std::ios::binary);
-            readXvecFvec<float>(base_input, base_dataset.data(), dimension, nb);
-            */
-
+            
             std::unordered_set<uint32_t> grountruth_set;
             for (size_t j = 0; j < result_k; j++)
                 grountruth_set.insert(groundtruth[i * 100 + j]);
@@ -621,6 +616,11 @@ namespace bslib{
             std::vector<float> query_search_dists(result_k);
             std::vector<faiss::Index::idx_t> query_search_labels(result_k);
             faiss::maxheap_heapify(result_k, query_search_dists.data(), query_search_labels.data());
+
+            std::vector<float> actual_search_dists(result_k);
+            std::vector<faiss::Index::idx_t> actual_search_labels(result_k);
+            faiss::maxheap_heapify(result_k, actual_search_dists.data(), actual_search_labels.data());
+
             
             float query_centroid_dists = 0;
             for (size_t j = 0; j < keep_result_space; j++){
@@ -655,16 +655,22 @@ namespace bslib{
                     float term3 = 2 * pq_L2sqr(code + m * code_size);
                     float dist = term1 + term2 - term3;
 
+                    /************************************************/
+                    std::vector<float> base_vector(dimension);
+                    uint32_t dim;
+                    base_input.seekg(origin_ids[group_id][m] * dimension * sizeof (float) + origin_ids[group_id][m] * sizeof(uint32_t), std::ios::beg);
+                    base_input.read((char *) & dim, sizeof(uint32_t));
+                    assert(dim == this->dimension);
+                    base_input.read((char *) base_vector.data(), sizeof(float)*dimension);
 
-                    /*
                     std::vector<float> distance_vector(dimension);
-                    float * base_vector = base_dataset.data() + origin_ids[group_id][m] * dimension;
-                    faiss::fvec_madd(dimension, base_vector, -1, query, distance_vector.data());
+                    faiss::fvec_madd(dimension, base_vector.data(), -1, query, distance_vector.data());
                     float actual_dist =  faiss::fvec_norm_L2sqr(distance_vector.data(), dimension);
-                    */
-                    
-
-
+                    if (actual_dist < actual_search_dists[0]){
+                        faiss::maxheap_pop(result_k, actual_search_dists.data(), actual_search_labels.data());
+                        faiss::maxheap_push(result_k, actual_search_dists.data(), actual_search_labels.data(), actual_dist, this->origin_ids[group_id][m]);
+                    }
+                    /**********************************************/
 
                     if (grountruth_set.count(this->origin_ids[group_id][m]) != 0)
                         visited_gt ++;
@@ -678,9 +684,15 @@ namespace bslib{
                     break;
             }
 
+            /*
             for (size_t j = 0; j < result_k; j++){
                 query_dists[i * result_k + j] = query_search_dists[j];
                 query_ids[i * result_k + j] = query_search_labels[j];
+            }
+            */
+            for (size_t j = 0; j < result_k; j++){
+                query_dists[i * result_k + j] = actual_search_dists[j];
+                query_ids[i * result_k + j] = actual_search_labels[j];
             }
 
            overall_proportion += float(visited_gt) / result_k;
