@@ -180,6 +180,9 @@ int main(){
         readXvecFvec<origin_data_type>(query_input, queries.data(), dimension, nq, true, false);
     }
 
+    index->use_reranking = use_reranking;
+    index->reraking_space = rerank_space;
+
     index->max_visited_vectors = max_vectors;
     index->precomputed_table.resize(index->pq.M * index->pq.ksub);
     std::vector<float> query_distances(nq * result_k);

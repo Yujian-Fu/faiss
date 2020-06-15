@@ -23,6 +23,8 @@ struct Bslib_Index{
     size_t subnt; //Initialized in constructer by 0, assigned in main 
     bool use_subset;
     bool pq_use_subset;
+    bool use_reranking;
+    size_t reraking_space;
 
     size_t M; // Initialized by training pq
     size_t norm_M;

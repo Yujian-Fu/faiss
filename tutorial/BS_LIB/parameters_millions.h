@@ -12,6 +12,8 @@ const uint32_t ncentroids[layers] = {100, 10, 100};
 const char * path_quantizers = "/home/y/yujianfu/ivf-hnsw/models_VQ_VQ_LQ/SIFT1M/quantizer_100_10_100.qt";
 const bool use_subset = false;
 const bool pq_use_subset = true;
+const bool use_reranking = true;
+const size_t rerank_space = 5;
 
 //For train PQ
 const size_t bytes_per_code = 16;

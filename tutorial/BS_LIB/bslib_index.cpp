@@ -716,29 +716,39 @@ namespace bslib{
             std::iota(actual_dist_index.begin(), actual_dist_index.end(), x++);
             std::sort( actual_dist_index.begin(),actual_dist_index.end(), [&](int i,int j){return query_actual_dists[i]<query_actual_dists[j];} );
 
-
-            size_t re_ranking_range = 10 * result_k;
-            std::vector<float> reranking_dists(re_ranking_range);
-            std::vector<float> reranking_labels(re_ranking_range);
-            for (size_t j = 0; j < re_ranking_range; j++){
-                reranking_dists[j] = query_actual_dists[search_dist_index[j]];
-                reranking_labels[j] = query_search_labels[search_dist_index[j]];
-            }
-
-            std::vector<idx_t> reranking_dist_index(re_ranking_range);
-            x = 0;
-            std::iota(reranking_dist_index.begin(), reranking_dist_index.end(), x++);
-            std::sort(reranking_dist_index.begin(), reranking_dist_index.end(), [&](int i,int j){return reranking_dists[i] < reranking_dists[j];});
-
-
-
+            
             size_t correct = 0;
-            for (size_t j = 0; j < result_k; j++){
-                query_dists[i * result_k + j] = reranking_dists[reranking_dist_index[j]];
-                query_ids[i * result_k + j] = reranking_labels[reranking_dist_index[j]];
-                if (grountruth_set.count(query_ids[i * result_k + j]) != 0)
-                    correct ++;
+            if (use_reranking){
+                size_t re_ranking_range = 10 * result_k;
+                std::vector<float> reranking_dists(re_ranking_range);
+                std::vector<float> reranking_labels(re_ranking_range);
+                for (size_t j = 0; j < re_ranking_range; j++){
+                    reranking_dists[j] = query_actual_dists[search_dist_index[j]];
+                    reranking_labels[j] = query_search_labels[search_dist_index[j]];
+                }
+
+                std::vector<idx_t> reranking_dist_index(re_ranking_range);
+                x = 0;
+                std::iota(reranking_dist_index.begin(), reranking_dist_index.end(), x++);
+                std::sort(reranking_dist_index.begin(), reranking_dist_index.end(), [&](int i,int j){return reranking_dists[i] < reranking_dists[j];});
+
+                for (size_t j = 0; j < result_k; j++){
+                    query_dists[i * result_k + j] = reranking_dists[reranking_dist_index[j]];
+                    query_ids[i * result_k + j] = reranking_labels[reranking_dist_index[j]];
+                    if (grountruth_set.count(query_ids[i * result_k + j]) != 0)
+                        correct ++;
+                }
             }
+
+            else{
+                for (size_t j = 0; j < result_k; j++){
+                    query_dists[i * result_k + j] = query_search_dists[search_dist_index[j]];
+                    query_ids[i * result_k + j] = query_search_labels[search_dist_index[j]];
+                    if (grountruth_set.count(query_ids[i * result_k + j]) != 0)
+                        correct ++;
+                }
+            }
+
 
             float recall = float(correct) / result_k;
             std::cout << i << " th recall: " << recall << std::endl;
