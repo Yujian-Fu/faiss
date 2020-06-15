@@ -511,8 +511,13 @@ namespace bslib{
       */
 
     void Bslib_Index::search(size_t n, size_t result_k, float * queries, float * query_dists, faiss::Index::idx_t * query_ids, size_t * keep_space, uint32_t * groundtruth){
-            float overall_proportion = 0;
-//#pragma omp parallel for
+        float overall_proportion = 0;
+        float avg_visited_vectors = 0;
+        std::vector<float> avg_time_consumption(layers+1);
+        for (size_t i = 0; i < layers+1; i++){avg_time_consumption[i] = 0;}
+        float avg_query_centroid_dist = 0;
+
+#pragma omp parallel for
         for (size_t i = 0; i < n; i++){
             std::vector<float> time_consumption(layers+1);
             time_recorder Trecorder = time_recorder();
@@ -610,11 +615,20 @@ namespace bslib{
             std::vector<faiss::Index::idx_t> query_search_labels(2 * result_k);
             faiss::maxheap_heapify(result_k, query_search_dists.data(), query_search_labels.data());
             
+            float query_centroid_dists = 0;
+            for (size_t j = 0; j < keep_result_space; j++){
+                query_centroid_dists += group_dists[j];
+            }
+            query_centroid_dists = query_centroid_dists / keep_result_space;
+            avg_query_centroid_dist += query_centroid_dists;
+
             size_t visited_gt = 0;
             for (size_t j = 0; j < keep_result_space; j++){
 
                 
                 size_t group_id = get_next_group_idx(keep_result_space, group_idxs.data(), group_dists.data());
+
+
                 float q_c_dist = group_dists[j];
 
                 size_t group_size = this->origin_ids[group_id].size();
@@ -652,14 +666,22 @@ namespace bslib{
 
            overall_proportion += float(visited_gt) / result_k;
             time_consumption[this->layers]  = Trecorder.getTimeConsumption();
-            std::cout << "The visited vectors: " << visited_vectors << std::endl;
-            std::cout << "The time consumption is: ";
+
+            avg_visited_vectors += visited_vectors;
             for (size_t j = 0; j < layers + 1; j++){
-                std::cout << time_consumption[j] << " ";    
+                avg_time_consumption[j] += time_consumption[j];    
             }
             std::cout << std::endl;
         }
 
+        std::cout << "The time consumption: ";
+        for (size_t i = 0; i < layers+1; i++){
+            std::cout << avg_time_consumption[i] / n << " ";
+        }
+        std::cout << std::endl;
+
+        std::cout << "The average visited vectors: " << avg_visited_vectors / n << std::endl;
+        std::cout << "The average query centroid distance: " << avg_query_centroid_dist / n << std::endl;
         std::cout << "The avarage groundtruth proportion is: " << overall_proportion / n << std::endl;
     }
 
