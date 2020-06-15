@@ -160,10 +160,7 @@ namespace bslib{
             this->train_data.resize(this-> nt * dimension);
             std::ifstream learn_input(path_learn, std::ios::binary);
             readXvecFvec<learn_data_type>(learn_input, this->train_data.data(), this->dimension, this->nt, true);
-            this->train_data_idxs.resize(nt);
-            for (size_t i = 0; i < nt; i++){
-                this->train_data_idxs[i] = 0;
-            }
+
             if (this->use_subset){
                 std::cout << "Using subset for training " << std::endl;
                 assert (this->nt != this->subnt);
@@ -173,9 +170,6 @@ namespace bslib{
                 train_data_idxs.resize(subnt);
                 for (size_t i = 0; i < subnt * dimension; i++){
                     this->train_data[i] = train_subset[i];
-                }
-                for (size_t i = 0; i < subnt; i++){
-                    this->train_data_idxs[i] = 0;
                 }
                 this->nt = this->subnt;
             }
@@ -187,13 +181,10 @@ namespace bslib{
         this->norm_code_size = this->norm_pq.code_size;
 
         std::cout << "Assigning the train dataset to compute residual" << std::endl;
-        std::vector<float> residuals(dimension * this->nt);
+        std::vector<float> residuals(this->dimension * this->nt);
         std::vector<idx_t> group_ids(this->nt);
         assign(this->nt, this->train_data.data(), group_ids.data());
 
-        for (size_t i = 0; i < group_ids.size(); i++){
-            std::cout << group_ids[i] << " ";
-        }
         std::cout << std::endl;
         std::cout << "Encoding the train dataset " << std::endl;
         encode(this->nt, this->train_data.data(), group_ids.data(), residuals.data());
