@@ -508,7 +508,7 @@ namespace bslib{
       */
 
     void Bslib_Index::search(size_t n, size_t result_k, float * queries, float * query_dists, faiss::Index::idx_t * query_ids, size_t * keep_space, uint32_t * groundtruth){
-#pragma omp parallel for
+//#pragma omp parallel for
 /*
         std::cout << "Check the distribution of group:" << std::endl;
         for (size_t i = 0; i < this->final_nc; i ++){
@@ -659,12 +659,12 @@ namespace bslib{
                     this->pq.compute_code(distance_vector.data(), pq_code_vector.data());
                     std::cout << "The groundtruth vector: " << std::endl;
                     for (size_t temp =0; temp < group_size; temp++){
-                        std::cout << pq_code_vector[temp] << " ";
+                        std::cout << float(pq_code_vector[temp]) << " ";
                     }
                     std::cout << std::endl;
                     std::cout << "The stored vector: " << std::endl;
                     for (size_t temp =0; temp < group_size; temp++){
-                        std::cout << code[m * code_size + temp] << " ";
+                        std::cout << float(code[m * code_size + temp]) << " ";
                     }
                     std::cout << std::endl;
                     exit(0);
