@@ -647,6 +647,34 @@ namespace bslib{
                     float term2 = base_norms[m];
                     float term3 = 2 * pq_L2sqr(code + m * code_size);
                     float dist = term1 + term2 - term3;
+
+                    size_t nb = 1000000;
+                    std::vector<float> base_dataset(dimension * nb);
+                    std::ifstream base_input("/home/y/yujianfu/ivf-hnsw/data/SIFT1M/sift_base.fvecs", std::ios::binary);
+                    readXvecFvec<float>(base_input, base_dataset.data(), dimension, nb);
+
+                    std::cout << "Checking query centroid distance: " << std::endl;
+                    std::vector<float> group_centroid(dimension);
+                    this->lq_quantizer_index[0].compute_final_centroid(group_id, group_centroid.data());
+                    std::vector<float> distance_vector(dimension);
+                    faiss::fvec_madd(dimension, group_centroid.data(), -1 ,query, distance_vector.data());
+                    std::cout << "Using: " << q_c_dist << " Groundtruth: " << faiss::fvec_norm_L2sqr(distance_vector.data(), dimension) << std::endl;
+
+                    std::cout << "Checking centroid norm distance: " << std::endl;
+                    std::cout << "Using: " << centroid_norms[group_id] << " Groundtruth: " << faiss::fvec_norm_L2sqr(group_centroid.data(), dimension) << std::endl;
+
+                    std::cout << "Checking base norm distance: " << std::endl;
+                    float * base_vector = base_dataset.data() + origin_ids[group_id][m] * dimension;
+                    std::cout << "Using: " << base_norms[m] << " Groundtruth: " << faiss::fvec_norm_L2sqr(base_vector, dimension) << std::endl;
+
+                    std::cout << "Checking final distance: " << std::endl;
+                    faiss::fvec_madd(dimension, base_vector, -1, query, distance_vector.data());
+                    std::cout << "Using: " << dist << " Groundtruth: " << faiss::fvec_norm_L2sqr(distance_vector.data(), dimension) << std::endl;
+                    std::cout << "The proportion of error on final distance: " << (faiss::fvec_norm_L2sqr(distance_vector.data(), dimension) - dist) / dist << std::endl;
+
+                    if (m == 10)
+                        exit(0);
+                        
                     if (grountruth_set.count(this->origin_ids[group_id][m]) != 0)
                         visited_gt ++;
                     if (dist < query_search_dists[0]){
