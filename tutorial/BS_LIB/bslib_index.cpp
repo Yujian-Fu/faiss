@@ -645,7 +645,7 @@ namespace bslib{
                 this->norm_pq.decode(base_norm_codes[group_id].data(), base_norms.data(), group_size);
                 const uint8_t * code = base_codes[group_id].data();
 
-                std::cout << "Search in group: " << group_id << std::endl;
+                //std::cout << "Search in group: " << group_id << std::endl;
                 for (size_t m = 0; m < group_size; m++){
                     float term2 = base_norms[m];
                     float term3 = 2 * pq_L2sqr(code + m * code_size);
@@ -655,8 +655,9 @@ namespace bslib{
                     std::vector<float> distance_vector(dimension);
                     faiss::fvec_madd(dimension, query, -1, base_vector, distance_vector.data());
                     float actual_dist = faiss::fvec_norm_L2sqr(distance_vector.data(), dimension);
-                    std::cout << this->origin_ids[group_id][m] <<" "<< dist << " " << actual_dist << " " << abs(dist - actual_dist) / actual_dist << "     ";
-                    
+                    //std::cout << this->origin_ids[group_id][m] <<" "<< dist << " " << actual_dist << " " << abs(dist - actual_dist) / actual_dist << "     ";
+                    std::cout << dist << ",";
+
                     //std::cout << group_id << " " << this->origin_ids[group_id][m] << " " << dist << " "; 
                     
                     //std::cout << "Labels: " << this->origin_ids[group_id][m] << " Distance: " << dist << " " << q_c_dist << " " << centroid_norms[group_id] << " " << term2 << " " << term3 << " " << " Query search result: ";
