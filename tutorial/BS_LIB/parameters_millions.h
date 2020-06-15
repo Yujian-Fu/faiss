@@ -11,6 +11,7 @@ const std::string index_type[layers] = {"VQ", "VQ"};
 const uint32_t ncentroids[layers] = {100, 50};
 const char * path_quantizers = "/home/y/yujianfu/ivf-hnsw/models_VQ_VQ/SIFT1M/quantizer_100_50.qt";
 const bool use_subset = false;
+const bool pq_use_subset = true;
 
 //For train PQ
 const size_t bytes_per_code = 16;

@@ -3,8 +3,9 @@
 
 namespace bslib{
 
-    Bslib_Index::Bslib_Index(const size_t dimension, const size_t layers, const std::string * index_type, const bool use_subset):
+    Bslib_Index::Bslib_Index(const size_t dimension, const size_t layers, const std::string * index_type, const bool use_subset, const bool pq_use_subset):
         dimension(dimension), layers(layers){
+            this->pq_use_subset = pq_use_subset;
             this->use_subset = use_subset;
             this->index_type.resize(layers);
 
@@ -96,7 +97,7 @@ namespace bslib{
             for (size_t i = 0; i < subnt * dimension; i++){
                 this->train_data[i] = train_subset[i];
             }
-            this->nt = subnt;
+            this->nt = this->subnt;
             CheckResult<float>(this->train_data.data(), this->dimension);
         }
 
@@ -160,20 +161,21 @@ namespace bslib{
             this->train_data.resize(this-> nt * dimension);
             std::ifstream learn_input(path_learn, std::ios::binary);
             readXvecFvec<learn_data_type>(learn_input, this->train_data.data(), this->dimension, this->nt, true);
-
-            if (this->use_subset){
-                std::cout << "Using subset for training " << std::endl;
-                assert (this->nt != this->subnt);
-                std::vector<float> train_subset(subnt * dimension);
-                RandomSubset(this->train_data.data(), train_subset.data(), dimension, this->nt, this->subnt);
-                train_data.resize(subnt * dimension);
-                train_data_idxs.resize(subnt);
-                for (size_t i = 0; i < subnt * dimension; i++){
-                    this->train_data[i] = train_subset[i];
-                }
-                this->nt = this->subnt;
-            }
         }
+
+        if (this->pq_use_subset && this->nt != this->subnt){
+            std::cout << "Using subset for pq training " << std::endl;
+            assert (this->nt != this->subnt);
+            std::vector<float> train_subset(subnt * dimension);
+            RandomSubset(this->train_data.data(), train_subset.data(), dimension, this->nt, this->subnt);
+            train_data.resize(subnt * dimension);
+            train_data_idxs.resize(subnt);
+            for (size_t i = 0; i < subnt * dimension; i++){
+                this->train_data[i] = train_subset[i];
+            }
+            this->nt = this->subnt;
+        }
+
         std::cout << "Initilizing index " << std::endl;
         this->pq = faiss::ProductQuantizer(this->dimension, this->M, this->nbits);
         this->norm_pq = faiss::ProductQuantizer(1, this->norm_M, this->nbits);

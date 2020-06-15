@@ -21,6 +21,7 @@ struct Bslib_Index{
     size_t nt; //Initialized in constructer by 0, assigned in main
     size_t subnt; //Initialized in constructer by 0, assigned in main 
     bool use_subset;
+    bool pq_use_subset;
 
     size_t M; // Initialized by training pq
     size_t norm_M;
@@ -51,7 +52,7 @@ struct Bslib_Index{
 
 
 
-    explicit Bslib_Index(const size_t dimension, const size_t layers, const std::string * index_type, const bool use_subset);
+    explicit Bslib_Index(const size_t dimension, const size_t layers, const std::string * index_type, const bool use_subset, const bool pq_use_subset);
 
     void build_quantizers(const uint32_t * ncentroids, const char * path_quantizers, const char * path_learn);
     

@@ -39,7 +39,7 @@ int main(){
     //Initialize the index
     ShowMessage("Initializing the index");
     Trecorder.reset();
-    Bslib_Index * index = new Bslib_Index(dimension, layers, index_type, use_subset);
+    Bslib_Index * index = new Bslib_Index(dimension, layers, index_type, use_subset, pq_use_subset);
     index->nt = nt;
     index->subnt = subnt;
 
