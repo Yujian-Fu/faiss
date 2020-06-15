@@ -726,9 +726,6 @@ namespace bslib{
                 }
             }
 
-            float recall = float(correct) / result_k;
-            //std::cout << i << " th recall: " << recall << std::endl;
-            
            overall_proportion += float(visited_gt) / result_k;
             time_consumption[this->layers]  = Trecorder.getTimeConsumption();
 
