@@ -3,6 +3,7 @@
 #include "LQ_quantizer.h"
 #include "utils.h"
 #include <unordered_set>
+#include <algorithm>
 
 #define MAX_DIST 1e9
 #define INVALID_ID -1
