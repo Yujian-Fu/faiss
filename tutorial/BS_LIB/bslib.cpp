@@ -188,10 +188,12 @@ int main(){
     
     index->search(nq, result_k, queries.data(), query_distances.data(), query_labels.data(), keep_space, groundtruth.data());
     
+    /*
     for (size_t i = 0; i < nq * result_k;i++){
         std::cout << query_labels[i] << " " << query_distances[i] << " ";
     }
     std::cout << std::endl;
+    */
     
     std::cout << "The qps for searching is: " << Trecorder.getTimeConsumption() / nq << " us " << std::endl;
     message = "Finish Search";

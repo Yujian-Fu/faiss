@@ -643,6 +643,31 @@ namespace bslib{
                     float term2 = base_norms[m];
                     float term3 = 2 * pq_L2sqr(code + m * code_size);
                     float dist = term1 + term2 - term3;
+
+                    std::cout << "Checking the pq code " << std::endl;
+                    size_t nb = 1000000;
+                    std::vector<float> base_dataset(dimension * nb);
+                    std::ifstream base_input("/home/y/yujianfu/ivf-hnsw/data/SIFT1M/sift_base.fvecs", std::ios::binary);
+                    readXvecFvec<float>(base_input, base_dataset.data(), dimension, nb);
+
+                    float * base_vector = base_dataset.data() + this->origin_ids[group_id][m] * dimension;
+                    std::vector<float> centroid_vector(dimension);
+                    this->lq_quantizer_index[0].compute_final_centroid(group_id, centroid_vector.data());
+                    std::vector<float> distance_vector(dimension);
+                    faiss::fvec_madd(dimension, base_vector, -1, centroid_vector.data(), distance_vector.data());
+                    std::vector<uint8_t> pq_code_vector(code_size);
+                    this->pq.compute_code(distance_vector.data(), pq_code_vector.data());
+                    std::cout << "The groundtruth vector: " << std::endl;
+                    for (size_t temp =0; temp < group_size; temp++){
+                        std::cout << pq_code_vector[temp] << " ";
+                    }
+                    std::cout << std::endl;
+                    std::cout << "The stored vector: " << std::endl;
+                    for (size_t temp =0; temp < group_size; temp++){
+                        std::cout << code[m * code_size + temp] << " ";
+                    }
+                    std::cout << std::endl;
+                    exit(0);
                     
                     //std::cout << group_id << " " << this->origin_ids[group_id][m] << " " << dist << " "; 
                     
