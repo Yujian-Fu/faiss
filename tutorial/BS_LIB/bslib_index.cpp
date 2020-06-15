@@ -117,8 +117,8 @@ namespace bslib{
                 ShowMessage("Adding VQ quantizer");
                 bool update_idxs = (i == layers-1) ? false:true;
                 add_vq_quantizer(nc_upper, nc_per_group, update_idxs);
-                std::cout << "VQ quantizer added, check it " << std::endl;
-                std::cout << "The vq quantizer size is: " <<  vq_quantizer_index.size() << " the num of quantizers: " << vq_quantizer_index[vq_quantizer_index.size()-1].quantizers.size();
+                std::cout << i << "th VQ quantizer added, check it " << std::endl;
+                std::cout << "The vq quantizer size is: " <<  vq_quantizer_index.size() << " the num of quantizers (groups): " << vq_quantizer_index[vq_quantizer_index.size()-1].quantizers.size();
             }
             else if(index_type[i] == "LQ"){
                 assert (i >= 1);
