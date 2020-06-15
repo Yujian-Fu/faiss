@@ -690,7 +690,7 @@ namespace bslib{
             std::vector<idx_t> actual_dist_index(visited_vectors);
             x = 0;
             std::iota(actual_dist_index.begin(), actual_dist_index.end(), x++);
-            std::sort( actual_dist_index.begin(),actual_dist_index.end(), [&](int i,int j){return query_search_dists[i]<query_search_dists[j];} );
+            std::sort( actual_dist_index.begin(),actual_dist_index.end(), [&](int i,int j){return query_actual_dists[i]<query_actual_dists[j];} );
 
 
 
