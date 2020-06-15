@@ -676,7 +676,7 @@ namespace bslib{
                         sum_product += recovered_x[temp] * query[temp];
                     }
                     std::cout << "The computed product: " << 2 * sum_product << std::endl;
-                    std::cout << "The origin term3: " << 2 * term3 << std::endl;
+                    std::cout << "The origin term3: " << term3 << std::endl;
                     if (m == 3)
                     exit(0);
                     
