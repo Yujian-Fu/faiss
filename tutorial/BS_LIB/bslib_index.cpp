@@ -678,7 +678,7 @@ namespace bslib{
                         faiss::maxheap_pop(result_k, query_search_dists.data(), query_search_labels.data());
                         faiss::maxheap_push(result_k, query_search_dists.data(), query_search_labels.data(), dist, this->origin_ids[group_id][m]);
                     }
-                    std::cout << this->origin_ids[group_id][m] << "," << dist << ",";
+                    std::cout << this->origin_ids[group_id][m] << "," << actual_dist << ",";
                 }
                 visited_vectors += group_size;
                 if (visited_vectors > this->max_visited_vectors)
@@ -688,7 +688,7 @@ namespace bslib{
             
             std::cout << "The searching results: " << std::endl;
             for (size_t j = 0; j < result_k; j ++){
-                std::cout << query_search_labels[j] << "," << query_search_dists[j] << ",";
+                std::cout << actual_search_labels[j] << "," << actual_search_dists[j] << ",";
             }
             std::cout << std::endl;
             exit(0);
