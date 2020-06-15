@@ -645,7 +645,7 @@ namespace bslib{
                 this->norm_pq.decode(base_norm_codes[group_id].data(), base_norms.data(), group_size);
                 const uint8_t * code = base_codes[group_id].data();
 
-
+                std::cout << "Search in group: " << group_id << std::endl;
                 for (size_t m = 0; m < group_size; m++){
                     float term2 = base_norms[m];
                     float term3 = 2 * pq_L2sqr(code + m * code_size);
@@ -655,7 +655,7 @@ namespace bslib{
                     std::vector<float> distance_vector(dimension);
                     faiss::fvec_madd(dimension, query, -1, base_vector, distance_vector.data());
                     float actual_dist = faiss::fvec_norm_L2sqr(distance_vector.data(), dimension);
-                    std::cout << dist << " " << actual_dist << " " << abs(dist - actual_dist) / actual_dist << "  ";
+                    std::cout << dist << " " << actual_dist << " " << abs(dist - actual_dist) / actual_dist << "  " << std::endl;
                     
                     //std::cout << group_id << " " << this->origin_ids[group_id][m] << " " << dist << " "; 
                     
@@ -675,15 +675,26 @@ namespace bslib{
                 if (visited_vectors > this->max_visited_vectors)
                     break;
             }
+            std::cout << std::endl;
 
+            std::cout << "The search results: " << std::endl;
             for (size_t temp = 0; temp < result_k; temp++){
-                size_t base_vector_id = groundtruth[i * 100 + temp];
-
+                size_t base_vector_id = query_search_labels[temp];
                 float * base_vector = base_dataset.data() + base_vector_id * dimension;
                 std::vector<float> distance_vector(dimension);
                 faiss::fvec_madd(dimension, query, -1, base_vector, distance_vector.data());
                 float actual_dist = faiss::fvec_norm_L2sqr(distance_vector.data(), dimension);
-                std::cout << query_search_dists[temp] << " " << actual_dist << " " << abs(query_search_dists[temp]  - actual_dist) / actual_dist << "  ";
+                std::cout << base_vector_id << query_search_dists[temp] << " " << actual_dist << " " << abs(query_search_dists[temp]  - actual_dist) / actual_dist << "  " << std::endl;
+            }
+
+            std::cout << "The groundtruth: " << std::endl;
+            for (size_t temp = 0; temp < result_k; temp++){
+                size_t base_vector_id = groundtruth[i * 100 + temp];
+                float * base_vector = base_dataset.data() + base_vector_id * dimension;
+                std::vector<float> distance_vector(dimension);
+                faiss::fvec_madd(dimension, query, -1, base_vector, distance_vector.data());
+                float actual_dist = faiss::fvec_norm_L2sqr(distance_vector.data(), dimension);
+                std::cout << base_vector_id << " " << actual_dist << " " << std::endl;
             }
 
             exit(0);
