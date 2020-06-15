@@ -518,7 +518,7 @@ namespace bslib{
         for (size_t i = 0; i < layers+1; i++){avg_time_consumption[i] = 0;}
         float avg_query_centroid_dist = 0;
 
-#pragma omp parallel for
+//#pragma omp parallel for
         for (size_t i = 0; i < n; i++){
             std::vector<float> time_consumption(layers+1);
             time_recorder Trecorder = time_recorder();
@@ -678,21 +678,21 @@ namespace bslib{
                         faiss::maxheap_pop(result_k, query_search_dists.data(), query_search_labels.data());
                         faiss::maxheap_push(result_k, query_search_dists.data(), query_search_labels.data(), dist, this->origin_ids[group_id][m]);
                     }
-                    //std::cout << this->origin_ids[group_id][m] << "," << dist << ",";
+                    std::cout << this->origin_ids[group_id][m] << "," << dist << ",";
                 }
                 visited_vectors += group_size;
                 if (visited_vectors > this->max_visited_vectors)
                     break;
             }
 
-            /*
+            
             std::cout << std::endl;
             for (size_t j = 0; j < result_k; j ++){
                 std::cout << query_search_dists[j] << ",";
             }
             std::cout << std::endl;
             exit(0);
-            */ 
+            
             
             for (size_t j = 0; j < result_k; j++){
                 query_dists[i * result_k + j] = query_search_dists[j];
