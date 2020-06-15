@@ -605,7 +605,7 @@ namespace bslib{
                 group_dists.resize(keep_result_space);
 
                 keep_k_min(search_space, keep_result_space, result_dists.data(), result_labels.data(), group_dists.data(), group_idxs.data());
-                time_consumption[j] = Trecorder.getTimeConsumption() / (search_space / group_size);
+                time_consumption[j] = Trecorder.getTimeConsumption();
                 Trecorder.reset();
             }
 
@@ -671,29 +671,6 @@ namespace bslib{
                     query_actual_dists[visited_vectors] = actual_dist;
                     /**********************************************/
 
-
-                    if ((i == 2 && origin_ids[group_id][m] == 80543)){
-
-
-                        std::cout << term1 << " " << term2 << " " << term3 << " " << std::endl;
-                        std::vector<uint8_t> vector_codes(this->code_size);
-                        std::vector<float> group_centroid(dimension);
-                        this->lq_quantizer_index[0].compute_final_centroid(group_id, group_centroid.data());
-                        std::vector<float> distance_vector(dimension);
-                        faiss::fvec_madd(dimension, base_vector.data(), -1, group_centroid.data(), distance_vector.data());
-                        this->pq.compute_code(distance_vector.data(), vector_codes.data());
-                        for (size_t temp = 0; temp < code_size; temp++){std::cout << float(vector_codes[temp]) << " ";} 
-                        std::cout << std::endl;
-                        for (size_t temp = 0; temp < code_size; temp++){std::cout << float(code[m * code_size + temp]) << " ";}
-                        std::cout << std::endl;
-                        float product_sum = 0;
-                        std::vector<float> reconstructed_x(dimension);
-                        this->pq.decode(vector_codes.data(), reconstructed_x.data());
-                        for (size_t temp = 0; temp < dimension; temp++){product_sum += reconstructed_x[temp]*query[temp];}
-                        std::cout << term3 / 2 << " " << product_sum << std::endl;
-                    }
-
-
                     query_search_labels[visited_vectors] = origin_ids[group_id][m];
                     visited_vectors ++;
 
@@ -749,23 +726,8 @@ namespace bslib{
                 }
             }
 
-
             float recall = float(correct) / result_k;
             //std::cout << i << " th recall: " << recall << std::endl;
-            if (recall < 0){
-                for (size_t temp = 0; temp < 300; temp++){
-                    std::cout << query_search_labels[search_dist_index[temp]] << " " << query_search_dists[search_dist_index[temp]] << " ";
-                }
-                std::cout << std::endl;
-                for (size_t temp = 0; temp < 300; temp ++){
-                    std::cout << query_search_labels[actual_dist_index[temp]] << " " << query_actual_dists[actual_dist_index[temp]] << " ";
-                }
-                std::cout << std::endl;
-                for (size_t temp = 0; temp < 100; temp++){
-                    std::cout << groundtruth[i * 100 + temp] << " ";
-                }
-                std::cout << std::endl;
-            }
             
            overall_proportion += float(visited_gt) / result_k;
             time_consumption[this->layers]  = Trecorder.getTimeConsumption();
@@ -1006,6 +968,23 @@ faiss::fvec_madd(dimension, base_vector, -1, query, distance_vector.data());
 std::cout << "Using: " << dist << " Groundtruth: " << faiss::fvec_norm_L2sqr(distance_vector.data(), dimension) << std::endl;
 std::cout << "The proportion of error on final distance: " << (faiss::fvec_norm_L2sqr(distance_vector.data(), dimension) - dist) / dist << std::endl;
 
+std::cout << "Checking the PQ code " << std::endl;
+std::vector<uint8_t> vector_codes(this->code_size);
+std::vector<float> group_centroid(dimension);
+this->lq_quantizer_index[0].compute_final_centroid(group_id, group_centroid.data());
+std::vector<float> distance_vector(dimension);
+faiss::fvec_madd(dimension, base_vector.data(), -1, group_centroid.data(), distance_vector.data());
+this->pq.compute_code(distance_vector.data(), vector_codes.data());
+for (size_t temp = 0; temp < code_size; temp++){std::cout << float(vector_codes[temp]) << " ";} 
+std::cout << std::endl;
+for (size_t temp = 0; temp < code_size; temp++){std::cout << float(code[m * code_size + temp]) << " ";}
+std::cout << std::endl;
+std::cout << "Checking the product and term3 " << std::endl;
+float product_sum = 0;
+std::vector<float> reconstructed_x(dimension);
+this->pq.decode(vector_codes.data(), reconstructed_x.data());
+for (size_t temp = 0; temp < dimension; temp++){product_sum += reconstructed_x[temp]*query[temp];}
+std::cout << term3 / 2 << " " << product_sum << std::endl;
 if (m == 10)
     exit(0);
     */
