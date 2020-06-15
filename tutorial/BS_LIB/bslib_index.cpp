@@ -649,6 +649,7 @@ namespace bslib{
                     float term3 = 2 * pq_L2sqr(code + m * code_size);
                     float dist = term1 + term2 - term3;
 
+                    /*
                     size_t nb = 1000000;
                     std::vector<float> base_dataset(dimension * nb);
                     std::ifstream base_input("/home/y/yujianfu/ivf-hnsw/data/SIFT1M/sift_base.fvecs", std::ios::binary);
@@ -675,6 +676,7 @@ namespace bslib{
 
                     if (m == 10)
                         exit(0);
+                    */
 
                     if (grountruth_set.count(this->origin_ids[group_id][m]) != 0)
                         visited_gt ++;
