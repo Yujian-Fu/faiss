@@ -672,7 +672,7 @@ namespace bslib{
                     /**********************************************/
 
 
-                    if (i == 2 && origin_ids[group_id][m] == 80543){
+                    if ((i == 2 && origin_ids[group_id][m] == 80543) || (i == 2 && origin_ids[group_id][m] == 408855)){
                         std::cout << term1 << " " << term2 << " " << term3 << " " << std::endl;
                         std::vector<uint8_t> vector_codes(this->code_size);
                         this->pq.compute_code(base_vector.data(), vector_codes.data());
