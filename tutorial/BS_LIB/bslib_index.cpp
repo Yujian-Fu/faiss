@@ -510,6 +510,10 @@ namespace bslib{
     void Bslib_Index::search(size_t n, size_t result_k, float * queries, float * query_dists, faiss::Index::idx_t * query_ids, size_t * keep_space, uint32_t * groundtruth){
 #pragma omp parallel for
         for (size_t i = 0; i < n; i++){
+            std::unordered_set<uint32_t> grountruth_set;
+            for (size_t j = 0; j < result_k; j++)
+                grountruth_set.insert(groundtruth[i * 100 + j]);
+
             const float * query = queries + i * dimension;
 
             std::vector<idx_t> group_idxs(1);
@@ -588,9 +592,7 @@ namespace bslib{
 
             }
 
-
             //std::cout << "Finished assigned query data, start computing the distance to base vectors" << std::endl;
-
             assert((n_vq + n_lq) == this->layers);
             this->pq.compute_inner_prod_table(query, this->precomputed_table.data());
             size_t visited_vectors = 0;
@@ -598,7 +600,7 @@ namespace bslib{
             std::vector<faiss::Index::idx_t> query_search_labels(2 * result_k);
             faiss::maxheap_heapify(result_k, query_search_dists.data(), query_search_labels.data());
             
-
+            size_t visited_gt = 0;
             for (size_t j = 0; j < keep_result_space; j++){
 
                 
@@ -621,6 +623,8 @@ namespace bslib{
                     float term2 = base_norms[m];
                     float term3 = 2 * pq_L2sqr(code + m * code_size);
                     float dist = term1 + term2 - term3;
+                    if (grountruth_set.count(this->origin_ids[group_id][m]) != 0)
+                        visited_gt ++;
                     if (dist < query_search_dists[0]){
                         faiss::maxheap_pop(result_k, query_search_dists.data(), query_search_labels.data());
                         faiss::maxheap_push(result_k, query_search_dists.data(), query_search_labels.data(), dist, this->origin_ids[group_id][m]);
@@ -636,6 +640,7 @@ namespace bslib{
                 query_ids[i * result_k + j] = query_search_labels[j];
             }
 
+            std::cout << "The gt proportion visited is: " << float(visited_gt) / result_k << std::endl;
         }
     }
 

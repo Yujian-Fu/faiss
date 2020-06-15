@@ -15,20 +15,23 @@ namespace bslib{
                 train_set[idx].push_back(train_data[i*dimension + j]);
         }
 
-        std::cout << "Building all_quantizer and group quantizers for vq_quantizer " << std::endl;
+        this->quantizers.resize(this->nc_upper);
+        std::cout << "Building group quantizers for vq_quantizer " << std::endl;
+#pragma omp parallel for
         for (size_t i = 0; i < nc_upper; i++){
             std::vector<float> centroids(dimension * nc_per_group);
             size_t nt_sub = train_set[i].size() / this->dimension;
             faiss::kmeans_clustering(dimension, nt_sub, nc_per_group, train_set[i].data(), centroids.data());
             faiss::IndexFlatL2 centroid_quantizer(dimension);
             centroid_quantizer.add(nc_per_group, centroids.data());
-            this->quantizers.push_back(centroid_quantizer);
+            this->quantizers[i] = centroid_quantizer;
         }
 
         std::cout << "finished computing centoids" <<std::endl;
         if (update_idxs){
             std::cout << "Finding the centroid idxs for train vectors for futher quantizer construction " << std::endl;
             //Find the centroid idxs for train vectors
+#pragma omp parallel for
             for (size_t i = 0; i < this->nc_upper; i++){
                 size_t base_idx = CentroidDistributionMap[i];
                 size_t group_size = train_set[i].size() / dimension;

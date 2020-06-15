@@ -78,6 +78,7 @@ namespace bslib{
         std::cout << "The size of upper_centroids: " << this->upper_centroids.size() / this->dimension << std::endl;
         std::cout << "The size if nn_centroid_idxs: " << nn_centroid_idxs.size() << std::endl;
 
+#pragma omp parallel for
         for (size_t i = 0; i < nc_upper; i++){
             std::vector<float> centroid_vectors(nc_per_group * dimension);
             const float * centroid = this->upper_centroids.data() + i * dimension;
@@ -86,9 +87,7 @@ namespace bslib{
                 faiss::fvec_madd(dimension, nn_centroid, -1.0, centroid, centroid_vectors.data()+ j * dimension);
             }
             size_t group_size = train_set[i].size() / this->dimension;
-            if ( i % 100 == 0)
-            std::cout << "Computing alpha for [ " << i << " / " << nc_upper << " ]" << std::endl;
-            this->alphas[i] = compute_alpha(centroid_vectors.data(), train_set[i].data(), centroid, nn_centroid_dists[i].data(), group_size);
+            this->alphas[i] = compute_alpha(centroid_vectors.data(), train_set[i].data(), centroid, this->nn_centroid_dists[i].data(), group_size);
         }
         
         std::cout << "finished computing centoids" <<std::endl;
@@ -96,6 +95,7 @@ namespace bslib{
         if (update_idxs){
             std::cout << "Finding the centroid idxs for train vectors for futher quantizer construction " << std::endl;
 
+#pragma omp parallel for
             for (size_t i = 0; i < this->nc_upper; i++){
                 std::vector<float> final_centroids(this->nc_per_group * dimension);
                 idx_t base_idx = CentroidDistributionMap[i];
