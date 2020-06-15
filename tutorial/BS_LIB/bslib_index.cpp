@@ -352,7 +352,7 @@ namespace bslib{
             assert(n_lq + n_vq == i);
             size_t group_size;
             if (index_type[i] == "VQ"){
-                std::cout << "searching in VQ layer" << std::endl;
+                //std::cout << "searching in VQ layer" << std::endl;
                 group_size = vq_quantizer_index[n_vq].nc_per_group;
                 result_dists.resize(group_size * n);
                 vq_quantizer_index[n_vq].search_in_group(n, assign_data, group_idxs.data(), result_dists.data());
@@ -366,7 +366,7 @@ namespace bslib{
             }
 
             else if(index_type[i] == "LQ"){
-                std::cout << "searching in LQ layer" << std::endl;
+                //std::cout << "searching in LQ layer" << std::endl;
                 group_size = lq_quantizer_index[n_lq].nc_per_group;
                 result_dists.resize(group_size * n);
                 lq_quantizer_index[n_lq].search_in_group(n, assign_data, queries_upper_centroid_dists, group_idxs.data(), result_dists.data());
@@ -385,14 +385,14 @@ namespace bslib{
             }
 
             if (i < this->layers-1 && index_type[i+1] == "LQ"){
-                std::cout << "The next layer is LQ, load the query centroid distsnaces" << std::endl;
+                //std::cout << "The next layer is LQ, load the query centroid distsnaces" << std::endl;
                 for (size_t j = 0; j < n; j++){
                     for (size_t m = 0; m < group_size; m++)
                         queries_upper_centroid_dists[j].insert(std::pair<idx_t, float>(result_labels[j*group_size+m], result_dists[j*group_size+m]));
                 }
             }
 
-            std::cout << "Choosing k instances with smallest distances " << std::endl;
+            //std::cout << "Choosing k instances with smallest distances " << std::endl;
 
             //clock_t starttime = clock();
             for (size_t j = 0; j < n; j++){
@@ -671,7 +671,6 @@ namespace bslib{
             for (size_t j = 0; j < layers + 1; j++){
                 avg_time_consumption[j] += time_consumption[j];    
             }
-            std::cout << std::endl;
         }
 
         std::cout << "The time consumption: ";
