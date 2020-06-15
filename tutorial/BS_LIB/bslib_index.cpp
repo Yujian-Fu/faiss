@@ -508,7 +508,7 @@ namespace bslib{
       */
 
     void Bslib_Index::search(size_t n, size_t result_k, float * queries, float * query_dists, faiss::Index::idx_t * query_ids, size_t * keep_space, uint32_t * groundtruth){
-//#pragma omp parallel for
+#pragma omp parallel for
 /*
         std::cout << "Check the distribution of group:" << std::endl;
         for (size_t i = 0; i < this->final_nc; i ++){
@@ -621,11 +621,12 @@ namespace bslib{
             std::vector<faiss::Index::idx_t> query_search_labels(2 * result_k);
             faiss::maxheap_heapify(result_k, query_search_dists.data(), query_search_labels.data());
             
-
+            /*
             size_t nb = 1000000;
             std::vector<float> base_dataset(dimension * nb);
             std::ifstream base_input("/home/y/yujianfu/ivf-hnsw/data/SIFT1M/sift_base.fvecs", std::ios::binary);
             readXvecFvec<float>(base_input, base_dataset.data(), dimension, nb);
+            */
 
             for (size_t j = 0; j < keep_result_space; j++){
 
@@ -651,12 +652,14 @@ namespace bslib{
                     float term3 = 2 * pq_L2sqr(code + m * code_size);
                     float dist = term1 + term2 - term3;
 
+                    /*
                     float * base_vector = base_dataset.data() + this->origin_ids[group_id][m] * dimension;
                     std::vector<float> distance_vector(dimension);
                     faiss::fvec_madd(dimension, query, -1, base_vector, distance_vector.data());
                     float actual_dist = faiss::fvec_norm_L2sqr(distance_vector.data(), dimension);
-                    //std::cout << this->origin_ids[group_id][m] <<" "<< dist << " " << actual_dist << " " << abs(dist - actual_dist) / actual_dist << "     ";
-                    //std::cout << dist << ",";
+                    std::cout << this->origin_ids[group_id][m] <<" "<< dist << " " << actual_dist << " " << abs(dist - actual_dist) / actual_dist << "     ";
+                    std::cout << dist << ",";
+                    */
 
                     //std::cout << group_id << " " << this->origin_ids[group_id][m] << " " << dist << " "; 
                     
