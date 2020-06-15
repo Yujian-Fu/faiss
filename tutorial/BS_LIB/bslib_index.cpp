@@ -686,9 +686,9 @@ namespace bslib{
             }
 
             
-            std::cout << std::endl;
+            std::cout << "The searching results: " << std::endl;
             for (size_t j = 0; j < result_k; j ++){
-                std::cout << query_search_dists[j] << ",";
+                std::cout << query_search_labels[j] << "," << query_search_dists[j] << ",";
             }
             std::cout << std::endl;
             exit(0);
