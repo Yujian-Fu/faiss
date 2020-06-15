@@ -482,7 +482,7 @@ namespace bslib{
         return result;
     }
 
-    idx_t Bslib_Index::get_next_group_idx(size_t keep_result_space, idx_t * group_ids, float * query_group_dists){
+    void Bslib_Index::get_next_group_idx(size_t keep_result_space, idx_t * group_ids, float * query_group_dists, float * result_idx_dist){
         idx_t min_label = INVALID_ID;
         float min_dist = MAX_DIST;
         size_t min_i = -1;
@@ -500,7 +500,8 @@ namespace bslib{
             std::cout << std::endl <<  "No enough group ids for: " << keep_result_space << std::endl;
             exit(0);
         }
-        return min_label;
+        result_idx_dist[0] = min_label;
+        result_idx_dist[1] = min_dist;
     }
 
      /*
@@ -625,11 +626,11 @@ namespace bslib{
             size_t visited_gt = 0;
             for (size_t j = 0; j < keep_result_space; j++){
 
+                std::vector<float> result_idx_dist(2);
+                get_next_group_idx(keep_result_space, group_idxs.data(), group_dists.data(), result_idx_dist.data());
                 
-                size_t group_id = get_next_group_idx(keep_result_space, group_idxs.data(), group_dists.data());
-
-
-                float q_c_dist = group_dists[j];
+                size_t group_id = result_idx_dist[0];
+                float q_c_dist = result_idx_dist[1];
 
                 size_t group_size = this->origin_ids[group_id].size();
                 assert(group_size == this->base_codes[group_id].size() / this->code_size);
