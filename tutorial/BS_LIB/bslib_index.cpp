@@ -658,15 +658,16 @@ namespace bslib{
                     std::vector<uint8_t> pq_code_vector(code_size);
                     this->pq.compute_code(distance_vector.data(), pq_code_vector.data());
                     std::cout << "The groundtruth vector: " << std::endl;
-                    for (size_t temp =0; temp < group_size; temp++){
+                    for (size_t temp =0; temp < code_size; temp++){
                         std::cout << float(pq_code_vector[temp]) << " ";
                     }
                     std::cout << std::endl;
                     std::cout << "The stored vector: " << std::endl;
-                    for (size_t temp =0; temp < group_size; temp++){
+                    for (size_t temp =0; temp < code_size; temp++){
                         std::cout << float(code[m * code_size + temp]) << " ";
                     }
                     std::cout << std::endl;
+                    if (m == 3)
                     exit(0);
                     
                     //std::cout << group_id << " " << this->origin_ids[group_id][m] << " " << dist << " "; 
