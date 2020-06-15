@@ -523,12 +523,12 @@ namespace bslib{
             std::vector<float> time_consumption(layers+1);
             time_recorder Trecorder = time_recorder();
 
-
+            /*
             size_t nb = 1000000;
             std::vector<float> base_dataset(dimension * nb);
             std::ifstream base_input("/home/y/yujianfu/ivf-hnsw/data/SIFT1M/sift_base.fvecs", std::ios::binary);
             readXvecFvec<float>(base_input, base_dataset.data(), dimension, nb);
-
+            */
 
             std::unordered_set<uint32_t> grountruth_set;
             for (size_t j = 0; j < result_k; j++)
