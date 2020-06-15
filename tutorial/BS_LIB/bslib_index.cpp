@@ -511,6 +511,7 @@ namespace bslib{
       */
 
     void Bslib_Index::search(size_t n, size_t result_k, float * queries, float * query_dists, faiss::Index::idx_t * query_ids, size_t * keep_space, uint32_t * groundtruth){
+            float overall_proportion = 0;
 #pragma omp parallel for
         for (size_t i = 0; i < n; i++){
             std::unordered_set<uint32_t> grountruth_set;
@@ -643,8 +644,9 @@ namespace bslib{
                 query_ids[i * result_k + j] = query_search_labels[j];
             }
 
-            std::cout << "The gt proportion visited is: " << float(visited_gt) / result_k << std::endl;
+           overall_proportion += float(visited_gt) / result_k;
         }
+        std::cout << "The avarage groundtruth proportion is: " << overall_proportion / n << std::endl;
     }
 
     void Bslib_Index::write_quantizers(const char * path_quantizer){
