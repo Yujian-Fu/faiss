@@ -518,7 +518,7 @@ namespace bslib{
         for (size_t i = 0; i < layers+1; i++){avg_time_consumption[i] = 0;}
         float avg_query_centroid_dist = 0;
 
-#pragma omp parallel for
+//#pragma omp parallel for
         for (size_t i = 0; i < n; i++){
             std::vector<float> time_consumption(layers+1);
             time_recorder Trecorder = time_recorder();
@@ -727,7 +727,7 @@ namespace bslib{
             }
 
             float recall = float(correct) / result_k;
-            //std::cout << i << " th recall: " << recall << std::endl;
+            std::cout << i << " th recall: " << recall << std::endl;
             if (recall < 0){
                 for (size_t temp = 0; temp < 300; temp++){
                     std::cout << query_search_labels[search_dist_index[temp]] << " " << query_search_dists[search_dist_index[temp]] << " ";
