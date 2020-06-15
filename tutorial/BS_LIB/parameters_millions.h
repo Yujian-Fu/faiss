@@ -32,8 +32,8 @@ const size_t nbatches = nb / batch_size; //1000
 const size_t ngt = 100;
 const size_t nq = 10000;
 const size_t result_k = 10;
-const size_t max_vectors = 10000;
-size_t keep_space[layers] = {20, 5, 10};
+const size_t max_vectors = 5000;
+size_t keep_space[layers] = {10, 5, 10};
 
 bool is_recording = true;
 
