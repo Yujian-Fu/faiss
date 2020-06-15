@@ -629,7 +629,7 @@ namespace bslib{
                 std::vector<float> result_idx_dist(2);
                 get_next_group_idx(keep_result_space, group_idxs.data(), group_dists.data(), result_idx_dist.data());
                 
-                size_t group_id = result_idx_dist[0];
+                uint32_t group_id = result_idx_dist[0];
                 float q_c_dist = result_idx_dist[1];
 
                 size_t group_size = this->origin_ids[group_id].size();
