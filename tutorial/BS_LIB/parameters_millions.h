@@ -11,7 +11,7 @@ const std::string index_type[layers] = {"VQ", "VQ","LQ"};
 const uint32_t ncentroids[layers] = {100, 10, 100};
 const char * path_quantizers = "/home/y/yujianfu/ivf-hnsw/models_VQ_VQ_LQ/SIFT1M/quantizer_100_10_100.qt";
 const bool use_subset = false;
-const bool pq_use_subset = true;
+const bool pq_use_subset = false;
 
 //For train PQ
 const size_t bytes_per_code = 16;
@@ -47,8 +47,8 @@ const char * path_gt =        "/home/y/yujianfu/ivf-hnsw/data/SIFT1M/sift_ground
 const char * path_query =     "/home/y/yujianfu/ivf-hnsw/data/SIFT1M/sift_query.fvecs";
 
 const char * path_record =    "/home/y/yujianfu/ivf-hnsw/models_VQ_VQ_LQ/SIFT1M/recording_100_10_100.txt";
-const char * path_pq =        "/home/y/yujianfu/ivf-hnsw/models_VQ_VQ_LQ/SIFT1M/PQ16_8_100_10_100.pq";
-const char * path_pq_norm =   "/home/y/yujianfu/ivf-hnsw/models_VQ_VQ_LQ/SIFT1M/PQ_NORM16_8_100_10_100.pq";
+const char * path_pq =        "/home/y/yujianfu/ivf-hnsw/models_VQ_VQ_LQ/SIFT1M/PQ16_16_100_10_100.pq";
+const char * path_pq_norm =   "/home/y/yujianfu/ivf-hnsw/models_VQ_VQ_LQ/SIFT1M/PQ_NORM16_16_100_10_100.pq";
 const char * path_idxs =      "/home/y/yujianfu/ivf-hnsw/models_VQ_VQ_LQ/SIFT1M/base_idxs_100_10_100.ivecs";
-const char * path_index =     "/home/y/yujianfu/ivf-hnsw/models_VQ_VQ_LQ/SIFT1M/PQ16_8_100_10_100.index";
+const char * path_index =     "/home/y/yujianfu/ivf-hnsw/models_VQ_VQ_LQ/SIFT1M/PQ16_16_100_10_100.index";
 
