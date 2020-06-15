@@ -231,7 +231,7 @@ int main(){
         }
     }
 
-    std::cout << "The recall is: " << float(correct) / (result_k * nq) << std::endl;
+    std::cout << "The recall is: " << float(correct) / (result_k * nq) << "with reranking parameter: " << index->reraking_space << std::endl;
 }
 
 
