@@ -723,19 +723,12 @@ namespace bslib{
             for (size_t j = 0; j < re_ranking_range; j++){
                 reranking_dists[j] = query_actual_dists[search_dist_index[j]];
                 reranking_labels[j] = query_search_labels[search_dist_index[j]];
-                std::cout << query_search_labels[search_dist_index[j]] << " " << query_actual_dists[search_dist_index[j]] << " " << query_search_dists[search_dist_index[j]] << " ";
             }
 
-            std::cout << std::endl;
             std::vector<idx_t> reranking_dist_index(re_ranking_range);
             x = 0;
             std::iota(reranking_dist_index.begin(), reranking_dist_index.end(), x++);
             std::sort(reranking_dist_index.begin(), reranking_dist_index.end(), [&](int i,int j){return reranking_dists[i] < reranking_dists[j];});
-
-            for (size_t j =0; j < re_ranking_range; j++){
-                std::cout <<reranking_labels[reranking_dist_index[j]] << " " << reranking_dists[reranking_dist_index[j]] << " ";
-            }
-            std::cout << std::endl;
 
 
 
