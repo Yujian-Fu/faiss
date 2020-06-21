@@ -42,7 +42,7 @@ f.close()
 #b = a.reshape(-1, d + 4)[:, 4:]
 
 a = np.fromfile(base_set, dtype='float')
-d = a[0]
+d = int(a[0])
 b = a.reshape(-1, d + 1)[:, 1:].copy()
 base_size = b.shape[0]
 print("Base set size is ", base_size)
