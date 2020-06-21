@@ -631,7 +631,7 @@ namespace bslib{
                 keep_k_min(search_space, keep_result_space, result_dists.data(), result_labels.data(), group_dists.data(), group_idxs.data());
                 std::cout << "The result labels are: " << std::endl;
                 for (size_t temp = 0; temp < keep_result_space; temp++){
-                    std::cout << group_idxs[temp] << " ";
+                    std::cout << group_idxs[temp] << " " << group_dists[temp] << " ";
                 }
                 std::cout << std::endl;
                 time_consumption[j] = Trecorder.getTimeConsumption();
