@@ -729,7 +729,7 @@ namespace bslib{
                             std::cout << this->vq_quantizer_index[0].quantizers[0].xb[group_id * dimension + temp] << " ";
                         }
                         std::cout << std::endl;
-                        std::cout << origin_ids[group_id][m] << " " << q_c_dist << " " << centroid_norms[group_id] << " " << term2 << " " << term3 << " " << dist << "     ";
+                        std::cout << origin_ids[group_id][m] << " " << q_c_dist << " " << centroid_norms[group_id] << " " << term2 << " " << term3 << " " << dist << "     " << std::endl;
                     }
                         
                 }
