@@ -79,7 +79,10 @@ namespace bslib{
         for (size_t i = 0; i < n; i++){
             std::cout << "now computing " << i << " ";
             std::vector<float> final_centroid(this->dimension);
-            }
+            compute_final_centroid(labels[i], final_centroid.data());
+            
+        }
+        exit(0);
     }
 
     void VQ_quantizer::recover_residual_group_id(size_t n, const idx_t * labels, const float * residuals, float * x){
