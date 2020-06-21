@@ -10,8 +10,8 @@ const size_t layers = 1;
 const std::string index_type[layers] = {"VQ"};
 const uint32_t ncentroids[layers] = {10000};
 const char * path_quantizers = "/home/y/yujianfu/ivf-hnsw/models_VQ/SIFT1M/quantizer_10000.qt";
-const bool use_subset = true;
-const bool pq_use_subset = true;
+const bool use_subset = false;
+const bool pq_use_subset = false;
 const bool use_reranking = true;
 const size_t reranking_space = 200;
 
