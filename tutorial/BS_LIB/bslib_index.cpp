@@ -247,6 +247,13 @@ namespace bslib{
         //The code is for the residual between base vectors and their final neighbor centroids
         std::vector<uint8_t> batch_codes(n * this->code_size);
         this->pq.compute_codes(residuals.data(), batch_codes.data(), n);
+        std::cout << "The sample codes " << std::endl;
+        for (size_t i = 0; i < 10 ; i++){
+            for (size_t j = 0; j < this->code_size; j++){
+                std::cout << (float)batch_codes[i*code_size + j] << " ";
+            }
+            std::cout << std::endl;
+        }
 
         /*
         Todo: should we use the decoded reconstructed_x for exp? actually we may use
@@ -527,6 +534,11 @@ namespace bslib{
             for (size_t j = 0; j < result_k; j++)
                 grountruth_set.insert(groundtruth[i * 100 + j]);
 
+            for (size_t j = 0; j < result_k; j++){
+                std::cout << groundtruth[i * 100 + j] << " ";
+            }
+            std::cout << std::endl;
+
             const float * query = queries + i * dimension;
 
             std::vector<idx_t> group_idxs(1);
@@ -710,8 +722,10 @@ namespace bslib{
                 for (size_t j = 0; j < result_k; j++){
                     query_dists[i * result_k + j] = reranking_dists[reranking_dist_index[j]];
                     query_ids[i * result_k + j] = reranking_labels[reranking_dist_index[j]];
-                    if (grountruth_set.count(query_ids[i * result_k + j]) != 0)
+                    if (grountruth_set.count(query_ids[i * result_k + j]) != 0){
                         correct ++;
+                        
+                    }
                 }
             }
 
@@ -719,17 +733,34 @@ namespace bslib{
                 for (size_t j = 0; j < result_k; j++){
                     query_dists[i * result_k + j] = query_search_dists[search_dist_index[j]];
                     query_ids[i * result_k + j] = query_search_labels[search_dist_index[j]];
-                    if (grountruth_set.count(query_ids[i * result_k + j]) != 0)
+                    if (grountruth_set.count(query_ids[i * result_k + j]) != 0){
                         correct ++;
+                        std::cout << query_ids[i * result_k + j] << " ";
+                    }
+                        
                 }
+                std::cout << "The visited gt proportion: " << float(visited_gt) / result_k << std::endl;
+                std::cout << "The computed distance, actual distance label, groundtruth_label are " << std::endl;
+                for (size_t i = 0; i < 100; i++){
+                    std::cout << query_search_labels[search_dist_index[i]] << "_" << query_search_dists[search_dist_index[i]] << " ";
+                }
+                std::cout << std::endl;
+
+                for (size_t i = 0; i < 100; i++){
+                    std::cout << query_search_labels[actual_dist_index[i]] << "_" << query_actual_dists[search_dist_index[i]] << " ";
+                }
+                std::cout << std::endl;
             }
 
-           overall_proportion += float(visited_gt) / result_k;
+            overall_proportion += float(visited_gt) / result_k;
             time_consumption[this->layers]  = Trecorder.getTimeConsumption();
 
             avg_visited_vectors += visited_vectors;
             for (size_t j = 0; j < layers + 1; j++){
                 avg_time_consumption[j] += time_consumption[j];    
+            }
+            if (i == 10){
+                exit(0);
             }
         }
 
