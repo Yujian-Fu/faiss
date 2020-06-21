@@ -72,11 +72,13 @@ namespace bslib{
 
     void VQ_quantizer::compute_residual_group_id(size_t n,  const idx_t * labels, const float * x, float * residuals){
         std::cout << "Computing VQ residual for train data " << std::endl;
-#pragma omp parallel for
+//#pragma omp parallel for
         for (size_t i = 0; i < n; i++){
+            
             std::vector<float> final_centroid(dimension);
             compute_final_centroid(labels[i], final_centroid.data());
             faiss::fvec_madd(dimension, x + i * dimension, -1.0, final_centroid.data(), residuals + i * dimension);
+            std::cout << i << " ";
         }
     }
 
