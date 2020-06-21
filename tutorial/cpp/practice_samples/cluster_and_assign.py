@@ -12,7 +12,7 @@ base_set = "/home/y/yujianfu/ivf-hnsw/data/SIFT1M/sift_base.fvecs"
 #b = a.reshape(-1, d + 4)[:, 4:]
 
 a = np.fromfile(learn_set, dtype='float')
-d = a[0]
+d = int(a[0])
 b = a.reshape(-1, d + 1)[:, 1:].copy()
 
 
