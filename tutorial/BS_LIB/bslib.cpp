@@ -4,7 +4,7 @@
 #include <sys/resource.h>
 
 #include "bslib_index.h"
-#include "parameters_VQ_LQ.h"
+#include "parameters_millions.h"
 
 
 using namespace bslib;
@@ -17,7 +17,7 @@ int main(){
 
 /*Prepare the work space*/
     PrepareFolder(folder_model);
-    PrepareFolder((char *) (std::string(folder_model)+"/SIFT1B").c_str());
+    PrepareFolder((char *) (std::string(folder_model)+"/SIFT1M").c_str());
     std::cout << "Preparing work space: " << folder_model << std::endl;
 
     //For recording 

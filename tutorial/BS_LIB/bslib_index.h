@@ -11,7 +11,7 @@
 namespace bslib{
 
 typedef uint32_t idx_t;
-typedef uint8_t learn_data_type;
+typedef float learn_data_type;
 
 struct Bslib_Index{
     size_t dimension; // Initialized in constructer
