@@ -41,11 +41,9 @@ namespace bslib{
 
     void Bslib_Index::encode(size_t n, const float * encode_data, const idx_t * encoded_ids, float * encoded_data){
         if (index_type[layers-1] == "VQ"){
-            std::cout << "Encoding in VQ layer " << std::endl;
             vq_quantizer_index[vq_quantizer_index.size()-1].compute_residual_group_id(n, encoded_ids, encode_data, encoded_data);
         }
         else if(index_type[layers-1] == "LQ"){
-            std::cout << "Encoding in LQ layer " << std::endl;
             lq_quantizer_index[lq_quantizer_index.size()-1].compute_residual_group_id(n, encoded_ids, encode_data, encoded_data);
         }
         else{
@@ -146,7 +144,7 @@ namespace bslib{
                 }
 
                 std::cout << "lq quantizer added, check it " << std::endl;
-                std::cout << "The lq quantizer size is: " <<  lq_quantizer_index.size() << " the num of alphas: " << lq_quantizer_index[lq_quantizer_index.size()-1].alphas.size();
+                std::cout << "The lq quantizer size is: " <<  lq_quantizer_index.size() << " the num of alphas: " << lq_quantizer_index[lq_quantizer_index.size()-1].alphas.size() << std::endl;;
             }
             nc_upper  = nc_upper * nc_per_group;
         }
@@ -256,16 +254,16 @@ namespace bslib{
             }
             std::cout << std::endl;
         }
-        
-
-        std::vector<float> reconstructed_x(n * dimension);
 
         /*
         Todo: should we use the decoded reconstructed_x for exp? actually we may use
         the distance in full precision for exp?
         */
-       
-        decode(n, residuals.data(), encoded_ids, reconstructed_x.data());
+        std::vector<float> decoded_residuals(n * dimension);
+        this->pq.decode(batch_codes.data(), decoded_residuals.data(), n);
+
+        std::vector<float> reconstructed_x(n * dimension);
+        decode(n, decoded_residuals.data(), encoded_ids, reconstructed_x.data());
 
         std::cout << "Compare origin vector and reconstructed codes " << std::endl;
         for (size_t i = 0; i < 10; i++){
@@ -279,7 +277,7 @@ namespace bslib{
         */
         std::vector<float> xnorms (n);
         for (size_t i = 0; i < n; i++){
-            xnorms[i] =  faiss::fvec_norm_L2sqr(data + i * dimension, dimension);
+            xnorms[i] =  faiss::fvec_norm_L2sqr(reconstructed_x.data() + i * dimension, dimension);
         }
 
         std::vector<uint8_t> xnorm_codes (n * norm_code_size);
@@ -859,7 +857,7 @@ namespace bslib{
             }
         }
         std::cout << this->vq_quantizer_index[0].quantizers.size() << std::endl;
-        
+
         quantizer_input.close();
     }
 
