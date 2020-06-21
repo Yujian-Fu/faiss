@@ -589,6 +589,7 @@ namespace bslib{
                             result_labels[m * group_size + n] = group_idxs[m] * group_size + n;
                         }
                     }
+                    std::cout << result_dists[8383] << " " << result_dists[3124] << std::endl;
                     n_vq ++;
                 }
 
@@ -811,7 +812,7 @@ namespace bslib{
             for (size_t j = 0; j < layers + 1; j++){
                 avg_time_consumption[j] += time_consumption[j];    
             }
-            if (i == 10){
+            if (i == 1){
                 exit(0);
             }
         }
