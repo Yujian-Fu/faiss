@@ -91,6 +91,7 @@ int main(){
     else
     {
         index->nt = nt;
+        index->subnt = subnt;
         index->M = bytes_per_code;
         index->norm_M = bytes_per_norm_code;
         index->nbits = nbits;
@@ -115,14 +116,12 @@ int main(){
         Mrecorder.record_memory_usage(record_file,  message);
         Trecorder.print_time_usage(message);
         Trecorder.record_time_usage(record_file, message);
-
     }
     else{
         ShowMessage("Constructing the index");
         index->base_codes.resize(index->final_nc);
         index->base_norm_codes.resize(index->final_nc);
         index->origin_ids.resize(index->final_nc);
-
 
         Trecorder.reset();
         std::ifstream base_input(path_base, std::ios::binary);

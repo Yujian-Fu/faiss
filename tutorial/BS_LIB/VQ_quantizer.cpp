@@ -71,6 +71,7 @@ namespace bslib{
 
 
     void VQ_quantizer::compute_residual_group_id(size_t n,  const idx_t * labels, const float * x, float * residuals){
+        std::cout << "Computing VQ residual for train data " << std::endl;
 #pragma omp parallel for
         for (size_t i = 0; i < n; i++){
             std::vector<float> final_centroid(dimension);
@@ -80,6 +81,7 @@ namespace bslib{
     }
 
     void VQ_quantizer::recover_residual_group_id(size_t n, const idx_t * labels, const float * residuals, float * x){
+        std::cout << "Computing LQ residual for train data " << std::endl;
 #pragma omp parallel for
         for (size_t i = 0; i < n; i++){
             std::vector<float> final_centroid(dimension);

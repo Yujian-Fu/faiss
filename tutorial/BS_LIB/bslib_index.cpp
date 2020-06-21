@@ -163,13 +163,13 @@ namespace bslib{
             readXvecFvec<learn_data_type>(learn_input, this->train_data.data(), this->dimension, this->nt, true);
         }
 
-        if (this->pq_use_subset && this->nt != this->subnt){
+        if (this->pq_use_subset && (this->nt != this->subnt)){
             std::cout << "Using subset for pq training " << std::endl;
             assert (this->nt != this->subnt);
             std::vector<float> train_subset(subnt * dimension);
             RandomSubset(this->train_data.data(), train_subset.data(), dimension, this->nt, this->subnt);
-            train_data.resize(subnt * dimension);
-            train_data_idxs.resize(subnt);
+            train_data.resize(this->subnt * dimension);
+            train_data_idxs.resize(this->subnt);
             for (size_t i = 0; i < subnt * dimension; i++){
                 this->train_data[i] = train_subset[i];
             }
