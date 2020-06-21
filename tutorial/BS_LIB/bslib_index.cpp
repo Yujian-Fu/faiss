@@ -168,8 +168,8 @@ namespace bslib{
             assert (this->nt != this->subnt);
             std::vector<float> train_subset(subnt * dimension);
             RandomSubset(this->train_data.data(), train_subset.data(), dimension, this->nt, this->subnt);
-            train_data.resize(this->subnt * dimension);
-            train_data_idxs.resize(this->subnt);
+            this->train_data.resize(this->subnt * dimension);
+            this->train_data_idxs.resize(this->subnt);
             for (size_t i = 0; i < subnt * dimension; i++){
                 this->train_data[i] = train_subset[i];
             }
@@ -191,7 +191,7 @@ namespace bslib{
         }
         std::cout << std::endl;
 
-        std::cout << "Encoding the train dataset " << std::endl;
+        std::cout << "Encoding the train dataset with " << this->nt << " data points " << std::endl;
         encode(this->nt, this->train_data.data(), group_ids.data(), residuals.data());
         /*
         std::cout << "Checking the residual data " << std::endl;
