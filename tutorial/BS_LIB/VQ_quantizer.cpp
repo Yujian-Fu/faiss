@@ -66,8 +66,7 @@ namespace bslib{
         size_t j = size_t (label / nc_per_group);
         size_t group_label = label - CentroidDistributionMap[j];
         for (size_t i = 0; i < dimension; i++){
-            std::cout << i << " ";
-            final_centroid[i] = this->quantizers[group_label].xb[group_label * this->dimension + i];
+            final_centroid[i] = this->quantizers[j].xb[group_label * this->dimension + i];
         }
     }
 
