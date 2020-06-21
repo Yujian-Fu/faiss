@@ -11,7 +11,6 @@ using namespace bslib;
 
 
 int main(){
-
     memory_recorder Mrecorder = memory_recorder();
     time_recorder Trecorder = time_recorder();
     std::string message;
@@ -35,7 +34,6 @@ int main(){
 
 
 /*Train the residual PQ and norm PQ*/
-
     //Initialize the index
     ShowMessage("Initializing the index");
     Trecorder.reset();
