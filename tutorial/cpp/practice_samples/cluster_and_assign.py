@@ -15,7 +15,7 @@ a = np.fromfile(learn_set, dtype='int32')
 d = a[0]
 b =  a.reshape(-1, d + 1)[:, 1:].copy().view('float32')
 
-print("Dataset dimension is ", d)
+print("Dataset dimension is ", d, " train set size is: ", b.shape[0])
 niter = 20
 verbose = True
 
