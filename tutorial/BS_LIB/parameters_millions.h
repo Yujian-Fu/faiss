@@ -53,4 +53,3 @@ const char * path_pq =        "/home/y/yujianfu/ivf-hnsw/models_VQ/SIFT1M/PQ16_1
 const char * path_pq_norm =   "/home/y/yujianfu/ivf-hnsw/models_VQ/SIFT1M/PQ_NORM16_10000.pq";
 const char * path_idxs =      "/home/y/yujianfu/ivf-hnsw/models_VQ/SIFT1M/base_idxs_10000.ivecs";
 const char * path_index =     "/home/y/yujianfu/ivf-hnsw/models_VQ/SIFT1M/PQ16_10000.index";
-

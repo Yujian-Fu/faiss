@@ -186,8 +186,11 @@ namespace bslib{
         std::vector<float> residuals(this->dimension * this->nt);
         std::vector<idx_t> group_ids(this->nt);
         assign(this->nt, this->train_data.data(), group_ids.data());
-
+        for (size_t i = 0; i < 100; i++){
+            std::cout << group_ids[i] << " ";
+        }
         std::cout << std::endl;
+
         std::cout << "Encoding the train dataset " << std::endl;
         encode(this->nt, this->train_data.data(), group_ids.data(), residuals.data());
         /*
