@@ -11,10 +11,9 @@ base_set = "/home/y/yujianfu/ivf-hnsw/data/SIFT1M/sift_base.fvecs"
 #d = int(a[:4].view('int32')[0])
 #b = a.reshape(-1, d + 4)[:, 4:]
 
-a = np.fromfile(learn_set, dtype='float')
-d = int(a[0])
-b = a.reshape(-1, d + 1)[:, 1:].copy()
-
+a = np.fromfile(learn_set, dtype='int32')
+d = a[0]
+b =  a.reshape(-1, d + 1)[:, 1:].copy().view('float32')
 
 print("Dataset dimension is ", d)
 niter = 20
@@ -41,9 +40,10 @@ f.close()
 #d = a[:4].view('int32')[0]
 #b = a.reshape(-1, d + 4)[:, 4:]
 
-a = np.fromfile(base_set, dtype='float')
-d = int(a[0])
-b = a.reshape(-1, d + 1)[:, 1:].copy()
+a = np.fromfile(base_set, dtype='int32')
+d = a[0]
+b =  a.reshape(-1, d + 1)[:, 1:].copy().view('float32')
+
 base_size = b.shape[0]
 print("Base set size is ", base_size)
 num_batches = 10000
