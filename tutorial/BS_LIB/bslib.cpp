@@ -4,7 +4,7 @@
 #include <sys/resource.h>
 
 #include "bslib_index.h"
-#include "parameters_millions.h"
+#include "parameters_VQ_LQ.h"
 
 
 using namespace bslib;
@@ -18,7 +18,7 @@ int main(){
 
 /*Prepare the work space*/
     PrepareFolder(folder_model);
-    PrepareFolder((char *) (std::string(folder_model)+"/SIFT1M").c_str());
+    PrepareFolder((char *) (std::string(folder_model)+"/SIFT1B").c_str());
     std::cout << "Preparing work space: " << folder_model << std::endl;
 
     //For recording 
@@ -107,9 +107,6 @@ int main(){
     Trecorder.print_time_usage(message);
     Trecorder.record_time_usage(record_file, message);
     
-
-
-
     //Build the index
     if (exists(path_index)){
         ShowMessage("Loading index");
@@ -190,13 +187,6 @@ int main(){
     size_t correct = 0;
     
     index->search(nq, result_k, queries.data(), query_distances.data(), query_labels.data(), keep_space, groundtruth.data());
-    
-    /*
-    for (size_t i = 0; i < nq * result_k;i++){
-        std::cout << query_labels[i] << " " << query_distances[i] << " ";
-    }
-    std::cout << std::endl;
-    */
     
     std::cout << "The qps for searching is: " << Trecorder.getTimeConsumption() / nq << " us " << std::endl;
     message = "Finish Search";
