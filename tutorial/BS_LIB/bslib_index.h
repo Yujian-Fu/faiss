@@ -11,11 +11,9 @@
 namespace bslib{
 
 typedef uint32_t idx_t;
-typedef float learn_data_type;
+typedef uint8_t learn_data_type;
 
 struct Bslib_Index{
-
-
     size_t dimension; // Initialized in constructer
     size_t layers; // Initialized in constructer
     std::vector<std::string> index_type; // Initialized in constructer
