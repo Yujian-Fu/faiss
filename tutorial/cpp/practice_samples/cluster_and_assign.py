@@ -24,6 +24,7 @@ train_size = 100000
 b = b[random.sample(range(b.shape[0]), train_size), :]
 b = np.ascontiguousarray(b.astype('float32'))
 ncentroids = 10000
+print("start training")
 kmeans = faiss.Kmeans(d, ncentroids, niter=niter, verbose=verbose, gpu=True)
 kmeans.train(b)
 end = time.time()
