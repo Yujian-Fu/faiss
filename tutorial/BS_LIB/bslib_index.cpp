@@ -634,6 +634,31 @@ namespace bslib{
 
             assert((n_vq + n_lq) == this->layers);
             this->pq.compute_inner_prod_table(query, this->precomputed_table.data());
+            std::cout << "The query vector: " << std::endl;
+            for (size_t temp = 0; temp < 10; temp ++){
+                std::cout << query[temp] << " ";
+            }
+            std::cout << std::endl;
+
+            std::cout << "The norm pq centroids: " << std::endl;
+            for(size_t temp = 0; temp < 100; temp++){
+                std::cout << this->norm_pq.centroids[temp] << " ";
+            }
+            std::cout << std::endl;
+
+            std::cout << "The pq centroids: " << std::endl;
+            for(size_t temp = 0; temp < 100; temp++){
+                std::cout << this->pq.centroids[temp] << " ";
+            }
+            std::cout << std::endl;
+
+            std::cout << "The prod table: " << std::endl;
+            for (size_t temp = 0; temp < 10; temp++){
+                std::cout << this->precomputed_table[temp] << " " << std::endl;
+            }
+            std::cout << std::endl;
+            
+
             size_t visited_vectors = 0;
             size_t visited_gt = 0;
             float query_centroid_dists = 0;
@@ -699,7 +724,12 @@ namespace bslib{
 
                     if (grountruth_set.count(this->origin_ids[group_id][m]) != 0){
                         visited_gt ++;
-                        std::cout << origin_ids[group_id][m] << " " << term1 << " " << term2 << " " << term3 << " " << dist << "     ";
+                        std::cout << "Confirm the centroid: " << std::endl;
+                        for (size_t temp = 0; temp < 10; temp ++){
+                            std::cout << this->vq_quantizer_index[0].quantizers[0].xb[group_id * dimension + temp] << " ";
+                        }
+                        std::cout << std::endl;
+                        std::cout << origin_ids[group_id][m] << " " << q_c_dist << " " << centroid_norms[group_id] << " " << term2 << " " << term3 << " " << dist << "     ";
                     }
                         
                 }
