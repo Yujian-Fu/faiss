@@ -111,6 +111,7 @@ int main(){
         ShowMessage("Loading index");
         Trecorder.reset();
         index->read_index(path_index);
+        
         message = "Loaded index";
         Mrecorder.print_memory_usage(message);
         Mrecorder.record_memory_usage(record_file,  message);

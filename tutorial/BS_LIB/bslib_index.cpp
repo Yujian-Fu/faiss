@@ -858,6 +858,8 @@ namespace bslib{
                 this->lq_quantizer_index.push_back(lq_quantizer);
             }
         }
+        std::cout << this->vq_quantizer_index[0].quantizers.size() << std::endl;
+        
         quantizer_input.close();
     }
 
