@@ -65,15 +65,28 @@ namespace bslib{
         }
     }
 
-    void Bslib_Index::build_quantizers(const uint32_t * ncentroids, const char * path_quantizers, const char * path_learn){
-        if (exists(path_quantizers)){
-            read_quantizers(path_quantizers);
+    void Bslib_Index::build_quantizers(const uint32_t * ncentroids, const char * path_quantizer, const char * path_learn){
+        if (exists(path_quantizer)){
+            /*
+            read_quantizers(path_quantizer);
             std::cout << "Checking the quantizers read from file " << std::endl;
             std::cout << "The number of quantizers: " << this->vq_quantizer_index.size() << " " << this->lq_quantizer_index.size() << std::endl;
             std::cout  << "The number of centroids in each quantizer: ";
             for (size_t i = 0 ; i < this->vq_quantizer_index[0].quantizers.size(); i++){
                 std::cout << vq_quantizer_index[0].quantizers[i].xb.size() / dimension << " ";
             }
+            */
+           
+           std::cout << "reading the VQ centroids " << std::endl;
+           std::ifstream quantizer_input(path_quantizer, std::ios::binary);
+            VQ_quantizer vq_quantizer = VQ_quantizer(this->dimension, 1, 10000);
+            std::vector<float> centroids(10000 * this->dimension);
+            quantizer_input.read((char * ) centroids.data(), 10000 * this->dimension * sizeof(float));
+            faiss::IndexFlatL2 centroid_quantizer(dimension);
+            centroid_quantizer.add(10000, centroids.data());
+            vq_quantizer.quantizers.push_back(centroid_quantizer);
+            this->vq_quantizer_index.push_back(vq_quantizer);
+            std::cout << this->vq_quantizer_index[0].quantizers.size() << " " << this->vq_quantizer_index[0].quantizers[0].xb.size() << " " << std::endl;
         }
         else
         {
@@ -148,7 +161,7 @@ namespace bslib{
             }
             nc_upper  = nc_upper * nc_per_group;
         }
-        write_quantizers(path_quantizers);
+        write_quantizers(path_quantizer);
         }  
     }
 
@@ -684,12 +697,16 @@ namespace bslib{
                     query_search_labels[visited_vectors] = origin_ids[group_id][m];
                     visited_vectors ++;
 
-                    if (grountruth_set.count(this->origin_ids[group_id][m]) != 0)
+                    if (grountruth_set.count(this->origin_ids[group_id][m]) != 0){
                         visited_gt ++;
+                        std::cout << origin_ids[group_id][m] << " " << term1 << " " << term2 << " " << term3 << " " << dist << "     ";
+                    }
+                        
                 }
                 if (visited_vectors > this->max_visited_vectors)
                     break;
             }
+            std::cout << std::endl;
 
             //Compute the distance sort for computed distance
             std::vector<idx_t> search_dist_index(visited_vectors);
