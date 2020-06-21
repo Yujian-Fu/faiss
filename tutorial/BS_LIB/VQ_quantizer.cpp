@@ -65,8 +65,10 @@ namespace bslib{
     void VQ_quantizer::compute_final_centroid(idx_t label, float * final_centroid){
         size_t j = size_t (label / nc_per_group);
         size_t group_label = label - CentroidDistributionMap[j];
-        for (size_t i = 0; i < dimension; i++)
+        for (size_t i = 0; i < dimension; i++){
+            std::cout << i << " ";
             final_centroid[i] = this->quantizers[group_label].xb[group_label * this->dimension + i];
+        }
     }
 
 
@@ -74,11 +76,11 @@ namespace bslib{
         std::cout << "Computing VQ residual for train data " << std::endl;
 //#pragma omp parallel for
         for (size_t i = 0; i < n; i++){
-            
+            std::cout << i << " ";
             std::vector<float> final_centroid(dimension);
             compute_final_centroid(labels[i], final_centroid.data());
             faiss::fvec_madd(dimension, x + i * dimension, -1.0, final_centroid.data(), residuals + i * dimension);
-            std::cout << i << " ";
+            
         }
     }
 
