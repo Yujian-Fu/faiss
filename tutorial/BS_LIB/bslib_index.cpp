@@ -247,13 +247,6 @@ namespace bslib{
         //The code is for the residual between base vectors and their final neighbor centroids
         std::vector<uint8_t> batch_codes(n * this->code_size);
         this->pq.compute_codes(residuals.data(), batch_codes.data(), n);
-        std::cout << "The sample codes " << std::endl;
-        for (size_t i = 0; i < 10 ; i++){
-            for (size_t j = 0; j < this->code_size; j++){
-                std::cout << (float)batch_codes[i*code_size + j] << " ";
-            }
-            std::cout << std::endl;
-        }
 
         /*
         Todo: should we use the decoded reconstructed_x for exp? actually we may use
@@ -265,6 +258,7 @@ namespace bslib{
         std::vector<float> reconstructed_x(n * dimension);
         decode(n, decoded_residuals.data(), encoded_ids, reconstructed_x.data());
 
+        /*
         std::cout << "Compare origin vector and reconstructed codes " << std::endl;
         for (size_t i = 0; i < 10; i++){
             for (size_t j = 0; j < dimension; j++){
@@ -272,6 +266,7 @@ namespace bslib{
             }
             std::cout << std::endl;
         }
+        */
         /*
         Use the origin distance can save time?
         */
@@ -284,6 +279,7 @@ namespace bslib{
 
         this->norm_pq.compute_codes(xnorms.data(), xnorm_codes.data(), n);
 
+        /*
         std::cout << "The sample codes " << std::endl;
         for (size_t i = 0; i < 10 ; i++){
             for (size_t j = 0; j < this->norm_code_size; j++){
@@ -291,6 +287,7 @@ namespace bslib{
             }
             std::cout << std::endl;
         }
+        */
 
         for (size_t i = 0 ; i < n; i++){
             for (size_t j = 0; j < this->code_size; j++){
