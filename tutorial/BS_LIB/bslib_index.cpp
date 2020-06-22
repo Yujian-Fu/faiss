@@ -787,6 +787,7 @@ namespace bslib{
                     query_ids[i * result_k + j] = reranking_labels[reranking_dist_index[j]];
                     if (grountruth_set.count(query_ids[i * result_k + j]) != 0){
                         correct ++;
+                        std::cout << "Now correct is " << correct << std::endl;
                         
                     }
                 }
@@ -821,9 +822,6 @@ namespace bslib{
             avg_visited_vectors += visited_vectors;
             for (size_t j = 0; j < layers + 1; j++){
                 avg_time_consumption[j] += time_consumption[j];    
-            }
-            if (i == 0){
-                exit(0);
             }
         }
 
