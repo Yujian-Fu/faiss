@@ -806,17 +806,18 @@ namespace bslib{
                     }
                         
                 }
-                std::cout << "The visited gt proportion: " << float(visited_gt) / result_k << std::endl;
-                std::cout << "The computed distance, actual distance label, groundtruth_label are " << std::endl;
-                for (size_t i = 0; i < 100; i++){
-                    std::cout << query_search_labels[search_dist_index[i]] << "_" << query_search_dists[search_dist_index[i]] << " ";
-                }
-                std::cout << std::endl;
 
-                for (size_t i = 0; i < 100; i++){
-                    std::cout << query_search_labels[actual_dist_index[i]] << "_" << query_actual_dists[search_dist_index[i]] << " ";
-                }
-                std::cout << std::endl;
+                //std::cout << "The visited gt proportion: " << float(visited_gt) / result_k << std::endl;
+                //std::cout << "The computed distance, actual distance label, groundtruth_label are " << std::endl;
+                //for (size_t i = 0; i < 100; i++){
+                    //std::cout << query_search_labels[search_dist_index[i]] << "_" << query_search_dists[search_dist_index[i]] << " ";
+                //}
+                //std::cout << std::endl;
+
+                //for (size_t i = 0; i < 100; i++){
+                    //std::cout << query_search_labels[actual_dist_index[i]] << "_" << query_actual_dists[search_dist_index[i]] << " ";
+                //}
+                //std::cout << std::endl;
             }
 
             overall_proportion += float(visited_gt) / result_k;
