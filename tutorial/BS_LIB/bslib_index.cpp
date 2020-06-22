@@ -633,7 +633,6 @@ namespace bslib{
                 for (size_t temp = 0; temp < keep_result_space; temp++){
                     std::cout << group_idxs[temp] << " " << group_dists[temp] << " ";
                 }
-                exit(0);
                 std::cout << std::endl;
                 time_consumption[j] = Trecorder.getTimeConsumption();
                 Trecorder.reset();
@@ -691,6 +690,7 @@ namespace bslib{
 
                 std::vector<float> result_idx_dist(2);
                 get_next_group_idx(keep_result_space, group_idxs.data(), group_dists.data(), result_idx_dist.data());
+                std::cout << "Now scanning cluster: " << result_idx_dist[0] << std::endl;
                 uint32_t group_id = result_idx_dist[0];
                 float q_c_dist = result_idx_dist[1];
 
