@@ -640,6 +640,9 @@ namespace bslib{
 
             assert((n_vq + n_lq) == this->layers);
             this->pq.compute_inner_prod_table(query, this->precomputed_table.data());
+
+            /*
+            ///////////////////////////////////////////////////////////
             std::cout << "The query vector: " << std::endl;
             for (size_t temp = 0; temp < 10; temp ++){
                 std::cout << query[temp] << " ";
@@ -663,6 +666,8 @@ namespace bslib{
                 std::cout << this->precomputed_table[temp] << " " << std::endl;
             }
             std::cout << std::endl;
+            ////////////////////////////////////////////////////////////
+            */
             
 
             size_t visited_vectors = 0;
@@ -697,9 +702,6 @@ namespace bslib{
                 size_t group_size = this->origin_ids[group_id].size();
                 assert(group_size == this->base_codes[group_id].size() / this->code_size);
 
-                std::cout << "Now scanning cluster: " << group_id << "with group size " << this->origin_ids[group_id].size() << std::endl;
-
-
                 float term1 = q_c_dist - centroid_norms[group_id];
                 std::vector<float> base_norms(group_size);
                 assert(group_size == base_norm_codes[group_id].size() / this->norm_code_size);
@@ -733,12 +735,17 @@ namespace bslib{
 
                     if (grountruth_set.count(this->origin_ids[group_id][m]) != 0){
                         visited_gt ++;
+
+                        /*
+                        ///////////////////////////////////////////////////////
                         std::cout << "Confirm the centroid: " << std::endl;
                         for (size_t temp = 0; temp < 10; temp ++){
                             std::cout << this->vq_quantizer_index[0].quantizers[0].xb[group_id * dimension + temp] << " ";
                         }
                         std::cout << std::endl;
                         std::cout << group_id << " " << origin_ids[group_id][m] << " " << q_c_dist << " " << centroid_norms[group_id] << " " << term2 << " " << term3 << " " << dist << "     " << std::endl;
+                        ///////////////////////////////////////////////////////
+                        */
                     }
                         
                 }
