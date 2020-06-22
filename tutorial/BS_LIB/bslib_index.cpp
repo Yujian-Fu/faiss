@@ -633,6 +633,7 @@ namespace bslib{
                 for (size_t temp = 0; temp < 10000; temp++){
                     std::cout << result_labels[temp] << " " << result_dists[temp] << " ";
                 }
+                exit(0);
                 std::cout << std::endl;
                 time_consumption[j] = Trecorder.getTimeConsumption();
                 Trecorder.reset();
