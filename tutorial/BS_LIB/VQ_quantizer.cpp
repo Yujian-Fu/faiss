@@ -57,6 +57,7 @@ namespace bslib{
                 faiss::fvec_madd(dimension, sub_centroid, -1.0, query, query_sub_centroid_vector.data());
                 result_dists[i * this->nc_per_group + j] = faiss::fvec_norm_L2sqr(query_sub_centroid_vector.data(), dimension);
 
+                /*
                 ///////////////////////////////////////////////////////////////
                 std::cout << "Testing the correctness of distance computation " << std::endl;
                 std::cout << "Centroid " << std::endl;
@@ -82,6 +83,8 @@ namespace bslib{
                 
                 if (j == 3)
                     exit(0);
+                //////////////////////////////////////////////////////////////////
+                */
             }
         }
         //clock_t endtime = clock();
