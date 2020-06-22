@@ -11,10 +11,10 @@ const std::string index_type[layers] = {"VQ"};
 const uint32_t ncentroids[layers] = {10000};
 //const char * path_quantizers = "/home/y/yujianfu/ivf-hnsw/models_VQ/SIFT1M/quantizer_10000.qt";
 const char * path_quantizers = "/home/y/yujianfu/ivf-hnsw/models_VQ/SIFT1M/centroids_sift1M.fvecs";
-const bool use_subset = true;
+const bool use_subset = false;
 const bool pq_use_subset = true;
-const bool use_reranking = false;
-const size_t reranking_space = 50;
+const bool use_reranking = true;
+const size_t reranking_space = 200;
 
 //For train PQ
 const size_t bytes_per_code = 16;
