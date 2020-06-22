@@ -547,10 +547,6 @@ namespace bslib{
             for (size_t j = 0; j < result_k; j++)
                 grountruth_set.insert(groundtruth[i * 100 + j]);
 
-            for (size_t j = 0; j < result_k; j++){
-                std::cout << groundtruth[i * 100 + j] << " ";
-            }
-            std::cout << std::endl;
 
             const float * query = queries + i * dimension;
 
@@ -589,7 +585,6 @@ namespace bslib{
                             result_labels[m * group_size + n] = group_idxs[m] * group_size + n;
                         }
                     }
-                    std::cout << result_dists[8383] << " " << result_dists[3124] << std::endl;
                     n_vq ++;
                 }
 
@@ -757,7 +752,7 @@ namespace bslib{
                 if (visited_vectors > this->max_visited_vectors)
                     break;
             }
-            std::cout << std::endl;
+            //std::cout << std::endl;
 
             //Compute the distance sort for computed distance
             std::vector<idx_t> search_dist_index(visited_vectors);
@@ -802,7 +797,6 @@ namespace bslib{
                     query_ids[i * result_k + j] = query_search_labels[search_dist_index[j]];
                     if (grountruth_set.count(query_ids[i * result_k + j]) != 0){
                         correct ++;
-                        std::cout << query_ids[i * result_k + j] << " ";
                     }
                         
                 }
