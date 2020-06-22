@@ -690,12 +690,14 @@ namespace bslib{
 
                 std::vector<float> result_idx_dist(2);
                 get_next_group_idx(keep_result_space, group_idxs.data(), group_dists.data(), result_idx_dist.data());
-                std::cout << "Now scanning cluster: " << result_idx_dist[0] << std::endl;
+                
                 uint32_t group_id = result_idx_dist[0];
                 float q_c_dist = result_idx_dist[1];
 
                 size_t group_size = this->origin_ids[group_id].size();
                 assert(group_size == this->base_codes[group_id].size() / this->code_size);
+
+                std::cout << "Now scanning cluster: " << group_id << "with group size " << this->origin_ids[group_id].size() << std::endl;
 
 
                 float term1 = q_c_dist - centroid_norms[group_id];
