@@ -14,7 +14,7 @@ const char * path_quantizers = "/home/y/yujianfu/ivf-hnsw/models_VQ/SIFT1M/centr
 const bool use_subset = false;
 const bool pq_use_subset = true;
 const bool use_reranking = true;
-const size_t reranking_space = 10;
+const size_t reranking_space = 20;
 
 //For train PQ
 const size_t bytes_per_code = 16;
