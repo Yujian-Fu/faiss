@@ -81,7 +81,7 @@ namespace bslib{
            std::ifstream quantizer_input(path_quantizer, std::ios::binary);
             VQ_quantizer vq_quantizer = VQ_quantizer(this->dimension, 1, 10000);
             std::vector<float> centroids(10000 * this->dimension);
-            quantizer_input.read((char * ) centroids.data(), 10000 * this->dimension * sizeof(float));
+            readXvec<float>(quantizer_input, centroids.data(), dimension, 10000, true);
             faiss::IndexFlatL2 centroid_quantizer(dimension);
             centroid_quantizer.add(10000, centroids.data());
             vq_quantizer.quantizers.push_back(centroid_quantizer);
