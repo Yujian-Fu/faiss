@@ -4,7 +4,7 @@ import time
 import random
 import struct
 
-learn_set = "/home/y/yujianfu/ivf-hnsw/data/SIFT1M/sift_learn.fvecs"
+learn_set = "/home/y/yujianfu/ivf-hnsw/data/SIFT1M/sift_base.fvecs"
 base_set = "/home/y/yujianfu/ivf-hnsw/data/SIFT1M/sift_base.fvecs"
 
 #a = np.memmap(learn_set, dtype='uint8', mode='r')
@@ -20,7 +20,7 @@ niter = 50
 verbose = True
 
 start = time.time()
-train_size = 100000
+train_size = 1000000
 b = b[random.sample(range(b.shape[0]), train_size), :]
 b = np.ascontiguousarray(b.astype('float32'))
 ncentroids = 10000
