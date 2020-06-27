@@ -172,7 +172,7 @@ namespace bslib{
             query_sequence_set[idx].push_back(i);
         }
         //std::cout << "Query sequence set built " << std::endl;
-#pragma omp parallel for
+//#pragma omp parallel for
         for (size_t i = 0; i < this->nc_upper; i++){
             if (query_sequence_set[i].size() == 0)
                 continue;

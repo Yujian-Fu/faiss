@@ -29,7 +29,7 @@ const size_t dimension = 128;
 //For building index
 const size_t nb = 1000000;
 const uint32_t batch_size = 10000;
-const size_t nbatches = nb / batch_size; //1000
+const size_t nbatches = nb / batch_size; //100
 
 //For searching
 const size_t ngt = 100;

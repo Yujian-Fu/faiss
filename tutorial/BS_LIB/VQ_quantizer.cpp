@@ -56,39 +56,8 @@ namespace bslib{
                 const float * query = queries + i * dimension;
                 faiss::fvec_madd(dimension, sub_centroid, -1.0, query, query_sub_centroid_vector.data());
                 result_dists[i * this->nc_per_group + j] = faiss::fvec_norm_L2sqr(query_sub_centroid_vector.data(), dimension);
-
-                /*
-                ///////////////////////////////////////////////////////////////
-                std::cout << "Testing the correctness of distance computation " << std::endl;
-                std::cout << "Centroid " << std::endl;
-
-                for (size_t temp = 0; temp < dimension; temp++){
-                    std::cout << sub_centroid[temp] << " ";
-                }
-                std::cout << std::endl;
-
-                std::cout << "Query: " << std::endl;
-                for (size_t temp = 0; temp < dimension; temp++){
-                    std::cout << query[temp] << " ";
-                }
-                std::cout << std::endl;
-
-                std::cout << "Query - Cnetroid" <<std::endl;
-                for (size_t temp = 0; temp < dimension; temp++){
-                    std::cout << query_sub_centroid_vector[temp] << " ";
-                }
-                std::cout << std::endl;
-
-                std::cout << "Distance: " << result_dists[i * this->nc_per_group + j] << std::endl;
-                
-                if (j == 3)
-                    exit(0);
-                //////////////////////////////////////////////////////////////////
-                */
             }
         }
-        //clock_t endtime = clock();
-        //std::cout << "Search time in VQ " << float(endtime - starttime) / CLOCKS_PER_SEC << std::endl;
     }
 
     void VQ_quantizer::compute_final_centroid(idx_t label, float * final_centroid){
