@@ -417,8 +417,9 @@ namespace bslib{
         size_t group_size;
 
         std::vector<float> result_dists(this->max_group_size * n);
+        std::vector<float> upper_result_dists(this->max_group_size * n);
         std::vector<idx_t> result_labels (this->max_group_size * n);
-        std::vector<std::map<idx_t, float>>  queries_upper_centroid_dists(n);
+        size_t upper_nc_per_group = 1;
 
         //clock_t starttime1 = clock();
         for (size_t i = 0; i < this->layers; i++){
@@ -446,10 +447,9 @@ namespace bslib{
                 clock_t starttime = clock();
                 group_size = lq_quantizer_index[n_lq].nc_per_group;
 
-                lq_quantizer_index[n_lq].search_in_group(n, assign_data, queries_upper_centroid_dists, group_idxs.data(), result_dists.data());
+                lq_quantizer_index[n_lq].search_in_group(n, assign_data, result_labels.data(), upper_result_dists.data(), upper_nc_per_group, group_idxs.data(), result_dists.data());
 
                 for (size_t j = 0; j < n; j++){
-                    queries_upper_centroid_dists[j].clear();
                     for (size_t m = 0; m < group_size; m++){
                         result_labels[j * group_size + m] = group_idxs[j] * group_size + m;
                     }
@@ -465,9 +465,9 @@ namespace bslib{
 
             if (i < this->layers-1 && index_type[i+1] == "LQ"){
                 clock_t starttime = clock();
-                for (size_t j = 0; j < n; j++){
-                    for (size_t m = 0; m < group_size; m++)
-                        queries_upper_centroid_dists[j].insert(std::pair<idx_t, float>(result_labels[j*group_size+m], result_dists[j*group_size+m]));
+                upper_nc_per_group = group_size;
+                for (size_t j = 0; j < n * max_group_size; j++){
+                    upper_result_dists[j] = result_dists[j];
                 }
                 clock_t endtime = clock();
                 std::cout << "Time in inserting distance: " << float(endtime - starttime) / CLOCKS_PER_SEC << std::endl;
@@ -632,8 +632,9 @@ namespace bslib{
             group_dists[0] = 0;
 
             std::vector<float> result_dists; 
+            std::vector<float> upper_result_dists;
             std::vector<idx_t> result_labels;
-            std::vector<std::map<idx_t, float>> query_upper_centroid_dists(1);
+            size_t upper_nc_per_group = 1;
             
             size_t n_vq = 0;
             size_t n_lq = 0;
@@ -666,11 +667,10 @@ namespace bslib{
                 else if(index_type[j] == "LQ") {
                     //std::cout << "searching in LQ layer" << std::endl;
                     group_size = lq_quantizer_index[n_lq].nc_per_group;
-                    result_dists.resize(group_size * n);
-                    assert(query_upper_centroid_dists[0].size() > 0);
+                    result_dists.resize(group_idxs.size()* group_size );
 #pragma omp parallel for
                     for (size_t m = 0; m < group_idxs.size(); m++){
-                        lq_quantizer_index[n_lq].search_in_group(1, query, query_upper_centroid_dists, group_idxs.data()+m, result_dists.data()+m*group_size);
+                        lq_quantizer_index[n_lq].search_in_group(1, query, result_labels.data(), upper_result_dists.data(), upper_nc_per_group, group_idxs.data()+m * 1, result_dists.data()+m*group_size);
                     }
                     result_labels.resize(group_idxs.size()*group_size);
                     for (size_t m = 0; m < group_idxs.size(); m++){
@@ -678,7 +678,6 @@ namespace bslib{
                             result_labels[m * group_size + n] = group_idxs[m] * group_size + n;
                         }
                     }
-                    query_upper_centroid_dists[0].clear();
                     n_lq ++;
                 }
                 else{
@@ -688,8 +687,10 @@ namespace bslib{
                 
                 if (j < this->layers-1 && index_type[j+1] == "LQ"){
                     //std::cout << "The next layer is LQ, load the query centroid distsnaces" << std::endl;
+                    upper_nc_per_group = group_size;
+                    upper_result_dists.resize(group_idxs.size()*group_size);
                     for (size_t m = 0; m < group_idxs.size()*group_size; m++){
-                        query_upper_centroid_dists[0].insert(std::pair<idx_t, float>(result_labels[m], result_dists[m]));
+                        upper_result_dists[m] = result_dists[m];
                     }
                 }
 
