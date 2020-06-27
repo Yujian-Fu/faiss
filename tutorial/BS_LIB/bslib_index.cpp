@@ -648,7 +648,7 @@ namespace bslib{
                 size_t group_size;
                 
                 if (index_type[j] == "VQ"){
-                    //std::cout << "searching in VQ layer" << std::endl;
+                    std::cout << "searching in VQ layer" << std::endl;
                     group_size = vq_quantizer_index[n_vq].nc_per_group;
                     result_dists.resize(group_idxs.size()*group_size);
 #pragma omp parallel for
@@ -665,7 +665,7 @@ namespace bslib{
                 }
 
                 else if(index_type[j] == "LQ") {
-                    //std::cout << "searching in LQ layer" << std::endl;
+                    std::cout << "searching in LQ layer" << std::endl;
                     group_size = lq_quantizer_index[n_lq].nc_per_group;
                     result_dists.resize(group_idxs.size()* group_size );
 #pragma omp parallel for
@@ -686,7 +686,7 @@ namespace bslib{
                 }
                 
                 if (j < this->layers-1 && index_type[j+1] == "LQ"){
-                    //std::cout << "The next layer is LQ, load the query centroid distsnaces" << std::endl;
+                    std::cout << "The next layer is LQ, load the query centroid distsnaces" << std::endl;
                     upper_nc_per_group = group_size;
                     upper_result_dists.resize(group_idxs.size()*group_size);
                     for (size_t m = 0; m < group_idxs.size()*group_size; m++){
@@ -694,7 +694,7 @@ namespace bslib{
                     }
                 }
 
-                //std::cout << "Choosing k instances with smallest distances " << std::endl;
+                std::cout << "Choosing k instances with smallest distances " << std::endl;
                 size_t search_space = group_size * group_idxs.size();
                 group_idxs.resize(keep_result_space);
                 group_dists.resize(keep_result_space);
