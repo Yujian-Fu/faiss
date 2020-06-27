@@ -101,7 +101,7 @@ namespace bslib{
 
             
 
-
+            this->max_group_size = 10000;
            std::cout << "reading the VQ centroids " << std::endl;
            std::ifstream quantizer_input(path_quantizer, std::ios::binary);
             VQ_quantizer vq_quantizer = VQ_quantizer(this->dimension, 1, 10000);
@@ -136,6 +136,7 @@ namespace bslib{
         {
         ShowMessage("No preconstructed quantizers, constructing quantizers");
         //Load the train set into the index
+        this->max_group_size = 0;
         this->train_data.resize(this->nt * this->dimension);
         std::cout << "Loading learn set from " << path_learn << std::endl;
         std::ifstream learn_input(path_learn, std::ios::binary);
@@ -167,7 +168,11 @@ namespace bslib{
         std::vector<float> nn_centroids_dists;
 
         for (size_t i = 0; i < layers; i++){
+            
             nc_per_group = ncentroids[i];
+            if (nc_per_group > this->max_group_size){
+                this->max_group_size = nc_per_group;
+            }
             if (index_type[i] == "VQ"){
                 ShowMessage("Adding VQ quantizer");
                 bool update_idxs = (i == layers-1) ? false:true;
@@ -404,21 +409,22 @@ namespace bslib{
 
         size_t n_vq = 0;
         size_t n_lq = 0;
+        size_t group_size;
 
-        std::vector<float> result_dists;
-        std::vector<idx_t> result_labels;
+        std::vector<float> result_dists(this->max_group_size * n);
+        std::vector<idx_t> result_labels (this->max_group_size * n);
         std::vector<std::map<idx_t, float>>  queries_upper_centroid_dists(n);
 
         //clock_t starttime1 = clock();
         for (size_t i = 0; i < this->layers; i++){
             assert(n_lq + n_vq == i);
-            size_t group_size;
+            
             if (index_type[i] == "VQ"){
                 //std::cout << "searching in VQ layer" << std::endl;
                 group_size = vq_quantizer_index[n_vq].nc_per_group;
-                result_dists.resize(group_size * n);
+
                 vq_quantizer_index[n_vq].search_in_group(n, assign_data, group_idxs.data(), result_dists.data());
-                result_labels.resize(group_size * n);
+
                 for (size_t j = 0; j < n; j++){
                     for (size_t m = 0; m < group_size; m++){
                         result_labels[j * group_size + m] = group_idxs[j] * group_size + m;
@@ -430,9 +436,9 @@ namespace bslib{
             else if(index_type[i] == "LQ"){
                 //std::cout << "searching in LQ layer" << std::endl;
                 group_size = lq_quantizer_index[n_lq].nc_per_group;
-                result_dists.resize(group_size * n);
+
                 lq_quantizer_index[n_lq].search_in_group(n, assign_data, queries_upper_centroid_dists, group_idxs.data(), result_dists.data());
-                result_labels.resize(group_size * n);
+
                 for (size_t j = 0; j < n; j++){
                     queries_upper_centroid_dists[j].clear();
                     for (size_t m = 0; m < group_size; m++){
@@ -457,8 +463,20 @@ namespace bslib{
             //std::cout << "Choosing k instances with smallest distances " << std::endl;
 
             //clock_t starttime = clock();
+
+#pragma omp parallel for
             for (size_t j = 0; j < n; j++){
-                keep_k_min(group_size, 1, result_dists.data()+j*group_size, result_labels.data()+j*group_size, group_dists.data()+j, group_idxs.data()+j);
+                uint32_t label = 0;
+                float dist = MAX_DIST;
+                for (size_t m = 0; m < group_size; m++){
+                    if (result_dists[j * group_size + m] < dist){
+                        dist = result_dists[j * group_size + m];
+                        label = result_labels[j * group_size + m];
+                    }
+                }
+                group_dists[j] = dist;
+                group_idxs[j] = label;
+                //keep_k_min(group_size, 1, result_dists.data()+j*group_size, result_labels.data()+j*group_size, group_dists.data()+j, group_idxs.data()+j);
             }
             //clock_t endtime = clock();
             //std::cout << "Time in selct k min: " << float(endtime - starttime) / CLOCKS_PER_SEC << std::endl;
@@ -685,7 +703,7 @@ namespace bslib{
             assert((n_vq + n_lq) == this->layers);
             this->pq.compute_inner_prod_table(query, this->precomputed_table.data());
 
-            /*
+            
             ///////////////////////////////////////////////////////////
             std::cout << "The query vector: " << std::endl;
             for (size_t temp = 0; temp < 10; temp ++){
@@ -711,7 +729,7 @@ namespace bslib{
             }
             std::cout << std::endl;
             ////////////////////////////////////////////////////////////
-            */
+            
             
 
             size_t visited_vectors = 0;
@@ -884,6 +902,8 @@ namespace bslib{
         std::ofstream quantizers_output(path_quantizer, std::ios::binary);
         size_t n_vq = 0;
         size_t n_lq = 0;
+        quantizers_output.write((char *) & this->max_group_size, sizeof(size_t));
+
         for (size_t i = 0; i < this->layers; i++){
             if (index_type[i] == "VQ"){
                 ShowMessage("Writing VQ quantizer layer");
@@ -942,6 +962,7 @@ namespace bslib{
         size_t nc;
         size_t nc_upper;
         size_t nc_per_group;
+        quantizer_input.read((char *) & this->max_group_size, sizeof(size_t));
 
         for(size_t i = 0; i < this->layers; i++){
             if (index_type[i] == "VQ"){
@@ -995,6 +1016,7 @@ namespace bslib{
     void Bslib_Index::write_index(const char * path_index){
         std::ofstream output(path_index, std::ios::binary);
         output.write((char *) & this->final_nc, sizeof(size_t));
+
         assert((base_norm_codes.size() == base_codes.size()) && (base_codes.size() == origin_ids.size()) && (origin_ids.size() == final_nc )  );
         for (size_t i = 0; i < this->final_nc; i++){
             assert((base_norm_codes[i].size() == base_codes[i].size() / this->code_size) && (base_norm_codes[i].size() == origin_ids[i].size()));

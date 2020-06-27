@@ -19,6 +19,7 @@ struct Bslib_Index{
     std::vector<std::string> index_type; // Initialized in constructer
     size_t nt; //Initialized in constructer by 0, assigned in main
     size_t subnt; //Initialized in constructer by 0, assigned in main 
+    size_t max_group_size;
     bool use_subset;
     bool pq_use_subset;
     bool use_reranking;
