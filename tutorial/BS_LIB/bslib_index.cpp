@@ -897,6 +897,9 @@ namespace bslib{
             for (size_t j = 0; j < layers + 1; j++){
                 avg_time_consumption[j] += time_consumption[j];    
             }
+            if (i == 2){
+                exit(0);
+            }
         }
 
         std::cout << "The time consumption: ";
