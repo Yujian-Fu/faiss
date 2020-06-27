@@ -136,7 +136,7 @@ namespace bslib{
             }
             std::cout << std::endl;
         }
-        
+
         else
         {
         ShowMessage("No preconstructed quantizers, constructing quantizers");
@@ -426,6 +426,7 @@ namespace bslib{
             
             if (index_type[i] == "VQ"){
                 //std::cout << "searching in VQ layer" << std::endl;
+                clock_t starttime = clock();
                 group_size = vq_quantizer_index[n_vq].nc_per_group;
 
                 vq_quantizer_index[n_vq].search_in_group(n, assign_data, group_idxs.data(), result_dists.data());
@@ -436,10 +437,13 @@ namespace bslib{
                     }
                 }
                 n_vq ++;
+                clock_t endtime = clock();
+                std::cout << "Time in VQ layer: " << float(endtime - starttime) / CLOCKS_PER_SEC << std::endl;
+
             }
 
             else if(index_type[i] == "LQ"){
-                //std::cout << "searching in LQ layer" << std::endl;
+                clock_t starttime = clock();
                 group_size = lq_quantizer_index[n_lq].nc_per_group;
 
                 lq_quantizer_index[n_lq].search_in_group(n, assign_data, queries_upper_centroid_dists, group_idxs.data(), result_dists.data());
@@ -451,6 +455,8 @@ namespace bslib{
                     }
                 }
                 n_lq ++;
+                clock_t endtime = clock();
+                std::cout << "Time in LQ layer: " << float(endtime - starttime) / CLOCKS_PER_SEC << std::endl;
             }
             else{
                 std::cout << "The type name is wrong with " << index_type[i] << "!" << std::endl;
@@ -458,17 +464,19 @@ namespace bslib{
             }
 
             if (i < this->layers-1 && index_type[i+1] == "LQ"){
-                //std::cout << "The next layer is LQ, load the query centroid distsnaces" << std::endl;
+                clock_t starttime = clock();
                 for (size_t j = 0; j < n; j++){
                     for (size_t m = 0; m < group_size; m++)
                         queries_upper_centroid_dists[j].insert(std::pair<idx_t, float>(result_labels[j*group_size+m], result_dists[j*group_size+m]));
                 }
+                clock_t endtime = clock();
+                std::cout << "Time in inserting distance: " << float(endtime - starttime) / CLOCKS_PER_SEC << std::endl;
             }
 
             //std::cout << "Choosing k instances with smallest distances " << std::endl;
 
-            //clock_t starttime = clock();
-
+            //
+            clock_t starttime = clock();
 #pragma omp parallel for
             for (size_t j = 0; j < n; j++){
                 uint32_t label = 0;
@@ -483,8 +491,8 @@ namespace bslib{
                 group_idxs[j] = label;
                 //keep_k_min(group_size, 1, result_dists.data()+j*group_size, result_labels.data()+j*group_size, group_dists.data()+j, group_idxs.data()+j);
             }
-            //clock_t endtime = clock();
-            //std::cout << "Time in selct k min: " << float(endtime - starttime) / CLOCKS_PER_SEC << std::endl;
+            clock_t endtime = clock();
+            std::cout << "Time in selct minest: " << float(endtime - starttime) / CLOCKS_PER_SEC << std::endl;
         }
         //clock_t endtime1 = clock();
 
