@@ -46,7 +46,6 @@ namespace bslib{
     }
 
     void VQ_quantizer::search_in_group(size_t n, const float * queries, const idx_t * group_idxs, float * result_dists){
-        //clock_t starttime = clock();
 #pragma omp parallel for
         for (size_t i = 0; i < n; i++){
             idx_t idx = group_idxs[i];

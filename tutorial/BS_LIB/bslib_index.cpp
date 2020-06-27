@@ -492,7 +492,7 @@ namespace bslib{
                 //keep_k_min(group_size, 1, result_dists.data()+j*group_size, result_labels.data()+j*group_size, group_dists.data()+j, group_idxs.data()+j);
             }
             clock_t endtime = clock();
-            std::cout << "Time in selct minest: " << float(endtime - starttime) / CLOCKS_PER_SEC << std::endl;
+            std::cout << "Time in selct min: " << float(endtime - starttime) / CLOCKS_PER_SEC << std::endl;
         }
         //clock_t endtime1 = clock();
 
