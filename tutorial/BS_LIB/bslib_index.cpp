@@ -124,12 +124,12 @@ namespace bslib{
             }
 
 
-            uint32_t nc_per_group = ncentroids[0];
+            uint32_t nc_per_group = ncentroids[1];
             std::vector<float> upper_centroids (ncentroids[0]*dimension);
             std::vector<idx_t> nn_centroids_idxs(ncentroids[0]*ncentroids[1]);
             std::vector<float> nn_centroids_dists(ncentroids[0]*ncentroids[1]);
-            vq_quantizer_index[0].compute_nn_centroids(nc_per_group, upper_centroids.data(), nn_centroids_dists.data(), nn_centroids_idxs.data());
-            
+            this->vq_quantizer_index[0].compute_nn_centroids(nc_per_group, upper_centroids.data(), nn_centroids_dists.data(), nn_centroids_idxs.data());
+            std::cout << "Adding lq quantizer" << std::endl;
             add_lq_quantizer(ncentroids[0], ncentroids[1], upper_centroids.data(), nn_centroids_idxs.data(), nn_centroids_dists.data(), false);
         }
         else
