@@ -210,7 +210,8 @@ namespace bslib{
                             //std::cout << "Computing easy distance" << std::endl;
                             query_sub_centroids_dists[m] = alpha*(alpha-1)*group_nn_dist + (1-alpha)*query_group_dist + alpha*query_nn_dist;
                         }
-                        else{
+                        //else{
+                        {
                         if (sub_centroids[m].size() == 0){
                             idx_t label = base_idx + m;
                             compute_final_centroid(label, sub_centroids[m].data());
@@ -219,7 +220,8 @@ namespace bslib{
                         const float * query = queries + sequence_id * dimension;
                         std::vector<float> query_sub_centroid_vector(dimension);
                         faiss::fvec_madd(dimension, sub_centroids[m].data(), -1.0, query, query_sub_centroid_vector.data());
-                        query_sub_centroids_dists[m] = faiss::fvec_norm_L2sqr(query_sub_centroid_vector.data(), dimension);
+                        //query_sub_centroids_dists[m] = faiss::fvec_norm_L2sqr(query_sub_centroid_vector.data(), dimension);
+                        std::cout << faiss::fvec_norm_L2sqr(query_sub_centroid_vector.data(), dimension) << "_" << query_sub_centroids_dists[m] << " ";
                         }
                     }
 
