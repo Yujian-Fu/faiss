@@ -131,7 +131,12 @@ namespace bslib{
             this->vq_quantizer_index[0].compute_nn_centroids(nc_per_group, upper_centroids.data(), nn_centroids_dists.data(), nn_centroids_idxs.data());
             std::cout << "Adding lq quantizer" << std::endl;
             add_lq_quantizer(ncentroids[0], ncentroids[1], upper_centroids.data(), nn_centroids_idxs.data(), nn_centroids_dists.data(), false);
+            for (size_t i = 0; i < this->lq_quantizer_index[0].alphas.size(); i++){
+                std::cout << lq_quantizer_index[0].alphas[i] << " ";
+            }
+            std::cout << std::endl;
         }
+        
         else
         {
         ShowMessage("No preconstructed quantizers, constructing quantizers");

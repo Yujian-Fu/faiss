@@ -20,7 +20,7 @@ const size_t reranking_space = 20;
 const size_t bytes_per_code = 16;
 const size_t bytes_per_norm_code = 1;
 const size_t nbits = 8; //Or 16
-const size_t nt = 100000;
+const size_t nt = 1000000;
 const size_t subnt = 10000;
 const size_t dimension = 128;
 
@@ -44,7 +44,7 @@ bool is_recording = true;
 const char * folder_model = "/home/y/yujianfu/ivf-hnsw/models_VQ_LQ";
 
 //File paths
-const char * path_learn =     "/home/y/yujianfu/ivf-hnsw/data/SIFT1M/sift_learn.fvecs";
+const char * path_learn =     "/home/y/yujianfu/ivf-hnsw/data/SIFT1M/sift_base.fvecs";
 const char * path_base =      "/home/y/yujianfu/ivf-hnsw/data/SIFT1M/sift_base.fvecs";
 const char * path_gt =        "/home/y/yujianfu/ivf-hnsw/data/SIFT1M/sift_groundtruth.ivecs";
 const char * path_query =     "/home/y/yujianfu/ivf-hnsw/data/SIFT1M/sift_query.fvecs";
