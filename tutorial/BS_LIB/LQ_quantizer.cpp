@@ -68,12 +68,9 @@ namespace bslib{
             idx_t idx = train_data_idxs[i];
             assert(idx <= this->nc_upper);
             for (size_t j = 0; j < this->dimension; j++){
-
                 train_set[idx].push_back(train_data[i * dimension + j]);
             }
-
         }
-
         std::cout << "Computing alphas for lq_quantizer with upper centroids: " << this->upper_centroids.size() << " nc_per_group: " << this->nc_per_group << std::endl;
         std::cout << "The size of upper_centroids: " << this->upper_centroids.size() / this->dimension << std::endl;
         std::cout << "The size if nn_centroid_idxs: " << nn_centroid_idxs.size() << std::endl;
