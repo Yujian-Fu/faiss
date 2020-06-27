@@ -178,6 +178,7 @@ namespace bslib{
             else{
                 //std::cout << "Query found, search in group " << i << std::endl;
                 std::vector<std::vector<float>> sub_centroids(this->nc_per_group, std::vector<float>(dimension));
+                std::vector<bool> sub_centroids_computed(this->nc_per_group, false);
                 idx_t base_idx = CentroidDistributionMap[i];
                 float alpha = this->alphas[i];
 
@@ -212,9 +213,10 @@ namespace bslib{
                         }
                         //else{
                         {
-                        if (sub_centroids[m].size() == 0){
+                        if (! sub_centroids_computed[m]){
                             idx_t label = base_idx + m;
                             compute_final_centroid(label, sub_centroids[m].data());
+                            sub_centroids_computed[m] = true;
                         }
                         
                         const float * query = queries + sequence_id * dimension;
