@@ -76,7 +76,32 @@ namespace bslib{
                 std::cout << vq_quantizer_index[0].quantizers[i].xb.size() / dimension << " ";
             }
             */
-           
+            this->train_data.resize(this->nt * this->dimension);
+            std::cout << "Loading learn set from " << path_learn << std::endl;
+            std::ifstream learn_input(path_learn, std::ios::binary);
+            readXvecFvec<learn_data_type>(learn_input, this->train_data.data(), this->dimension, this->nt, true);
+            this->train_data_idxs.resize(this->nt);
+            for (size_t i = 0; i < this->nt; i++){
+                this->train_data_idxs[i] = 0;
+            }
+            if (this->use_subset){
+                ShowMessage("Using subset of the train set, saving sub train set");
+                std::vector<float> train_subset(this->subnt * this->dimension);
+                RandomSubset(this->train_data.data(), train_subset.data(), this->dimension, this->nt, this->subnt);
+                train_data.resize(this->subnt * this->dimension);
+                for (size_t i = 0; i < subnt * dimension; i++){
+                    this->train_data[i] = train_subset[i];
+                }
+                this->nt = this->subnt;
+                CheckResult<float>(this->train_data.data(), this->dimension);
+            }
+
+            assert(index_type.size() == layers && index_type[0] != "LQ");
+            std::cout << "adding layers to the index structure " << std::endl;
+
+            
+
+
            std::cout << "reading the VQ centroids " << std::endl;
            std::ifstream quantizer_input(path_quantizer, std::ios::binary);
             VQ_quantizer vq_quantizer = VQ_quantizer(this->dimension, 1, 10000);
@@ -86,7 +111,21 @@ namespace bslib{
             centroid_quantizer.add(10000, centroids.data());
             vq_quantizer.quantizers.push_back(centroid_quantizer);
             this->vq_quantizer_index.push_back(vq_quantizer);
+            
             std::cout << this->vq_quantizer_index[0].quantizers.size() << " " << this->vq_quantizer_index[0].quantizers[0].xb.size() << " " << std::endl;
+            
+            size_t group_size = this->train_data.size() / dimension;
+            std::vector<float> centroid_distances(group_size);
+            std::vector<faiss::Index::idx_t> centroid_idxs(group_size);
+
+            this->vq_quantizer_index[0].quantizers[0].search(group_size, this->train_data.data(), 1, centroid_distances.data(), centroid_idxs.data());
+            for (size_t j = 0; j < group_size; j++){
+                this->train_data_idxs[j] = centroid_idxs[j];
+                std::cout << this->train_data_idxs[j] << " ";
+            }
+            std::cout << std::endl;
+
+
             uint32_t nc_per_group = ncentroids[0];
             std::vector<float> upper_centroids (ncentroids[0]*dimension);
             std::vector<idx_t> nn_centroids_idxs(ncentroids[0]*ncentroids[1]);
