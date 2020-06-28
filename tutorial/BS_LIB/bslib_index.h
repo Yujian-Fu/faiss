@@ -10,7 +10,7 @@
 
 namespace bslib{
 
-typedef uint32_t idx_t;
+typedef faiss::Index::idx_t idx_t;
 typedef float learn_data_type;
 
 struct Bslib_Index{

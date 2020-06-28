@@ -6,6 +6,8 @@
 #include <queue>
 #include <math.h>
 #include <map>
+#include <algorithm>
+#include <numeric>
 
 #include <faiss/index_io.h>
 #include <faiss/utils/Heap.h>
@@ -16,13 +18,13 @@
 #include <faiss/IndexFlat.h>
 #include <faiss/Index.h>
 
-
+typedef faiss::Index::idx_t idx_t;
 
 namespace bslib{
 struct Base_quantizer
 {
 
-    typedef uint32_t idx_t;
+
     size_t dimension;
     size_t nc_upper;
     size_t nc_per_group;
