@@ -2,14 +2,8 @@
 
 namespace hnswlib {
 
-    HierarchicalNSW::HierarchicalNSW(const std::string &infoLocation,
-                                     const std::string &dataLocation,
-                                     const std::string &edgeLocation)
-    {
-        LoadInfo(infoLocation);
-        LoadData(dataLocation);
-        LoadEdges(edgeLocation);
-    }
+    HierarchicalNSW::HierarchicalNSW()
+    {}
 
     HierarchicalNSW::HierarchicalNSW(size_t d, size_t maxelements, size_t M, size_t maxM, size_t efConstruction)
 {
@@ -38,11 +32,11 @@ namespace hnswlib {
     cur_element_count = 0;
 }
 
-HierarchicalNSW::~HierarchicalNSW()
-{
-    free(data_level0_memory_);
-    delete visitedlistpool;
-}
+//HierarchicalNSW::~HierarchicalNSW()
+//{
+//    free(data_level0_memory_);
+//    delete visitedlistpool;
+//}
 
 
 std::priority_queue<std::pair<float, idx_t>> HierarchicalNSW::searchBaseLayer(const float *point, size_t ef)

@@ -8,6 +8,7 @@
 #include <map>
 #include <algorithm>
 #include <numeric>
+#include <set>
 
 #include <faiss/index_io.h>
 #include <faiss/utils/Heap.h>
@@ -17,8 +18,12 @@
 #include <faiss/utils/distances.h>
 #include <faiss/IndexFlat.h>
 #include <faiss/Index.h>
+//#include <faiss/IndexHNSW.h>
 
 typedef faiss::Index::idx_t idx_t;
+
+#define MAX_DIST 1e9
+#define INVALID_ID -1
 
 namespace bslib{
 struct Base_quantizer

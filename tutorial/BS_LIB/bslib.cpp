@@ -37,7 +37,7 @@ int main(){
     //Initialize the index
     ShowMessage("Initializing the index");
     Trecorder.reset();
-    Bslib_Index * index = new Bslib_Index(dimension, layers, index_type, use_subset, pq_use_subset);
+    Bslib_Index * index = new Bslib_Index(dimension, layers, index_type, use_subset, pq_use_subset, use_HNSW_VQ, use_HNSW_group, use_norm_quantization);
     index->nt = nt;
     index->subnt = subnt;
 
@@ -121,7 +121,10 @@ int main(){
     else{
         ShowMessage("Constructing the index");
         index->base_codes.resize(index->final_nc);
-        index->base_norm_codes.resize(index->final_nc);
+        if (use_norm_quantization)
+            index->base_norm_codes.resize(index->final_nc);
+        else
+            index->base_norm.resize(index->final_nc);
         index->origin_ids.resize(index->final_nc);
 
         Trecorder.reset();
@@ -133,7 +136,7 @@ int main(){
         std::vector<idx_t> ids(batch_size);
 
         for (size_t i = 0; i < nbatches; i++){
-            readXvec<uint32_t>(idx_input, idxs.data(), batch_size, 1);
+            readXvec<idx_t>(idx_input, idxs.data(), batch_size, 1);
             readXvecFvec<origin_data_type> (base_input, batch.data(), dimension, batch_size);
 
             for (size_t j = 0; j < batch_size; j++){
@@ -146,9 +149,6 @@ int main(){
                 Trecorder.print_time_usage("");
             }
         }
-
-        index->centroid_norms.resize(index->final_nc);
-        index->centroid_norm_codes.resize(index->final_nc * index->norm_code_size);
 
         index->compute_centroid_norm();
 

@@ -1,17 +1,18 @@
 #include <string>
 #include "VQ_quantizer.h"
 #include "LQ_quantizer.h"
+#include "PQ_quantizer.h"
 #include "utils.h"
 #include <unordered_set>
 #include <algorithm>
 
-#define MAX_DIST 1e9
-#define INVALID_ID -1
 
 namespace bslib{
 
 typedef faiss::Index::idx_t idx_t;
 typedef float learn_data_type;
+typedef std::pair<std::pair<size_t, size_t>, size_t> HNSW_para;
+typedef std::pair<size_t, size_t> PQ_para;
 
 struct Bslib_Index{
     size_t dimension; // Initialized in constructer
@@ -23,6 +24,9 @@ struct Bslib_Index{
     bool use_subset;
     bool pq_use_subset;
     bool use_reranking;
+    bool use_HNSW_VQ;
+    bool use_HNSW_group;
+    bool use_norm_quantization;
     size_t reraking_space;
 
     size_t M; // Initialized by training pq
@@ -34,17 +38,19 @@ struct Bslib_Index{
     size_t max_visited_vectors; //
     
     
-
+    std::vector<size_t> ncentroids;
     std::vector<VQ_quantizer > vq_quantizer_index; // Initialized in read_quantizer
     std::vector<LQ_quantizer > lq_quantizer_index; // Initialized in read_quantizer
+    std::vector<PQ_quantizer > pq_quantizer_index;
     faiss::ProductQuantizer pq; // Initialized in train_pq
     faiss::ProductQuantizer norm_pq; // Initialized in train_pq
     
     std::vector<float> centroid_norms;
-    std::vector<uint8_t> centroid_norm_codes;
+    //std::vector<uint8_t> centroid_norm_codes;
 
     std::vector<std::vector<uint8_t>> base_norm_codes;
     std::vector<std::vector<uint8_t>> base_codes;
+    std::vector<std::vector<float>> base_norm;
     std::vector<std::vector<idx_t>> origin_ids;
 
     std::vector<float> precomputed_table; 
@@ -54,13 +60,14 @@ struct Bslib_Index{
 
 
 
-    explicit Bslib_Index(const size_t dimension, const size_t layers, const std::string * index_type, const bool use_subset, const bool pq_use_subset);
+    explicit Bslib_Index(const size_t dimension, const size_t layers, const std::string * index_type, const bool use_subset, const bool pq_use_subset, const bool use_HNSW_VQ, const bool use_HNSW_group, const bool use_norm_quantization);
 
-    void build_quantizers(const uint32_t * ncentroids, const char * path_quantizers, const char * path_learn);
+    void build_quantizers(const uint32_t * ncentroids, const char * path_quantizer, const char * path_learn, const std::vector<HNSW_para> HNSW_paras = std::vector<HNSW_para>(0), const std::vector<PQ_para> PQ_paras = std::vector<PQ_para>(0));
     
-    void add_vq_quantizer(size_t nc_upper, size_t nc_per_group, bool update_idxs);
+    void add_vq_quantizer(size_t nc_upper, size_t nc_per_group, bool update_idxs, size_t M, size_t efConstruction, size_t efSearch);
     void add_lq_quantizer(size_t nc_upper, size_t nc_per_group, const float * upper_centroids, const idx_t * upper_nn_centroid_idxs, const float * upper_nn_centroid_dists, bool update_idxs);
-    
+    void add_pq_quantizer(size_t nc_upper, size_t M, size_t nbits);
+
     void train_pq(const char * path_pq, const char * path_norm_pq, const char * path_learn);
 
     void encode(size_t n, const float * data, const idx_t * encoded_ids, float * encoded_data);
@@ -70,7 +77,7 @@ struct Bslib_Index{
     void get_final_nc();
     void compute_centroid_norm();
     void search(size_t n, size_t result_k, float * queries, float * query_dists, faiss::Index::idx_t * query_ids, size_t * keep_space, uint32_t * groundtruth);
-    void get_next_group_idx(size_t keep_result_space, idx_t * group_ids, float * query_group_dists, float * result_idx_dist);
+    void get_next_group_idx(size_t keep_result_space, idx_t * group_ids, float * query_group_dists, std::pair<idx_t, float> & result_idx_dist);
     void keep_k_min(const size_t m, const size_t k, const float * all_dists, const idx_t * all_ids, float * sub_dists, idx_t * sub_ids);
     float pq_L2sqr(const uint8_t *code);
 

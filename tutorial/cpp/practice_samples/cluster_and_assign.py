@@ -16,7 +16,7 @@ d = a[0]
 b =  a.reshape(-1, d + 1)[:, 1:].copy().view('float32')
 
 print("Dataset dimension is ", d, " train set size is: ", b.shape[0])
-niter = 50
+niter = 100
 verbose = True
 
 start = time.time()

@@ -13,7 +13,7 @@
 #include <cmath>
 #include <queue>
 
-#include <faiss/Heap.h>
+#include <faiss/utils/Heap.h>
 
 #ifdef _MSC_VER
 #include <intrin.h>
@@ -69,7 +69,7 @@ namespace hnswlib {
         size_t efSearch;
 
     public:
-        HierarchicalNSW(const std::string &infoLocation, const std::string &dataLocation, const std::string &edgeLocation);
+        HierarchicalNSW();
         HierarchicalNSW(size_t d, size_t maxelements, size_t M, size_t maxM, size_t efConstruction = 500);
         ~HierarchicalNSW();
 

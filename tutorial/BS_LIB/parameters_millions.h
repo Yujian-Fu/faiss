@@ -14,6 +14,9 @@ const char * path_quantizers = "/home/y/yujianfu/ivf-hnsw/models_VQ_LQ/SIFT1M/ce
 const bool use_subset = false;
 const bool pq_use_subset = false;
 const bool use_reranking = false;
+const bool use_HNSW_VQ = false;
+const bool use_HNSW_group = false;
+const bool use_norm_quantization = false;
 const size_t reranking_space = 20;
 
 //For train PQ
