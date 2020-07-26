@@ -39,6 +39,7 @@ int main(){
     Bslib_Index * index = new Bslib_Index(dimension, layers, index_type, use_HNSW_VQ, use_HNSW_group, use_norm_quantization);
     index->train_size = train_size;
 
+    index->build_train_selector(path_learn, path_groups, path_labels, train_size, selector_train_size, selector_group_size);
     std::vector<HNSW_para> HNSW_paras;
     if (use_HNSW_VQ){
         for (size_t i = 0; i < VQ_layers; i++){
@@ -60,7 +61,6 @@ int main(){
     Trecorder.print_time_usage(message);
     Trecorder.record_time_usage(record_file, message);
 
-    index->build_train_selector(path_learn, path_groups, path_labels, train_size, selector_train_size, selector_group_size);
 
     //Precompute the base vector idxs
     if (!exists(path_idxs)){

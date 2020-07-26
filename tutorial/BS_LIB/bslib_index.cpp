@@ -143,6 +143,7 @@ namespace bslib{
      * 
      **/
     void Bslib_Index::build_train_selector(const char * path_learn, const char * path_groups, const char * path_labels, size_t total_train_size, size_t sub_train_size, size_t group_size){
+        PrintMessage("Building train dataset selector for further train tasks");
         if (exists(path_labels)){
             std::ifstream labels_input(path_labels, std::ios::binary);
             assert(this->train_set_ids.size() == 0);
