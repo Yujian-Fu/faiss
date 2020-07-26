@@ -123,7 +123,6 @@ namespace bslib{
     }
 
 
-
     inline bool exists(const char * FilePath){
         std::ifstream f (FilePath);
         return f.good();
@@ -139,7 +138,7 @@ namespace bslib{
             memcpy(output + i * dimension, x + RandomId[i] * dimension, sizeof(T) * dimension);
     }
 
-    inline void ShowMessage(std::string s){
+    inline void PrintMessage(std::string s){
         std::cout << s << std::endl;
     }
 

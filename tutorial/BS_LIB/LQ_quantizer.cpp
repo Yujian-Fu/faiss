@@ -105,23 +105,14 @@ namespace bslib{
      * train_data_ids: updated train group id                          
      * 
     **/ 
-    void LQ_quantizer::build_centroids(const float * train_data, size_t train_set_size, idx_t * train_data_ids, bool update_ids){
-        
-
+    void LQ_quantizer::build_centroids(const float * train_data, size_t train_set_size, idx_t * train_data_ids){
         std::cout << "Adding " << train_set_size << " train set data into " << nc_upper << " groups " << std::endl;
         
         std::vector<std::vector<float>> train_set(this->nc_upper);
-        std::vector<std::vector<idx_t>> sequence_id_set;
-
-        //The sequence id is only used when update idx is required
-        if (update_ids){
-            sequence_id_set.resize(this->nc_upper);
-        }
 
         for(size_t i = 0; i < train_set_size; i++){
             idx_t group_id = train_data_ids[i];
             assert(group_id <= this->nc_upper);
-            if (update_ids){sequence_id_set[group_id].push_back(i);}
             for (size_t j = 0; j < this->dimension; j++){
                 train_set[group_id].push_back(train_data[i * dimension + j]);
             }
@@ -142,32 +133,39 @@ namespace bslib{
             size_t train_group_size = train_set[i].size() / this->dimension;
             this->alphas[i] = compute_alpha(centroid_vectors.data(), train_set[i].data(), centroid, this->nn_centroid_dists[i].data(), train_group_size);
         }
-        
         std::cout << "finished computing centoids" <<std::endl;
+    }
 
-        if (update_ids){
-            std::cout << "Finding the centroid ids for train vectors for futher quantizer construction " << std::endl;
 
-#pragma omp parallel for
-            for (size_t group_id = 0; group_id < this->nc_upper; group_id++){
-                std::vector<float> final_centroids(this->nc_per_group * dimension);
-                idx_t base_id = CentroidDistributionMap[group_id];
-                faiss::IndexFlatL2 group_quantizer(dimension);
-                for (size_t inner_group_id = 0; inner_group_id < this->nc_per_group; inner_group_id ++){
-                    compute_final_centroid(group_id, inner_group_id, final_centroids.data() + inner_group_id * dimension);
-                }
-                group_quantizer.add(this->nc_per_group, final_centroids.data());
-                size_t train_group_size = train_set[group_id].size() / dimension;
+    /**
+     * 
+     * This is the function for updating the ids for train set data
+     * 
+     * Input:
+     * train_data: the new train data for next layer     size: train_set_size * dimension
+     * train_set_size: the size for train set
+     * 
+     * Output:
+     * train_data_ids: the ids for train vectors        size: train_set_size
+     * 
+     **/
 
-                std::vector<float> group_train_dis(train_group_size);
-                std::vector<idx_t> group_train_ids(train_group_size);
-                group_quantizer.search(train_group_size, train_set[group_id].data(), 1, group_train_dis.data(), group_train_ids.data());
-                for (size_t inner_group_id = 0; inner_group_id < train_group_size; inner_group_id++){
-                    train_data_ids[sequence_id_set[group_id][inner_group_id]] = group_train_ids[inner_group_id] + base_id;
-                }
+    void LQ_quantizer::update_train_ids(const float * train_data, idx_t * train_data_ids, size_t train_set_size){
+        faiss::IndexFlatL2 centroid_index(dimension);
+        std::vector<float> one_centroid(dimension);
+
+        for (size_t group_id = 0; group_id < nc_upper; group_id++){
+            for (size_t inner_group_id = 0; inner_group_id < nc_per_group; inner_group_id++){
+                compute_final_centroid(group_id, inner_group_id, one_centroid.data());
+                centroid_index.add(1, one_centroid.data());
             }
         }
+
+        std::vector<float> result_dists(train_set_size);
+        centroid_index.search(train_set_size, train_data, 1, result_dists.data(), train_data_ids);
     }
+
+
 
     /**
      * The size for final centroid: dimension
@@ -286,7 +284,6 @@ namespace bslib{
             else{
                 std::vector<std::vector<float>> sub_centroids(this->nc_per_group, std::vector<float>(dimension));
                 std::vector<bool> sub_centroids_computed(this->nc_per_group, false);
-                idx_t base_id = CentroidDistributionMap[group_id];
                 float alpha = this->alphas[group_id];
 
                 for (size_t train_group_id = 0; train_group_id < query_sequence_set[group_id].size(); train_group_id++){
@@ -318,7 +315,6 @@ namespace bslib{
                         }
                         else{
                         if (! sub_centroids_computed[inner_group_id]){
-                            idx_t label = base_id + inner_group_id;
                             compute_final_centroid(group_id, inner_group_id, sub_centroids[inner_group_id].data());
                             sub_centroids_computed[inner_group_id] = true;
                         }

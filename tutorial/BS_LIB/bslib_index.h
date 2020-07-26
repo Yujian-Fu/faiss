@@ -5,6 +5,7 @@
 #include "utils.h"
 #include <unordered_set>
 #include <algorithm>
+#include <faiss/VectorTransform.h>
 
 
 namespace bslib{
@@ -18,16 +19,14 @@ struct Bslib_Index{
     size_t dimension; // Initialized in constructer
     size_t layers; // Initialized in constructer
     std::vector<std::string> index_type; // Initialized in constructer
-    size_t nt; //Initialized in constructer by 0, assigned in main
-    size_t subnt; //Initialized in constructer by 0, assigned in main 
+    size_t train_size; //Initialized in constructer by 0, assigned in main
     size_t max_group_size;
-    bool use_subset;
-    bool pq_use_subset;
     bool use_reranking;
     bool use_HNSW_VQ;
     bool use_HNSW_group;
     bool use_norm_quantization;
-    size_t reraking_space;
+    bool use_OPQ;
+    size_t reranking_space;
 
     size_t M; // Initialized by training pq
     size_t norm_M;
@@ -42,9 +41,11 @@ struct Bslib_Index{
     std::vector<VQ_quantizer > vq_quantizer_index; // Initialized in read_quantizer
     std::vector<LQ_quantizer > lq_quantizer_index; // Initialized in read_quantizer
     std::vector<PQ_quantizer > pq_quantizer_index;
+
     faiss::ProductQuantizer pq; // Initialized in train_pq
     faiss::ProductQuantizer norm_pq; // Initialized in train_pq
-    
+    faiss::LinearTransform opq_matrix;
+
     std::vector<float> centroid_norms;
     //std::vector<uint8_t> centroid_norm_codes;
 
@@ -55,20 +56,24 @@ struct Bslib_Index{
 
     std::vector<float> precomputed_table; 
 
+    std::vector<std::vector<idx_t>> train_set_ids;
     std::vector<float> train_data; // Initialized in build_quantizers (without reading)
-    std::vector<idx_t> train_data_idxs; // Initialized in build_quantizers (without reading)
+    std::vector<idx_t> train_data_ids; // Initialized in build_quantizers (without reading)
 
 
 
-    explicit Bslib_Index(const size_t dimension, const size_t layers, const std::string * index_type, const bool use_subset, const bool pq_use_subset, const bool use_HNSW_VQ, const bool use_HNSW_group, const bool use_norm_quantization);
+    explicit Bslib_Index(const size_t dimension, const size_t layers, const std::string * index_type, const bool use_HNSW_VQ, const bool use_HNSW_group, const bool use_norm_quantization);
 
-    void build_quantizers(const uint32_t * ncentroids, const char * path_quantizer, const char * path_learn, const std::vector<HNSW_para> HNSW_paras = std::vector<HNSW_para>(0), const std::vector<PQ_para> PQ_paras = std::vector<PQ_para>(0));
+    void build_quantizers(const uint32_t * ncentroids, const char * path_quantizer, const char * path_learn, const size_t * num_train, const std::vector<HNSW_para> HNSW_paras, const std::vector<PQ_para> PQ_paras);
     
-    void add_vq_quantizer(size_t nc_upper, size_t nc_per_group, bool update_idxs, size_t M, size_t efConstruction, size_t efSearch);
-    void add_lq_quantizer(size_t nc_upper, size_t nc_per_group, const float * upper_centroids, const idx_t * upper_nn_centroid_idxs, const float * upper_nn_centroid_dists, bool update_idxs);
+    void add_vq_quantizer(size_t nc_upper, size_t nc_per_group, size_t M, size_t efConstruction, size_t efSearch);
+    void add_lq_quantizer(size_t nc_upper, size_t nc_per_group, const float * upper_centroids, const idx_t * upper_nn_centroid_idxs, const float * upper_nn_centroid_dists);
     void add_pq_quantizer(size_t nc_upper, size_t M, size_t nbits);
 
-    void train_pq(const char * path_pq, const char * path_norm_pq, const char * path_learn);
+    void build_train_selector(const char * path_learn, const char * path_groups, const char * path_labels, size_t total_train_size, size_t sub_train_size, size_t group_size);
+    void read_train_set(const char * path_learn, size_t total_size, size_t train_set_size);
+
+    void train_pq(const char * path_pq, const char * path_norm_pq, const char * path_learn, const size_t train_set_size);
 
     void encode(size_t n, const float * data, const idx_t * encoded_ids, float * encoded_data);
     void decode(size_t n, const float * encoded_data, const idx_t * encoded_ids, float * decoded_data);
@@ -85,5 +90,10 @@ struct Bslib_Index{
     void write_quantizers(const char * path_quantizers);
     void read_index(const char * path_index);
     void write_index(const char * path_index);
+
+    /**
+     ** This is the function for dynamically get the reranking space for 
+     **/
+    size_t get_reranking_space(size_t k, size_t group_label, size_t group_id);
 };
 }

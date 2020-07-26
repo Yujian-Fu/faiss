@@ -10,7 +10,8 @@ namespace bslib{
 
         explicit LQ_quantizer(size_t dimension, size_t nc_upper, size_t nc_per_group, const float * upper_centroids,
                               const idx_t * upper_centroid_ids, const float * upper_centroid_dists);
-        void build_centroids(const float * train_data, size_t train_set_size, idx_t * train_set_idxs, bool update_idxs);
+        void build_centroids(const float * train_data, size_t train_set_size, idx_t * train_set_idxs);
+        void update_train_ids(const float * train_data, idx_t * train_data_ids, size_t train_set_size);
         float compute_alpha(const float * centroid_vectors, const float * points, const float * centroid,
                                       const float * centroid_vector_norms_L2sqr, size_t group_size);
         void compute_final_centroid(idx_t group_id, idx_t inner_group_id, float * sub_centroid);

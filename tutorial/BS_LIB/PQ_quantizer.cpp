@@ -152,7 +152,7 @@ namespace bslib{
                     break;
                 }
             }
-            if (index_flag = true)
+            if (index_flag == true)
                 return true;
         }
         return false;
@@ -173,8 +173,6 @@ namespace bslib{
      * result_labels: the label of the cloest centroid                       keep_space
      * 
      **/
-
-   //The result label is represented as the a M sequence
    void PQ_quantizer::multi_sequence_sort(const idx_t group_id, const float * dist_sequence, size_t keep_space, float * result_dists, idx_t * result_labels){
        
        std::vector<std::vector<float>> dist_seqs(this->M, std::vector<float>(this->ksub));
@@ -195,20 +193,16 @@ namespace bslib{
        std::priority_queue<dist_pair, std::vector<dist_pair>, cmp> dist_queue;
        std::vector<dist_pair> result_sequence;
        std::vector<idx_t> visited_index;
-       std::vector<float> visited_dist;
 
        std::vector<idx_t> dist_ids(this->M, 0);
        float origin_dist_sum = 0;
-       for (size_t i = 0; i < this->M; i++){
-           origin_dist_sum += dist_seqs[i][dist_index[i][dist_ids[i]]];
-       }
+       for (size_t i = 0; i < this->M; i++){origin_dist_sum += dist_seqs[i][dist_index[i][dist_ids[i]]];}
         dist_pair origin_pair(origin_dist_sum, dist_ids);
 
         for (size_t i = 0; i < this->M; i++){visited_index.push_back(origin_pair.second[i]);}
-        visited_dist.push_back(origin_pair.first);
         dist_queue.push(origin_pair);
 
-        
+
        while(result_sequence.size() < keep_space){
            dist_pair top_pair = dist_queue.top();
            result_sequence.push_back(top_pair);
@@ -236,7 +230,6 @@ namespace bslib{
                         if (!traversed(visited_index.data(), new_dist_idxs.data(), visited_index.size() / M)){
                             dist_pair new_pair(new_dist_sum, new_dist_idxs);
                             for (size_t k = 0; k < this->M; k++){visited_index.push_back(new_pair.second[k]);}
-                            visited_dist.push_back(new_pair.first);
                             dist_queue.push(new_pair);
                         }
                     }
@@ -259,7 +252,6 @@ namespace bslib{
                         if (! traversed(visited_index.data(), new_dist_idxs.data(), visited_index.size() / this->M)){
                             dist_pair new_pair(new_dist_sum, new_dist_idxs);
                             for (size_t k = 0; k < this->M; k++){visited_index.push_back(new_pair.second[k]);}
-                            visited_dist.push_back(new_pair.first);
                             dist_queue.push(new_pair);
                         }
                     }
@@ -358,7 +350,7 @@ namespace bslib{
 
     
     float PQ_quantizer::get_centroid_norms(const idx_t centroid_idx){
-        float result;
+        float result = 0;
         std::vector<idx_t> index(this->M);
         idx_t group_id = id_2_index(centroid_idx, index.data());
         for (size_t i = 0; i < this->M; i++){

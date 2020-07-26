@@ -170,7 +170,7 @@ void HierarchicalNSW::mutuallyConnectNewElement(const float *point, idx_t cur_c,
         uint8_t *ll_other = get_linklist0(res[idx]);
         uint8_t sz_link_list_other = *ll_other;
 
-        if (sz_link_list_other > resMmax || sz_link_list_other < 0)
+        if (sz_link_list_other > resMmax) //|| sz_link_list_other < 0)
             throw std::runtime_error("Bad sz_link_list_other");
 
         if (sz_link_list_other < resMmax) {

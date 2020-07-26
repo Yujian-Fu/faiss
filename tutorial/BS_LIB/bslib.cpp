@@ -9,7 +9,6 @@
 
 using namespace bslib;
 
-
 int main(){
     memory_recorder Mrecorder = memory_recorder();
     time_recorder Trecorder = time_recorder();
@@ -35,13 +34,25 @@ int main(){
 
 /*Train the residual PQ and norm PQ*/
     //Initialize the index
-    ShowMessage("Initializing the index");
+    PrintMessage("Initializing the index");
     Trecorder.reset();
-    Bslib_Index * index = new Bslib_Index(dimension, layers, index_type, use_subset, pq_use_subset, use_HNSW_VQ, use_HNSW_group, use_norm_quantization);
-    index->nt = nt;
-    index->subnt = subnt;
+    Bslib_Index * index = new Bslib_Index(dimension, layers, index_type, use_HNSW_VQ, use_HNSW_group, use_norm_quantization);
+    index->train_size = train_size;
 
-    index->build_quantizers(ncentroids, path_quantizers, path_learn);
+    std::vector<HNSW_para> HNSW_paras;
+    if (use_HNSW_VQ){
+        for (size_t i = 0; i < VQ_layers; i++){
+            HNSW_para new_para; new_para.first.first = M_HNSW[i]; new_para.first.second = efConstruction[i]; new_para.second = efSearch[i];
+            HNSW_paras.push_back(new_para);
+        }
+    }
+    std::vector<PQ_para> PQ_paras;
+    for (size_t i = 0; i < PQ_layers; i++){
+        PQ_para new_para; new_para.first = M_PQ_layer[i]; new_para.second = nbits_PQ_layer[i];
+        PQ_paras.push_back(new_para);
+    }
+
+    index->build_quantizers(ncentroids, path_quantizers, path_learn, num_train, HNSW_paras, PQ_paras);
     index->get_final_nc();
     message = "Initialized the index, ";
     Mrecorder.print_memory_usage(message);
@@ -49,21 +60,23 @@ int main(){
     Trecorder.print_time_usage(message);
     Trecorder.record_time_usage(record_file, message);
 
+    index->build_train_selector(path_learn, path_groups, path_labels, train_size, selector_train_size, selector_group_size);
+
     //Precompute the base vector idxs
     if (!exists(path_idxs)){
         Trecorder.reset();
-        ShowMessage("Assigning the points");
+        PrintMessage("Assigning the points");
         std::ifstream base_input (path_base, std::ios::binary);
         std::ofstream base_output (path_idxs, std::ios::binary);
 
         std::vector <float> batch(batch_size * dimension);
-        std::vector<idx_t> assigned_idxs(batch_size);
+        std::vector<idx_t> assigned_ids(batch_size);
 
         for (size_t i = 0; i < nbatches; i++){
             readXvecFvec<origin_data_type> (base_input, batch.data(), dimension, batch_size);
-            index->assign(batch_size, batch.data(), assigned_idxs.data());
+            index->assign(batch_size, batch.data(), assigned_ids.data());
             base_output.write((char * ) & batch_size, sizeof(uint32_t));
-            base_output.write((char *) assigned_idxs.data(), batch_size * sizeof(idx_t));
+            base_output.write((char *) assigned_ids.data(), batch_size * sizeof(idx_t));
             if (i % 10 == 0){
                 std::cout << " assigned batches [ " << i << " / " << nbatches << " ]";
                 Trecorder.print_time_usage("");
@@ -79,7 +92,7 @@ int main(){
     }
 
     //Train the PQ quantizer
-    ShowMessage("Training the PQ");
+    PrintMessage("Training the PQ");
     Trecorder.reset();
     if (exists(path_pq) && exists(path_pq_norm)){
         std::cout << "Loading PQ codebook from " << path_pq << std::endl;
@@ -90,14 +103,12 @@ int main(){
     }
     else
     {
-        index->nt = nt;
-        index->subnt = subnt;
-        index->M = bytes_per_code;
-        index->norm_M = bytes_per_norm_code;
+        index->M = M_PQ;
+        index->norm_M = M_norm_PQ;
         index->nbits = nbits;
         
         std::cout << "Training PQ codebook" << std::endl;
-        index->train_pq(path_pq, path_pq_norm, path_learn);
+        index->train_pq(path_pq, path_pq_norm, path_learn, PQ_train_size);
     }
     std::cout << "Checking the PQ " << index->pq.code_size << index->norm_pq.code_size << std::endl;
     message = "Trained the PQ, ";
@@ -108,7 +119,7 @@ int main(){
     
     //Build the index
     if (exists(path_index)){
-        ShowMessage("Loading index");
+        PrintMessage("Loading index");
         Trecorder.reset();
         index->read_index(path_index);
         
@@ -119,7 +130,7 @@ int main(){
         Trecorder.record_time_usage(record_file, message);
     }
     else{
-        ShowMessage("Constructing the index");
+        PrintMessage("Constructing the index");
         index->base_codes.resize(index->final_nc);
         if (use_norm_quantization)
             index->base_norm_codes.resize(index->final_nc);
@@ -161,14 +172,14 @@ int main(){
     }
 
     record_file.close();
-    ShowMessage("Loading groundtruth");
+    PrintMessage("Loading groundtruth");
     std::vector<uint32_t> groundtruth(nq * ngt);
     {
         std::ifstream gt_input(path_gt, std::ios::binary);
         readXvec<uint32_t>(gt_input, groundtruth.data(), ngt, nq, true, false);
     }
 
-    ShowMessage("Loading queries");
+    PrintMessage("Loading queries");
     std::vector<float> queries(nq * dimension);
     {
         std::ifstream query_input(path_query, std::ios::binary);
@@ -176,7 +187,7 @@ int main(){
     }
 
     index->use_reranking = use_reranking;
-    index->reraking_space = reranking_space;
+    index->reranking_space = reranking_space;
 
     index->max_visited_vectors = max_vectors;
     index->precomputed_table.resize(index->pq.M * index->pq.ksub);
@@ -221,7 +232,7 @@ int main(){
 
     std::cout << "The recall is: " << float(correct) / (result_k * nq) ;
     if (use_reranking){
-        std::cout << " with reranking parameter: " << index->reraking_space << std::endl;
+        std::cout << " with reranking parameter: " << index->reranking_space << std::endl;
     } 
     std::cout << std::endl;
 

@@ -14,7 +14,7 @@ namespace bslib{
      * efSearch:        for efSearch: keep_space < efSearch < nc_per_group
      * 
      **/
-    VQ_quantizer::VQ_quantizer(size_t dimension, size_t nc_upper, size_t nc_per_group, size_t M, size_t efConstruction, size_t efSearch, bool use_HNSW = false):
+    VQ_quantizer::VQ_quantizer(size_t dimension, size_t nc_upper, size_t nc_per_group, size_t M, size_t efConstruction, size_t efSearch, bool use_HNSW):
         Base_quantizer(dimension, nc_upper, nc_per_group), use_HNSW(use_HNSW){
             if (use_HNSW){
                 this->M = M;
@@ -30,26 +30,18 @@ namespace bslib{
      * train_data:      the train data for construct centroids        size: train_set_size * dimension
      * train_set_size:  the train data set size                       size_t
      * train_data_ids: the group_id for train data                    size: train_set_size
-     * update_idxs:     whether to update the ids of train data set   bool
      * 
      * Output:
      * train_data_ids: updated train group id
      * 
      **/
-    void VQ_quantizer::build_centroids(const float * train_data, size_t train_set_size, idx_t * train_data_ids, bool update_ids){
+    void VQ_quantizer::build_centroids(const float * train_data, size_t train_set_size, idx_t * train_data_ids){
         std::cout << "Adding " << train_set_size << " train set data into " << nc_upper << " groups " << std::endl;
         std::vector<std::vector<float>> train_set(this->nc_upper);
-        std::vector<std::vector<idx_t>> sequence_id_set;
-
-        //The sequence id set is only used when update idx is required
-        if (update_ids){
-            sequence_id_set.resize(this->nc_upper);
-        }
 
         for (size_t i = 0; i < train_set_size; i++){
             idx_t group_id = train_data_ids[i];
             assert(group_id <= this->nc_upper);
-            if (update_ids){sequence_id_set[group_id].push_back(i);}
             for (size_t j = 0; j < dimension; j++)
                 train_set[group_id].push_back(train_data[i*dimension + j]);
         }
@@ -77,33 +69,38 @@ namespace bslib{
                 this->L2_quantizers[i] = centroid_quantizer;
             }
         }
-
         std::cout << "finished computing centoids" <<std::endl;
-        if (update_ids){
-            std::cout << "Finding the centroid ids for train vectors for futher quantizer construction " << std::endl;
-            //Find the centroid idxs for train vectors
-#pragma omp parallel for
-            for (size_t group_id = 0; group_id < this->nc_upper; group_id++){
-                size_t base_id = CentroidDistributionMap[group_id];
-                size_t train_group_size = train_set[group_id].size() / dimension;
-                assert(train_group_size == sequence_id_set[group_id].size());
-                std::vector<float> group_train_dis(train_group_size);
-                std::vector<faiss::Index::idx_t> group_train_ids(train_group_size);
-                if (use_HNSW){
-                    for (size_t inner_group_id = 0; inner_group_id < train_group_size; inner_group_id++)
-                        group_train_ids[inner_group_id] = this->HNSW_quantizers[group_id]->searchKnn(train_set[group_id].data() + inner_group_id * dimension, 1).top().second;
-                }
-                
-                else
-                    this->L2_quantizers[group_id]->search(train_group_size, train_set[group_id].data(), 1, group_train_dis.data(), group_train_ids.data());
-                for (size_t inner_group_id = 0; inner_group_id < train_group_size; inner_group_id++){
-                    train_data_ids[sequence_id_set[group_id][inner_group_id]] = group_train_ids[inner_group_id] + base_id;
-                }
-            }
-        }
     }
 
+
+    /**
+     * 
+     * This is the function for updating the ids for train set data
+     * 
+     * Input:
+     * train_data: the new train data for next layer     size: train_set_size * dimension
+     * train_set_size: the size for train set
+     * 
+     * Output:
+     * train_data_ids: the ids for train vectors        size: train_set_size
+     * 
+     **/
+    void VQ_quantizer::update_train_ids(const float * train_data, idx_t * train_data_ids, size_t train_set_size){
+        faiss::IndexFlatL2 centroid_index(dimension);
+        std::vector<float> one_centroid(dimension);
+
+        for (size_t group_id = 0; group_id < nc_upper; group_id++){
+            for (size_t inner_group_id = 0; inner_group_id < nc_per_group; inner_group_id++){
+                compute_final_centroid(group_id, inner_group_id, one_centroid.data());
+                centroid_index.add(1, one_centroid.data());
+            }
+        }
+
+        std::vector<float> result_dists(train_set_size);
+        centroid_index.search(train_set_size, train_data, 1, result_dists.data(), train_data_ids);
+    }
     
+
     /**
      * For a query sequence queries, search in their group and return the k cloest centroids
      * 
@@ -335,7 +332,7 @@ namespace bslib{
             HNSW->efConstruction_ = 0;
             HNSW->cur_element_count = HNSW->maxelements_;
 
-            HNSW->visitedlistpool = new hnswlib::VisitedListPool::VisitedListPool(1, HNSW->maxelements_);
+            HNSW->visitedlistpool = new hnswlib::VisitedListPool(1, HNSW->maxelements_);
 
             //Load Edges
             uint32_t size;
