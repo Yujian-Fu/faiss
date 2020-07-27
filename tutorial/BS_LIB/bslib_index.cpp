@@ -206,6 +206,7 @@ namespace bslib{
      * 
      **/
     void Bslib_Index::read_train_set(const char * path_learn, size_t total_size, size_t train_set_size){
+        std::cout << "Reading " << train_set_size << " from " << total_size << " for training" << std::endl;
         this->train_data.resize(train_set_size * dimension);
         this->train_data_ids.resize(train_set_size, 0);
 
@@ -344,7 +345,7 @@ namespace bslib{
 
             if (index_type[i] == "VQ"){
                 
-                PrintMessage("Adding VQ quantizer");
+                std::cout << "Adding VQ quantizer with parameters: " << nc_upper << " " << nc_per_group;
                 if (use_HNSW_VQ){
                     size_t existed_VQ_layers = this->vq_quantizer_index.size();
                     HNSW_para para = HNSW_paras[existed_VQ_layers];
