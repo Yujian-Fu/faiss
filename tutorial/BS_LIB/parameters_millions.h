@@ -77,10 +77,10 @@ const char * path_quantizers = "/home/y/yujianfu/ivf-hnsw/models_VQ/SIFT1M/quant
 /**
  **This is the centroids for assigining origin train vectors  size: n_group * dimension
  **/
-const char * path_groups = ("/home/y/yujianfu/ivf-hnsw/models_VQ/SIFT1M/selector_centroids_" + std::to_string(selector_group_size) + ".fvecs").c_str();
+const char * path_groups = (char *) ("/home/y/yujianfu/ivf-hnsw/models_VQ/SIFT1M/selector_centroids_" + std::to_string(selector_group_size) + ".fvecs").c_str();
 //This is for recording the labels based on the generated centroids
 
 /**
  ** This is the labels for all assigned vectors, n_group * group_size 
  **/
-const char * path_labels = ("/home/y/yujianfu/ivf-hnsw/models_VQ/SIFT1M/selector_ids_" + std::to_string(train_size)).c_str();
+const char * path_labels = (char *) ("/home/y/yujianfu/ivf-hnsw/models_VQ/SIFT1M/selector_ids_" + std::to_string(train_size)).c_str();

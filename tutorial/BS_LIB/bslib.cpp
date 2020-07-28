@@ -2,6 +2,7 @@
 #include <fstream>
 #include <unordered_set>
 #include <sys/resource.h>
+#include <string>
 
 #include "bslib_index.h"
 #include "parameters_millions.h"
