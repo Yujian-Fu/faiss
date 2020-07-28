@@ -64,6 +64,7 @@ namespace bslib{
             }
             else
             {
+                L2_quantizers.resize(nc_upper);
                 faiss::IndexFlatL2 * centroid_quantizer = new faiss::IndexFlatL2(dimension);
                 centroid_quantizer->add(nc_per_group, centroids.data());
                 this->L2_quantizers[i] = centroid_quantizer;

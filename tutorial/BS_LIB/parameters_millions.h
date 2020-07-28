@@ -10,12 +10,11 @@ const size_t layers = 1;
 const size_t VQ_layers = 1;
 const size_t PQ_layers = 0;
 const std::string index_type[layers] = {"VQ"};
-const uint32_t ncentroids[layers] = {10000};
+const uint32_t ncentroids[layers] = {5000};
 
 const bool pq_use_subset = false;
 const bool use_reranking = false;
 const bool use_HNSW_VQ = false;
-const bool use_HNSW_group = false;
 const bool use_norm_quantization = false;
 const bool use_train_selection = false;
 const bool use_dynamic_reranking = false;

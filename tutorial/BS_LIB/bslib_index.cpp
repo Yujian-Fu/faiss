@@ -345,7 +345,7 @@ namespace bslib{
 
             if (index_type[i] == "VQ"){
                 
-                std::cout << "Adding VQ quantizer with parameters: " << nc_upper << " " << nc_per_group;
+                std::cout << "Adding VQ quantizer with parameters: " << nc_upper << " " << nc_per_group << std::endl;
                 if (use_HNSW_VQ){
                     size_t existed_VQ_layers = this->vq_quantizer_index.size();
                     HNSW_para para = HNSW_paras[existed_VQ_layers];
@@ -1170,7 +1170,6 @@ namespace bslib{
                         quantizers_output.write((char * ) vq_quantizer_index[n_vq].L2_quantizers[j]->xb.data(), group_quantizer_data_size * sizeof(float));
                     }
                 }
-
                 assert(n_vq + n_lq + n_pq == i);
                 n_vq ++;
             }
@@ -1228,6 +1227,7 @@ namespace bslib{
                 exit(0);
             }
         }
+        PrintMessage("Write quantizer finished");
         quantizers_output.close();
     }
 
