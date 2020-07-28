@@ -16,7 +16,7 @@ int main(){
     std::string message;
 
 /*Prepare the work space*/
-    PrepareFolder(folder_model);
+    PrepareFolder((char *) folder_model.c_str());
     PrepareFolder((char *) (std::string(folder_model)+"/SIFT1M").c_str());
     std::cout << "Preparing work space: " << folder_model << std::endl;
 
