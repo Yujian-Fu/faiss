@@ -36,7 +36,7 @@ int main(){
     //Initialize the index
     PrintMessage("Initializing the index");
     Trecorder.reset();
-    Bslib_Index * index = new Bslib_Index(dimension, layers, index_type, use_HNSW_VQ, use_HNSW_group, use_norm_quantization);
+    Bslib_Index * index = new Bslib_Index(dimension, layers, index_type, use_HNSW_VQ, use_norm_quantization);
     index->train_size = train_size;
 
     index->build_train_selector(path_learn, path_groups, path_labels, train_size, selector_train_size, selector_group_size);

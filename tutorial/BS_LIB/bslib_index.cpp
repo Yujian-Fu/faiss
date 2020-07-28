@@ -6,7 +6,7 @@ namespace bslib{
     /**
      * The initialize function for BSLIB struct 
      **/
-    Bslib_Index::Bslib_Index(const size_t dimension, const size_t layers, const std::string * index_type, const bool use_HNSW_VQ, const bool use_HNSW_group, const bool use_norm_quantization):
+    Bslib_Index::Bslib_Index(const size_t dimension, const size_t layers, const std::string * index_type, const bool use_HNSW_VQ,  const bool use_norm_quantization):
         dimension(dimension), layers(layers){
 
             this->use_HNSW_VQ = use_HNSW_VQ;

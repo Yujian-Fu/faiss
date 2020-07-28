@@ -62,7 +62,7 @@ struct Bslib_Index{
 
 
 
-    explicit Bslib_Index(const size_t dimension, const size_t layers, const std::string * index_type, const bool use_HNSW_VQ, const bool use_HNSW_group, const bool use_norm_quantization);
+    explicit Bslib_Index(const size_t dimension, const size_t layers, const std::string * index_type, const bool use_HNSW_VQ, const bool use_norm_quantization);
 
     void build_quantizers(const uint32_t * ncentroids, const char * path_quantizer, const char * path_learn, const size_t * num_train, const std::vector<HNSW_para> HNSW_paras, const std::vector<PQ_para> PQ_paras);
     
