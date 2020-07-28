@@ -63,11 +63,11 @@ int main(){
     Trecorder.record_time_usage(record_file, message);
 
     //Precompute the base vector idxs
-    if (!exists(path_idxs)){
+    if (!exists(path_ids)){
         Trecorder.reset();
         PrintMessage("Assigning the points");
         std::ifstream base_input (path_base, std::ios::binary);
-        std::ofstream base_output (path_idxs, std::ios::binary);
+        std::ofstream base_output (path_ids, std::ios::binary);
 
         std::vector <float> batch(batch_size * dimension);
         std::vector<idx_t> assigned_ids(batch_size);
@@ -144,21 +144,19 @@ int main(){
 
         Trecorder.reset();
         std::ifstream base_input(path_base, std::ios::binary);
-        std::ifstream idx_input(path_idxs, std::ios::binary);
+        std::ifstream idx_input(path_ids, std::ios::binary);
 
-        std::vector<idx_t> idxs(batch_size);
-        std::vector<float> batch(batch_size * dimension);
         std::vector<idx_t> ids(batch_size);
+        std::vector<float> batch(batch_size * dimension);
+        std::vector<idx_t> sequence_ids(batch_size);
 
         for (size_t i = 0; i < nbatches; i++){
-            readXvec<idx_t>(idx_input, idxs.data(), batch_size, 1);
+            readXvec<idx_t>(idx_input, ids.data(), batch_size, 1);
             readXvecFvec<origin_data_type> (base_input, batch.data(), dimension, batch_size);
 
-            for (size_t j = 0; j < batch_size; j++){
-                ids[j] = batch_size * i + j;
-            }
+            for (size_t j = 0; j < batch_size; j++){sequence_ids[j] = batch_size * i + j;}
 
-            index.add_batch(batch_size, batch.data(), ids.data(), idxs.data());
+            index.add_batch(batch_size, batch.data(), sequence_ids.data(), ids.data());
             if (i % 10 == 0){
                 std::cout << " adding batches [ " << i << " / " << nbatches << " ]";
                 Trecorder.print_time_usage("");
@@ -199,33 +197,19 @@ int main(){
     std::vector<faiss::Index::idx_t> query_labels(nq * result_k);
     size_t correct = 0;
     
-    index.search(nq, result_k, queries.data(), query_distances.data(), query_labels.data(), keep_space, groundtruth.data());
-    
+    Trecorder.reset();
+    index.search(nq, result_k, queries.data(), query_distances.data(), query_labels.data(), keep_space, groundtruth.data(), path_base);
     std::cout << "The qps for searching is: " << Trecorder.getTimeConsumption() / nq << " us " << std::endl;
     message = "Finish Search";
     Trecorder.print_time_usage(message);
     Mrecorder.print_memory_usage(message);
-
-    std::vector<float> base_dataset(nb * dimension);
-    std::ifstream base_input(path_base, std::ios::binary);
-    readXvecFvec<origin_data_type> (base_input, base_dataset.data(), dimension, nb);
-
 
     for (size_t i = 0; i < nq; i++){
         std::unordered_set<idx_t> gt;
 
         for (size_t j = 0; j < result_k; j++){
             gt.insert(groundtruth[ngt * i + j]);
-            /*
-            std::cout << query_labels[i * result_k + j] << " ";
-            float * nn = base_dataset.data() + query_labels[i * result_k + j] * dimension;
-            float * query = queries.data() + i * dimension;
-            std::vector<float> distance_vector(dimension);
-            faiss::fvec_madd(dimension, nn, -1, query, distance_vector.data());
-            std::cout << query_distances[i * result_k + j] << " " << faiss::fvec_norm_L2sqr(distance_vector.data(), dimension) << " ";
-            */
         }
-
 
         assert (gt.size() == result_k);
         for (size_t j = 0; j < result_k; j++){
@@ -234,7 +218,7 @@ int main(){
         }
     }
 
-    std::cout << "The recall is: " << float(correct) / (result_k * nq) ;
+    std::cout << "The average recall is: " << float(correct) / (result_k * nq) ;
     if (use_reranking){
         std::cout << " with reranking parameter: " << index.reranking_space << std::endl;
     } 

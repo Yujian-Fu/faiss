@@ -6,12 +6,16 @@
 #include <unordered_set>
 #include <algorithm>
 #include <faiss/VectorTransform.h>
-
+#define EPSILON 5
 
 namespace bslib{
 
-typedef faiss::Index::idx_t idx_t;
+
+// Change this type for different datasets
 typedef float learn_data_type;
+typedef float base_data_type;
+
+typedef faiss::Index::idx_t idx_t;
 typedef std::pair<std::pair<size_t, size_t>, size_t> HNSW_para;
 typedef std::pair<size_t, size_t> PQ_para;
 
@@ -60,8 +64,6 @@ struct Bslib_Index{
     std::vector<float> train_data; // Initialized in build_quantizers (without reading)
     std::vector<idx_t> train_data_ids; // Initialized in build_quantizers (without reading)
 
-
-
     explicit Bslib_Index(const size_t dimension, const size_t layers, const std::string * index_type, const bool use_HNSW_VQ, const bool use_norm_quantization);
 
     void build_quantizers(const uint32_t * ncentroids, const std::string path_quantizer, const std::string path_learn, const size_t * num_train, const std::vector<HNSW_para> HNSW_paras, const std::vector<PQ_para> PQ_paras);
@@ -81,7 +83,7 @@ struct Bslib_Index{
     void add_batch(size_t n, const float * data, const idx_t * origin_ids, idx_t * encoded_ids);
     void get_final_nc();
     void compute_centroid_norm();
-    void search(size_t n, size_t result_k, float * queries, float * query_dists, faiss::Index::idx_t * query_ids, size_t * keep_space, uint32_t * groundtruth);
+    void search(size_t n, size_t result_k, float * queries, float * query_dists, idx_t * query_ids, size_t * keep_space, uint32_t * groundtruth, std::string path_base);
     void get_next_group_idx(size_t keep_result_space, idx_t * group_ids, float * query_group_dists, std::pair<idx_t, float> & result_idx_dist);
     void keep_k_min(const size_t m, const size_t k, const float * all_dists, const idx_t * all_ids, float * sub_dists, idx_t * sub_ids);
     float pq_L2sqr(const uint8_t *code);
@@ -90,6 +92,9 @@ struct Bslib_Index{
     void write_quantizers(const std::string path_quantizers);
     void read_index(const std::string path_index);
     void write_index(const std::string path_index);
+
+    void get_final_centroid(const size_t group_id, float * final_centroid);
+
 
     /**
      ** This is the function for dynamically get the reranking space for 

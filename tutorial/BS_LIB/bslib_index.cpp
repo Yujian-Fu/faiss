@@ -564,6 +564,41 @@ namespace bslib{
 
     /**
      * 
+     * This is the function for get a final centroid data
+     * 
+     * Input: 
+     * group id: the id of the final group in the last layer
+     * 
+     * Output:
+     * final centroid: the centroid data of the group id
+     * 
+     **/
+    void Bslib_Index::get_final_centroid(size_t group_id, float * final_centroid){
+        if (index_type[layers - 1] == "VQ"){
+            size_t n_vq = vq_quantizer_index.size();
+            size_t group_num = vq_quantizer_index[n_vq-1].nc_upper;
+            size_t group_size = vq_quantizer_index[n_vq-1].nc_per_group;
+            size_t vq_group_id = size_t(group_id / group_num);
+            size_t inner_vq_group_id = group_id - vq_group_id * group_size;
+            vq_quantizer_index[n_vq - 1].compute_final_centroid(vq_group_id, inner_vq_group_id, final_centroid);
+        }
+        else if(index_type[layers -1] == "LQ"){
+            size_t n_lq = lq_quantizer_index.size();
+            size_t group_num = lq_quantizer_index[n_lq - 1].nc_upper;
+            size_t group_size = lq_quantizer_index[n_lq - 1].nc_per_group;
+            size_t lq_group_id = size_t(group_id / group_num);
+            size_t inner_lq_group_id = group_id - lq_group_id * group_size;
+            lq_quantizer_index[n_lq - 1].compute_final_centroid(lq_group_id, inner_lq_group_id, final_centroid);
+        }
+        else{
+            size_t n_pq = pq_quantizer_index.size();
+            pq_quantizer_index[n_pq - 1].compute_final_centroid(group_id, final_centroid);
+        }
+    }
+
+
+    /**
+     * 
      * This is the function for computing norms of final centroids
      * For LQ and VQ layer, we compute the norm directly, but for PQ, we compute it indirectedly
      * The number of centroids in VQ and LQ are: final_nc
@@ -814,25 +849,36 @@ namespace bslib{
       * 
       **/
 
-    void Bslib_Index::search(size_t n, size_t result_k, float * queries, float * query_dists, idx_t * query_ids, size_t * keep_space, uint32_t * groundtruth){
+    void Bslib_Index::search(size_t n, size_t result_k, float * queries, float * query_dists, idx_t * query_ids, size_t * keep_space, uint32_t * groundtruth, std::string path_base){
         
-        float overall_proportion = 0;
-        float avg_visited_vectors = 0;
-        std::vector<float> avg_time_consumption(layers+1, 0);
-        float avg_query_centroid_dist = 0;
+        // Variables for testing and validation
+        bool validation = true; size_t validation_print_space = 50;
+        bool analysis = true;
+
+        std::vector<float>  visited_gt_proportion;
+        std::vector<size_t> actual_visited_vectors;
+        std::vector<std::vector<float>> time_consumption;
+        std::vector<float> q_c_dists;
+        std::vector<float> recall;
+        if (analysis){
+            visited_gt_proportion.resize(n, 0); actual_visited_vectors.resize(n, 0);
+            time_consumption.resize(n); for (size_t i=0;i<n;i++){time_consumption[i].resize(layers+1, 0);}
+            q_c_dists.resize(n, 0); recall.resize(n, 0);
+        }
+
+        std::ifstream base_input;
+        if (validation){base_input = std::ifstream(path_base, std::ios::binary);}
 
 //Use parallel in real use
 //#pragma omp parallel for
         for (size_t i = 0; i < n; i++){
-            std::vector<float> time_consumption(layers+1, 0);
+
+            //Variables for analysis
             time_recorder Trecorder = time_recorder();
-            std::ifstream base_input("/home/y/yujianfu/ivf-hnsw/data/SIFT1M/sift_base.fvecs", std::ios::binary);
-            
             std::unordered_set<uint32_t> grountruth_set;
-            for (size_t j = 0; j < result_k; j++){grountruth_set.insert(groundtruth[i * 100 + j]);}
+            if (analysis){for (size_t j = 0; j < result_k; j++){grountruth_set.insert(groundtruth[i * 100 + j]);}}
 
             const float * query = queries + i * dimension;
-
             size_t n_vq = 0;
             size_t n_lq = 0;
             size_t n_pq = 0;
@@ -894,7 +940,6 @@ namespace bslib{
                     memcpy(upper_result_dists.data(), result_dists.data(), search_space * sizeof(float));
 
                     //for (size_t m = 0; m < search_space; m++){upper_result_labels[m] = result_labels[m]; upper_result_dists[m] = result_dists[m];}
-
 #pragma omp parallel for
                     for (size_t m = 0; m < keep_result_space; m++){
                         lq_quantizer_index[n_lq].search_in_group(1, query, upper_result_labels.data(), upper_result_dists.data(), search_space, group_ids.data()+m*1, result_dists.data()+m*group_size, result_labels.data()+m*group_size);
@@ -929,48 +974,28 @@ namespace bslib{
                 search_space = group_size * keep_result_space;
                 keep_result_space = keep_result_space * keep_space[j];
 
-                time_consumption[j] = Trecorder.getTimeConsumption();
-                Trecorder.reset();
+                if (analysis){time_consumption[i][j] = Trecorder.getTimeConsumption();Trecorder.reset();}
             }
 
             assert((n_vq + n_lq + n_pq) == this->layers);
             this->pq.compute_inner_prod_table(query, this->precomputed_table.data());
 
-            ///////////////////////////////////////////////////////////
-            std::cout << "The query vector: " << std::endl;
-            for (size_t temp = 0; temp < 10; temp ++){
-                std::cout << query[temp] << " ";
-            }
-            std::cout << std::endl;
-
-            std::cout << "The pq centroids: " << std::endl;
-            for(size_t temp = 0; temp < 100; temp++){
-                std::cout << this->pq.centroids[temp] << " ";
-            }
-            std::cout << std::endl;
-
-            std::cout << "The prod table: " << std::endl;
-            for (size_t temp = 0; temp < 10; temp++){
-                std::cout << this->precomputed_table[temp] << " " << std::endl;
-            }
-            std::cout << std::endl;
-            ////////////////////////////////////////////////////////////
-            
+            //The analysis variables
             size_t visited_vectors = 0;
             size_t visited_gt = 0;
-            float query_centroid_dists = 0;
 
-            for (size_t j = 0; j < final_keep_space; j++){query_centroid_dists += group_dists[j];}
-            query_centroid_dists = query_centroid_dists / final_keep_space;
-            avg_query_centroid_dist += query_centroid_dists;
+            if (analysis){
+                float query_centroid_dists = 0;
+                for (size_t j = 0; j < final_keep_space; j++){query_centroid_dists += group_dists[j];}
+                query_centroid_dists = query_centroid_dists / final_keep_space;
+                q_c_dists[i] = query_centroid_dists;
+            }
 
-
-            size_t total_size = 0;
-            for (size_t j = 0; j < final_keep_space; j++){total_size += this->origin_ids[group_ids[j]].size();}
-
-            std::vector<float> query_search_dists(total_size);
-            std::vector<idx_t> query_search_labels(total_size);
-            std::vector<float> query_actual_dists(total_size);
+            size_t total_size = 0;for (size_t j = 0; j < final_keep_space; j++){total_size += this->origin_ids[group_ids[j]].size();}
+            
+            std::vector<float> query_search_dists(total_size, 0);std::vector<idx_t> query_search_labels(total_size, 0);
+            // The dists for actual data
+            std::vector<float> query_actual_dists; if (validation){(query_actual_dists.resize(total_size));}
 
             for (size_t j = 0; j < final_keep_space; j++){
 
@@ -979,7 +1004,7 @@ namespace bslib{
                 
                 idx_t group_id = result_idx_dist.first;
                 float q_c_dist = result_idx_dist.second;
-                std::cout << "Searching in " << group_id << " th group" << std::endl;
+                std::cout << "Searching in " << group_id << " th group with distance" << q_c_dist << std::endl;
 
                 size_t group_size = this->origin_ids[group_id].size();
                 assert(group_size == this->base_codes[group_id].size() / this->code_size);
@@ -993,8 +1018,20 @@ namespace bslib{
                 assert(centroid_norm > 0);
                 float term1 = q_c_dist - centroid_norm;
 
-                std::vector<float> base_reconstructed_norms;
+                // Validating the computation of q_c_dist and centroid_norm
+                if (validation){
+                    float actual_centroid_norm, actual_q_c_dist;
+                    std::vector<float> centroid(dimension);
+                    std::vector<float> q_c_dis_vector(dimension);
+                    get_final_centroid(group_id, centroid.data());
+                    actual_centroid_norm = faiss::fvec_norm_L2sqr(centroid.data(), dimension);
+                    faiss::fvec_madd(dimension, query, -1.0, centroid.data(), q_c_dis_vector.data());
+                    actual_q_c_dist = faiss::fvec_norm_L2sqr(q_c_dis_vector.data(), dimension);
+                    assert(abs(q_c_dist - actual_q_c_dist) < EPSILON && abs(centroid_norm - actual_centroid_norm) < EPSILON);
+                }
 
+                // If use norm pq for base vectors
+                std::vector<float> base_reconstructed_norms;
                 if (use_norm_quantization){
                     base_reconstructed_norms.resize(group_size, 0);
                     assert(group_size == base_norm_codes[group_id].size() / this->norm_code_size);
@@ -1009,125 +1046,107 @@ namespace bslib{
                     float dist = term1 + term2 - term3;
                     query_search_dists[visited_vectors] = dist;
 
-
                     //Compute the actual distance
-                    /************************************************/
-                    std::vector<float> base_vector(dimension);
-                    uint32_t dim;
-                    base_input.seekg(origin_ids[group_id][m] * dimension * sizeof (float) + origin_ids[group_id][m] * sizeof(uint32_t), std::ios::beg);
-                    base_input.read((char *) & dim, sizeof(uint32_t));
-                    assert(dim == this->dimension);
-                    base_input.read((char *) base_vector.data(), sizeof(float)*dimension);
+                    if (validation){
+                        std::vector<base_data_type> base_vector(dimension);
+                        uint32_t dim;
+                        base_input.seekg(origin_ids[group_id][m] * dimension * sizeof(base_data_type) + origin_ids[group_id][m] * sizeof(uint32_t), std::ios::beg);
+                        base_input.read((char *) & dim, sizeof(uint32_t)); assert(dim == this->dimension);
+                        base_input.read((char *) base_vector.data(), sizeof(base_data_type)*dimension);
+                        std::vector<float> base_vector_float(dimension);
+                        for (size_t temp = 0; temp < dimension; temp++){base_vector_float[temp] = base_vector[temp];}
 
-                    std::vector<float> distance_vector(dimension);
-                    faiss::fvec_madd(dimension, base_vector.data(), -1, query, distance_vector.data());
-                    float actual_dist =  faiss::fvec_norm_L2sqr(distance_vector.data(), dimension);
-                    query_actual_dists[visited_vectors] = actual_dist;
-                    /**********************************************/
+                        std::vector<float> distance_vector(dimension);
+                        faiss::fvec_madd(dimension, base_vector_float.data(), -1, query, distance_vector.data());
+                        float actual_dist =  faiss::fvec_norm_L2sqr(distance_vector.data(), dimension);
+                        float actual_norm = faiss::fvec_norm_L2sqr(base_vector_float.data(), dimension);
+                        query_actual_dists[visited_vectors] = actual_dist;
+                        std::cout << "S: " << dist << " A: " << actual_dist << " LN: " << term2 << " AN: " << actual_norm << " "; // S for "Search" and A for "Actual"
+                    }
 
                     query_search_labels[visited_vectors] = origin_ids[group_id][m];
                     visited_vectors ++;
 
-                    if (grountruth_set.count(this->origin_ids[group_id][m]) != 0){
-                        visited_gt ++;
-
-                        /*
-                        ///////////////////////////////////////////////////////
-                        std::cout << "Confirm the centroid: " << std::endl;
-                        for (size_t temp = 0; temp < 10; temp ++){
-                            std::cout << this->vq_quantizer_index[0].quantizers[0].xb[group_id * dimension + temp] << " ";
-                        }
-                        std::cout << std::endl;
-                        std::cout << group_id << " " << origin_ids[group_id][m] << " " << q_c_dist << " " << centroid_norms[group_id] << " " << term2 << " " << term3 << " " << dist << "     " << std::endl;
-                        ///////////////////////////////////////////////////////
-                        */
-                    }
+                    if (analysis){if (grountruth_set.count(origin_ids[group_id][m]) != 0){visited_gt ++;}}
                 }
-                if (visited_vectors > this->max_visited_vectors)
+                if (visited_vectors >= this->max_visited_vectors)
                     break;
             }
-            //std::cout << std::endl;
+            std::cout << std::endl;
 
+            if (validation){
             //Compute the distance sort for computed distance
-            std::vector<idx_t> search_dist_index(visited_vectors);
-            uint32_t x=0;
-            std::iota(search_dist_index.begin(),search_dist_index.end(),x++);
-            std::sort(search_dist_index.begin(),search_dist_index.end(), [&](int i,int j){return query_search_dists[i]<query_search_dists[j];} );
+                std::vector<idx_t> search_dist_index(visited_vectors);
+                uint32_t x=0;
+                std::iota(search_dist_index.begin(),search_dist_index.end(),x++);
+                std::sort(search_dist_index.begin(),search_dist_index.end(), [&](int i,int j){return query_search_dists[i]<query_search_dists[j];} );
 
-            //Compute the distance sort for actual distance
-            std::vector<idx_t> actual_dist_index(visited_vectors);
-            x = 0;
-            std::iota(actual_dist_index.begin(), actual_dist_index.end(), x++);
-            std::sort( actual_dist_index.begin(),actual_dist_index.end(), [&](int i,int j){return query_actual_dists[i]<query_actual_dists[j];} );
-
-            size_t correct = 0;
-            if (use_reranking){
-                size_t re_ranking_range = this->reranking_space;
-                std::vector<float> reranking_dists(re_ranking_range);
-                std::vector<float> reranking_labels(re_ranking_range);
-                for (size_t j = 0; j < re_ranking_range; j++){
-                    reranking_dists[j] = query_actual_dists[search_dist_index[j]];
-                    reranking_labels[j] = query_search_labels[search_dist_index[j]];
-                }
-
-                std::vector<idx_t> reranking_dist_index(re_ranking_range);
+                //Compute the distance sort for actual distance
+                std::vector<idx_t> actual_dist_index(visited_vectors);
                 x = 0;
-                std::iota(reranking_dist_index.begin(), reranking_dist_index.end(), x++);
-                std::sort(reranking_dist_index.begin(), reranking_dist_index.end(), [&](int i,int j){return reranking_dists[i] < reranking_dists[j];});
+                std::iota(actual_dist_index.begin(), actual_dist_index.end(), x++);
+                std::sort(actual_dist_index.begin(),actual_dist_index.end(), [&](int i,int j){return query_actual_dists[i]<query_actual_dists[j];} );
 
-                for (size_t j = 0; j < result_k; j++){
-                    query_dists[i * result_k + j] = reranking_dists[reranking_dist_index[j]];
-                    query_ids[i * result_k + j] = reranking_labels[reranking_dist_index[j]];
-                    if (grountruth_set.count(query_ids[i * result_k + j]) != 0){
-                        correct ++;
-                    }
+                assert(visited_vectors > validation_print_space);
+                std::cout << "Search Labels     Search Dists     Actual Labels     Actual Dists" << std::endl;
+                for (size_t temp = 0; temp < validation_print_space; temp++){
+                    std::cout << query_search_labels[search_dist_index[temp]] << "        " << 
+                    query_search_dists[search_dist_index[temp]] << "        " << 
+                    query_search_labels[actual_dist_index[temp]] << "        " <<
+                    query_actual_dists[actual_dist_index[temp]] << std::endl;
                 }
             }
 
-            else{
-                for (size_t j = 0; j < result_k; j++){
-                    query_dists[i * result_k + j] = query_search_dists[search_dist_index[j]];
-                    query_ids[i * result_k + j] = query_search_labels[search_dist_index[j]];
-                    if (grountruth_set.count(query_ids[i * result_k + j]) != 0){
-                        correct ++;
-                    }
-                        
+            if (use_reranking){
+                assert(visited_vectors > reranking_space);
+                std::ifstream reranking_input(path_base, std::ios::binary);
+                std::vector<float> reranking_dists(reranking_space, 0);
+                std::vector<idx_t> reranking_labels(reranking_space, 0);
+                std::vector<float> reranking_actual_dists(reranking_space, 0);
+                keep_k_min(visited_vectors, reranking_space, query_search_dists.data(), query_search_labels.data(), reranking_dists.data(), reranking_labels.data());
+
+                for (size_t j = 0; j < reranking_space; j++){
+                    std::vector<base_data_type> base_vector(dimension); std::vector<float> base_vector_float(dimension); uint32_t dim;
+                    reranking_input.seekg(reranking_labels[j] * dimension * sizeof(base_data_type) + reranking_labels[j] * sizeof(uint32_t), std::ios::beg);
+                    reranking_input.read((char *) & dim, sizeof(uint32_t)); assert(dim == dimension);
+                    reranking_input.read((char *) base_vector.data(), sizeof(base_data_type) * dimension);
+                    for (size_t temp = 0; temp < dimension; temp++){base_vector_float[temp] = base_vector[temp];}
+                    std::vector<float> distance_vector(dimension);
+                    faiss::fvec_madd(dimension, base_vector_float.data(), -1, query, distance_vector.data());
+                    float actual_dist =  faiss::fvec_norm_L2sqr(distance_vector.data(), dimension);
+                    reranking_actual_dists[j] = actual_dist;
                 }
 
-                //std::cout << "The visited gt proportion: " << float(visited_gt) / result_k << std::endl;
-                //std::cout << "The computed distance, actual distance label, groundtruth_label are " << std::endl;
-                //for (size_t i = 0; i < 100; i++){
-                    //std::cout << query_search_labels[search_dist_index[i]] << "_" << query_search_dists[search_dist_index[i]] << " ";
-                //}
-                //std::cout << std::endl;
-
-                //for (size_t i = 0; i < 100; i++){
-                    //std::cout << query_search_labels[actual_dist_index[i]] << "_" << query_actual_dists[search_dist_index[i]] << " ";
-                //}
-                //std::cout << std::endl;
+                keep_k_min(reranking_space, result_k, reranking_actual_dists.data(), reranking_labels.data(), query_dists + i * result_k, query_ids + i * result_k);
             }
 
-            overall_proportion += float(visited_gt) / result_k;
-            time_consumption[this->layers]  = Trecorder.getTimeConsumption();
+            else{keep_k_min(visited_vectors, result_k, query_search_dists.data(), query_search_labels.data(), query_dists + i * result_k, query_ids + i * result_k);}
 
-            avg_visited_vectors += visited_vectors;
-            for (size_t j = 0; j < layers + 1; j++){
-                avg_time_consumption[j] += time_consumption[j];    
-            }
-            if (i == 2){
-                exit(0);
+            if (analysis){
+                size_t correct = 0; for (size_t temp=0;temp<result_k;temp++){if(grountruth_set.count(query_ids[temp])!=0) correct++;}
+                recall[i] = float(correct) / result_k;
+                time_consumption[i][layers]  = Trecorder.getTimeConsumption();
+                visited_gt_proportion[i] = float(visited_gt) / result_k;
+                actual_visited_vectors[i] = visited_vectors;
             }
         }
 
-        std::cout << "The time consumption: ";
-        for (size_t i = 0; i < layers+1; i++){
-            std::cout << avg_time_consumption[i] / n << " ";
+        if (analysis){
+            float avg_visited_vectors = 0, avg_q_c_dist = 0, avg_visited_gt_proportion = 0;
+            std::vector<float> avg_time_consumption(layers+1, 0);
+            for (size_t i = 0; i < n; i++){
+                avg_visited_vectors += actual_visited_vectors[i];
+                avg_q_c_dist += q_c_dists[i];
+                avg_visited_gt_proportion += visited_gt_proportion[i];
+                for (size_t j = 0; j < layers+1; j++){
+                    avg_time_consumption[j] += time_consumption[i][j];
+                }
+            }
+            std::cout << "Time consumption in different parts: ";for(size_t i = 0; i < layers+1; i++){std::cout << avg_time_consumption[i] / n << " ";}std::cout << std::endl;
+            std::cout << "The average visited vectors: " << avg_visited_vectors / n << std::endl;
+            std::cout << "The average query centroid distance: " << avg_q_c_dist / n << std::endl;
+            std::cout << "The avarage groundtruth proportion is: " << avg_visited_gt_proportion / n << std::endl;
         }
-        std::cout << std::endl;
-
-        std::cout << "The average visited vectors: " << avg_visited_vectors / n << std::endl;
-        std::cout << "The average query centroid distance: " << avg_query_centroid_dist / n << std::endl;
-        std::cout << "The avarage groundtruth proportion is: " << overall_proportion / n << std::endl;
     }
 
 
