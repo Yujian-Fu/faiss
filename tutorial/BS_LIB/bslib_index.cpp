@@ -189,9 +189,11 @@ namespace bslib{
                 groups_output.write((char *) train_set_centroids.data() + i * dimension, dimension * sizeof(float));
 
                 size_t num_per_group = this->train_set_ids[i].size();
+                std::cout << num_per_group << " ";
                 labels_output.write((char *) & num_per_group, sizeof(size_t));
                 labels_output.write((char *) train_set_ids[i].data(), num_per_group * sizeof(idx_t));
             }
+            std::cout << std::endl;
         }
     }
 

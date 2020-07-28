@@ -1,5 +1,6 @@
 #include <cstdio>
 #include <iostream>
+#include <string>
 
 typedef float origin_data_type;
 
@@ -16,7 +17,6 @@ const bool pq_use_subset = false;
 const bool use_reranking = false;
 const bool use_HNSW_VQ = false;
 const bool use_norm_quantization = false;
-const bool use_train_selection = false;
 const bool use_dynamic_reranking = false;
 const bool use_OPQ = false;
 const size_t reranking_space = 20;
@@ -77,10 +77,10 @@ const char * path_quantizers = "/home/y/yujianfu/ivf-hnsw/models_VQ/SIFT1M/quant
 /**
  **This is the centroids for assigining origin train vectors  size: n_group * dimension
  **/
-const char * path_groups = "/home/y/yujianfu/ivf-hnsw/models_VQ/SIFT1M/selector_centroids_1000.fvecs";
+const char * path_groups = ("/home/y/yujianfu/ivf-hnsw/models_VQ/SIFT1M/selector_centroids_" + std::to_string(selector_group_size) + ".fvecs").c_str();
 //This is for recording the labels based on the generated centroids
 
 /**
  ** This is the labels for all assigned vectors, n_group * group_size 
  **/
-const char * path_labels = "/home/y/yujianfu/ivf-hnsw/models_VQ/SIFT1M/selector_ids";
+const char * path_labels = ("/home/y/yujianfu/ivf-hnsw/models_VQ/SIFT1M/selector_ids" + std::to_string(train_size)).c_str();
