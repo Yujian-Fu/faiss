@@ -34,8 +34,6 @@ namespace bslib{
     void Bslib_Index::add_vq_quantizer(size_t nc_upper, size_t nc_per_group, size_t M = 16, size_t efConstruction = 500, size_t efSearch = 100){
         
         VQ_quantizer vq_quantizer (dimension, nc_upper, nc_per_group, M, efConstruction, efSearch, use_HNSW_VQ);
-        std::cout << "The quantizers size are: " << vq_quantizer.L2_quantizers.size() << " " << vq_quantizer.HNSW_quantizers.size() << std::endl;
-        std::cout << "The L2 quantizer size is " << vq_quantizer.L2_quantizers.size() << std::endl;
         PrintMessage("Building centroids for vq quantizer");
         vq_quantizer.build_centroids(this->train_data.data(), this->train_data.size() / dimension, this->train_data_ids.data());
         PrintMessage("Finished construct the VQ layer");
@@ -616,9 +614,6 @@ namespace bslib{
      * 
      **/
     void Bslib_Index::assign(const size_t n, const float * assign_data, idx_t * assigned_ids){
-        
-        std::cout << "Assigning for " << n << " vector " << std::endl;
-
         std::vector<idx_t> group_ids (n, 0);
         std::vector<float> group_dists(n, 0.0);
 
@@ -1172,7 +1167,7 @@ namespace bslib{
                     for (size_t j = 0; j < nc_upper; j++){
                         std::cout << "Writing centroids " << std::endl;
                         size_t group_quantizer_data_size = nc_per_group * this->dimension;
-                        //assert(vq_quantizer_index[n_vq].L2_quantizers[j]->xb.size() == group_quantizer_data_size);
+                        assert(vq_quantizer_index[n_vq].L2_quantizers[j]->xb.size() == group_quantizer_data_size);
                         std::cout << "the centroid size is " << vq_quantizer_index[0].L2_quantizers.size() << std::endl;
                         std::cout << vq_quantizer_index[n_vq].L2_quantizers[j]->xb.size() << std::endl;
                         quantizers_output.write((char * ) vq_quantizer_index[n_vq].L2_quantizers[j]->xb.data(), group_quantizer_data_size * sizeof(float));
