@@ -522,14 +522,6 @@ namespace bslib{
             this->origin_ids[encoded_ids[i]].push_back(ids[i]);
         }
 
-        std::cout << "The sample codes " << std::endl;
-        for (size_t i = 0; i < 10 ; i++){
-            for (size_t j = 0; j < this->code_size; j++){
-                std::cout << (float)batch_codes[i*code_size + j] << " ";
-            }
-            std::cout << std::endl;
-        }
-
         std::vector<float> decoded_residuals(n * dimension);
         this->pq.decode(batch_codes.data(), decoded_residuals.data(), n);
         assert(this->base_codes.size() == this->final_nc);
@@ -754,7 +746,6 @@ namespace bslib{
      **/
     void Bslib_Index::keep_k_min(const size_t m, const size_t k, const float * all_dists, const idx_t * all_labels, float * sub_dists, idx_t * sub_labels){
         
-        assert(m >= k);
         if (k < m){
             faiss::maxheap_heapify(k, sub_dists, sub_labels);
             for (size_t i = 0; i < m; i++){
@@ -764,10 +755,14 @@ namespace bslib{
                 }
             }
         }
-        else{
+        else if (k == m){
             memcpy(sub_dists, all_dists, k * sizeof(float));
             memcpy(sub_labels, all_labels, k * sizeof(idx_t));
             //for (size_t i = 0; i < m; i++){sub_dists[i] = all_dists[i];sub_labels[i] = all_labels[i];}
+        }
+        else{
+            std::cout << "k should be at least as large as m in keep_k_min function " << std::endl;
+            exit(0);
         }
     }
 
@@ -1063,7 +1058,7 @@ namespace bslib{
                         float actual_dist =  faiss::fvec_norm_L2sqr(distance_vector.data(), dimension);
 
                         std::vector<float> decoded_code(dimension);
-                        pq.decode(code, decoded_code.data(), 1);
+                        pq.decode(code + m * code_size, decoded_code.data(), 1);
                         std::vector<float> decoded_base_vector(dimension);
                         decode(1, decoded_code.data(), & group_id, decoded_base_vector.data());
                         float actual_norm = faiss::fvec_norm_L2sqr(decoded_base_vector.data(), dimension);

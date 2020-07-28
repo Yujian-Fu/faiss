@@ -10,7 +10,6 @@
 
 namespace bslib{
 
-
 // Change this type for different datasets
 typedef float learn_data_type;
 typedef float base_data_type;

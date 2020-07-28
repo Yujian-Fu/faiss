@@ -69,19 +69,24 @@ int main(){
         std::ifstream base_input (path_base, std::ios::binary);
         std::ofstream base_output (path_ids, std::ios::binary);
 
-        std::vector <float> batch(batch_size * dimension);
-        std::vector<idx_t> assigned_ids(batch_size);
+        std::vector<idx_t> assigned_ids(batch_size * nbatches);
 
+#pragma omp parallel for
         for (size_t i = 0; i < nbatches; i++){
-            readXvecFvec<origin_data_type> (base_input, batch.data(), dimension, batch_size);
-            index.assign(batch_size, batch.data(), assigned_ids.data());
+            std::vector <float> batch(batch_size * dimension);
+            base_input.seekg(i * batch_size * dimension * sizeof(base_data_type) + i * batch_size * sizeof(uint32_t), std::ios::beg);
+            readXvecFvec<base_data_type> (base_input, batch.data(), dimension, batch_size);
+            index.assign(batch_size, batch.data(), assigned_ids.data()+ i * batch_size);
+            //if (i % 10 == 0){
+                //std::cout << " assigned batches [ " << i << " / " << nbatches << " ]";
+                //Trecorder.print_time_usage("");
+            //}
+        }
+        for (size_t i = 0; i < nbatches; i++){
             base_output.write((char * ) & batch_size, sizeof(uint32_t));
             base_output.write((char *) assigned_ids.data(), batch_size * sizeof(idx_t));
-            if (i % 10 == 0){
-                std::cout << " assigned batches [ " << i << " / " << nbatches << " ]";
-                Trecorder.print_time_usage("");
-            }
         }
+
         base_input.close();
         base_output.close();
         message = "Assigned the base vectors";
@@ -152,7 +157,7 @@ int main(){
 
         for (size_t i = 0; i < nbatches; i++){
             readXvec<idx_t>(idx_input, ids.data(), batch_size, 1);
-            readXvecFvec<origin_data_type> (base_input, batch.data(), dimension, batch_size);
+            readXvecFvec<base_data_type> (base_input, batch.data(), dimension, batch_size);
 
             for (size_t j = 0; j < batch_size; j++){sequence_ids[j] = batch_size * i + j;}
 
@@ -166,6 +171,8 @@ int main(){
         index.compute_centroid_norm();
 
         index.write_index(path_index);
+        base_input.close();
+        idx_input.close();
         message = "Constructed and wrote the index ";
         Mrecorder.print_memory_usage(message);
         Mrecorder.record_memory_usage(record_file,  message);
@@ -179,13 +186,15 @@ int main(){
     {
         std::ifstream gt_input(path_gt, std::ios::binary);
         readXvec<uint32_t>(gt_input, groundtruth.data(), ngt, nq, true, false);
+        gt_input.close();
     }
 
     PrintMessage("Loading queries");
     std::vector<float> queries(nq * dimension);
     {
         std::ifstream query_input(path_query, std::ios::binary);
-        readXvecFvec<origin_data_type>(query_input, queries.data(), dimension, nq, true, false);
+        readXvecFvec<base_data_type>(query_input, queries.data(), dimension, nq, true, false);
+        query_input.close();
     }
 
     index.use_reranking = use_reranking;
