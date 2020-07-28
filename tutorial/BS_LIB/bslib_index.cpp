@@ -233,6 +233,7 @@ namespace bslib{
                 learn_input.read((char *) & dim, sizeof(uint32_t));
                 assert(dim == dimension);
                 learn_input.read((char *)this->train_data.data() + i * dimension, dimension * sizeof(float));
+                
             }
         }
     }
@@ -857,7 +858,7 @@ namespace bslib{
                 assert(n_vq+ n_lq + n_pq== j);
                 
                 if (index_type[j] == "VQ"){
-                    PrintMessage("Searching in PQ Layer");
+                    PrintMessage("Searching in VQ Layer");
                     group_size = vq_quantizer_index[n_vq].nc_per_group;
 #pragma omp parallel for
                     for (size_t m = 0; m < keep_result_space; m++){
@@ -934,12 +935,6 @@ namespace bslib{
             std::cout << "The query vector: " << std::endl;
             for (size_t temp = 0; temp < 10; temp ++){
                 std::cout << query[temp] << " ";
-            }
-            std::cout << std::endl;
-
-            std::cout << "The norm pq centroids: " << std::endl;
-            for(size_t temp = 0; temp < 100; temp++){
-                std::cout << this->norm_pq.centroids[temp] << " ";
             }
             std::cout << std::endl;
 
