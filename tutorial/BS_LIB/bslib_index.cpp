@@ -972,7 +972,6 @@ namespace bslib{
             std::vector<idx_t> query_search_labels(total_size);
             std::vector<float> query_actual_dists(total_size);
 
-
             for (size_t j = 0; j < final_keep_space; j++){
 
                 std::pair<idx_t, float> result_idx_dist;
