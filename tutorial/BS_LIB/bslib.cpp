@@ -199,7 +199,6 @@ int main(){
 
     index.use_reranking = use_reranking;
     index.reranking_space = reranking_space;
-
     index.max_visited_vectors = max_vectors;
     
     std::vector<float> query_distances(nq * result_k);
