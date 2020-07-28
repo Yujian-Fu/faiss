@@ -1152,6 +1152,7 @@ namespace bslib{
                 quantizers_output.write((char *) & nc, sizeof(size_t));
                 quantizers_output.write((char *) & nc_upper, sizeof(size_t));
                 quantizers_output.write((char *) & nc_per_group, sizeof(size_t));
+                std::cout << nc << " " << nc_upper << " " << nc_per_group << std::endl;
 
                 if (use_HNSW_VQ){
                     size_t M = vq_quantizer_index[n_vq].M;
@@ -1164,7 +1165,9 @@ namespace bslib{
                     vq_quantizer_index[n_vq].write_HNSW(quantizers_output);
                 }
                 else{
+                    std::cout << "Writing centroids " << std::endl;
                     for (size_t j = 0; j < nc_upper; j++){
+                        std::cout << "Writing centroids " << std::endl;
                         size_t group_quantizer_data_size = nc_per_group * this->dimension;
                         assert(vq_quantizer_index[n_vq].L2_quantizers[j]->xb.size() == group_quantizer_data_size);
                         quantizers_output.write((char * ) vq_quantizer_index[n_vq].L2_quantizers[j]->xb.data(), group_quantizer_data_size * sizeof(float));
