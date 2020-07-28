@@ -1075,10 +1075,10 @@ namespace bslib{
                 if (visited_vectors >= this->max_visited_vectors)
                     break;
             }
-            std::cout << std::endl;
 
             if (validation){
             //Compute the distance sort for computed distance
+                std::cout << std::endl;
                 std::vector<idx_t> search_dist_index(visited_vectors);
                 uint32_t x=0;
                 std::iota(search_dist_index.begin(),search_dist_index.end(),x++);
