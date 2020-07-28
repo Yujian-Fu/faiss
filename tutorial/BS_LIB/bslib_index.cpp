@@ -579,6 +579,7 @@ namespace bslib{
             size_t group_num = vq_quantizer_index[n_vq-1].nc_upper;
             size_t group_size = vq_quantizer_index[n_vq-1].nc_per_group;
             size_t vq_group_id = size_t(group_id / group_size);
+            assert(vq_group_id < group_num);
             size_t inner_vq_group_id = group_id - vq_group_id * group_size;
             vq_quantizer_index[n_vq - 1].compute_final_centroid(vq_group_id, inner_vq_group_id, final_centroid);
         }
@@ -587,6 +588,7 @@ namespace bslib{
             size_t group_num = lq_quantizer_index[n_lq - 1].nc_upper;
             size_t group_size = lq_quantizer_index[n_lq - 1].nc_per_group;
             size_t lq_group_id = size_t(group_id / group_size);
+            assert(lq_group_id < group_num);
             size_t inner_lq_group_id = group_id - lq_group_id * group_size;
             lq_quantizer_index[n_lq - 1].compute_final_centroid(lq_group_id, inner_lq_group_id, final_centroid);
         }
@@ -853,7 +855,7 @@ namespace bslib{
         
         // Variables for testing and validation
         bool validation = true; size_t validation_print_space = 50;
-        bool analysis = true;
+        bool analysis = false;
 
         std::vector<float>  visited_gt_proportion;
         std::vector<size_t> actual_visited_vectors;
@@ -1059,7 +1061,12 @@ namespace bslib{
                         std::vector<float> distance_vector(dimension);
                         faiss::fvec_madd(dimension, base_vector_float.data(), -1, query, distance_vector.data());
                         float actual_dist =  faiss::fvec_norm_L2sqr(distance_vector.data(), dimension);
-                        float actual_norm = faiss::fvec_norm_L2sqr(base_vector_float.data(), dimension);
+
+                        std::vector<float> decoded_code(dimension);
+                        pq.decode(code, decoded_code.data(), 1);
+                        std::vector<float> decoded_base_vector(dimension);
+                        decode(1, decoded_code.data(), & group_id, decoded_base_vector.data());
+                        float actual_norm = faiss::fvec_norm_L2sqr(decoded_base_vector.data(), dimension);
                         query_actual_dists[visited_vectors] = actual_dist;
                         std::cout << "S: " << dist << " A: " << actual_dist << " LN: " << term2 << " AN: " << actual_norm << " "; // S for "Search" and A for "Actual"
                     }
