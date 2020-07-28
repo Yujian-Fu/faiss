@@ -47,6 +47,13 @@ namespace bslib{
         }
 
         std::cout << "Building group quantizers for vq_quantizer " << std::endl;
+        if (use_HNSW){
+            HNSW_quantizers.resize(nc_upper);
+        }
+        else{
+            L2_quantizers.resize(nc_upper);
+        }
+
 #pragma omp parallel for
         for (size_t i = 0; i < nc_upper; i++){
             std::vector<float> centroids(dimension * nc_per_group);
@@ -55,7 +62,6 @@ namespace bslib{
 
             //Adding centroids into quantizers
             if (use_HNSW){
-                HNSW_quantizers.resize(nc_upper);
                 hnswlib::HierarchicalNSW * centroid_quantizer = new hnswlib::HierarchicalNSW(dimension, nc_per_group, M, 2 * M, efConstruction);
                 for (size_t j = 0; j < nc_per_group; j++){
                     centroid_quantizer->addPoint(centroids.data() + j * dimension);
@@ -64,7 +70,6 @@ namespace bslib{
             }
             else
             {
-                L2_quantizers.resize(nc_upper);
                 faiss::IndexFlatL2 * centroid_quantizer = new faiss::IndexFlatL2(dimension);
                 centroid_quantizer->add(nc_per_group, centroids.data());
                 this->L2_quantizers[i] = centroid_quantizer;
