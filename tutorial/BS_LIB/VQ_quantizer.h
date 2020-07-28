@@ -1,5 +1,5 @@
 #include "quantizer.h"
-#include "hnswalg.h"
+#include "HNSWlib/hnswalg.h"
 #include "faiss/IndexHNSW.h"
 
 namespace bslib{
