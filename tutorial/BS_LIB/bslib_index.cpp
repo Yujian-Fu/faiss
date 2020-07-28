@@ -451,6 +451,7 @@ namespace bslib{
         std::cout << "Training the pq " << std::endl;
         this->pq.verbose = true;
         this->pq.train(train_set_size, residuals.data());
+        std::cout << "Writing PQ codebook to " << path_pq << std::endl;
         faiss::write_ProductQuantizer(& this->pq, path_pq.c_str());
 
         if (use_norm_quantization){
@@ -468,6 +469,7 @@ namespace bslib{
             std::cout << "Training the norm pq" << std::endl;
             this->norm_pq.verbose = true;
             this->norm_pq.train(train_set_size, xnorm.data());
+            std::cout << "Writing norm_PQ codebook to " << path_norm_pq << std::endl;
             faiss::write_ProductQuantizer(& this->norm_pq, path_norm_pq.c_str());
         }
     }

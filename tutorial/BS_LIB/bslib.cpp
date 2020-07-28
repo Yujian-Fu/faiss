@@ -95,12 +95,16 @@ int main(){
     //Train the PQ quantizer
     PrintMessage("Constructing the PQ");
     Trecorder.reset();
-    if (exists(path_pq) && exists(path_pq_norm)){
+    if (exists(path_pq)){
         std::cout << "Loading PQ codebook from " << path_pq << std::endl;
         index->pq = * faiss::read_ProductQuantizer(path_pq.c_str());
-        index->norm_pq = * faiss::read_ProductQuantizer(path_pq_norm.c_str());
         index->code_size = index->pq.code_size;
-        index->norm_code_size = index->norm_pq.code_size;
+
+        if(use_norm_quantization){
+            std::cout << "Loading norm PQ codebook from " << path_pq_norm << std::endl;
+            index->norm_pq = * faiss::read_ProductQuantizer(path_pq_norm.c_str());
+            index->norm_code_size = index->norm_pq.code_size;
+        }
     }
     else
     {
@@ -117,7 +121,7 @@ int main(){
     Mrecorder.record_memory_usage(record_file,  message);
     Trecorder.print_time_usage(message);
     Trecorder.record_time_usage(record_file, message);
-    
+
     //Build the index
     if (exists(path_index)){
         PrintMessage("Loading index");
