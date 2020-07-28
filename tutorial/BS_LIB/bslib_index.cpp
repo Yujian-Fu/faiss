@@ -33,11 +33,13 @@ namespace bslib{
      **/
     void Bslib_Index::add_vq_quantizer(size_t nc_upper, size_t nc_per_group, size_t M = 16, size_t efConstruction = 500, size_t efSearch = 100){
         
-        VQ_quantizer vq_quantizer (dimension, nc_upper, nc_per_group, use_HNSW_VQ, M, efConstruction, efSearch);
+        VQ_quantizer vq_quantizer (dimension, nc_upper, nc_per_group, M, efConstruction, efSearch, use_HNSW_VQ);
+        std::cout << "The quantizers size are: " << vq_quantizer.L2_quantizers.size() << " " << vq_quantizer.HNSW_quantizers.size() << std::endl;
+        std::cout << "The L2 quantizer size is " << vq_quantizer.L2_quantizers.size() << std::endl;
         PrintMessage("Building centroids for vq quantizer");
         vq_quantizer.build_centroids(this->train_data.data(), this->train_data.size() / dimension, this->train_data_ids.data());
         PrintMessage("Finished construct the VQ layer");
-        std::cout << "The L2 quantizer size is " << vq_quantizer.L2_quantizers.size() << std::endl;
+        
         this->vq_quantizer_index.push_back(vq_quantizer);
     }
 

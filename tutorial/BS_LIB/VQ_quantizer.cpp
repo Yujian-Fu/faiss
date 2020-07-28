@@ -20,10 +20,10 @@ namespace bslib{
                 this->M = M;
                 this->efConstruction = efConstruction;
                 this->efSearch = efSearch;
-                HNSW_quantizers.resize(nc_upper);
+                this->HNSW_quantizers.resize(nc_upper);
             }
             else{
-                L2_quantizers.resize(nc_upper);
+                this->L2_quantizers.resize(nc_upper);
             }
         }
 
