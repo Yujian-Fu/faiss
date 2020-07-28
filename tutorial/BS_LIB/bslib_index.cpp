@@ -37,6 +37,7 @@ namespace bslib{
         PrintMessage("Building centroids for vq quantizer");
         vq_quantizer.build_centroids(this->train_data.data(), this->train_data.size() / dimension, this->train_data_ids.data());
         PrintMessage("Finished construct the VQ layer");
+        std::cout << "The L2 quantizer size is " << vq_quantizer.L2_quantizers.size() << std::endl;
         this->vq_quantizer_index.push_back(vq_quantizer);
     }
 

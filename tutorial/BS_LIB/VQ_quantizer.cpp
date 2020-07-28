@@ -20,6 +20,10 @@ namespace bslib{
                 this->M = M;
                 this->efConstruction = efConstruction;
                 this->efSearch = efSearch;
+                HNSW_quantizers.resize(nc_upper);
+            }
+            else{
+                L2_quantizers.resize(nc_upper);
             }
         }
 
@@ -47,12 +51,6 @@ namespace bslib{
         }
 
         std::cout << "Building group quantizers for vq_quantizer " << std::endl;
-        if (use_HNSW){
-            HNSW_quantizers.resize(nc_upper);
-        }
-        else{
-            L2_quantizers.resize(nc_upper);
-        }
 
 #pragma omp parallel for
         for (size_t i = 0; i < nc_upper; i++){
