@@ -25,7 +25,7 @@ const size_t reranking_space = 20;
 const size_t M_PQ = 16;
 const size_t M_norm_PQ = 1;
 const size_t nbits = 8; //Or 16
-const size_t train_size = 1000000; //This is the size of train set
+const size_t train_size = 100000; //This is the size of train set
 const size_t dimension = 128;
 
 //For assigning ID
@@ -61,7 +61,7 @@ bool is_recording = true;
 const char * folder_model = "/home/y/yujianfu/ivf-hnsw/models_VQ";
 
 //File paths
-const char * path_learn =     "/home/y/yujianfu/ivf-hnsw/data/SIFT1M/sift_base.fvecs";
+const char * path_learn =     "/home/y/yujianfu/ivf-hnsw/data/SIFT1M/sift_learn.fvecs";
 const char * path_base =      "/home/y/yujianfu/ivf-hnsw/data/SIFT1M/sift_base.fvecs";
 const char * path_gt =        "/home/y/yujianfu/ivf-hnsw/data/SIFT1M/sift_groundtruth.ivecs";
 const char * path_query =     "/home/y/yujianfu/ivf-hnsw/data/SIFT1M/sift_query.fvecs";
