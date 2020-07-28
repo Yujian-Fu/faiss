@@ -904,7 +904,7 @@ namespace bslib{
             std::vector<idx_t> group_ids(1 * final_keep_space, 0);
             std::vector<float> group_dists(1 * final_keep_space, 0);
 
-#pragma omp critical
+//#pragma omp critical
             for (size_t j = 0; j < layers; j++){
                 assert(n_vq+ n_lq + n_pq== j);
                 
