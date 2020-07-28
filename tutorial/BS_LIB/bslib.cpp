@@ -92,7 +92,7 @@ int main(){
     }
 
     //Train the PQ quantizer
-    PrintMessage("Training the PQ");
+    PrintMessage("Constructing the PQ");
     Trecorder.reset();
     if (exists(path_pq) && exists(path_pq_norm)){
         std::cout << "Loading PQ codebook from " << path_pq << std::endl;

@@ -146,6 +146,7 @@ namespace bslib{
     void Bslib_Index::build_train_selector(const char * path_learn, const char * path_groups, const char * path_labels, size_t total_train_size, size_t sub_train_size, size_t group_size){
         PrintMessage("Building train dataset selector for further train tasks");
         if (exists(path_labels)){
+            PrintMessage("Selector already constructed, load it");
             std::ifstream labels_input(path_labels, std::ios::binary);
             assert(this->train_set_ids.size() == 0);
             this->train_set_ids.resize(group_size);
@@ -155,6 +156,7 @@ namespace bslib{
                 this->train_set_ids[i].resize(num_per_group);
                 labels_input.read((char *) train_set_ids[i].data(), num_per_group * sizeof(idx_t));
             }
+            PrintMessage("Finished reading the selector");
         }
         else{
             std::vector<float> origin_train_set(total_train_size * dimension);
@@ -182,6 +184,8 @@ namespace bslib{
             this->train_set_ids.resize(group_size);
             for (size_t i = 0; i < total_train_size; i++){this->train_set_ids[result_ids[i]].push_back(i);}
 
+            std::cout << "Saving group centroids to " << path_groups << std::endl;
+            std::cout << "Saving IDs to " << path_labels << std::endl;
             std::ofstream groups_output(path_groups, std::ios::binary);
             std::ofstream labels_output(path_labels, std::ios::binary);
             for (size_t i = 0; i < group_size; i++){
@@ -431,7 +435,7 @@ namespace bslib{
         // Load the train set fot training
         read_train_set(path_learn, this->train_size, train_set_size);
 
-        std::cout << "Initilizing index " << std::endl;
+        std::cout << "Initilizing index PQ quantizer " << std::endl;
         this->pq = faiss::ProductQuantizer(this->dimension, this->M, this->nbits);
         this->code_size = this->pq.code_size;
 
