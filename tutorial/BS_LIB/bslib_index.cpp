@@ -578,7 +578,7 @@ namespace bslib{
             size_t n_vq = vq_quantizer_index.size();
             size_t group_num = vq_quantizer_index[n_vq-1].nc_upper;
             size_t group_size = vq_quantizer_index[n_vq-1].nc_per_group;
-            size_t vq_group_id = size_t(group_id / group_num);
+            size_t vq_group_id = size_t(group_id / group_size);
             size_t inner_vq_group_id = group_id - vq_group_id * group_size;
             vq_quantizer_index[n_vq - 1].compute_final_centroid(vq_group_id, inner_vq_group_id, final_centroid);
         }
@@ -586,7 +586,7 @@ namespace bslib{
             size_t n_lq = lq_quantizer_index.size();
             size_t group_num = lq_quantizer_index[n_lq - 1].nc_upper;
             size_t group_size = lq_quantizer_index[n_lq - 1].nc_per_group;
-            size_t lq_group_id = size_t(group_id / group_num);
+            size_t lq_group_id = size_t(group_id / group_size);
             size_t inner_lq_group_id = group_id - lq_group_id * group_size;
             lq_quantizer_index[n_lq - 1].compute_final_centroid(lq_group_id, inner_lq_group_id, final_centroid);
         }
@@ -1004,7 +1004,7 @@ namespace bslib{
                 
                 idx_t group_id = result_idx_dist.first;
                 float q_c_dist = result_idx_dist.second;
-                std::cout << "Searching in " << group_id << " th group with distance" << q_c_dist << std::endl;
+                std::cout << "Searching in " << group_id << " th group with distance " << q_c_dist << std::endl;
 
                 size_t group_size = this->origin_ids[group_id].size();
                 assert(group_size == this->base_codes[group_id].size() / this->code_size);
