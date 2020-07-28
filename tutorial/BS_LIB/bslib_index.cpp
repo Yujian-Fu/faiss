@@ -143,7 +143,7 @@ namespace bslib{
      * group_size: the size of centroids
      * 
      **/
-    void Bslib_Index::build_train_selector(const char * path_learn, const char * path_groups, const char * path_labels, size_t total_train_size, size_t sub_train_size, size_t group_size){
+    void Bslib_Index::build_train_selector(const std::string path_learn, const std::string path_groups, const std::string path_labels, size_t total_train_size, size_t sub_train_size, size_t group_size){
         PrintMessage("Building train dataset selector for further train tasks");
         if (exists(path_labels)){
             PrintMessage("Selector already constructed, load it");
@@ -212,7 +212,7 @@ namespace bslib{
      * train_set_size: the size to be read 
      * 
      **/
-    void Bslib_Index::read_train_set(const char * path_learn, size_t total_size, size_t train_set_size){
+    void Bslib_Index::read_train_set(const std::string path_learn, size_t total_size, size_t train_set_size){
         std::cout << "Reading " << train_set_size << " from " << total_size << " for training" << std::endl;
         this->train_data.resize(train_set_size * dimension);
         this->train_data_ids.resize(train_set_size, 0);
@@ -258,7 +258,7 @@ namespace bslib{
      * 
      * 
      **/
-    void Bslib_Index::build_quantizers(const uint32_t * ncentroids, const char * path_quantizer, const char * path_learn, const size_t * num_train, const std::vector<HNSW_para> HNSW_paras, const std::vector<PQ_para> PQ_paras){
+    void Bslib_Index::build_quantizers(const uint32_t * ncentroids, const std::string path_quantizer, const std::string path_learn, const size_t * num_train, const std::vector<HNSW_para> HNSW_paras, const std::vector<PQ_para> PQ_paras){
         if (exists(path_quantizer)){
             
             read_quantizers(path_quantizer);
@@ -430,7 +430,7 @@ namespace bslib{
      * path_learn: the path for learning dataset
      * 
      **/
-    void Bslib_Index::train_pq(const char * path_pq, const char * path_norm_pq, const char * path_learn, const size_t train_set_size){
+    void Bslib_Index::train_pq(const std::string path_pq, const std::string path_norm_pq, const std::string path_learn, const size_t train_set_size){
 
         // Load the train set fot training
         read_train_set(path_learn, this->train_size, train_set_size);
@@ -452,7 +452,7 @@ namespace bslib{
         std::cout << "Training the pq " << std::endl;
         this->pq.verbose = true;
         this->pq.train(train_set_size, residuals.data());
-        faiss::write_ProductQuantizer(& this->pq, path_pq);
+        faiss::write_ProductQuantizer(& this->pq, path_pq.c_str());
 
         if (use_norm_quantization){
             std::cout << "Decoding the residual data and train norm product quantizer" << std::endl;
@@ -469,7 +469,7 @@ namespace bslib{
             std::cout << "Training the norm pq" << std::endl;
             this->norm_pq.verbose = true;
             this->norm_pq.train(train_set_size, xnorm.data());
-            faiss::write_ProductQuantizer(& this->norm_pq, path_norm_pq);
+            faiss::write_ProductQuantizer(& this->norm_pq, path_norm_pq.c_str());
         }
     }
     
@@ -1131,7 +1131,7 @@ namespace bslib{
     }
 
 
-    void Bslib_Index::write_quantizers(const char * path_quantizer){
+    void Bslib_Index::write_quantizers(const std::string path_quantizer){
         PrintMessage("Writing quantizers");
         std::ofstream quantizers_output(path_quantizer, std::ios::binary);
         size_t n_vq = 0;
@@ -1236,7 +1236,7 @@ namespace bslib{
     }
 
 
-    void Bslib_Index::read_quantizers(const char * path_quantizer){
+    void Bslib_Index::read_quantizers(const std::string path_quantizer){
         PrintMessage("Reading quantizers ");
         std::ifstream quantizer_input(path_quantizer, std::ios::binary);
 
@@ -1338,7 +1338,7 @@ namespace bslib{
         quantizer_input.close();
     }
 
-    void Bslib_Index::write_index(const char * path_index){
+    void Bslib_Index::write_index(const std::string path_index){
         std::ofstream output(path_index, std::ios::binary);
         output.write((char *) & this->final_nc, sizeof(size_t));
 
@@ -1382,7 +1382,7 @@ namespace bslib{
         output.close();
     }
 
-    void Bslib_Index::read_index(const char * path_index){
+    void Bslib_Index::read_index(const std::string path_index){
         std::ifstream input(path_index, std::ios::binary);
         size_t final_nc_input;
         size_t group_size_input;

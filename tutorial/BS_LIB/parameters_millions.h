@@ -61,26 +61,26 @@ bool is_recording = true;
 const char * folder_model = "/home/y/yujianfu/ivf-hnsw/models_VQ";
 
 //File paths
-const char * path_learn =     "/home/y/yujianfu/ivf-hnsw/data/SIFT1M/sift_learn.fvecs";
-const char * path_base =      "/home/y/yujianfu/ivf-hnsw/data/SIFT1M/sift_base.fvecs";
-const char * path_gt =        "/home/y/yujianfu/ivf-hnsw/data/SIFT1M/sift_groundtruth.ivecs";
-const char * path_query =     "/home/y/yujianfu/ivf-hnsw/data/SIFT1M/sift_query.fvecs";
+const std::string path_learn =     "/home/y/yujianfu/ivf-hnsw/data/SIFT1M/sift_learn.fvecs";
+const std::string path_base =      "/home/y/yujianfu/ivf-hnsw/data/SIFT1M/sift_base.fvecs";
+const std::string path_gt =        "/home/y/yujianfu/ivf-hnsw/data/SIFT1M/sift_groundtruth.ivecs";
+const std::string path_query =     "/home/y/yujianfu/ivf-hnsw/data/SIFT1M/sift_query.fvecs";
 
-const char * path_record =    "/home/y/yujianfu/ivf-hnsw/models_VQ/SIFT1M/recording_10000.txt";
-const char * path_pq =        "/home/y/yujianfu/ivf-hnsw/models_VQ/SIFT1M/PQ16_10000.pq";
-const char * path_pq_norm =   "/home/y/yujianfu/ivf-hnsw/models_VQ/SIFT1M/PQ_NORM16_10000.pq";
-const char * path_idxs =      "/home/y/yujianfu/ivf-hnsw/models_VQ/SIFT1M/base_idxs_10000.ivecs";
-const char * path_index =     "/home/y/yujianfu/ivf-hnsw/models_VQ/SIFT1M/PQ16_10000.index";
-const char * path_quantizers = "/home/y/yujianfu/ivf-hnsw/models_VQ/SIFT1M/quantizer_10000.qt";
+const std::string path_record =    "/home/y/yujianfu/ivf-hnsw/models_VQ/SIFT1M/recording_10000.txt";
+const std::string path_pq =        "/home/y/yujianfu/ivf-hnsw/models_VQ/SIFT1M/PQ16_10000.pq";
+const std::string path_pq_norm =   "/home/y/yujianfu/ivf-hnsw/models_VQ/SIFT1M/PQ_NORM16_10000.pq";
+const std::string path_idxs =      "/home/y/yujianfu/ivf-hnsw/models_VQ/SIFT1M/base_idxs_10000.ivecs";
+const std::string path_index =     "/home/y/yujianfu/ivf-hnsw/models_VQ/SIFT1M/PQ16_10000.index";
+const std::string path_quantizers = "/home/y/yujianfu/ivf-hnsw/models_VQ/SIFT1M/quantizer_10000.qt";
 //const char * path_quantizers = "/home/y/yujianfu/ivf-hnsw/models_VQ/SIFT1M/centroids_sift1M.fvecs";
 
 /**
  **This is the centroids for assigining origin train vectors  size: n_group * dimension
  **/
-const char * path_groups = (char *) ("/home/y/yujianfu/ivf-hnsw/models_VQ/SIFT1M/selector_centroids_" + std::to_string(selector_group_size) + ".fvecs").c_str();
+const std::string path_groups = "/home/y/yujianfu/ivf-hnsw/models_VQ/SIFT1M/selector_centroids_" + std::to_string(selector_group_size) + ".fvecs";
 //This is for recording the labels based on the generated centroids
 
 /**
  ** This is the labels for all assigned vectors, n_group * group_size 
  **/
-const char * path_labels = (char *) ("/home/y/yujianfu/ivf-hnsw/models_VQ/SIFT1M/selector_ids_" + std::to_string(train_size)).c_str();
+const std::string path_labels = "/home/y/yujianfu/ivf-hnsw/models_VQ/SIFT1M/selector_ids_" + std::to_string(train_size);

@@ -97,8 +97,8 @@ int main(){
     Trecorder.reset();
     if (exists(path_pq) && exists(path_pq_norm)){
         std::cout << "Loading PQ codebook from " << path_pq << std::endl;
-        index->pq = * faiss::read_ProductQuantizer(path_pq);
-        index->norm_pq = * faiss::read_ProductQuantizer(path_pq_norm);
+        index->pq = * faiss::read_ProductQuantizer(path_pq.c_str());
+        index->norm_pq = * faiss::read_ProductQuantizer(path_pq_norm.c_str());
         index->code_size = index->pq.code_size;
         index->norm_code_size = index->norm_pq.code_size;
     }

@@ -64,16 +64,16 @@ struct Bslib_Index{
 
     explicit Bslib_Index(const size_t dimension, const size_t layers, const std::string * index_type, const bool use_HNSW_VQ, const bool use_norm_quantization);
 
-    void build_quantizers(const uint32_t * ncentroids, const char * path_quantizer, const char * path_learn, const size_t * num_train, const std::vector<HNSW_para> HNSW_paras, const std::vector<PQ_para> PQ_paras);
+    void build_quantizers(const uint32_t * ncentroids, const std::string path_quantizer, const std::string path_learn, const size_t * num_train, const std::vector<HNSW_para> HNSW_paras, const std::vector<PQ_para> PQ_paras);
     
     void add_vq_quantizer(size_t nc_upper, size_t nc_per_group, size_t M, size_t efConstruction, size_t efSearch);
     void add_lq_quantizer(size_t nc_upper, size_t nc_per_group, const float * upper_centroids, const idx_t * upper_nn_centroid_idxs, const float * upper_nn_centroid_dists);
     void add_pq_quantizer(size_t nc_upper, size_t M, size_t nbits);
 
-    void build_train_selector(const char * path_learn, const char * path_groups, const char * path_labels, size_t total_train_size, size_t sub_train_size, size_t group_size);
-    void read_train_set(const char * path_learn, size_t total_size, size_t train_set_size);
+    void build_train_selector(const std::string path_learn, const std::string path_groups, const std::string path_labels, size_t total_train_size, size_t sub_train_size, size_t group_size);
+    void read_train_set(const std::string path_learn, size_t total_size, size_t train_set_size);
 
-    void train_pq(const char * path_pq, const char * path_norm_pq, const char * path_learn, const size_t train_set_size);
+    void train_pq(const std::string path_pq, const std::string path_norm_pq, const std::string path_learn, const size_t train_set_size);
 
     void encode(size_t n, const float * data, const idx_t * encoded_ids, float * encoded_data);
     void decode(size_t n, const float * encoded_data, const idx_t * encoded_ids, float * decoded_data);
@@ -86,10 +86,10 @@ struct Bslib_Index{
     void keep_k_min(const size_t m, const size_t k, const float * all_dists, const idx_t * all_ids, float * sub_dists, idx_t * sub_ids);
     float pq_L2sqr(const uint8_t *code);
 
-    void read_quantizers(const char * path_quantizers);
-    void write_quantizers(const char * path_quantizers);
-    void read_index(const char * path_index);
-    void write_index(const char * path_index);
+    void read_quantizers(const std::string path_quantizers);
+    void write_quantizers(const std::string path_quantizers);
+    void read_index(const std::string path_index);
+    void write_index(const std::string path_index);
 
     /**
      ** This is the function for dynamically get the reranking space for 

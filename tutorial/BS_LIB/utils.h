@@ -123,7 +123,7 @@ namespace bslib{
     }
 
 
-    inline bool exists(const char * FilePath){
+    inline bool exists(const std::string FilePath){
         std::ifstream f (FilePath);
         return f.good();
     }
