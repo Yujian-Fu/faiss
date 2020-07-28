@@ -851,6 +851,7 @@ namespace bslib{
         // Variables for testing and validation
         bool validation = false; size_t validation_print_space = 50;
         bool analysis = false;
+        bool showmessage = false;
 
         std::vector<float>  visited_gt_proportion;
         std::vector<size_t> actual_visited_vectors;
@@ -906,7 +907,7 @@ namespace bslib{
                 assert(n_vq+ n_lq + n_pq== j);
                 
                 if (index_type[j] == "VQ"){
-                    PrintMessage("Searching in VQ Layer");
+                    if (showmessage) PrintMessage("Searching in VQ Layer");
                     group_size = vq_quantizer_index[n_vq].nc_per_group;
 #pragma omp parallel for
                     for (size_t m = 0; m < keep_result_space; m++){
@@ -928,7 +929,7 @@ namespace bslib{
                     n_vq ++;
                 }
                 else if(index_type[j] == "LQ") {
-                    PrintMessage("Searching in LQ layer");
+                    if (showmessage) PrintMessage("Searching in LQ layer");
                     group_size = lq_quantizer_index[n_lq].nc_per_group;
                     // Copy the upper search result for LQ layer 
                     std::vector<idx_t> upper_result_labels(search_space);
@@ -948,7 +949,7 @@ namespace bslib{
                 }
 
                 else if(index_type[j] == "PQ"){
-                    PrintMessage("Searching in PQ layer");
+                    if (showmessage) PrintMessage("Searching in PQ layer");
                     assert(j == this->layers-1);
 #pragma omp parallel for
                     for (size_t m = 0; m < keep_result_space; m++){
@@ -1001,7 +1002,7 @@ namespace bslib{
                 
                 idx_t group_id = result_idx_dist.first;
                 float q_c_dist = result_idx_dist.second;
-                std::cout << "Searching in " << group_id << " th group with distance " << q_c_dist << std::endl;
+                if (showmessage) std::cout << "Searching in " << group_id << " th group with distance " << q_c_dist << std::endl;
 
                 size_t group_size = this->origin_ids[group_id].size();
                 assert(group_size == this->base_codes[group_id].size() / this->code_size);
