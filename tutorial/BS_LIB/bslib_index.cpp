@@ -33,7 +33,7 @@ namespace bslib{
      **/
     void Bslib_Index::add_vq_quantizer(size_t nc_upper, size_t nc_per_group, size_t M = 16, size_t efConstruction = 500, size_t efSearch = 100){
         
-        VQ_quantizer vq_quantizer (dimension, nc_upper, nc_per_group, M, efConstruction, efSearch, use_HNSW_VQ);
+        VQ_quantizer vq_quantizer = VQ_quantizer(dimension, nc_upper, nc_per_group, M, efConstruction, efSearch, use_HNSW_VQ);
         PrintMessage("Building centroids for vq quantizer");
         vq_quantizer.build_centroids(this->train_data.data(), this->train_data.size() / dimension, this->train_data_ids.data());
         PrintMessage("Finished construct the VQ layer");
@@ -53,7 +53,7 @@ namespace bslib{
      * 
      **/
     void Bslib_Index::add_lq_quantizer(size_t nc_upper, size_t nc_per_group, const float * upper_centroids, const idx_t * upper_nn_centroid_idxs, const float * upper_nn_centroid_dists){
-        LQ_quantizer lq_quantizer (dimension, nc_upper, nc_per_group, upper_centroids, upper_nn_centroid_idxs, upper_nn_centroid_dists);
+        LQ_quantizer lq_quantizer = LQ_quantizer(dimension, nc_upper, nc_per_group, upper_centroids, upper_nn_centroid_idxs, upper_nn_centroid_dists);
         PrintMessage("Building centroids for lq quantizer");
         lq_quantizer.build_centroids(this->train_data.data(), this->train_data.size() / dimension, this->train_data_ids.data());
         PrintMessage("Finished construct the LQ layer");
@@ -68,7 +68,7 @@ namespace bslib{
      * 
      **/
     void Bslib_Index::add_pq_quantizer(size_t nc_upper, size_t M, size_t nbits){
-        PQ_quantizer pq_quantizer (dimension, nc_upper, M, nbits);
+        PQ_quantizer pq_quantizer = PQ_quantizer(dimension, nc_upper, M, nbits);
         PrintMessage("Building centroids for pq quantizer");
         pq_quantizer.build_centroids(this->train_data.data(), this->train_data_ids.size(), this->train_data_ids.data());
         this->pq_quantizer_index.push_back(pq_quantizer);
@@ -260,10 +260,9 @@ namespace bslib{
      **/
     void Bslib_Index::build_quantizers(const uint32_t * ncentroids, const std::string path_quantizer, const std::string path_learn, const size_t * num_train, const std::vector<HNSW_para> HNSW_paras, const std::vector<PQ_para> PQ_paras){
         if (exists(path_quantizer)){
-            
             read_quantizers(path_quantizer);
             std::cout << "Checking the quantizers read from file " << std::endl;
-            std::cout << "The number of quantizers: " << this->vq_quantizer_index.size() << " " << this->lq_quantizer_index.size() <<  this->pq_quantizer_index.size() << std::endl;
+            std::cout << "The number of quantizers: " << this->vq_quantizer_index.size() << " " << this->lq_quantizer_index.size() << " " << this->pq_quantizer_index.size() << std::endl;
 
             /*
             this->train_data.resize(this->nt * this->dimension);
@@ -642,7 +641,7 @@ namespace bslib{
             assert(n_lq + n_vq + n_pq == i);
 
             if (index_type[i] == "VQ"){
-                //std::cout << "searching in VQ layer" << std::endl;
+                std::cout << "searching in VQ layer" << std::endl;
                 clock_t starttime = clock();
                 group_size = vq_quantizer_index[n_vq].nc_per_group;
                 vq_quantizer_index[n_vq].search_in_group(n, assign_data, group_ids.data(), result_dists.data(), result_labels.data(), 1);
@@ -1277,7 +1276,7 @@ namespace bslib{
                         quantizer_input.read((char *) centroids.data(), nc_per_group * dimension * sizeof(float));
                         faiss::IndexFlatL2 * centroid_quantizer = new faiss::IndexFlatL2(dimension);
                         centroid_quantizer->add(nc_per_group, centroids.data());
-                        vq_quantizer.L2_quantizers.push_back(centroid_quantizer);
+                        vq_quantizer.L2_quantizers[j] = centroid_quantizer;
                     }
                     this->vq_quantizer_index.push_back(vq_quantizer);
                 }
