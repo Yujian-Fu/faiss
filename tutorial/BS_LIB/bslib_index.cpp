@@ -848,7 +848,8 @@ namespace bslib{
 
     void Bslib_Index::search(size_t n, size_t result_k, float * queries, float * query_dists, idx_t * query_ids, size_t * keep_space, uint32_t * groundtruth, std::string path_base){
         
-        // Variables for testing and validation
+        // Variables for testing and validation and printing
+        // Notice: they should only be activated when parallel is not used
         bool validation = false; size_t validation_print_space = 50;
         bool analysis = false;
         bool showmessage = false;
@@ -903,13 +904,14 @@ namespace bslib{
             std::vector<idx_t> group_ids(1 * final_keep_space, 0);
             std::vector<float> group_dists(1 * final_keep_space, 0);
 
+#pragma omp critical
             for (size_t j = 0; j < layers; j++){
                 assert(n_vq+ n_lq + n_pq== j);
                 
                 if (index_type[j] == "VQ"){
                     if (showmessage) PrintMessage("Searching in VQ Layer");
                     group_size = vq_quantizer_index[n_vq].nc_per_group;
-#pragma omp parallel for
+//#pragma omp parallel for
                     for (size_t m = 0; m < keep_result_space; m++){
                         vq_quantizer_index[n_vq].search_in_group(1, query, group_ids.data()+m, result_dists.data()+m*group_size, result_labels.data() + m*group_size, keep_space[j]);
                     }
@@ -938,7 +940,7 @@ namespace bslib{
                     memcpy(upper_result_dists.data(), result_dists.data(), search_space * sizeof(float));
 
                     //for (size_t m = 0; m < search_space; m++){upper_result_labels[m] = result_labels[m]; upper_result_dists[m] = result_dists[m];}
-#pragma omp parallel for
+//#pragma omp parallel for
                     for (size_t m = 0; m < keep_result_space; m++){
                         lq_quantizer_index[n_lq].search_in_group(1, query, upper_result_labels.data(), upper_result_dists.data(), search_space, group_ids.data()+m*1, result_dists.data()+m*group_size, result_labels.data()+m*group_size);
                     }
@@ -951,7 +953,7 @@ namespace bslib{
                 else if(index_type[j] == "PQ"){
                     if (showmessage) PrintMessage("Searching in PQ layer");
                     assert(j == this->layers-1);
-#pragma omp parallel for
+//#pragma omp parallel for
                     for (size_t m = 0; m < keep_result_space; m++){
                         pq_quantizer_index[n_pq].search_in_group(1, query, group_ids.data()+m, result_dists.data()+m*keep_space[j], result_labels.data()+m*keep_space[j], keep_space[j]);
                     }
