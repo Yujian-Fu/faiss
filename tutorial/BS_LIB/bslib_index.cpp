@@ -777,7 +777,7 @@ namespace bslib{
      * the product value of query and quantized base vectors
      * 
      **/
-    float Bslib_Index::pq_L2sqr(const uint8_t *code)
+    float Bslib_Index::pq_L2sqr(const uint8_t *code, const float * precomputed_table)
     {
         float result = 0.;
         const size_t dim = code_size >> 2;
@@ -978,7 +978,9 @@ namespace bslib{
             }
 
             assert((n_vq + n_lq + n_pq) == this->layers);
-            this->pq.compute_inner_prod_table(query, this->precomputed_table.data());
+            
+            std::vector<float> precomputed_table(pq.M * pq.ksub);
+            this->pq.compute_inner_prod_table(query, precomputed_table.data());
 
             //The analysis variables
             size_t visited_vectors = 0;
@@ -1042,7 +1044,7 @@ namespace bslib{
 
                 for (size_t m = 0; m < group_size; m++){
                     float term2 = use_norm_quantization ? base_reconstructed_norms[m] : base_norm[group_id][m];
-                    float term3 = 2 * pq_L2sqr(code + m * code_size);
+                    float term3 = 2 * pq_L2sqr(code + m * code_size, precomputed_table.data());
                     float dist = term1 + term2 - term3;
                     query_search_dists[visited_vectors] = dist;
 

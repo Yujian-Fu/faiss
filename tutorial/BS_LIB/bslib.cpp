@@ -201,7 +201,7 @@ int main(){
     index.reranking_space = reranking_space;
 
     index.max_visited_vectors = max_vectors;
-    index.precomputed_table.resize(index.pq.M * index.pq.ksub);
+    
     std::vector<float> query_distances(nq * result_k);
     std::vector<faiss::Index::idx_t> query_labels(nq * result_k);
     size_t correct = 0;

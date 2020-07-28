@@ -57,8 +57,6 @@ struct Bslib_Index{
     std::vector<std::vector<float>> base_norm;
     std::vector<std::vector<idx_t>> origin_ids;
 
-    std::vector<float> precomputed_table; 
-
     std::vector<std::vector<idx_t>> train_set_ids;
     std::vector<float> train_data; // Initialized in build_quantizers (without reading)
     std::vector<idx_t> train_data_ids; // Initialized in build_quantizers (without reading)
@@ -85,7 +83,7 @@ struct Bslib_Index{
     void search(size_t n, size_t result_k, float * queries, float * query_dists, idx_t * query_ids, size_t * keep_space, uint32_t * groundtruth, std::string path_base);
     void get_next_group_idx(size_t keep_result_space, idx_t * group_ids, float * query_group_dists, std::pair<idx_t, float> & result_idx_dist);
     void keep_k_min(const size_t m, const size_t k, const float * all_dists, const idx_t * all_ids, float * sub_dists, idx_t * sub_ids);
-    float pq_L2sqr(const uint8_t *code);
+    float pq_L2sqr(const uint8_t *code, const float * precomputed_table);
 
     void read_quantizers(const std::string path_quantizers);
     void write_quantizers(const std::string path_quantizers);
