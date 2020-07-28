@@ -1132,20 +1132,20 @@ namespace bslib{
         }
 
         if (analysis){
-            float avg_visited_vectors = 0, avg_q_c_dist = 0, avg_visited_gt_proportion = 0;
+            float avg_visited_vectors = 0, avg_q_c_dist = 0, avg_visited_gt_proportion = 0, avg_recall = 0;
             std::vector<float> avg_time_consumption(layers+1, 0);
             for (size_t i = 0; i < n; i++){
                 avg_visited_vectors += actual_visited_vectors[i];
                 avg_q_c_dist += q_c_dists[i];
                 avg_visited_gt_proportion += visited_gt_proportion[i];
-                for (size_t j = 0; j < layers+1; j++){
-                    avg_time_consumption[j] += time_consumption[i][j];
-                }
+                for (size_t j = 0; j < layers+1; j++){avg_time_consumption[j] += time_consumption[i][j];}
+                avg_recall += recall[i];
             }
             std::cout << "Time consumption in different parts: ";for(size_t i = 0; i < layers+1; i++){std::cout << avg_time_consumption[i] / n << " ";}std::cout << std::endl;
             std::cout << "The average visited vectors: " << avg_visited_vectors / n << std::endl;
             std::cout << "The average query centroid distance: " << avg_q_c_dist / n << std::endl;
             std::cout << "The avarage groundtruth proportion is: " << avg_visited_gt_proportion / n << std::endl;
+            std::cout << "The avarage recall is: " << avg_recall / n << std::endl;
         }
     }
 
