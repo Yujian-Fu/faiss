@@ -12,11 +12,13 @@
  * 
  **/
 
+using namespace bslib;
 int main(){
-    bool TEST_VQ;
-    bool TEST_LQ;
-    bool TEST_PQ;
-    bool TEST_ALGO;
+    bool TEST_VQ = false;
+    bool TEST_LQ = false;
+    bool TEST_PQ = false;
+    bool TEST_ALGO = false;
+    bool TEST_DATA = true; 
 
     /**
      * Testing VQ part
@@ -33,6 +35,18 @@ int main(){
    /**
     * Testing algorithm part
     **/
+
+   /**
+    * Testing data generated
+    **/
+   if (TEST_DATA){
+       std::vector<idx_t> origin_ids(nb);
+       std::ifstream ids_input(path_ids, std::ios::binary);
+       readXvec<idx_t>(ids_input, origin_ids.data(), batch_size, nbatches);
+       for (size_t i = 0; i < nb; i++){std::cout << origin_ids[i] << std::endl;}
+   }
+   
+   
 
 
 }
