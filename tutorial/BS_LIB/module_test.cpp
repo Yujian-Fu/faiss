@@ -50,12 +50,18 @@ int main(){
        std::vector<idx_t> seq_origin_ids(nb);
        std::ifstream seq_ids_input(path_seq_ids, std::ios::binary);
        readXvec<idx_t> (seq_ids_input, seq_origin_ids.data(), batch_size, nbatches);
-       for (size_t i = 0; i < nb / 10; i++){if (seq_origin_ids[i] == origin_ids[i]) std::cout << "t" << i; else std::cout << "f";}
-       
+       //for (size_t i = 0; i < nb / 10; i++){if (seq_origin_ids[i] == origin_ids[i]) std::cout << "t" << i; else std::cout << "f";}
+    for (size_t i = 0; i < nbatches; i++){
+        for (size_t j = 0; j < 100; j++){
+            std::cout << origin_ids[i * batch_size + j] << " ";
+        }
+    }
+
 
         //Bslib_Index index = Bslib_Index(dimension, layers, index_type, use_HNSW_VQ, use_norm_quantization);
         //index.read_index(path_index);
 
+        /*
         std::ifstream seq_base_input(path_base, std::ios::binary);
         std::vector<float> seq_batch(batch_size * dimension);
         for (size_t i = 0; i < 3; i++){
@@ -71,6 +77,7 @@ int main(){
         for (size_t i = 0; i < batch_size * dimension; i++){
             std::cout << i << " " << batch[i] - seq_batch[i] << " ";
         }
+        */
 
 
 
