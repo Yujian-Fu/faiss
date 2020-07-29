@@ -40,6 +40,7 @@ int main(){
     * Testing data generated
     **/
    if (TEST_DATA){
+
        std::vector<idx_t> origin_ids(nb);
        std::ifstream ids_input(path_ids, std::ios::binary);
        readXvec<idx_t>(ids_input, origin_ids.data(), batch_size, nbatches);
@@ -54,6 +55,22 @@ int main(){
 
         //Bslib_Index index = Bslib_Index(dimension, layers, index_type, use_HNSW_VQ, use_norm_quantization);
         //index.read_index(path_index);
+
+        std::ifstream seq_base_input(path_base, std::ios::binary);
+        std::vector<float> seq_batch(batch_size * dimension);
+        for (size_t i = 0; i < 3; i++){
+            readXvecFvec<base_data_type> (seq_base_input, seq_batch.data(), dimension, batch_size);
+        }
+
+        size_t i = 2;
+        std::vector<float> batch(batch_size * dimension);
+        std::ifstream base_input(path_base, std::ios::binary);
+        base_input.seekg(i * batch_size * dimension * sizeof(base_data_type) + i * batch_size * sizeof(uint32_t), std::ios::beg);
+        readXvecFvec<base_data_type> (base_input, batch.data(), dimension, batch_size);
+
+        for (size_t i = 0; i < batch_size * dimension; i++){
+            std::cout << i << " " << batch[i] - seq_batch[i] << " ";
+        }
 
 
 
