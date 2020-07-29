@@ -49,7 +49,7 @@ int main(){
        std::vector<idx_t> seq_origin_ids(nb);
        std::ifstream seq_ids_input(path_seq_ids, std::ios::binary);
        readXvec<idx_t> (seq_ids_input, seq_origin_ids.data(), batch_size, nbatches);
-       for (size_t i = 0; i < nb; i++){if (seq_origin_ids[i] == origin_ids[i]) std::cout << "t" << i; else std::cout << "f";}
+       for (size_t i = 0; i < nb / 10; i++){if (seq_origin_ids[i] == origin_ids[i]) std::cout << "t" << i; else std::cout << "f";}
        
 
         //Bslib_Index index = Bslib_Index(dimension, layers, index_type, use_HNSW_VQ, use_norm_quantization);
