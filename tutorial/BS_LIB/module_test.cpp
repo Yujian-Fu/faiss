@@ -55,6 +55,7 @@ int main(){
         for (size_t j = 0; j < 100; j++){
             std::cout << origin_ids[i * batch_size + j] << " ";
         }
+        std::cout << std::endl;
     }
 
 
