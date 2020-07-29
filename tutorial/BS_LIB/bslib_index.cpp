@@ -662,8 +662,8 @@ namespace bslib{
         clock_t starttime, endtime;
 
         //The size for results should be: n * group_size * search_space
-        std::vector<float> result_dists(this->max_group_size * n * 1);
-        std::vector<idx_t> result_labels (this->max_group_size * n * 1);
+        std::vector<float> result_dists(this->max_group_size * n * 1, 0);
+        std::vector<idx_t> result_labels (this->max_group_size * n * 1, 0);
         //search_space is num_group * group_size, num_group should always be 1 in assigning
         size_t search_space = 1;
         //The keep_space is always 1 for assign
@@ -725,7 +725,8 @@ namespace bslib{
         }
 
         assert((n_vq + n_lq + n_pq) == this->layers);
-        for (size_t i = 0; i < n; i++){assigned_ids[i] = group_ids[i];}
+        memcpy(assigned_ids, group_ids.data(), n * sizeof(idx_t));
+        //for (size_t i = 0; i < n; i++){assigned_ids[i] = group_ids[i];}
     }
 
 
