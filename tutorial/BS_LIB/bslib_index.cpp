@@ -725,9 +725,7 @@ namespace bslib{
         }
 
         assert((n_vq + n_lq + n_pq) == this->layers);
-        for (size_t i = 0; i < n; i++){
-            assigned_ids[i] = group_ids[i];
-        }
+        for (size_t i = 0; i < n; i++){assigned_ids[i] = group_ids[i];}
     }
 
 

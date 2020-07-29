@@ -66,29 +66,23 @@ int main(){
     if (!exists(path_ids)){
         Trecorder.reset();
         PrintMessage("Assigning the points");
-        
+        std::ifstream base_input (path_base, std::ios::binary);
         std::ofstream base_output (path_ids, std::ios::binary);
 
-        std::vector<idx_t> assigned_ids(batch_size * nbatches);
+        std::vector <float> batch(batch_size * dimension);
+        std::vector<idx_t> assigned_ids(batch_size);
 
-#pragma omp parallel for
         for (size_t i = 0; i < nbatches; i++){
-            std::ifstream base_input (path_base, std::ios::binary);
-            std::vector <float> batch(batch_size * dimension);
-            base_input.seekg(i * batch_size * dimension * sizeof(base_data_type) + i * batch_size * sizeof(uint32_t), std::ios::beg);
             readXvecFvec<base_data_type> (base_input, batch.data(), dimension, batch_size);
-            index.assign(batch_size, batch.data(), assigned_ids.data()+ i * batch_size);
-            base_input.close();
-            //if (i % 10 == 0){
-                //std::cout << " assigned batches [ " << i << " / " << nbatches << " ]";
-                //Trecorder.print_time_usage("");
-            //}
-        }
-        for (size_t i = 0; i < nbatches; i++){
+            index.assign(batch_size, batch.data(), assigned_ids.data());
             base_output.write((char * ) & batch_size, sizeof(uint32_t));
-            base_output.write((char *) assigned_ids.data() + i * batch_size, batch_size * sizeof(idx_t));
+            base_output.write((char *) assigned_ids.data(), batch_size * sizeof(idx_t));
+            if (i % 10 == 0){
+                std::cout << " assigned batches [ " << i << " / " << nbatches << " ]";
+                Trecorder.print_time_usage("");
+            }
         }
-
+        base_input.close();
         base_output.close();
         message = "Assigned the base vectors";
         Mrecorder.print_memory_usage(message);
@@ -172,8 +166,6 @@ int main(){
         index.compute_centroid_norm();
 
         index.write_index(path_index);
-        base_input.close();
-        idx_input.close();
         message = "Constructed and wrote the index ";
         Mrecorder.print_memory_usage(message);
         Mrecorder.record_memory_usage(record_file,  message);
@@ -187,7 +179,6 @@ int main(){
     {
         std::ifstream gt_input(path_gt, std::ios::binary);
         readXvec<uint32_t>(gt_input, groundtruth.data(), ngt, nq, true, false);
-        gt_input.close();
     }
 
     PrintMessage("Loading queries");
@@ -195,13 +186,12 @@ int main(){
     {
         std::ifstream query_input(path_query, std::ios::binary);
         readXvecFvec<base_data_type>(query_input, queries.data(), dimension, nq, true, false);
-        query_input.close();
     }
 
     index.use_reranking = use_reranking;
     index.reranking_space = reranking_space;
+
     index.max_visited_vectors = max_vectors;
-    
     std::vector<float> query_distances(nq * result_k);
     std::vector<faiss::Index::idx_t> query_labels(nq * result_k);
     size_t correct = 0;
