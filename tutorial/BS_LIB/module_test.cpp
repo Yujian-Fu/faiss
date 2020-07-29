@@ -43,7 +43,7 @@ int main(){
        std::vector<idx_t> origin_ids(nb);
        std::ifstream ids_input(path_ids, std::ios::binary);
        readXvec<idx_t>(ids_input, origin_ids.data(), batch_size, nbatches);
-       for (size_t i = 0; i < nb; i++){std::cout << origin_ids[i] << std::endl;}
+       for (size_t i = 0; i < 100; i++){std::cout << origin_ids[i] << " ";}
    }
    
    
