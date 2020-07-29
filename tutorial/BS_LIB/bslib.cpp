@@ -66,6 +66,27 @@ int main(){
     if (!exists(path_ids)){
         Trecorder.reset();
         PrintMessage("Assigning the points");
+        
+        //The parallel version of assigning points
+        std::ofstream base_output (path_ids, std::ios::binary);
+        std::vector<idx_t> assigned_ids(nb);
+
+#pragma omp parallel for 
+        for (size_t i = 0; i < nbatches; i++){
+            std::vector<float> batch(batch_size * dimension);
+            std::ifstream base_input(path_base, std::ios::binary);
+            base_input.seekg(i * batch_size * dimension * sizeof(base_data_type) + i * batch_size * sizeof(uint32_t), std::ios::beg);
+            readXvecFvec<base_data_type> (base_input, batch.data(), dimension, batch_size);
+            index.assign(batch_size, batch.data(), assigned_ids.data() + i * batch_size);
+            base_input.close();
+        }
+
+        for (size_t i = 0; i < nbatches; i++){
+            base_output.write((char *) & batch_size, sizeof(uint32_t));
+            base_output.write((char *) assigned_ids.data() + i * batch_size, batch_size * sizeof(idx_t));
+        }
+        
+        /*
         std::ifstream base_input (path_base, std::ios::binary);
         std::ofstream base_output (path_ids, std::ios::binary);
 
@@ -83,6 +104,7 @@ int main(){
             }
         }
         base_input.close();
+        */
         base_output.close();
         message = "Assigned the base vectors";
         Mrecorder.print_memory_usage(message);
