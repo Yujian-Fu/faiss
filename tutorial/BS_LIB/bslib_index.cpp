@@ -1020,7 +1020,7 @@ namespace bslib{
                 if (showmessage) std::cout << "Searching in " << group_id << " th group with distance " << q_c_dist << std::endl;
 
                 size_t group_size = this->base_sequence_ids[group_id].size();
-                assert(group_size == this->base_sequence_ids[group_id].size() / this->code_size);
+                assert(group_size == this->base_codes[group_id].size() / this->code_size);
 
                 float centroid_norm;
                 idx_t centroid_id = (use_hash) ? query_pre_hash_ids[id_position] : group_id;
