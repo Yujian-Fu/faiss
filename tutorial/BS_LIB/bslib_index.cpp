@@ -902,7 +902,8 @@ namespace bslib{
             size_t max_search_space = 1;
 
             for (size_t j = 0; j < layers; j++){
-                if (final_keep_space * ncentroids[j] > max_search_space){
+
+                if (final_keep_space * ncentroids[j] > max_search_space || final_keep_space * keep_space[j] > max_search_space){
                     max_search_space = final_keep_space * (ncentroids[j] > keep_space[j]) ? ncentroids[j] : keep_space[j];
                 }
                 final_keep_space *= keep_space[j];
