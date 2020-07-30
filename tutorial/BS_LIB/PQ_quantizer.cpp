@@ -63,7 +63,8 @@ namespace bslib{
         for (size_t i = 0; i < M; i++){
             idx += index[i] * new_pow(ksub, i);
         }
-        return (CentroidDistributionMap[group_id] + idx);
+        idx_t result_idx = CentroidDistributionMap[group_id] + idx; assert(result_idx < nc);
+        return result_idx;
     }
 
 
@@ -79,6 +80,7 @@ namespace bslib{
      * 
      **/
     idx_t PQ_quantizer::id_2_index(idx_t idx, idx_t * index){
+        assert(idx < nc);
         size_t group_id = idx / this->nc_per_group;
         idx = idx - CentroidDistributionMap[group_id];
         for (size_t i = 0; i < M; i++){index[i] = idx % ksub;idx = idx / ksub;}
@@ -177,7 +179,7 @@ namespace bslib{
        std::vector<std::vector<float>> dist_seqs(this->M, std::vector<float>(this->ksub));
        std::vector<std::vector<idx_t>> dist_index(this->M, std::vector<idx_t>(this->ksub));
 
-#pragma omp parallel for
+//#pragma omp parallel for
        for (size_t i = 0; i < this->M; i++){
            uint32_t x = 0;
            //From 0 to M-1
