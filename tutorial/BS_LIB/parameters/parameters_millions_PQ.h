@@ -31,8 +31,8 @@ const size_t M_HNSW[VQ_layers] = {};
 const size_t efConstruction [VQ_layers] = {};
 const size_t efSearch[VQ_layers] = {};
 
-const size_t M_PQ_layer[PQ_layers] = {};
-const size_t nbits_PQ_layer[PQ_layers] = {};
+const size_t M_PQ_layer[PQ_layers] = {4};
+const size_t nbits_PQ_layer[PQ_layers] = {8};
 
 const size_t selector_train_size = 100000;
 const size_t selector_group_size = 1000;
@@ -53,20 +53,20 @@ size_t keep_space[layers] = {100};
 
 bool is_recording = true;
 
-std::string conf_combination(size_t n, const uint32_t * s){
+std::string conf_combination(){
     std::string result = "";
-    for (size_t i = 0; i < n; i++){result += "_"; result += std::to_string(s[i]);}
+    for (size_t i = 0; i < layers; i++){result += "_"; result += index_type[i] == "PQ"? std::to_string(M_PQ_layer[i]) + "_" + std::to_string(nbits_PQ_layer[i]) : std::to_string(ncentroids[i]);}
     return result;
 }
 
-std::string index_combination(size_t n, const std::string * s){
+std::string index_combination(){
     std::string result = "";
-    for (size_t i = 0; i < n; i++){result += "_"; result += s[i]; if (s[i] == "VQ" && use_HNSW_VQ) result += "_HNSW";}
+    for (size_t i = 0; i < layers; i++){result += "_"; result += index_type[i]; if (index_type[i] == "VQ" && use_HNSW_VQ) result += "_HNSW";}
     return result;
 }
 
 // Folder path
-std::string ncentroid_conf = conf_combination(layers, ncentroids);
+std::string ncentroid_conf = conf_combination();
 std::string model = "models" + index_combination(layers, index_type);
 const std::string dataset = "SIFT1M";
 
