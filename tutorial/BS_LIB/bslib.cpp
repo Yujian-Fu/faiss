@@ -55,7 +55,7 @@ int main(){
     }
 
     index.build_quantizers(ncentroids, path_quantizers, path_learn, num_train, HNSW_paras, PQ_paras);
-    index.get_final_nc();
+    index.get_final_group_num();
     message = "Initialized the index, ";
     Mrecorder.print_memory_usage(message);
     Mrecorder.record_memory_usage(record_file,  message);
@@ -163,12 +163,13 @@ int main(){
     }
     else{
         PrintMessage("Constructing the index");
-        index.base_codes.resize(index.final_nc);
+        index.base_codes.resize(index.final_group_num);
         if (use_norm_quantization)
-            index.base_norm_codes.resize(index.final_nc);
+            index.base_norm_codes.resize(index.final_group_num);
         else
-            index.base_norm.resize(index.final_nc);
-        index.origin_ids.resize(index.final_nc);
+            index.base_norm.resize(index.final_group_num);
+        index.base_sequence_ids.resize(index.final_group_num);
+        if (use_hash) index.base_pre_hash_ids.resize(index.final_group_num);
 
         Trecorder.reset();
         std::ifstream base_input(path_base, std::ios::binary);

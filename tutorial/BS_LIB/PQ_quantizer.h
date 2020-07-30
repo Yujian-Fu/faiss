@@ -7,6 +7,7 @@ namespace bslib{
         size_t nbits;
         size_t ksub;
         size_t dsub;
+        size_t hash_size;
         std::vector<faiss::ProductQuantizer *> PQs;
         std::vector<std::vector<float>> centroid_norms;
 

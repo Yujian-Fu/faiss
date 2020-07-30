@@ -31,6 +31,8 @@ namespace bslib{
 
             this->ksub = new_pow(2, nbits);
             this->dsub = dimension / M;
+            // Tune this parameter to modify the size of Hash Table
+            this->hash_size = nc_upper * ksub;
         }
 
     /**
