@@ -2,18 +2,6 @@
 #include <iostream>
 #include <string>
 
-std::string conf_combination(size_t n, const uint32_t * s){
-    std::string result = "";
-    for (size_t i = 0; i < n; i++){result += "_"; result += std::to_string(s[i]);}
-    return result;
-}
-
-std::string index_combination(size_t n, const std::string * s){
-    std::string result = "";
-    for (size_t i = 0; i < n; i++){result += "_"; result += s[i];}
-    return result;
-}
-
 /* Parameter setting: */
 //Exp parameters
 //For index initialization
@@ -23,7 +11,6 @@ const size_t PQ_layers = 0;
 const std::string index_type[layers] = {"VQ"};
 const uint32_t ncentroids[layers] = {5000};
 
-const bool pq_use_subset = false;
 const bool use_reranking = false;
 const bool use_HNSW_VQ = false;
 const bool use_norm_quantization = false;
@@ -66,6 +53,18 @@ const size_t max_vectors = 3000;
 size_t keep_space[layers] = {100};
 
 bool is_recording = true;
+
+std::string conf_combination(size_t n, const uint32_t * s){
+    std::string result = "";
+    for (size_t i = 0; i < n; i++){result += "_"; result += std::to_string(s[i]);}
+    return result;
+}
+
+std::string index_combination(size_t n, const std::string * s){
+    std::string result = "";
+    for (size_t i = 0; i < n; i++){result += "_"; result += s[i]; if (s[i] == "VQ" && use_HNSW_VQ) result += "_HNSW";}
+    return result;
+}
 
 // Folder path
 std::string ncentroid_conf = conf_combination(layers, ncentroids);
