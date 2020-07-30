@@ -667,7 +667,7 @@ namespace bslib{
         //search_space is num_group * group_size, num_group should always be 1 in assigning
         size_t search_space = 1;
         //The keep_space is always 1 for assign
-        size_t keep_space = 1;
+        const size_t keep_space = 1;
 
         for (size_t i = 0; i < this->layers; i++){
             assert(n_lq + n_vq + n_pq == i);
@@ -711,10 +711,12 @@ namespace bslib{
             }
             else if (index_type[i] == "PQ"){
                 starttime = clock();
-                pq_quantizer_index[n_pq].search_in_group(n, assign_data, group_ids.data(), result_dists.data(), result_labels.data(), keep_space);
+                std::vector<float> pq_result_dists(n, 0);
+                std::vector<idx_t> pq_result_labels(n, 0);
+                pq_quantizer_index[n_pq].search_in_group(n, assign_data, group_ids.data(), pq_result_dists.data(), pq_result_labels.data(), keep_space);
                 //for (size_t j = 0; j < n; j++){group_ids[j] = result_labels[j]; group_dists[j] = result_dists[j];}
-                memcpy(group_ids.data(), result_labels.data(), n * sizeof(idx_t));
-                memcpy(group_dists.data(),result_dists.data(), n * sizeof(float));
+                memcpy(group_ids.data(), pq_result_labels.data(), n * sizeof(idx_t));
+                memcpy(group_dists.data(),pq_result_dists.data(), n * sizeof(float));
                 n_pq ++;
                 endtime = clock();
                 if(report_time) std::cout << "Time in PQ layer" << float(endtime - starttime) / CLOCKS_PER_SEC << std::endl;

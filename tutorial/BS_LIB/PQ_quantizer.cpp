@@ -268,7 +268,8 @@ namespace bslib{
             for (size_t j = 0; j < this->M; j++){
                 recovered_index[j] = dist_index[j][new_pair.second[j]];
             }
-            result_labels[i] = index_2_id(recovered_index.data(), group_id);
+            idx_t result_id = index_2_id(recovered_index.data(), group_id);
+            result_labels[i] = result_id;
             result_dists[i] = new_pair.first;
         }
     }
