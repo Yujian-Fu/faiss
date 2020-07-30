@@ -17,7 +17,7 @@ int main(){
 
 /*Prepare the work space*/
     PrepareFolder((char *) folder_model.c_str());
-    PrepareFolder((char *) (std::string(folder_model)+"/SIFT1M").c_str());
+    PrepareFolder((char *) (std::string(folder_model)+"/" + dataset).c_str());
     std::cout << "Preparing work space: " << folder_model << std::endl;
 
     //For recording 
@@ -67,6 +67,7 @@ int main(){
         Trecorder.reset();
         PrintMessage("Assigning the points");
         
+
         //The parallel version of assigning points
         std::ofstream base_output (path_ids, std::ios::binary);
         std::vector<idx_t> assigned_ids(nb);
@@ -85,7 +86,12 @@ int main(){
             base_output.write((char *) & batch_size, sizeof(uint32_t));
             base_output.write((char *) assigned_ids.data() + i * batch_size, batch_size * sizeof(idx_t));
         }
-        
+        base_output.close();
+        message = "Assigned the base vectors in sequential mode";
+        Mrecorder.print_memory_usage(message);
+        Mrecorder.record_memory_usage(record_file,  message);
+        Trecorder.print_time_usage(message);
+        Trecorder.record_time_usage(record_file, message);
         /*
         std::ifstream base_input (path_base, std::ios::binary);
         std::ofstream base_output (path_ids, std::ios::binary);
@@ -106,7 +112,7 @@ int main(){
         base_input.close();
         */
         base_output.close();
-        message = "Assigned the base vectors";
+        message = "Assigned the base vectors in sequential mode";
         Mrecorder.print_memory_usage(message);
         Mrecorder.record_memory_usage(record_file,  message);
         Trecorder.print_time_usage(message);
