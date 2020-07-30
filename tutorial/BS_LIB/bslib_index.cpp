@@ -712,7 +712,9 @@ namespace bslib{
             else if (index_type[i] == "PQ"){
                 starttime = clock();
                 pq_quantizer_index[n_pq].search_in_group(n, assign_data, group_ids.data(), result_dists.data(), result_labels.data(), keep_space);
-                for (size_t j = 0; j < n; j++){group_ids[j] = result_labels[j]; group_dists[j] = result_dists[j];}
+                //for (size_t j = 0; j < n; j++){group_ids[j] = result_labels[j]; group_dists[j] = result_dists[j];}
+                memcpy(group_ids.data(), result_labels.data(), n * sizeof(idx_t));
+                memcpy(group_dists.data(),result_dists.data(), n * sizeof(float));
                 n_pq ++;
                 endtime = clock();
                 if(report_time) std::cout << "Time in PQ layer" << float(endtime - starttime) / CLOCKS_PER_SEC << std::endl;

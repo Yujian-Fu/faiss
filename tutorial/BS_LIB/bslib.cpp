@@ -70,21 +70,21 @@ int main(){
 
         //The parallel version of assigning points
         std::ofstream base_output (path_ids, std::ios::binary);
-        std::vector<std::vector<idx_t>> assigned_ids(nbatches);
+        std::vector<idx_t> assigned_ids(nb);
+
 #pragma omp parallel for 
         for (size_t i = 0; i < nbatches; i++){
-            assigned_ids[i].resize(batch_size, 0);
             std::vector<float> batch(batch_size * dimension);
             std::ifstream base_input(path_base, std::ios::binary);
             base_input.seekg(i * batch_size * dimension * sizeof(base_data_type) + i * batch_size * sizeof(uint32_t), std::ios::beg);
             readXvecFvec<base_data_type> (base_input, batch.data(), dimension, batch_size);
-            index.assign(batch_size, batch.data(), assigned_ids[i].data());
+            index.assign(batch_size, batch.data(), assigned_ids.data() + i * batch_size * sizeof(idx_t));
             base_input.close();
         }
 
         for (size_t i = 0; i < nbatches; i++){
             base_output.write((char *) & batch_size, sizeof(uint32_t));
-            base_output.write((char *) assigned_ids[i].data(), batch_size * sizeof(idx_t));
+            base_output.write((char *) assigned_ids.data() + i * batch_size * sizeof(idx_t), batch_size * sizeof(idx_t));
         }
         base_output.close();
         message = "Assigned the base vectors in parallel mode";
@@ -93,7 +93,6 @@ int main(){
         Trecorder.print_time_usage(message);
         Trecorder.record_time_usage(record_file, message);
         /*
-        //The sequential version of assigned ids
         std::ifstream base_input (path_base, std::ios::binary);
         std::ofstream base_output (path_ids, std::ios::binary);
 
@@ -111,7 +110,6 @@ int main(){
             }
         }
         base_input.close();
-        
         base_output.close();
         message = "Assigned the base vectors in sequential mode";
         Mrecorder.print_memory_usage(message);

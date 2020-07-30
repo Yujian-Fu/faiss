@@ -201,11 +201,10 @@ namespace bslib{
 
         for (size_t i = 0; i < this->M; i++){visited_index.push_back(origin_pair.second[i]);}
         dist_queue.push(origin_pair);
-
+        result_sequence.push_back(origin_pair);
 
        while(result_sequence.size() < keep_space){
            dist_pair top_pair = dist_queue.top();
-           result_sequence.push_back(top_pair);
            dist_queue.pop();
            for (size_t j = 0; j < this->M; j++){
                //Check if there is an zero value (j)
@@ -257,6 +256,7 @@ namespace bslib{
                     }
                 }
             }
+            result_sequence.push_back(dist_queue.top());
         }
 
         for (size_t i = 0; i < keep_space; i++){
