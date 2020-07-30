@@ -904,7 +904,7 @@ namespace bslib{
             for (size_t j = 0; j < layers; j++){
 
                 if (final_keep_space * ncentroids[j] > max_search_space || final_keep_space * keep_space[j] > max_search_space){
-                    max_search_space = final_keep_space * (ncentroids[j] > keep_space[j]) ? ncentroids[j] : keep_space[j];
+                    max_search_space = final_keep_space * ((ncentroids[j] > keep_space[j]) ? ncentroids[j] : keep_space[j]);
                 }
                 final_keep_space *= keep_space[j];
             }
@@ -969,12 +969,8 @@ namespace bslib{
                         pq_quantizer_index[n_pq].search_in_group(1, query, query_group_ids.data()+m, query_result_dists.data()+m*keep_space[j], query_result_labels.data()+m*keep_space[j], keep_space[j]);
                     }
                     assert(keep_result_space * keep_space[j] == final_keep_space);
-                    for (size_t m = 0; m < keep_result_space; m++){
-                        for (size_t k = 0; k < keep_space[j]; k++){
-                            query_group_ids[m * keep_result_space + k] = query_result_labels[m * keep_space[j] + k];
-                            query_group_dists[m * keep_result_space + k] = query_result_dists[m * keep_space[j] + k];
-                        }
-                    }
+                    memcpy(query_group_ids.data(), query_result_labels.data(), final_keep_space * sizeof(idx_t));
+                    memcpy(query_group_dists.data(), query_result_dists.data(), final_keep_space * sizeof(float));
                     n_pq ++;
                 }
                 else{
