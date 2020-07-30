@@ -79,10 +79,7 @@ namespace bslib{
     idx_t PQ_quantizer::id_2_index(idx_t idx, idx_t * index){
         size_t group_id = idx / this->nc_per_group;
         idx = idx - CentroidDistributionMap[group_id];
-        for (size_t i = 0; i < M; i++){
-            index[i] = idx % ksub;
-            idx = idx / ksub;
-        }
+        for (size_t i = 0; i < M; i++){index[i] = idx % ksub;idx = idx / ksub;}
         return group_id;
     }
 

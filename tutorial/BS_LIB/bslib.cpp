@@ -67,7 +67,7 @@ int main(){
         Trecorder.reset();
         PrintMessage("Assigning the points");
         
-
+        /*
         //The parallel version of assigning points
         std::ofstream base_output (path_ids, std::ios::binary);
         std::vector<idx_t> assigned_ids(nb);
@@ -92,7 +92,8 @@ int main(){
         Mrecorder.record_memory_usage(record_file,  message);
         Trecorder.print_time_usage(message);
         Trecorder.record_time_usage(record_file, message);
-        /*
+        */
+        
         std::ifstream base_input (path_base, std::ios::binary);
         std::ofstream base_output (path_ids, std::ios::binary);
 
@@ -116,7 +117,6 @@ int main(){
         Mrecorder.record_memory_usage(record_file,  message);
         Trecorder.print_time_usage(message);
         Trecorder.record_time_usage(record_file, message);
-        */
     }
 
     //Train the PQ quantizer
