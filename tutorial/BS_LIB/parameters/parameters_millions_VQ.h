@@ -9,25 +9,27 @@ const size_t layers = 1;
 const size_t VQ_layers = 1;
 const size_t PQ_layers = 0;
 const std::string index_type[layers] = {"VQ"};
-const uint32_t ncentroids[layers] = {5000};
+const uint32_t ncentroids[layers] = {2000};
 
 const bool use_reranking = false;
 const bool use_HNSW_VQ = false;
 const bool use_norm_quantization = false;
 const bool use_dynamic_reranking = false;
 const bool use_OPQ = false;
+const bool use_parallel_indexing = false;
+const bool use_hash = PQ_layers > 0 ? true: false;
 const size_t reranking_space = 20;
 
 //For train PQ
 const size_t M_PQ = 16;
 const size_t M_norm_PQ = 1;
 const size_t nbits = 8; //Or 16
-const size_t train_size = 100000; //This is the size of train set
 const size_t dimension = 128;
 
 //For assigning ID
 
 //For building index
+const size_t train_size = 100000; //This is the size of train set
 const size_t M_HNSW[VQ_layers] = {16};
 const size_t efConstruction [VQ_layers] = {300};
 const size_t efSearch[VQ_layers] = {100};
@@ -48,27 +50,27 @@ const size_t nbatches = nb / batch_size; //100
 //For searching
 const size_t ngt = 100;
 const size_t nq = 1000;
-const size_t result_k = 100;
+const size_t result_k = 10;
 const size_t max_vectors = 3000;
 size_t keep_space[layers] = {100};
 
 bool is_recording = true;
 
-std::string conf_combination(size_t n, const uint32_t * s){
+std::string conf_combination(){
     std::string result = "";
-    for (size_t i = 0; i < n; i++){result += "_"; result += std::to_string(s[i]);}
+    for (size_t i = 0; i < layers; i++){result += "_"; result += index_type[i] == "PQ"? std::to_string(M_PQ_layer[i]) + "_" + std::to_string(nbits_PQ_layer[i]) : std::to_string(ncentroids[i]);}
     return result;
 }
 
-std::string index_combination(size_t n, const std::string * s){
+std::string index_combination(){
     std::string result = "";
-    for (size_t i = 0; i < n; i++){result += "_"; result += s[i]; if (s[i] == "VQ" && use_HNSW_VQ) result += "_HNSW";}
+    for (size_t i = 0; i < layers; i++){result += "_"; result += index_type[i]; if (index_type[i] == "VQ" && use_HNSW_VQ) result += "_HNSW";}
     return result;
 }
 
 // Folder path
-std::string ncentroid_conf = conf_combination(layers, ncentroids);
-std::string model = "models" + index_combination(layers, index_type);
+std::string ncentroid_conf = conf_combination();
+std::string model = "models" + index_combination();
 const std::string dataset = "SIFT1M";
 
 const std::string folder_model = "/home/y/yujianfu/ivf-hnsw/" + model;
