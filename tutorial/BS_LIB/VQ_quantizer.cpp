@@ -130,7 +130,7 @@ namespace bslib{
                 //The distance result for search kNN is in reverse 
                 auto result_queue = this->HNSW_quantizers[group_id]->searchBaseLayer(query, efSearch > k ? efSearch : k);
                 size_t result_length = result_queue.size();
-                assert (result_length > k && result_length < nc_per_group);
+                assert (result_length >= k && result_length <= nc_per_group);
 
                 for (size_t j = 0; j < this->nc_per_group; j++){
                     if (j < result_length){
