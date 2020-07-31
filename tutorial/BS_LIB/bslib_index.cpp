@@ -366,6 +366,7 @@ namespace bslib{
                 //Prepare train set for the next layer
                 if (update_ids){
                     read_train_set(path_learn, this->train_size, num_train[i+1]);
+                    std::cout << "Updating train set for the next layer" << std::endl;
                     vq_quantizer_index[vq_quantizer_index.size() - 1].update_train_ids(train_data.data(), train_data_ids.data(), train_data_ids.size());
                 }
 
@@ -399,6 +400,7 @@ namespace bslib{
                 //Prepare train set for the next layer
                 if (update_ids){
                     read_train_set(path_learn, this->train_size, num_train[i+1]);
+                    std::cout << "Updating train set for the next layer" << std::endl;
                     lq_quantizer_index[lq_quantizer_index.size() - 1].update_train_ids(train_data.data(), train_data_ids.data(), train_data_ids.size());
                 }
 
@@ -880,7 +882,7 @@ namespace bslib{
         if (validation){base_input = std::ifstream(path_base, std::ios::binary);}
 
 //Use parallel in real use
-#pragma omp parallel for
+//#pragma omp parallel for
         for (size_t i = 0; i < n; i++){
 
             //Variables for analysis

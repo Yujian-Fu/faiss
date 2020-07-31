@@ -315,6 +315,7 @@ namespace bslib{
 
     void VQ_quantizer::read_HNSW(std::ifstream & input){
         std::cout << "Reading HNSW index" << std::endl;
+        assert(HNSW_quantizers.size() == nc_upper);
 
         for (size_t HNSW_id = 0; HNSW_id < nc_upper; HNSW_id++){
             hnswlib::HierarchicalNSW * HNSW = new hnswlib::HierarchicalNSW();
