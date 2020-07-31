@@ -211,7 +211,7 @@ namespace bslib{
                //Check if there is an zero value (j)
                if (top_pair.second[j] == 0){
                    for (size_t m = 0; m < this->M; m++){
-                        if (m == j || top_pair.second[m] == this->M - 1){
+                        if (m == j || top_pair.second[m] == this->ksub - 1){
                             //keep index j (0) the same as before 
                             // skip if index m reaches the bound 
                             continue; 
