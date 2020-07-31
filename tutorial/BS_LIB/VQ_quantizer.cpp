@@ -123,7 +123,7 @@ namespace bslib{
      **/
     void VQ_quantizer::search_in_group(size_t n, const float * queries, const idx_t * group_ids, float * result_dists, idx_t * result_labels, size_t k){
         if (use_HNSW){
-#pragma omp parallel for
+//#pragma omp parallel for
             for (size_t i = 0; i < n; i++){
                 idx_t group_id = group_ids[i];
                 const float * query = queries + i * dimension;
