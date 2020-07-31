@@ -58,8 +58,7 @@ namespace bslib{
             std::vector<float> centroids(dimension * nc_per_group);
             size_t nt_sub = train_set[i].size() / this->dimension;
             faiss::kmeans_clustering(dimension, nt_sub, nc_per_group, train_set[i].data(), centroids.data());
-                std::vector<float> train_data_dists(nt_sub);
-                std::vector<idx_t> train_data_labels(nt_sub);
+
             //Adding centroids into quantizers
             if (use_HNSW){
                 hnswlib::HierarchicalNSW * centroid_quantizer = new hnswlib::HierarchicalNSW(dimension, nc_per_group, M, 2 * M, efConstruction);
@@ -74,8 +73,11 @@ namespace bslib{
                 centroid_quantizer->add(nc_per_group, centroids.data());
                 this->L2_quantizers[i] = centroid_quantizer;
 
+                std::vector<float> train_data_dists(nt_sub);
+                std::vector<idx_t> train_data_labels(nt_sub);
                 centroid_quantizer->search(nt_sub, train_set[i].data(), 1, train_data_dists.data(), train_data_labels.data());
-                for (size_t temp  =0; temp < nt_sub; temp++){std::cout << train_data_labels[temp] << " ";}
+                for (size_t temp  =0; temp < nt_sub; temp++){std::cout << train_data_labels[temp] << " ";} std::cout << std::endl;
+                for (size_t temp = 0; temp < centroids.size(); temp++) {std::cout << centroids[temp] << " ";} std::cout << std::endl;
             }
         }
         std::cout << "finished computing centoids" <<std::endl;
