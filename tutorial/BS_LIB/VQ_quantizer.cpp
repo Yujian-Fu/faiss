@@ -71,6 +71,9 @@ namespace bslib{
                 faiss::IndexFlatL2 * centroid_quantizer = new faiss::IndexFlatL2(dimension);
                 centroid_quantizer->add(nc_per_group, centroids.data());
                 this->L2_quantizers[i] = centroid_quantizer;
+                std::vector<float> train_data_dists(nt_sub);
+                std::vector<idx_t> train_data_labels(nt_sub);
+                centroid_quantizer->search(nt_sub, train_set[i].data(), 1, train_data_dists.data(), train_data_labels.data());
             }
         }
         std::cout << "finished computing centoids" <<std::endl;
