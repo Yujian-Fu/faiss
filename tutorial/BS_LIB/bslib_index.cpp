@@ -870,12 +870,6 @@ namespace bslib{
         std::vector<float> q_c_dists;
         std::vector<float> recall;
 
-        std::unordered_set<idx_t> all_pre_hash_ids;
-        for (size_t i = 0; i < final_group_num; i++){
-            for (size_t j = 0; j < base_pre_hash_ids[i].size(); j++)
-                all_pre_hash_ids.insert(base_pre_hash_ids[i][j]);
-        }
-
         if (analysis){
             visited_gt_proportion.resize(n, 0); actual_visited_vectors.resize(n, 0);
             time_consumption.resize(n); for (size_t i=0;i<n;i++){time_consumption[i].resize(layers+1, 0);}
