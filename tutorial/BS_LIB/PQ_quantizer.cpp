@@ -179,7 +179,7 @@ namespace bslib{
        std::vector<std::vector<float>> dist_seqs(this->M, std::vector<float>(this->ksub));
        std::vector<std::vector<idx_t>> dist_index(this->M, std::vector<idx_t>(this->ksub));
 
-//#pragma omp parallel for
+#pragma omp parallel for
        for (size_t i = 0; i < this->M; i++){
            uint32_t x = 0;
            //From 0 to M-1
@@ -236,30 +236,33 @@ namespace bslib{
                }
 
                //If top_pair.second[j] - 1 and top_pair.second[m] + 1 is already visited (m is another index) 
+               // Add top_pair.second[j], top_pair.second[m] + 1 
                else{
                     std::vector<idx_t> new_dist_idxs(this->M, 0);
+                    std::vector<idx_t> test_dist_idxs(this->M, 0);
                     float new_dist_sum = 0;
                     for (size_t m = 0; m < this->M; m++){
                         //m is the choice for another index
-                        if (m == j){
-                            continue;
-                        }
+                        if (m == j){continue;}
                         for (size_t k = 0; k < this->M; k++){
-                            new_dist_idxs[k] = (k == j) ? top_pair.second[k] + 1 : (k == m) ? top_pair.second[k] - 1 : top_pair.second[k];
-                            new_dist_sum += dist_seqs[k][dist_index[k][new_dist_idxs[k]]];
+                            test_dist_idxs[k] = (k == j) ? top_pair.second[j] - 1 :(k == m) ? top_pair.second[m] + 1 : top_pair.second[k];
                         }
-                        
-                        if (! traversed(visited_index.data(), new_dist_idxs.data(), visited_index.size() / this->M)){
-                            dist_pair new_pair(new_dist_sum, new_dist_idxs);
-                            for (size_t k = 0; k < this->M; k++){visited_index.push_back(new_pair.second[k]);}
-                            dist_queue.push(new_pair);
+                        if ( traversed(visited_index.data(), test_dist_idxs.data(), visited_index.size() / this->M)){
+                            for (size_t k = 0; k < this->M; k++){
+                                new_dist_idxs[k] = (k == m) ? top_pair.second[m] + 1 : top_pair.second[k];
+                                new_dist_sum += dist_seqs[k][dist_index[k][new_dist_idxs[k]]];
+                            }
+                            if (! traversed(visited_index.data(), new_dist_idxs.data(), visited_index.size() / this->M)){
+                                dist_pair new_pair(new_dist_sum, new_dist_idxs);
+                                for (size_t k = 0; k < this->M; k++){visited_index.push_back(new_pair.second[k]);}
+                                dist_queue.push(new_pair);
+                            }
                         }
                     }
                 }
             }
             result_sequence.push_back(dist_queue.top());
         }
-
         for (size_t i = 0; i < keep_space; i++){
             
             dist_pair new_pair = result_sequence[i];
@@ -269,8 +272,8 @@ namespace bslib{
             for (size_t j = 0; j < this->M; j++){
                 recovered_index[j] = dist_index[j][new_pair.second[j]];
             }
-            idx_t result_id = index_2_id(recovered_index.data(), group_id);
-            result_labels[i] = result_id;
+            result_labels[i] = index_2_id(recovered_index.data(), group_id);
+            
             result_dists[i] = new_pair.first;
         }
     }
