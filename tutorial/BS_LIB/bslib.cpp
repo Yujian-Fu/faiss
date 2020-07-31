@@ -176,7 +176,7 @@ int main(){
         if (use_norm_quantization){index.base_norm_codes.resize(index.final_group_num);} else{index.base_norm.resize(index.final_group_num);}
         if (use_hash) index.base_pre_hash_ids.resize(index.final_group_num);
         for (size_t i = 0; i < index.final_group_num; i++){
-            index.base_codes[i].resize(groups_size[i]);
+            index.base_codes[i].resize(groups_size[i] * index.code_size);
             index.base_sequence_ids[i].resize(groups_size[i]);
             if(use_hash) index.base_pre_hash_ids[i].resize(groups_size[i]);
             if (use_norm_quantization){index.base_norm_codes[i].resize(groups_size[i] * index.norm_code_size);}
