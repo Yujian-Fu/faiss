@@ -75,6 +75,7 @@ namespace bslib{
                 this->L2_quantizers[i] = centroid_quantizer;
 
                 centroid_quantizer->search(nt_sub, train_set[i].data(), 1, train_data_dists.data(), train_data_labels.data());
+                for (size_t temp  =0; temp < nt_sub; temp++){std::cout << train_data_labels[temp] << " ";}
             }
         }
         std::cout << "finished computing centoids" <<std::endl;
