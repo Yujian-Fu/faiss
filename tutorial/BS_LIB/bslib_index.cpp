@@ -806,6 +806,9 @@ namespace bslib{
      * group_ids: the list of cloest group_ids               size: keep_result_space
      * result_idx_dist: the list of corresponding dists      size: keep_result_space
      * 
+     * Output:
+     * id_position: this is the id position of next group id to be visited
+     * 
      **/
     size_t Bslib_Index::get_next_group_idx(size_t keep_result_space, idx_t * group_ids, float * query_group_dists, std::pair<idx_t, float> & result_idx_dist){
         idx_t min_label = INVALID_ID;
@@ -872,7 +875,7 @@ namespace bslib{
             for (size_t j = 0; j < base_pre_hash_ids[i].size(); j++)
                 all_pre_hash_ids.insert(base_pre_hash_ids[i][j]);
         }
-        
+
         if (analysis){
             visited_gt_proportion.resize(n, 0); actual_visited_vectors.resize(n, 0);
             time_consumption.resize(n); for (size_t i=0;i<n;i++){time_consumption[i].resize(layers+1, 0);}
@@ -1003,12 +1006,14 @@ namespace bslib{
             }
 
             std::vector<idx_t> query_pre_hash_ids; 
-            if (use_hash){query_pre_hash_ids.resize(final_keep_space, 0); memcpy(query_pre_hash_ids.data(), query_group_ids.data(), final_keep_space * sizeof(idx_t)); 
-            HashMapping(final_keep_space, query_pre_hash_ids.data(), query_group_ids.data(), final_group_num);}
+            if (use_hash){
+                query_pre_hash_ids.resize(final_keep_space, 0); memcpy(query_pre_hash_ids.data(), query_group_ids.data(), final_keep_space * sizeof(idx_t)); 
+                HashMapping(final_keep_space, query_pre_hash_ids.data(), query_group_ids.data(), final_group_num);}
             size_t max_size = 0;for (size_t j = 0; j < final_keep_space; j++){if (base_sequence_ids[query_group_ids[j]].size() > max_size) max_size = base_sequence_ids[query_group_ids[j]].size();}
             
             std::vector<float> query_search_dists(max_visited_vectors + max_size, 0);std::vector<idx_t> query_search_labels(max_visited_vectors + max_size, 0);
-            // The dists for actual data
+            
+            // The dists for actual distance validation
             std::vector<float> query_actual_dists; if (validation){(query_actual_dists.resize(max_visited_vectors + max_size));}
 
             for (size_t j = 0; j < final_keep_space; j++){
@@ -1048,7 +1053,7 @@ namespace bslib{
                 const uint8_t * code = base_codes[group_id].data();
 
                 for (size_t m = 0; m < group_size; m++){
-                    if (base_pre_hash_ids[j][m] != query_pre_hash_ids[j]){
+                    if (use_hash && base_pre_hash_ids[group_id][m] != centroid_id){
                         continue;
                     }
                     else{
