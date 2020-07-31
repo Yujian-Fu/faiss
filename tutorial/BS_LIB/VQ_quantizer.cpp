@@ -56,8 +56,10 @@ namespace bslib{
         for (size_t i = 0; i < nc_upper; i++){
             std::vector<float> centroids(dimension * nc_per_group);
             size_t nt_sub = train_set[i].size() / this->dimension;
+            std::cout << "Clustering " << std::endl;
             faiss::kmeans_clustering(dimension, nt_sub, nc_per_group, train_set[i].data(), centroids.data());
 
+            exit(0);
             //Adding centroids into quantizers
             if (use_HNSW){
                 hnswlib::HierarchicalNSW * centroid_quantizer = new hnswlib::HierarchicalNSW(dimension, nc_per_group, M, 2 * M, efConstruction);
