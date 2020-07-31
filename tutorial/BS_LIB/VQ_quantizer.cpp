@@ -79,7 +79,7 @@ namespace bslib{
                 std::vector<float> train_data_dists(nt_sub);
                 std::vector<idx_t> train_data_labels(nt_sub);
                 centroid_quantizer->search(nt_sub, train_set[i].data(), 1, train_data_dists.data(), train_data_labels.data());
-                for (size_t temp = 0; temp < 100 * 128; temp++) {std::cout << train_set[i][temp] << " ";} std::cout << std::endl;
+                for (size_t temp = 9900 * 128; temp < 10000 * 128; temp++) {std::cout << train_set[i][temp] << " ";} std::cout << std::endl;
                 for (size_t temp  =0; temp < nt_sub; temp++){std::cout << train_data_labels[temp] << " ";} std::cout << std::endl;
                 for (size_t temp = 0; temp < centroids.size() / 10; temp++) {std::cout << centroids[temp] << " ";} std::cout << std::endl;
                 exit(0);
