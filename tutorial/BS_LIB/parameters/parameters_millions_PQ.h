@@ -51,7 +51,7 @@ const size_t ngt = 100;
 const size_t nq = 1000;
 const size_t result_k = 10;
 const size_t max_vectors = 3000;
-size_t keep_space[layers] = {2000};
+size_t keep_space[layers] = {1000};
 
 bool is_recording = true;
 

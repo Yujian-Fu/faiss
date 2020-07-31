@@ -886,7 +886,7 @@ namespace bslib{
         if (validation){base_input = std::ifstream(path_base, std::ios::binary);}
 
 //Use parallel in real use
-//#pragma omp parallel for
+#pragma omp parallel for
         for (size_t i = 0; i < n; i++){
 
             //Variables for analysis
