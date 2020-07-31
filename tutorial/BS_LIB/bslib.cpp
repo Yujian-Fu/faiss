@@ -67,56 +67,58 @@ int main(){
         Trecorder.reset();
         PrintMessage("Assigning the points");
         
-        /*
-        //The parallel version of assigning points
-        std::ofstream base_output (path_ids, std::ios::binary);
-        std::vector<idx_t> assigned_ids(nb);
+        if (use_parallel_indexing){
+            //The parallel version of assigning points
+            std::ofstream base_output (path_ids, std::ios::binary);
+            std::vector<idx_t> assigned_ids(nb);
 
-#pragma omp parallel for 
-        for (size_t i = 0; i < nbatches; i++){
-            std::vector<float> batch(batch_size * dimension);
-            std::ifstream base_input(path_base, std::ios::binary);
-            base_input.seekg(i * batch_size * dimension * sizeof(base_data_type) + i * batch_size * sizeof(uint32_t), std::ios::beg);
-            readXvecFvec<base_data_type> (base_input, batch.data(), dimension, batch_size);
-            index.assign(batch_size, batch.data(), assigned_ids.data() + i * batch_size * sizeof(idx_t));
-            base_input.close();
-        }
-
-        for (size_t i = 0; i < nbatches; i++){
-            base_output.write((char *) & batch_size, sizeof(uint32_t));
-            base_output.write((char *) assigned_ids.data() + i * batch_size * sizeof(idx_t), batch_size * sizeof(idx_t));
-        }
-        base_output.close();
-        message = "Assigned the base vectors in parallel mode";
-        Mrecorder.print_memory_usage(message);
-        Mrecorder.record_memory_usage(record_file,  message);
-        Trecorder.print_time_usage(message);
-        Trecorder.record_time_usage(record_file, message);
-        */
-        
-        std::ifstream base_input (path_base, std::ios::binary);
-        std::ofstream base_output (path_ids, std::ios::binary);
-
-        std::vector <float> batch(batch_size * dimension);
-        std::vector<idx_t> assigned_ids(batch_size);
-
-        for (size_t i = 0; i < nbatches; i++){
-            readXvecFvec<base_data_type> (base_input, batch.data(), dimension, batch_size);
-            index.assign(batch_size, batch.data(), assigned_ids.data());
-            base_output.write((char * ) & batch_size, sizeof(uint32_t));
-            base_output.write((char *) assigned_ids.data(), batch_size * sizeof(idx_t));
-            if (i % 10 == 0){
-                std::cout << " assigned batches [ " << i << " / " << nbatches << " ]";
-                Trecorder.print_time_usage("");
+    #pragma omp parallel for 
+            for (size_t i = 0; i < nbatches; i++){
+                std::vector<float> batch(batch_size * dimension);
+                std::ifstream base_input(path_base, std::ios::binary);
+                base_input.seekg(i * batch_size * dimension * sizeof(base_data_type) + i * batch_size * sizeof(uint32_t), std::ios::beg);
+                readXvecFvec<base_data_type> (base_input, batch.data(), dimension, batch_size);
+                index.assign(batch_size, batch.data(), assigned_ids.data() + i * batch_size * sizeof(idx_t));
+                base_input.close();
             }
+
+            for (size_t i = 0; i < nbatches; i++){
+                base_output.write((char *) & batch_size, sizeof(uint32_t));
+                base_output.write((char *) assigned_ids.data() + i * batch_size * sizeof(idx_t), batch_size * sizeof(idx_t));
+            }
+            base_output.close();
+            message = "Assigned the base vectors in parallel mode";
+            Mrecorder.print_memory_usage(message);
+            Mrecorder.record_memory_usage(record_file,  message);
+            Trecorder.print_time_usage(message);
+            Trecorder.record_time_usage(record_file, message);
         }
-        base_input.close();
-        base_output.close();
-        message = "Assigned the base vectors in sequential mode";
-        Mrecorder.print_memory_usage(message);
-        Mrecorder.record_memory_usage(record_file,  message);
-        Trecorder.print_time_usage(message);
-        Trecorder.record_time_usage(record_file, message);
+
+        else{
+            std::ifstream base_input (path_base, std::ios::binary);
+            std::ofstream base_output (path_ids, std::ios::binary);
+
+            std::vector <float> batch(batch_size * dimension);
+            std::vector<idx_t> assigned_ids(batch_size);
+
+            for (size_t i = 0; i < nbatches; i++){
+                readXvecFvec<base_data_type> (base_input, batch.data(), dimension, batch_size);
+                index.assign(batch_size, batch.data(), assigned_ids.data());
+                base_output.write((char * ) & batch_size, sizeof(uint32_t));
+                base_output.write((char *) assigned_ids.data(), batch_size * sizeof(idx_t));
+                if (i % 10 == 0){
+                    std::cout << " assigned batches [ " << i << " / " << nbatches << " ]";
+                    Trecorder.print_time_usage("");
+                }
+            }
+            base_input.close();
+            base_output.close();
+            message = "Assigned the base vectors in sequential mode";
+            Mrecorder.print_memory_usage(message);
+            Mrecorder.record_memory_usage(record_file,  message);
+            Trecorder.print_time_usage(message);
+            Trecorder.record_time_usage(record_file, message);
+        }
     }
 
     //Train the PQ quantizer
@@ -162,30 +164,38 @@ int main(){
         Trecorder.record_time_usage(record_file, message);
     }
     else{
+        std::vector<idx_t> ids(nb); std::ifstream ids_input(path_ids, std::ios::binary);
+        readXvec<idx_t> (ids_input, ids.data(), batch_size, nbatches); 
+        std::vector<idx_t> pre_hash_ids; if (use_hash) {pre_hash_ids.resize(nb, 0); memcpy(pre_hash_ids.data(), ids.data(), nb * sizeof(idx_t)); HashMapping(nb, pre_hash_ids.data(), ids.data(), index.final_group_num);}
+        std::vector<size_t> groups_size(index.final_group_num, 0); std::vector<size_t> group_position(nb, 0);
+        for (size_t i = 0; i < nb; i++){group_position[i] = groups_size[ids[i]]; groups_size[ids[i]] ++;}
+
         PrintMessage("Constructing the index");
         index.base_codes.resize(index.final_group_num);
-        if (use_norm_quantization)
-            index.base_norm_codes.resize(index.final_group_num);
-        else
-            index.base_norm.resize(index.final_group_num);
         index.base_sequence_ids.resize(index.final_group_num);
+        if (use_norm_quantization){index.base_norm_codes.resize(index.final_group_num);} else{index.base_norm.resize(index.final_group_num);}
         if (use_hash) index.base_pre_hash_ids.resize(index.final_group_num);
+        for (size_t i = 0; i < index.final_group_num; i++){
+            index.base_codes[i].resize(groups_size[i]);
+            index.base_sequence_ids[i].resize(groups_size[i]);
+            if(use_hash) index.base_pre_hash_ids[i].resize(groups_size[i]);
+            if (use_norm_quantization){index.base_norm_codes[i].resize(groups_size[i] * index.norm_code_size);}
+            else{index.base_norm[i].resize(groups_size[i]);}
+        }
 
         Trecorder.reset();
         std::ifstream base_input(path_base, std::ios::binary);
         std::ifstream idx_input(path_ids, std::ios::binary);
 
-        std::vector<idx_t> ids(batch_size);
-        std::vector<float> batch(batch_size * dimension);
-        std::vector<idx_t> sequence_ids(batch_size);
+        std::vector<float> base_batch(batch_size * dimension);
+        std::vector<idx_t> batch_sequence_ids(batch_size);
 
         for (size_t i = 0; i < nbatches; i++){
-            readXvec<idx_t>(idx_input, ids.data(), batch_size, 1);
-            readXvecFvec<base_data_type> (base_input, batch.data(), dimension, batch_size);
+            readXvecFvec<base_data_type> (base_input, base_batch.data(), dimension, batch_size);
 
-            for (size_t j = 0; j < batch_size; j++){sequence_ids[j] = batch_size * i + j;}
+            for (size_t j = 0; j < batch_size; j++){batch_sequence_ids[j] = batch_size * i + j;}
 
-            index.add_batch(batch_size, batch.data(), sequence_ids.data(), ids.data());
+            index.add_batch(batch_size, base_batch.data(), batch_sequence_ids.data(), ids.data() + i * batch_size, group_position.data()+i*batch_size, pre_hash_ids.data()+i*batch_size);
             if (i % 10 == 0){
                 std::cout << " adding batches [ " << i << " / " << nbatches << " ]";
                 Trecorder.print_time_usage("");

@@ -79,7 +79,7 @@ struct Bslib_Index{
     void encode(size_t n, const float * data, const idx_t * encoded_ids, float * encoded_data);
     void decode(size_t n, const float * encoded_data, const idx_t * encoded_ids, float * decoded_data);
     void assign(const size_t n, const float * assign_data, idx_t * assigned_ids);
-    void add_batch(size_t n, const float * data, const idx_t * origin_ids, idx_t * encoded_ids);
+    void add_batch(size_t n, const float * data, const idx_t * sequence_ids, const idx_t * group_ids, const size_t * group_position, const idx_t * pre_hash_ids);
     void get_final_group_num();
     void compute_centroid_norm();
     void search(size_t n, size_t result_k, float * queries, float * query_dists, idx_t * query_ids, size_t * keep_space, uint32_t * groundtruth, std::string path_base);

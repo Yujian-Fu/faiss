@@ -500,46 +500,41 @@ namespace bslib{
      * This is the function for adding a base batch 
      * 
      * Input:
-     * n: the batch size of the batch data     size: size_t
-     * data: the base data                     size: n * dimension
-     * ids: the origin sequence id of data     size: n
-     * encoded_ids: the group id of the data   size: n
+     * n: the batch size of the batch data                                                 size: size_t
+     * data: the base data                                                                 size: n * dimension
+     * sequence_ids: the origin sequence id of data                                        size: n
+     * group_ids: the group id of the data                                                 size: n
+     * group_positions                                                                     size: n
+     * batch_pre_hash_ids: only provided in PQ layer, the origin group id without hashing. size: n
      * 
      **/
-    void Bslib_Index::add_batch(size_t n, const float * data, const idx_t * ids, idx_t * encoded_ids){
+    void Bslib_Index::add_batch(size_t n, const float * data, const idx_t * sequence_ids, const idx_t * group_ids, const size_t * group_positions, const idx_t * batch_pre_hash_ids = nullptr){
         std::vector<float> residuals(n * dimension);
         //Compute residuals
-        encode(n, data, encoded_ids, residuals.data());
-
+        if (use_hash) encode(n, data, batch_pre_hash_ids, residuals.data()); else encode(n, data, group_ids, residuals.data());
 
         //Compute code for residuals
         std::vector<uint8_t> batch_codes(n * this->code_size);
         this->pq.compute_codes(residuals.data(), batch_codes.data(), n);
-        
-        std::vector<idx_t> hash_ids;
-        if (use_hash){hash_ids.resize(n, 0);HashMapping(n, encoded_ids, hash_ids.data(), final_group_num);}
-
-        assert(this->base_codes.size() == this->final_group_num);
 
         //Add codes into index
         for (size_t i = 0 ; i < n; i++){
-            idx_t group_id = use_hash ? hash_ids[i] : encoded_ids[i];
-            for (size_t j = 0; j < this->code_size; j++){this->base_codes[group_id].push_back(batch_codes[i * this->code_size + j]);}
-            this->base_sequence_ids[group_id].push_back(ids[i]);
-            if (use_hash){this->base_pre_hash_ids[group_id].push_back(encoded_ids[i]);}
+            idx_t group_id = group_ids[i];
+            size_t group_position = group_positions[i];
+            for (size_t j = 0; j < this->code_size; j++){this->base_codes[group_id][group_position * code_size + j] = batch_codes[i * this->code_size + j];}
+            this->base_sequence_ids[group_id][group_position] = sequence_ids[i];
+            if (use_hash){this->base_pre_hash_ids[group_id][group_position] = batch_pre_hash_ids[i];}
         }
 
         std::vector<float> decoded_residuals(n * dimension);
         this->pq.decode(batch_codes.data(), decoded_residuals.data(), n);
         
         std::vector<float> reconstructed_x(n * dimension);
-        decode(n, decoded_residuals.data(), encoded_ids, reconstructed_x.data());
+        if (use_hash) decode(n, decoded_residuals.data(), batch_pre_hash_ids, reconstructed_x.data()); else decode(n, decoded_residuals.data(), group_ids, reconstructed_x.data());
 
        //This is the norm for reconstructed vectors
         std::vector<float> xnorms (n);
-        for (size_t i = 0; i < n; i++){
-            xnorms[i] =  faiss::fvec_norm_L2sqr(reconstructed_x.data() + i * dimension, dimension);
-        }
+        for (size_t i = 0; i < n; i++){xnorms[i] =  faiss::fvec_norm_L2sqr(reconstructed_x.data() + i * dimension, dimension);}
 
         //The size of base_norm_code or base_norm should be initialized in main function
         if (use_norm_quantization){
@@ -547,17 +542,19 @@ namespace bslib{
             std::vector<uint8_t> xnorm_codes (n * norm_code_size);
             this->norm_pq.compute_codes(xnorms.data(), xnorm_codes.data(), n);
             for (size_t i = 0 ; i < n; i++){
-                idx_t group_id = use_hash ? hash_ids[i] : encoded_ids[i];
+                idx_t group_id = group_ids[i];
+                size_t group_position = group_positions[i];
                 for (size_t j =0; j < this->norm_code_size; j++){
-                    this->base_norm_codes[group_id].push_back(xnorm_codes[i * this->norm_code_size +j]);
+                    this->base_norm_codes[group_id][group_position * norm_code_size + j] = xnorm_codes[i * this->norm_code_size +j];
                 }
             }
         }
         else{
             assert(this->base_norm.size() == this->final_group_num);
             for (size_t i = 0; i < n; i++){
-                idx_t group_id = use_hash ? hash_ids[i] : encoded_ids[i];
-                this->base_norm[group_id].push_back(xnorms[i]);
+                idx_t group_id = group_ids[i];
+                size_t group_position = group_positions[i];
+                this->base_norm[group_id][group_position] = xnorms[i];
             }
         }
     }
@@ -869,6 +866,13 @@ namespace bslib{
         std::vector<std::vector<float>> time_consumption;
         std::vector<float> q_c_dists;
         std::vector<float> recall;
+
+        std::unordered_set<idx_t> all_pre_hash_ids;
+        for (size_t i = 0; i < final_group_num; i++){
+            for (size_t j = 0; j < base_pre_hash_ids[i].size(); j++)
+                all_pre_hash_ids.insert(base_pre_hash_ids[i][j]);
+        }
+        
         if (analysis){
             visited_gt_proportion.resize(n, 0); actual_visited_vectors.resize(n, 0);
             time_consumption.resize(n); for (size_t i=0;i<n;i++){time_consumption[i].resize(layers+1, 0);}

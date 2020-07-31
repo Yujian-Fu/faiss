@@ -336,7 +336,6 @@ namespace bslib{
             std::vector<float> final_centroid(this->dimension);
             compute_final_centroid(centroid_idxs[i], final_centroid.data());
             faiss::fvec_madd(dimension, x + i * dimension, -1.0, final_centroid.data(), residuals + i * dimension);
-            
         }
     }
 
