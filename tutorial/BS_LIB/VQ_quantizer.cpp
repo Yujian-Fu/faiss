@@ -54,9 +54,10 @@ namespace bslib{
 
 //#pragma omp parallel for
         for (size_t i = 0; i < nc_upper; i++){
-            std::vector<float> centroids(dimension * nc_per_group);
+            //std::vector<float> centroids(dimension * nc_per_group);
             size_t nt_sub = train_set[i].size() / this->dimension;
             std::cout << "Clustering " << std::endl;
+            std::vector<float> centroids(dimension * 1000);
             faiss::kmeans_clustering(dimension, nt_sub, 1000, train_set[i].data(), centroids.data());
             //faiss::kmeans_clustering(dimension, nt_sub, nc_per_group, train_set[i].data(), centroids.data());
 
@@ -80,7 +81,7 @@ namespace bslib{
                 centroid_quantizer->search(nt_sub, train_set[i].data(), 1, train_data_dists.data(), train_data_labels.data());
                 for (size_t temp = 0; temp < 100 * 128; temp++) {std::cout << train_set[i][temp] << " ";} std::cout << std::endl;
                 for (size_t temp  =0; temp < nt_sub; temp++){std::cout << train_data_labels[temp] << " ";} std::cout << std::endl;
-                for (size_t temp = 0; temp < centroids.size(); temp++) {std::cout << centroids[temp] << " ";} std::cout << std::endl;
+                for (size_t temp = 0; temp < centroids.size() / 10; temp++) {std::cout << centroids[temp] << " ";} std::cout << std::endl;
                 exit(0);
             }
         }
