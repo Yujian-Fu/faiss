@@ -1382,31 +1382,48 @@ namespace bslib{
         output.write((char *) & this->final_group_num, sizeof(size_t));
 
         if (use_norm_quantization){
-            assert((base_norm_codes.size() == base_codes.size()) && (base_codes.size() == base_sequence_ids.size()) && (base_sequence_ids.size() == final_group_num ));
+            assert(base_codes.size() ==  final_group_num );
             for (size_t i = 0; i < this->final_group_num; i++){
-                assert((base_norm_codes[i].size() == base_codes[i].size() / this->code_size) && (base_norm_codes[i].size() == base_sequence_ids[i].size()));
+                assert(base_norm_codes[i].size() / norm_code_size == base_sequence_ids[i].size());
                 size_t group_size = base_norm_codes[i].size();
                 output.write((char *) & group_size, sizeof(size_t));
                 output.write((char *) base_norm_codes[i].data(), group_size * sizeof(uint8_t));
             }
         }
         else{
-            assert((base_norm.size() == base_codes.size()) && (base_codes.size() == base_sequence_ids.size()) && (base_sequence_ids.size() == final_group_num));
+            assert(base_norm.size() == final_group_num);
             for (size_t i = 0; i < this->final_group_num; i++){
-                assert((base_norm[i].size() == base_codes[i].size() / this->code_size) && (base_norm[i].size() == base_sequence_ids[i].size()));
+                assert((base_norm[i].size() == base_sequence_ids[i].size()));
                 size_t group_size = base_norm[i].size();
                 output.write((char *) & group_size, sizeof(size_t));
                 output.write((char *) base_norm[i].data(), group_size * sizeof(float));
             }
         }
+
+        if (use_hash){
+            output.write((char *) & this->final_group_num, sizeof(size_t));
+            assert(base_pre_hash_ids.size() == final_group_num);
+            for (size_t i = 0; i < final_group_num; i++){
+                assert(base_pre_hash_ids[i].size() == base_sequence_ids[i].size());
+                size_t group_size = base_pre_hash_ids[i].size();
+                output.write((char *) & group_size, sizeof(size_t));
+                output.write((char *) base_pre_hash_ids[i].data(), group_size * sizeof(idx_t));
+                
+            }
+        }
+
         output.write((char *) & this->final_group_num, sizeof(size_t));
+        assert(base_codes.size() == final_group_num);
         for (size_t i = 0; i < this->final_group_num; i++){
+            assert(base_codes[i].size() / code_size == base_sequence_ids[i].size());
             size_t group_size = base_codes[i].size();
             output.write((char *) & group_size, sizeof(size_t));
             output.write((char *) base_codes[i].data(), group_size * sizeof(uint8_t));
         }
 
+
         output.write((char *) & this->final_group_num, sizeof(size_t));
+        assert(base_sequence_ids.size() == final_group_num);
         for (size_t i = 0; i < this->final_group_num; i++){
             size_t group_size = base_sequence_ids[i].size();
             output.write((char *) & group_size, sizeof(size_t));
@@ -1448,6 +1465,17 @@ namespace bslib{
                 input.read((char *) & group_size_input, sizeof(size_t));
                 this->base_norm[i].resize(group_size_input);
                 input.read((char *) base_norm[i].data(), group_size_input * sizeof(float));
+            }
+        }
+
+        if (use_hash){
+            this->base_pre_hash_ids.resize(this->final_group_num);
+            input.read((char *) & final_nc_input, sizeof(size_t));
+            assert(final_nc_input == this->final_group_num);
+            for (size_t i = 0; i < this->final_group_num; i++){
+                input.read((char *) & group_size_input, sizeof(size_t));
+                this->base_pre_hash_ids[i].resize(group_size_input);
+                input.read((char *)base_pre_hash_ids[i].data(), group_size_input * sizeof(idx_t));
             }
         }
 
