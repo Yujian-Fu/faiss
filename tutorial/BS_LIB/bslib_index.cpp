@@ -237,7 +237,7 @@ namespace bslib{
                 learn_input.seekg(sequence_id * dimension * sizeof (float) + sequence_id * sizeof(uint32_t), std::ios::beg);
                 learn_input.read((char *) & dim, sizeof(uint32_t));
                 assert(dim == dimension);
-                learn_input.read((char *)this->train_data.data() + i * dimension, dimension * sizeof(float));
+                learn_input.read((char *)this->train_data.data() + i * dimension * sizeof(float), dimension * sizeof(float));
                 
             }
         }
