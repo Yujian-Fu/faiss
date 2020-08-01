@@ -1210,10 +1210,8 @@ namespace bslib{
                 else{
                     std::cout << "Writing centroids " << std::endl;
                     for (size_t j = 0; j < nc_upper; j++){
-                        std::cout << "Writing centroids " << std::endl;
                         size_t group_quantizer_data_size = nc_per_group * this->dimension;
                         assert(vq_quantizer_index[n_vq].L2_quantizers[j]->xb.size() == group_quantizer_data_size);
-                        std::cout << "the centroid size is " << vq_quantizer_index[0].L2_quantizers.size() << std::endl;
                         std::cout << vq_quantizer_index[n_vq].L2_quantizers[j]->xb.size() << std::endl;
                         quantizers_output.write((char * ) vq_quantizer_index[n_vq].L2_quantizers[j]->xb.data(), group_quantizer_data_size * sizeof(float));
                     }
