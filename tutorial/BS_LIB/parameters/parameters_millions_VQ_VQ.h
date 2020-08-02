@@ -61,7 +61,6 @@ bool is_recording = true;
 std::string conf_combination(){
     std::string result = "";
     for (size_t i = 0; i < layers; i++){result += "_"; result += index_type[i] == "PQ"? std::to_string(M_PQ_layer[i]) + "_" + std::to_string(nbits_PQ_layer[i]) : std::to_string(ncentroids[i]);}
-    result += "_" + std::to_string(M_PQ) + " " + std::to_string(nbits);
     return result;
 }
 

@@ -9,7 +9,7 @@ const size_t layers = 2;
 const size_t VQ_layers = 1;
 const size_t PQ_layers = 1;
 const std::string index_type[layers] = {"VQ", "PQ"};
-const uint32_t ncentroids[layers] = {200, 10};
+const uint32_t ncentroids[layers] = {200, 0};
 
 const bool use_reranking = false;
 const bool use_HNSW_VQ = false;
@@ -18,7 +18,6 @@ const bool use_dynamic_reranking = false;
 const bool use_OPQ = false;
 const bool use_parallel_indexing = false;
 const bool use_hash = PQ_layers > 0 ? true: false;
-const size_t reranking_space = 20;
 
 //For train PQ
 const size_t M_PQ = 16;
@@ -33,8 +32,8 @@ const size_t M_HNSW[VQ_layers] = {};
 const size_t efConstruction [VQ_layers] = {};
 const size_t efSearch[VQ_layers] = {};
 
-const size_t M_PQ_layer[PQ_layers] = {};
-const size_t nbits_PQ_layer[PQ_layers] = {};
+const size_t M_PQ_layer[PQ_layers] = {2};
+const size_t nbits_PQ_layer[PQ_layers] = {4};
 
 const size_t selector_train_size = 100000;
 const size_t selector_group_size = 1000;
@@ -49,9 +48,13 @@ const size_t nbatches = nb / batch_size; //100
 //For searching
 const size_t ngt = 100;
 const size_t nq = 1000;
-const size_t result_k = 10;
-const size_t max_vectors = 3000;
-size_t keep_space[layers] = {100, 5};
+const size_t num_search_paras = 2;
+const size_t num_recall = 3;
+const size_t result_k[num_recall] = {1, 10, 100};
+const size_t max_vectors[num_search_paras] = {5000, 10000};
+const size_t keep_space[layers * num_search_paras] = {120, 3, 120, 3};
+const size_t reranking_space[num_recall] = {10, 20, 150};
+const std::string search_mode = "non_parallel";
 
 bool is_recording = true;
 
@@ -81,11 +84,12 @@ const std::string path_gt =        "/home/y/yujianfu/ivf-hnsw/data/SIFT1M/sift_g
 const std::string path_query =     "/home/y/yujianfu/ivf-hnsw/data/SIFT1M/sift_query.fvecs";
 
 const std::string path_record =    "/home/y/yujianfu/ivf-hnsw/" + model + "/SIFT1M/recording" + ncentroid_conf + ".txt";
-const std::string path_pq =        "/home/y/yujianfu/ivf-hnsw/" + model + "/SIFT1M/PQ" + std::to_string(M_PQ) + ncentroid_conf + ".pq";
-const std::string path_pq_norm =   "/home/y/yujianfu/ivf-hnsw/" + model + "/SIFT1M/PQ_NORM" + std::to_string(M_PQ) + ncentroid_conf + ".pq";
-const std::string path_ids =      "/home/y/yujianfu/ivf-hnsw/" + model + "/SIFT1M/base_idxs" + ncentroid_conf + ".ivecs";
-const std::string path_index =     "/home/y/yujianfu/ivf-hnsw/" + model + "/SIFT1M/PQ" + std::to_string(M_PQ) + ncentroid_conf + ".index";
 const std::string path_quantizers = "/home/y/yujianfu/ivf-hnsw/" + model + "/SIFT1M/quantizer" + ncentroid_conf + ".qt";
+const std::string path_ids =      "/home/y/yujianfu/ivf-hnsw/" + model + "/SIFT1M/base_idxs" + ncentroid_conf + ".ivecs";
+const std::string path_pq =        "/home/y/yujianfu/ivf-hnsw/" + model + "/SIFT1M/PQ" + std::to_string(M_PQ) + ncentroid_conf + "_" + std::to_string(M_PQ) + " " + std::to_string(nbits) + ".pq";
+const std::string path_pq_norm =   "/home/y/yujianfu/ivf-hnsw/" + model + "/SIFT1M/PQ_NORM" + std::to_string(M_PQ) + ncentroid_conf + ".pq";
+const std::string path_index =     "/home/y/yujianfu/ivf-hnsw/" + model + "/SIFT1M/PQ" + std::to_string(M_PQ) + ncentroid_conf + "_" + std::to_string(M_PQ) + " " + std::to_string(nbits) + ".index";
+
 
 /**
  **This is the centroids for assigining origin train vectors  size: n_group * dimension
