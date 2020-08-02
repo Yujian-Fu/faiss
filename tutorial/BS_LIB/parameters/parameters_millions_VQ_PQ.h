@@ -38,7 +38,7 @@ const size_t nbits_PQ_layer[PQ_layers] = {4};
 const size_t selector_train_size = 100000;
 const size_t selector_group_size = 1000;
 
-const size_t PQ_train_size = 100000;
+const size_t PQ_train_size = 10000;
 
 const size_t num_train[layers] = {10000, 100000};
 const size_t nb = 1000000;
