@@ -9,7 +9,7 @@ const size_t layers = 2;
 const size_t VQ_layers = 1;
 const size_t PQ_layers = 1;
 const std::string index_type[layers] = {"VQ", "PQ"};
-const uint32_t ncentroids[layers] = {400, 0};
+const uint32_t ncentroids[layers] = {200, 0};
 
 const bool use_reranking = false;
 const bool use_HNSW_VQ = false;
@@ -32,7 +32,7 @@ const size_t M_HNSW[VQ_layers] = {};
 const size_t efConstruction [VQ_layers] = {};
 const size_t efSearch[VQ_layers] = {};
 
-const size_t M_PQ_layer[PQ_layers] = {2};
+const size_t M_PQ_layer[PQ_layers] = {4};
 const size_t nbits_PQ_layer[PQ_layers] = {4};
 
 const size_t selector_train_size = 100000;
