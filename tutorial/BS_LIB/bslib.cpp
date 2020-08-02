@@ -13,6 +13,7 @@ using namespace bslib;
 int main(){
     memory_recorder Mrecorder = memory_recorder();
     time_recorder Trecorder = time_recorder();
+    recall_recorder Rrecorder = recall_recorder();
     std::string message;
 
 /*Prepare the work space*/
@@ -227,40 +228,49 @@ int main(){
         readXvecFvec<base_data_type>(query_input, queries.data(), dimension, nq, true, false);
     }
 
-    index.use_reranking = use_reranking;
-    index.reranking_space = reranking_space;
+    // Evaluating the search performance with various search performance settings
+    for (size_t i = 0; i < num_search_paras; i++){
+        index.use_reranking = use_reranking;
+        index.reranking_space = reranking_space;
 
-    index.max_visited_vectors = max_vectors;
-    std::vector<float> query_distances(nq * result_k);
-    std::vector<faiss::Index::idx_t> query_labels(nq * result_k);
-    size_t correct = 0;
-    
-    Trecorder.reset();
-    index.search(nq, result_k, queries.data(), query_distances.data(), query_labels.data(), keep_space, groundtruth.data(), path_base);
-    std::cout << "The qps for searching is: " << Trecorder.getTimeConsumption() / nq << " us " << std::endl;
-    message = "Finish Search";
-    Trecorder.print_time_usage(message);
-    Mrecorder.print_memory_usage(message);
+        index.max_visited_vectors = max_vectors[i];
+        for (size_t j = 0; j < num_recall; j++){
+            size_t recall_k = result_k[j];
+            std::vector<float> query_distances(nq * recall_k);
+            std::vector<faiss::Index::idx_t> query_labels(nq * recall_k);
+            size_t correct = 0;
+            
+            Trecorder.reset();
+            index.search(nq, recall_k, queries.data(), query_distances.data(), query_labels.data(), keep_space+ i * layers, groundtruth.data(), path_base);
+            std::cout << "The qps for searching is: " << Trecorder.getTimeConsumption() / nq << " us " << std::endl;
+            message = "Finish Search";
+            Trecorder.print_time_usage(message);
+            Mrecorder.print_memory_usage(message);
 
-    for (size_t i = 0; i < nq; i++){
-        std::unordered_set<idx_t> gt;
+            for (size_t i = 0; i < nq; i++){
+                std::unordered_set<idx_t> gt;
 
-        for (size_t j = 0; j < result_k; j++){
-            gt.insert(groundtruth[ngt * i + j]);
+                for (size_t j = 0; j < recall_k; j++){
+                    gt.insert(groundtruth[ngt * i + j]);
+                }
+
+                assert (gt.size() == recall_k);
+                for (size_t j = 0; j < recall_k; j++){
+                    if (gt.count(query_labels[i * recall_k + j]) != 0)
+                        correct ++;
+                }
+            }
+            float recall = float(correct) / (recall_k * nq);
+            Rrecorder.print_recall_performance(nq, recall, recall_k, search_mode, layers, keep_space + i * layers, max_vectors[i]);
+            Rrecorder.record_recall_performance(record_file, nq, recall, recall, search_mode, layers, keep_space + i * layers, max_vectors[i]);
+            if (use_reranking){
+                std::cout << " with reranking parameter: " << index.reranking_space << std::endl;
+            } 
+            std::cout << std::endl;
         }
 
-        assert (gt.size() == result_k);
-        for (size_t j = 0; j < result_k; j++){
-            if (gt.count(query_labels[i * result_k + j]) != 0)
-                correct ++;
-        }
+
     }
-
-    std::cout << "The average recall is: " << float(correct) / (result_k * nq) ;
-    if (use_reranking){
-        std::cout << " with reranking parameter: " << index.reranking_space << std::endl;
-    } 
-    std::cout << std::endl;
 
 }
 
