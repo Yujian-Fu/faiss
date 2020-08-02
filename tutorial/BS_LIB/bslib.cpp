@@ -230,7 +230,6 @@ int main(){
         readXvecFvec<base_data_type>(query_input, queries.data(), dimension, nq, true, false);
     }
 
-    exit(0);
     // Evaluating the search performance with various search performance settings
     for (size_t i = 0; i < num_search_paras; i++){
         index.use_reranking = use_reranking;
