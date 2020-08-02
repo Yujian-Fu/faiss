@@ -57,7 +57,6 @@ namespace bslib{
         LQ_quantizer lq_quantizer = LQ_quantizer(dimension, nc_upper, nc_per_group, upper_centroids, upper_nn_centroid_idxs, upper_nn_centroid_dists);
         PrintMessage("Building centroids for lq quantizer");
         lq_quantizer.build_centroids(this->train_data.data(), this->train_data.size() / dimension, this->train_data_ids.data());
-        for (size_t i = 0; i < nc_upper; i++){std::cout << lq_quantizer.alphas[i] << " ";}std::cout << std::endl;
         PrintMessage("Finished construct the LQ layer");
         this->lq_quantizer_index.push_back(lq_quantizer);
     }

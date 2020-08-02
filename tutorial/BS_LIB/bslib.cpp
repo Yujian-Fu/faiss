@@ -56,6 +56,7 @@ int main(){
     }
 
     index.build_quantizers(ncentroids, path_quantizers, path_learn, num_train, HNSW_paras, PQ_paras);
+    for (size_t i = 0; i < ncentroids[0]; i++){std::cout << index.lq_quantizer_index[0].alphas[i] << " ";}std::cout << std::endl;
     index.get_final_group_num();
     message = "Initialized the index, ";
     Mrecorder.print_memory_usage(message);
