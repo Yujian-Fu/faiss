@@ -265,7 +265,7 @@ int main(){
             }
             float recall = float(correct) / (recall_k * nq);
             Rrecorder.print_recall_performance(nq, recall, recall_k, search_mode, layers, keep_space + i * layers, max_vectors[i]);
-            Rrecorder.record_recall_performance(record_file, nq, recall, recall, search_mode, layers, keep_space + i * layers, max_vectors[i]);
+            Rrecorder.record_recall_performance(record_file, nq, recall, recall_k, search_mode, layers, keep_space + i * layers, max_vectors[i]);
             if (use_reranking){
                 std::cout << " with reranking parameter: " << index.reranking_space << std::endl;
             } 
