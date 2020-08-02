@@ -9,7 +9,7 @@ const size_t layers = 1;
 const size_t VQ_layers = 1;
 const size_t PQ_layers = 0;
 const std::string index_type[layers] = {"VQ"};
-const uint32_t ncentroids[layers] = {500};
+const uint32_t ncentroids[layers] = {5000};
 
 const bool use_reranking = false;
 const bool use_HNSW_VQ = false;
@@ -23,7 +23,7 @@ const bool use_hash = PQ_layers > 0 ? true: false;
 const size_t M_PQ = 16;
 const size_t M_norm_PQ = 1;
 const size_t nbits = 8; //Or 16
-const size_t dimension = 128;
+const size_t dimension = 960;
 //For assigning ID
 
 //For building index
@@ -77,7 +77,7 @@ std::string index_combination(){
 std::string ncentroid_conf = conf_combination();
 std::string model = "models" + index_combination();
 //const std::string dataset = "SIFT1M";
-const std::string dataset = "SIFT1M";
+const std::string dataset = "GIST";
 
 const std::string folder_model = "/home/y/yujianfu/ivf-hnsw/" + model;
 
