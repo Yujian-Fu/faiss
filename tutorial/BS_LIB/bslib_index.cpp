@@ -865,7 +865,7 @@ namespace bslib{
         // Notice: they should only be activated when parallel is not used
         bool validation = false; size_t validation_print_space = 50;
         bool analysis = true;
-        bool showmessage = true;
+        bool showmessage = false;
 
         std::vector<float>  visited_gt_proportion;
         std::vector<size_t> actual_visited_vectors;
