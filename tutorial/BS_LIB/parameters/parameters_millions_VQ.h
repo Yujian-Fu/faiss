@@ -9,7 +9,7 @@ const size_t layers = 1;
 const size_t VQ_layers = 1;
 const size_t PQ_layers = 0;
 const std::string index_type[layers] = {"VQ"};
-const uint32_t ncentroids[layers] = {4000};
+const uint32_t ncentroids[layers] = {1000};
 
 const bool use_reranking = false;
 const bool use_HNSW_VQ = false;
@@ -23,7 +23,7 @@ const bool use_hash = PQ_layers > 0 ? true: false;
 const size_t M_PQ = 16;
 const size_t M_norm_PQ = 1;
 const size_t nbits = 8; //Or 16
-const size_t dimension = 128;
+const size_t dimension = 960;
 //For assigning ID
 
 //For building index
