@@ -863,7 +863,8 @@ namespace bslib{
         
         // Variables for testing and validation and printing
         // Notice: they should only be activated when parallel is not used
-        bool validation = false; size_t validation_print_space = 50;
+        bool validation = false; 
+        size_t validation_print_space = 50;
         bool analysis = false;
         bool showmessage = false;
 
