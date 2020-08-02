@@ -76,7 +76,8 @@ std::string index_combination(){
 // Folder path
 std::string ncentroid_conf = conf_combination();
 std::string model = "models" + index_combination();
-const std::string dataset = "SIFT1M";
+//const std::string dataset = "SIFT1M";
+const std::string dataset = "GIST1M";
 
 const std::string folder_model = "/home/y/yujianfu/ivf-hnsw/" + model;
 
