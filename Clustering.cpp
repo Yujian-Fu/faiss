@@ -24,7 +24,7 @@
 namespace faiss {
 
 ClusteringParameters::ClusteringParameters ():
-    niter(25),
+    niter(40),
     nredo(1),
     verbose(false),
     spherical(false),
@@ -250,7 +250,8 @@ float kmeans_clustering (size_t d, size_t n, size_t k,
                          float *centroids)
 {
     Clustering clus (d, k);
-    clus.verbose = d * n * k > (1L << 30);
+    clus.verbose = true;
+    //clus.verbose = d * n * k > (1L << 30);
     // display logs if > 1Gflop per iteration
     IndexFlatL2 index (d);
     clus.train (n, x, index);
