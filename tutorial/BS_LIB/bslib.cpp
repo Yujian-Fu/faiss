@@ -7,7 +7,6 @@
 #include "bslib_index.h"
 #include "parameters/parameters_millions_VQ_PQ.h"
 
-
 using namespace bslib;
 
 int main(){
@@ -32,7 +31,6 @@ int main(){
         record_file << "The memory usage format is ixrss, isrss, idrss, maxrss" << std::endl;
         record_file << "Now starting the indexing process " << std::endl;
     }
-
 
 /*Train the residual PQ and norm PQ*/
     //Initialize the index
@@ -203,7 +201,7 @@ int main(){
                 Trecorder.print_time_usage("");
             }
         }
-        std::cout << "The base id is " << std::endl;
+        std::cout << "The base id distribution in all groups is " << std::endl;
         for (size_t i = 0; i < index.base_sequence_ids.size(); i++){std::cout << index.base_sequence_ids[i].size() << " ";}std::cout << std::endl;
 
 
@@ -272,10 +270,7 @@ int main(){
             } 
             std::cout << std::endl;
         }
-
-
     }
-
 }
 
 
