@@ -277,7 +277,7 @@ namespace bslib{
             query_sequence_set[group_id].push_back(i);
         }
 
-#pragma omp parallel for
+//#pragma omp parallel for
         for (size_t group_id = 0; group_id < this->nc_upper; group_id++){
             if (query_sequence_set[group_id].size() == 0)
                 continue;
