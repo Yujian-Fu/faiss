@@ -1,0 +1,12 @@
+This is the reocrd file for observation in exps
+
+Parallel:
+    1. Use Parallel in search in group in every layer is faster for assigning base vectors while use it in searching will make the search much slower
+        (Since the search is one query per time)
+    2. 
+
+Component Parameter Selection:
+
+Construction parameter Selection:
+
+Search Paramter Selection:
