@@ -912,6 +912,7 @@ namespace bslib{
                 final_keep_space *= keep_space[j];
             }
 
+            assert(max_search_space > 0 && final_keep_space > 0);
             std::vector<float> query_result_dists(1 * max_search_space, 0);
             std::vector<idx_t> query_result_labels(1 * max_search_space, 0);
 
