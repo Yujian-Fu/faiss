@@ -52,7 +52,7 @@ const size_t nq = 1000;
 const size_t num_search_paras = 2;
 const size_t num_recall = 3;
 const size_t result_k[num_recall] = {1, 10, 100};
-const size_t max_vectors[num_search_paras] = {1000, 2000};
+const size_t max_vectors[num_search_paras] = {3000, 4000};
 size_t keep_space[layers * num_search_paras] = {100, 5, 100, 5};
 const std::string search_mode = "non_parallel";
 
