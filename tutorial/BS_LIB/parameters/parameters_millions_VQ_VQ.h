@@ -12,7 +12,7 @@ const std::string index_type[layers] = {"VQ", "VQ"};
 const uint32_t ncentroids[layers] = {200, 10};
 
 const bool use_reranking = false;
-const bool use_HNSW_VQ = false;
+const bool use_HNSW_VQ = true;
 const bool use_norm_quantization = false;
 const bool use_dynamic_reranking = false;
 const bool use_OPQ = false;
