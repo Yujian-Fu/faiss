@@ -9,7 +9,7 @@ const size_t layers = 1;
 const size_t VQ_layers = 1;
 const size_t PQ_layers = 0;
 const std::string index_type[layers] = {"VQ"};
-const uint32_t ncentroids[layers] = {2000};
+const uint32_t ncentroids[layers] = {1000};
 
 const bool use_reranking = false;
 const bool use_HNSW_VQ = false;
@@ -18,7 +18,6 @@ const bool use_dynamic_reranking = false;
 const bool use_OPQ = false;
 const bool use_parallel_indexing = false;
 const bool use_hash = PQ_layers > 0 ? true: false;
-const size_t reranking_space = 20;
 
 //For train PQ
 const size_t M_PQ = 16;
@@ -30,15 +29,15 @@ const size_t dimension = 128;
 
 //For building index
 const size_t train_size = 100000; //This is the size of train set
-const size_t M_HNSW[VQ_layers] = {16};
-const size_t efConstruction [VQ_layers] = {300};
-const size_t efSearch[VQ_layers] = {100};
+const size_t M_HNSW[VQ_layers] = {};
+const size_t efConstruction [VQ_layers] = {};
+const size_t efSearch[VQ_layers] = {};
 
 const size_t M_PQ_layer[PQ_layers] = {};
 const size_t nbits_PQ_layer[PQ_layers] = {};
 
 const size_t selector_train_size = 100000;
-const size_t selector_group_size = 1000;
+const size_t selector_group_size = 2000;
 
 const size_t PQ_train_size = 10000;
 
@@ -50,21 +49,28 @@ const size_t nbatches = nb / batch_size; //100
 //For searching
 const size_t ngt = 100;
 const size_t nq = 1000;
-const size_t result_k = 10;
-const size_t max_vectors = 3000;
-size_t keep_space[layers] = {100};
+const size_t num_search_paras = 5;
+const size_t num_recall = 3;
+
+const size_t result_k[num_recall] = {1, 10, 100};
+const size_t max_vectors[num_search_paras] = {1000, 2000, 3000, 4000, 5000};
+const size_t keep_space[layers * num_search_paras] = {50, 100, 150, 200, 250};
+const size_t reranking_space[num_recall] = {10, 20, 150};
+const std::string search_mode = "non_parallel";
 
 bool is_recording = true;
 
 std::string conf_combination(){
     std::string result = "";
-    for (size_t i = 0; i < layers; i++){result += "_"; result += index_type[i] == "PQ"? std::to_string(M_PQ_layer[i]) + "_" + std::to_string(nbits_PQ_layer[i]) : std::to_string(ncentroids[i]);}
+    for (size_t i = 0; i < layers; i++){
+        result += "_"; result += index_type[i] == "PQ"? std::to_string(M_PQ_layer[i]) + "_" + std::to_string(nbits_PQ_layer[i]) : std::to_string(ncentroids[i]);}
     return result;
 }
 
 std::string index_combination(){
     std::string result = "";
-    for (size_t i = 0; i < layers; i++){result += "_"; result += index_type[i]; if (index_type[i] == "VQ" && use_HNSW_VQ) result += "_HNSW";}
+    for (size_t i = 0; i < layers; i++){
+        result += "_"; result += index_type[i]; if (index_type[i] == "VQ" && use_HNSW_VQ) result += "_HNSW";}
     return result;
 }
 
@@ -76,26 +82,26 @@ const std::string dataset = "SIFT1M";
 const std::string folder_model = "/home/y/yujianfu/ivf-hnsw/" + model;
 
 //File paths
-const std::string path_learn =     "/home/y/yujianfu/ivf-hnsw/data/SIFT1M/sift_learn.fvecs";
-const std::string path_base =      "/home/y/yujianfu/ivf-hnsw/data/SIFT1M/sift_base.fvecs";
-const std::string path_gt =        "/home/y/yujianfu/ivf-hnsw/data/SIFT1M/sift_groundtruth.ivecs";
-const std::string path_query =     "/home/y/yujianfu/ivf-hnsw/data/SIFT1M/sift_query.fvecs";
+const std::string path_learn =     "/home/y/yujianfu/ivf-hnsw/data/" + dataset + "/" + dataset +"_learn.fvecs";
+const std::string path_base =      "/home/y/yujianfu/ivf-hnsw/data/" + dataset + "/" + dataset +"_base.fvecs";
+const std::string path_gt =        "/home/y/yujianfu/ivf-hnsw/data/" + dataset + "/" + dataset +"_groundtruth.ivecs";
+const std::string path_query =     "/home/y/yujianfu/ivf-hnsw/data/" + dataset + "/" + dataset +"_query.fvecs";
 
-const std::string path_record =    "/home/y/yujianfu/ivf-hnsw/" + model + "/SIFT1M/recording" + ncentroid_conf + ".txt";
-const std::string path_pq =        "/home/y/yujianfu/ivf-hnsw/" + model + "/SIFT1M/PQ" + std::to_string(M_PQ) + ncentroid_conf + ".pq";
-const std::string path_pq_norm =   "/home/y/yujianfu/ivf-hnsw/" + model + "/SIFT1M/PQ_NORM" + std::to_string(M_PQ) + ncentroid_conf + ".pq";
-const std::string path_ids =      "/home/y/yujianfu/ivf-hnsw/" + model + "/SIFT1M/base_idxs" + ncentroid_conf + ".ivecs";
-const std::string path_index =     "/home/y/yujianfu/ivf-hnsw/" + model + "/SIFT1M/PQ" + std::to_string(M_PQ) + ncentroid_conf + ".index";
-const std::string path_quantizers = "/home/y/yujianfu/ivf-hnsw/" + model + "/SIFT1M/quantizer" + ncentroid_conf + ".qt";
-//const char * path_quantizers = "/home/y/yujianfu/ivf-hnsw/" + model + "/SIFT1M/centroids_sift1M.fvecs";
+const std::string path_record =    "/home/y/yujianfu/ivf-hnsw/" + model + "/" + dataset + "/recording" + ncentroid_conf + ".txt";
+const std::string path_quantizers = "/home/y/yujianfu/ivf-hnsw/" + model + "/" + dataset + "/quantizer" + ncentroid_conf + ".qt";
+const std::string path_ids =      "/home/y/yujianfu/ivf-hnsw/" + model + "/" + dataset + "/base_idxs" + ncentroid_conf + ".ivecs";
+const std::string path_pq =        "/home/y/yujianfu/ivf-hnsw/" + model + "/" + dataset + "/PQ" + std::to_string(M_PQ) + ncentroid_conf + "_" + std::to_string(M_PQ) + "_" + std::to_string(nbits) + ".pq";
+const std::string path_pq_norm =   "/home/y/yujianfu/ivf-hnsw/" + model + "/" + dataset + "/PQ_NORM" + std::to_string(M_PQ) + ncentroid_conf + ".pq";
+const std::string path_index =     "/home/y/yujianfu/ivf-hnsw/" + model + "/" + dataset + "/PQ" + std::to_string(M_PQ) + ncentroid_conf + "_" + std::to_string(M_PQ) + "_" + std::to_string(nbits) + ".index";
+
 
 /**
  **This is the centroids for assigining origin train vectors  size: n_group * dimension
  **/
-const std::string path_groups = "/home/y/yujianfu/ivf-hnsw/" + model + "/SIFT1M/selector_centroids_" + std::to_string(selector_group_size) + ".fvecs";
+const std::string path_groups = "/home/y/yujianfu/ivf-hnsw/" + model + "/" + dataset + "/selector_centroids_" + std::to_string(selector_group_size) + ".fvecs";
 //This is for recording the labels based on the generated centroids
 
 /**
  ** This is the labels for all assigned vectors, n_group * group_size 
  **/
-const std::string path_labels = "/home/y/yujianfu/ivf-hnsw/" + model + "/SIFT1M/selector_ids_" + std::to_string(train_size);
+const std::string path_labels = "/home/y/yujianfu/ivf-hnsw/" + model + "/" + dataset + "/selector_ids_" + std::to_string(train_size);
