@@ -157,7 +157,7 @@ int main(){
         Trecorder.reset();
         index.read_index(path_index);
 
-        message = "Loaded index";
+        message = "Loaded index ";
         Mrecorder.print_memory_usage(message);
         Mrecorder.record_memory_usage(record_file,  message);
         Trecorder.print_time_usage(message);
@@ -215,7 +215,7 @@ int main(){
         Trecorder.record_time_usage(record_file, message);
     }
 
-    record_file.close();
+    exit(0);
     PrintMessage("Loading groundtruth");
     std::vector<uint32_t> groundtruth(nq * ngt);
     {
@@ -247,7 +247,9 @@ int main(){
             std::cout << "The qps for searching is: " << Trecorder.getTimeConsumption() / nq << " us " << std::endl;
             message = "Finish Search";
             Trecorder.print_time_usage(message);
+            Trecorder.record_time_usage(record_file, message);
             Mrecorder.print_memory_usage(message);
+            Mrecorder.record_memory_usage(record_file, message);
 
             for (size_t i = 0; i < nq; i++){
                 std::unordered_set<idx_t> gt;
@@ -271,6 +273,7 @@ int main(){
             std::cout << std::endl;
         }
     }
+    record_file.close();
 }
 
 
