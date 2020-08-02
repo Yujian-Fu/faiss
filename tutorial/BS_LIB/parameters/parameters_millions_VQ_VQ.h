@@ -29,9 +29,9 @@ const size_t dimension = 128;
 
 //For building index
 const size_t train_size = 100000; //This is the size of train set
-const size_t M_HNSW[VQ_layers] = {};
-const size_t efConstruction [VQ_layers] = {};
-const size_t efSearch[VQ_layers] = {};
+const size_t M_HNSW[VQ_layers] = {16, 3};
+const size_t efConstruction [VQ_layers] = {100, 5};
+const size_t efSearch[VQ_layers] = {100, 5};
 
 const size_t M_PQ_layer[PQ_layers] = {};
 const size_t nbits_PQ_layer[PQ_layers] = {};
