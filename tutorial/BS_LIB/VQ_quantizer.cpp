@@ -140,7 +140,7 @@ namespace bslib{
                 for (size_t j = 0; j < this->nc_per_group; j++){
                     if (j < result_length){
                         result_dists[i * nc_per_group + result_length - j - 1] = result_queue.top().first;
-                        result_labels[i * nc_per_group + result_length - j -1] = result_queue.top().second;
+                        result_labels[i * nc_per_group + result_length - j -1] = CentroidDistributionMap[group_id] + result_queue.top().second;
                         result_queue.pop();
                     }
                     else{
