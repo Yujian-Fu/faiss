@@ -32,6 +32,7 @@ const size_t M_HNSW[VQ_layers] = {};
 const size_t efConstruction [VQ_layers] = {};
 const size_t efSearch[VQ_layers] = {};
 
+
 const size_t M_PQ_layer[PQ_layers] = {4};
 const size_t nbits_PQ_layer[PQ_layers] = {4};
 
