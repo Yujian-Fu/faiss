@@ -51,13 +51,13 @@ namespace bslib{
         }
 
         std::cout << "Building group quantizers for vq_quantizer " << std::endl;
-        for (size_t i = 0; i < nc_upper; i++){std::cout << train_set.size() / 128 << " ";}std::cout << std::endl;
+        for (size_t i = 0; i < nc_upper; i++){std::cout << train_set[i].size() / 128 << " ";}std::cout << std::endl;
 
 //#pragma omp parallel for
         for (size_t i = 0; i < nc_upper; i++){
             std::vector<float> centroids(dimension * nc_per_group);
             size_t nt_sub = train_set[i].size() / this->dimension;
-            std::cout << "Clustering " << nt_sub << " train vectors into " << nc_per_group << "groups" << std::endl;
+            std::cout << "Clustering " << nt_sub << " train vectors into " << nc_per_group << " groups " << std::endl;
             faiss::kmeans_clustering(dimension, nt_sub, nc_per_group, train_set[i].data(), centroids.data());
 
             
