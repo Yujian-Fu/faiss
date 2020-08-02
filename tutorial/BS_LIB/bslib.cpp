@@ -158,7 +158,6 @@ int main(){
         PrintMessage("Loading index");
         Trecorder.reset();
         index.read_index(path_index);
-        for (size_t i = 0; i < index.base_sequence_ids.size(); i++){std::cout << index.base_sequence_ids[i].size() << " ";}std::cout << std::endl;
 
         message = "Loaded index";
         Mrecorder.print_memory_usage(message);
@@ -204,6 +203,9 @@ int main(){
                 Trecorder.print_time_usage("");
             }
         }
+        std::cout << "The base id is " << std::endl;
+        for (size_t i = 0; i < index.base_sequence_ids.size(); i++){std::cout << index.base_sequence_ids[i].size() << " ";}std::cout << std::endl;
+
 
         index.compute_centroid_norm();
 
