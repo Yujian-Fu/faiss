@@ -51,6 +51,7 @@ namespace bslib{
         }
 
         std::cout << "Building group quantizers for vq_quantizer " << std::endl;
+        for (size_t i = 0; i < nc_upper; i++){std::cout << train_set.size() / 128 << " ";}std::cout << std::endl;
 
 //#pragma omp parallel for
         for (size_t i = 0; i < nc_upper; i++){
