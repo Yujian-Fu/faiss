@@ -103,4 +103,4 @@ const std::string path_groups = "/home/y/yujianfu/ivf-hnsw/" + model + "/" + dat
 /**
  ** This is the labels for all assigned vectors, n_group * group_size 
  **/
-const std::string path_labels = "/home/y/yujianfu/ivf-hnsw/" + model + "/" + dataset + "/selector_ids_" + std::to_string(train_size);
+const std::string path_labels = "/home/y/yujianfu/ivf-hnsw/" + model + "/" + dataset + "/selector_ids_" + std::to_string(selector_group_size);
