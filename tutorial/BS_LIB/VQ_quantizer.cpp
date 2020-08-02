@@ -51,7 +51,9 @@ namespace bslib{
         }
 
         std::cout << "Building group quantizers for vq_quantizer " << std::endl;
-        for (size_t i = 0; i < nc_upper; i++){std::cout << train_set[i].size() / 128 << " ";}std::cout << std::endl;
+        size_t min_train_size = train_set[0].size() / 128; 
+        for (size_t i = 0; i < nc_upper; i++){if (min_train_size > train_set[i].size() / 128) min_train_size = train_set[i].size() / 128;}
+        std::cout << "The min size for sub train set is: " <<  std::endl;
 
 #pragma omp parallel for
         for (size_t i = 0; i < nc_upper; i++){
@@ -125,7 +127,7 @@ namespace bslib{
      **/
     void VQ_quantizer::search_in_group(size_t n, const float * queries, const idx_t * group_ids, float * result_dists, idx_t * result_labels, size_t k){
         if (use_HNSW){
-//#pragma omp parallel for
+#pragma omp parallel for
             for (size_t i = 0; i < n; i++){
                 idx_t group_id = group_ids[i];
                 const float * query = queries + i * dimension;
@@ -148,7 +150,7 @@ namespace bslib{
             }
         }
         else{
-//#pragma omp parallel for
+#pragma omp parallel for
             for (size_t i = 0; i < n; i++){
                 idx_t group_id = group_ids[i];
                 const float * query = queries + i * dimension;

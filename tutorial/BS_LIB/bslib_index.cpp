@@ -1210,11 +1210,10 @@ namespace bslib{
                     vq_quantizer_index[n_vq].write_HNSW(quantizers_output);
                 }
                 else{
-                    std::cout << "Writing centroids " << std::endl;
+                    std::cout << "Writing L2 centroids " << std::endl;
                     for (size_t j = 0; j < nc_upper; j++){
                         size_t group_quantizer_data_size = nc_per_group * this->dimension;
                         assert(vq_quantizer_index[n_vq].L2_quantizers[j]->xb.size() == group_quantizer_data_size);
-                        std::cout << vq_quantizer_index[n_vq].L2_quantizers[j]->xb.size() << std::endl;
                         quantizers_output.write((char * ) vq_quantizer_index[n_vq].L2_quantizers[j]->xb.data(), group_quantizer_data_size * sizeof(float));
                     }
                 }
