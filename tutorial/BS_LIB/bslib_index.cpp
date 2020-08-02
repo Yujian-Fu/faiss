@@ -859,7 +859,7 @@ namespace bslib{
       * 
       **/
 
-    void Bslib_Index::search(size_t n, size_t result_k, float * queries, float * query_dists, idx_t * query_ids, size_t * keep_space, uint32_t * groundtruth, std::string path_base){
+    void Bslib_Index::search(size_t n, size_t result_k, float * queries, float * query_dists, idx_t * query_ids, const size_t * keep_space, uint32_t * groundtruth, std::string path_base){
         
         // Variables for testing and validation and printing
         // Notice: they should only be activated when parallel is not used

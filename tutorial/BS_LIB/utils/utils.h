@@ -55,14 +55,14 @@ namespace bslib{
     struct recall_recorder{
         public:
 
-        void print_recall_performance(size_t n_query, float recall, size_t recall_k, std::string mode, size_t layers, size_t * search_paras, size_t max_visited_vectors){
+        void print_recall_performance(size_t n_query, float recall, size_t recall_k, std::string mode, size_t layers, const size_t * search_paras, size_t max_visited_vectors){
             std::cout << "The recall@ " << recall_k << " for " << n_query << " queries in " << mode << " mode is: " << recall <<  std::endl;
             std::cout << "The search parameters is: ";
             for (size_t i = 0; i < layers; i++){std::cout << search_paras[i] << " ";}
             std::cout << "The max ivisited vectors is: " << max_visited_vectors << std::endl;
         }
 
-        void record_recall_performance(std::ofstream & output_record, size_t n_query, float recall, size_t recall_k, std::string mode, size_t layers, size_t * search_paras, size_t max_visited_vectors){
+        void record_recall_performance(std::ofstream & output_record, size_t n_query, float recall, size_t recall_k, std::string mode, size_t layers, const size_t * search_paras, size_t max_visited_vectors){
             output_record << "The recall@" << recall_k << " for " << n_query << " queries in " << mode << " mode is: " << recall <<  std::endl;
             output_record << "The search parameters is ";
             for (size_t i = 0; i < layers; i++){output_record << search_paras[i] << " ";}

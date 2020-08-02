@@ -11,14 +11,13 @@ const size_t PQ_layers = 0;
 const std::string index_type[layers] = {"VQ", "VQ"};
 const uint32_t ncentroids[layers] = {200, 10};
 
-const bool use_reranking = false;
+const bool use_reranking = true;
 const bool use_HNSW_VQ = false;
 const bool use_norm_quantization = false;
 const bool use_dynamic_reranking = false;
 const bool use_OPQ = false;
 const bool use_parallel_indexing = false;
 const bool use_hash = PQ_layers > 0 ? true: false;
-const size_t reranking_space = 20;
 
 //For train PQ
 const size_t M_PQ = 16;
@@ -53,7 +52,8 @@ const size_t num_search_paras = 2;
 const size_t num_recall = 3;
 const size_t result_k[num_recall] = {1, 10, 100};
 const size_t max_vectors[num_search_paras] = {5000, 10000};
-size_t keep_space[layers * num_search_paras] = {120, 3, 120, 3};
+const size_t keep_space[layers * num_search_paras] = {120, 3, 120, 3};
+const size_t reranking_space[num_recall] = {10, 20, 150};
 const std::string search_mode = "non_parallel";
 
 bool is_recording = true;

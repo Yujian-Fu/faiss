@@ -235,10 +235,10 @@ int main(){
     // Evaluating the search performance with various search performance settings
     for (size_t i = 0; i < num_search_paras; i++){
         index.use_reranking = use_reranking;
-        index.reranking_space = reranking_space;
 
         index.max_visited_vectors = max_vectors[i];
         for (size_t j = 0; j < num_recall; j++){
+            if (use_reranking) index.reranking_space = reranking_space[j];
             size_t recall_k = result_k[j];
             std::vector<float> query_distances(nq * recall_k);
             std::vector<faiss::Index::idx_t> query_labels(nq * recall_k);
