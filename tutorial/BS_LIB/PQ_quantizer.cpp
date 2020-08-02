@@ -114,6 +114,7 @@ namespace bslib{
         this->PQs.resize(nc_upper);
 
         std::cout << "Building group quantizers for pq_quantizer" << std::endl;
+        for (size_t i = 0; i < nc_upper; i++){std::cout << train_set[i].size() / 128 << " ";} std::cout << std::endl;
 #pragma omp parallel for
         for (size_t i = 0; i < nc_upper; i++){
             faiss::ProductQuantizer * product_quantizer = new faiss::ProductQuantizer(dimension, M, nbits);
