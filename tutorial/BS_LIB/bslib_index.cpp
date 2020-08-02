@@ -371,7 +371,8 @@ namespace bslib{
                 }
 
                 std::cout << i << "th VQ quantizer added, check it " << std::endl;
-                std::cout << "The vq quantizer size is: " <<  vq_quantizer_index.size() << " the num of L2 quantizers (groups): " << vq_quantizer_index[vq_quantizer_index.size()-1].L2_quantizers.size() << std::endl;
+                std::cout << "The vq quantizer size is: " <<  vq_quantizer_index.size() << " the num of L2 quantizers (groups): " << vq_quantizer_index[vq_quantizer_index.size()-1].L2_quantizers.size() << 
+                " the num of HNSW quantizers (groups): " <<  vq_quantizer_index[vq_quantizer_index.size()-1].HNSW_quantizers.size() << std::endl;
             }
             else if(index_type[i] == "LQ"){
                 assert (i >= 1);
