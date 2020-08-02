@@ -27,7 +27,7 @@ const size_t dimension = 128;
 //For assigning ID
 
 //For building index
-const size_t train_size = 100000; //This is the size of train set
+const size_t train_size = 100000; //This is the size of train set 
 const size_t M_HNSW[VQ_layers] = {};
 const size_t efConstruction [VQ_layers] = {};
 const size_t efSearch[VQ_layers] = {};
@@ -89,7 +89,6 @@ const std::string path_ids =      "/home/y/yujianfu/ivf-hnsw/" + model + "/SIFT1
 const std::string path_pq =        "/home/y/yujianfu/ivf-hnsw/" + model + "/SIFT1M/PQ" + std::to_string(M_PQ) + ncentroid_conf + "_" + std::to_string(M_PQ) + " " + std::to_string(nbits) + ".pq";
 const std::string path_pq_norm =   "/home/y/yujianfu/ivf-hnsw/" + model + "/SIFT1M/PQ_NORM" + std::to_string(M_PQ) + ncentroid_conf + ".pq";
 const std::string path_index =     "/home/y/yujianfu/ivf-hnsw/" + model + "/SIFT1M/PQ" + std::to_string(M_PQ) + ncentroid_conf + "_" + std::to_string(M_PQ) + " " + std::to_string(nbits) + ".index";
-
 
 /**
  **This is the centroids for assigining origin train vectors  size: n_group * dimension
