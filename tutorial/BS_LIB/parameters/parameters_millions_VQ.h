@@ -24,7 +24,6 @@ const size_t M_PQ = 16;
 const size_t M_norm_PQ = 1;
 const size_t nbits = 8; //Or 16
 const size_t dimension = 128;
-
 //For assigning ID
 
 //For building index
