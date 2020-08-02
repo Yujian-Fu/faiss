@@ -863,10 +863,10 @@ namespace bslib{
         
         // Variables for testing and validation and printing
         // Notice: they should only be activated when parallel is not used
-        bool validation = false; 
+        const bool validation = false; 
         size_t validation_print_space = 50;
-        bool analysis = false;
-        bool showmessage = false;
+        const bool analysis = false;
+        const bool showmessage = false;
 
         std::vector<float>  visited_gt_proportion;
         std::vector<size_t> actual_visited_vectors;
