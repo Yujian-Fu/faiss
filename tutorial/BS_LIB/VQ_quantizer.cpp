@@ -52,8 +52,9 @@ namespace bslib{
 
         std::cout << "Building group quantizers for vq_quantizer " << std::endl;
         size_t min_train_size = train_set[0].size() / 128; 
-        for (size_t i = 0; i < nc_upper; i++){if (min_train_size > train_set[i].size() / 128) min_train_size = train_set[i].size() / 128;}
-        std::cout << "The min size for sub train set is: " <<  std::endl;
+        for (size_t i = 0; i < nc_upper; i++){if (min_train_size > train_set[i].size() / 128) min_train_size = train_set[i].size() / 128; std::cout << train_set[i].size() / 128 << " ";}
+
+        std::cout <<  std::endl << "The min size for sub train set is: " <<   std::endl;
 
 #pragma omp parallel for
         for (size_t i = 0; i < nc_upper; i++){
