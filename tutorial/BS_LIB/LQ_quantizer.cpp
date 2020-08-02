@@ -289,9 +289,10 @@ namespace bslib{
                 for (size_t train_group_id = 0; train_group_id < query_sequence_set[group_id].size(); train_group_id++){
                     idx_t sequence_id = query_sequence_set[group_id][train_group_id];
                     std::vector<float> query_sub_centroids_dists(this->nc_per_group, 0);
-                    float query_nn_dist = Not_Found;
-                    float query_group_dist = Not_Found;
+
                     for (size_t inner_group_id = 0; inner_group_id < this->nc_per_group; inner_group_id++){
+                        float query_nn_dist = Not_Found;
+                        float query_group_dist = Not_Found;
                         idx_t nn_id = this->nn_centroid_ids[group_id][inner_group_id];
 
                         for (size_t search_id = 0; search_id < upper_search_space; search_id++){
