@@ -22,7 +22,7 @@ const bool use_hash = PQ_layers > 0 ? true: false;
 //For train PQ
 const size_t M_PQ = 16;
 const size_t M_norm_PQ = 1;
-const size_t nbits = 16; //Or 16
+const size_t nbits = 12; //Or 16
 const size_t dimension = 128;
 //For assigning ID
 
@@ -61,7 +61,7 @@ bool is_recording = true;
 std::string conf_combination(){
     std::string result = "";
     for (size_t i = 0; i < layers; i++){result += "_"; result += index_type[i] == "PQ"? std::to_string(M_PQ_layer[i]) + "_" + std::to_string(nbits_PQ_layer[i]) : std::to_string(ncentroids[i]);}
-    result += " " + std::to_string(M_PQ) + " " + std::to_string(nbits);
+    result += "_" + std::to_string(M_PQ) + " " + std::to_string(nbits);
     return result;
 }
 
@@ -85,11 +85,12 @@ const std::string path_gt =        "/home/y/yujianfu/ivf-hnsw/data/SIFT1M/sift_g
 const std::string path_query =     "/home/y/yujianfu/ivf-hnsw/data/SIFT1M/sift_query.fvecs";
 
 const std::string path_record =    "/home/y/yujianfu/ivf-hnsw/" + model + "/SIFT1M/recording" + ncentroid_conf + ".txt";
-const std::string path_pq =        "/home/y/yujianfu/ivf-hnsw/" + model + "/SIFT1M/PQ" + std::to_string(M_PQ) + ncentroid_conf + ".pq";
-const std::string path_pq_norm =   "/home/y/yujianfu/ivf-hnsw/" + model + "/SIFT1M/PQ_NORM" + std::to_string(M_PQ) + ncentroid_conf + ".pq";
-const std::string path_ids =      "/home/y/yujianfu/ivf-hnsw/" + model + "/SIFT1M/base_idxs" + ncentroid_conf + ".ivecs";
-const std::string path_index =     "/home/y/yujianfu/ivf-hnsw/" + model + "/SIFT1M/PQ" + std::to_string(M_PQ) + ncentroid_conf + ".index";
 const std::string path_quantizers = "/home/y/yujianfu/ivf-hnsw/" + model + "/SIFT1M/quantizer" + ncentroid_conf + ".qt";
+const std::string path_ids =      "/home/y/yujianfu/ivf-hnsw/" + model + "/SIFT1M/base_idxs" + ncentroid_conf + ".ivecs";
+const std::string path_pq =        "/home/y/yujianfu/ivf-hnsw/" + model + "/SIFT1M/PQ" + std::to_string(M_PQ) + ncentroid_conf + "_" + std::to_string(M_PQ) + " " + std::to_string(nbits) + ".pq";
+const std::string path_pq_norm =   "/home/y/yujianfu/ivf-hnsw/" + model + "/SIFT1M/PQ_NORM" + std::to_string(M_PQ) + ncentroid_conf + ".pq";
+const std::string path_index =     "/home/y/yujianfu/ivf-hnsw/" + model + "/SIFT1M/PQ" + std::to_string(M_PQ) + ncentroid_conf + "_" + std::to_string(M_PQ) + " " + std::to_string(nbits) + ".index";
+
 
 /**
  **This is the centroids for assigining origin train vectors  size: n_group * dimension
