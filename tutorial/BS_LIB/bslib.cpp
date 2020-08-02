@@ -157,7 +157,8 @@ int main(){
         PrintMessage("Loading index");
         Trecorder.reset();
         index.read_index(path_index);
-        
+        for (size_t i = 0; i < index.base_sequence_ids.size(); i++){std::cout << index.base_sequence_ids[i].size() << " ";}std::cout << std::endl;
+
         message = "Loaded index";
         Mrecorder.print_memory_usage(message);
         Mrecorder.record_memory_usage(record_file,  message);
