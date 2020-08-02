@@ -23,7 +23,7 @@ const bool use_hash = PQ_layers > 0 ? true: false;
 const size_t M_PQ = 16;
 const size_t M_norm_PQ = 1;
 const size_t nbits = 8; //Or 16
-const size_t dimension = 960;
+const size_t dimension = 128;
 //For assigning ID
 
 //For building index
@@ -48,12 +48,12 @@ const size_t nbatches = nb / batch_size; //100
 //For searching
 const size_t ngt = 100;
 const size_t nq = 1000;
-const size_t num_search_paras = 5;
+const size_t num_search_paras = 10;
 const size_t num_recall = 3;
 
 const size_t result_k[num_recall] = {1, 10, 100};
-const size_t max_vectors[num_search_paras] = {1000, 2000, 3000, 4000, 5000};
-const size_t keep_space[layers * num_search_paras] = {50, 100, 150, 200, 250};
+const size_t max_vectors[num_search_paras] = {1000, 2500, 3000, 4000, 5000, 6000, 7000, 8000, 9000, 10000};
+const size_t keep_space[layers * num_search_paras] = {10, 25, 30, 40, 50, 60, 70, 80, 90, 100};
 const size_t reranking_space[num_recall] = {10, 20, 150};
 const std::string search_mode = "non_parallel";
 
@@ -77,7 +77,7 @@ std::string index_combination(){
 std::string ncentroid_conf = conf_combination();
 std::string model = "models" + index_combination();
 //const std::string dataset = "SIFT1M";
-const std::string dataset = "GIST1M";
+const std::string dataset = "SIFT1M";
 
 const std::string folder_model = "/home/y/yujianfu/ivf-hnsw/" + model;
 

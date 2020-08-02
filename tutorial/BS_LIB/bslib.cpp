@@ -215,7 +215,6 @@ int main(){
         Trecorder.record_time_usage(record_file, message);
     }
 
-    exit(0);
     PrintMessage("Loading groundtruth");
     std::vector<uint32_t> groundtruth(nq * ngt);
     {
