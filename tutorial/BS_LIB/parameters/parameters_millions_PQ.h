@@ -32,7 +32,7 @@ const size_t M_HNSW[VQ_layers] = {};
 const size_t efConstruction [VQ_layers] = {};
 const size_t efSearch[VQ_layers] = {};
 
-const size_t M_PQ_layer[PQ_layers] = {2};
+const size_t M_PQ_layer[PQ_layers] = {4};
 const size_t nbits_PQ_layer[PQ_layers] = {8};
 
 const size_t selector_train_size = 100000;
@@ -53,7 +53,7 @@ const size_t num_recall = 3;
 
 const size_t result_k[num_recall] = {1, 10, 100};
 const size_t max_vectors[num_search_paras] = {1000, 2000, 3000, 4000, 5000, 6000, 7000, 8000, 9000, 10000};
-const size_t keep_space[layers * num_search_paras] = {50, 70, 90, 110, 130, 150, 170, 190, 210, 230};
+const size_t keep_space[layers * num_search_paras] = {2000, 3000, 4000, 5000, 6000, 7000, 8000, 9000, 1000, 1100};
 const size_t reranking_space[num_recall] = {10, 20, 150};
 const std::string search_mode = "non_parallel";
 
