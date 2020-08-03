@@ -9,7 +9,7 @@ const size_t layers = 2;
 const size_t VQ_layers = 1;
 const size_t PQ_layers = 1;
 const std::string index_type[layers] = {"VQ", "PQ"};
-const uint32_t ncentroids[layers] = {200, 0};
+const uint32_t ncentroids[layers] = {400, 0};
 
 const bool use_reranking = false;
 const bool use_HNSW_VQ = false;
@@ -32,7 +32,7 @@ const size_t M_HNSW[VQ_layers] = {};
 const size_t efConstruction [VQ_layers] = {};
 const size_t efSearch[VQ_layers] = {};
 
-const size_t M_PQ_layer[PQ_layers] = {4};
+const size_t M_PQ_layer[PQ_layers] = {2};
 const size_t nbits_PQ_layer[PQ_layers] = {4};
 
 const size_t selector_train_size = 100000;
@@ -54,7 +54,7 @@ const size_t num_recall = 3;
 
 const size_t result_k[num_recall] = {1, 10, 100};
 const size_t max_vectors[num_search_paras] = {1000, 2000, 3000, 4000, 5000, 6000, 7000, 8000, 9000, 10000};
-const size_t keep_space[layers * num_search_paras] = {10, 1000, 15, 1000, 20, 1000, 25, 1000, 30, 1000, 35, 1000, 40, 1000, 45, 1000, 50, 1000, 55, 1000};
+const size_t keep_space[layers * num_search_paras] = {20, 100, 25, 100, 30, 100, 35, 100, 40, 100, 45, 100, 50, 100, 55, 100, 60, 100, 65, 100};
 const size_t reranking_space[num_recall] = {10, 20, 150};
 const std::string search_mode = "parallel";
 
