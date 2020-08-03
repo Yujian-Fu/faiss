@@ -9,7 +9,7 @@ const size_t layers = 2;
 const size_t VQ_layers = 2;
 const size_t PQ_layers = 0;
 const std::string index_type[layers] = {"VQ", "VQ"};
-const uint32_t ncentroids[layers] = {50, 100};
+const uint32_t ncentroids[layers] = {100, 10};
 
 const bool use_reranking = false;
 const bool use_HNSW_VQ = false;
@@ -53,7 +53,7 @@ const size_t num_recall = 3;
 
 const size_t result_k[num_recall] = {1, 10, 100};
 const size_t max_vectors[num_search_paras] = {1000, 2000, 3000, 4000, 5000, 6000, 7000, 8000, 9000, 10000};
-const size_t keep_space[layers * num_search_paras] = {5, 5, 5, 10, 5, 15, 5, 20, 5, 25, 5, 30, 5, 35, 5, 40, 5, 45, 5, 50};
+const size_t keep_space[layers * num_search_paras] = {10, 5, 15, 5, 20, 5, 25, 5, 30, 5, 35, 5, 40, 5, 45, 5, 50, 5, 50, 5};
 const size_t reranking_space[num_recall] = {10, 20, 150};
 const std::string search_mode = "parallel";
 
