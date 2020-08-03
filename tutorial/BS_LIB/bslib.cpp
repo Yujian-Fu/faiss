@@ -5,7 +5,7 @@
 #include <string>
 
 #include "bslib_index.h"
-#include "parameters/parameters_millions_VQ_LQ.h"
+#include "parameters/parameters_millions_VQ_PQ.h"
 
 using namespace bslib;
 
