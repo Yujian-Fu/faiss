@@ -11,7 +11,7 @@ const size_t PQ_layers = 0;
 const std::string index_type[layers] = {"VQ"};
 const uint32_t ncentroids[layers] = {5000};
 
-const bool use_reranking = false;
+const bool use_reranking = true;
 const bool use_HNSW_VQ = false;
 const bool use_norm_quantization = false;
 const bool use_dynamic_reranking = false;

@@ -27,13 +27,21 @@ basepath = "/home/yujian/Desktop/Recording_Files/VQ_LQ/SIFT1M/"
 filename = [ "recording_100_10.txt",  "recording_100_20.txt",  "recording_200_10.txt",  "recording_200_20.txt",  "recording_250_20.txt",  "recording_400_10.txt"]
 legends = ["100_10", "100_20", "200_10", "200_20", "250_20", "400_10"]
 '''
+'''
+basepath = "/home/yujian/Desktop/Recording_Files/VQ_PQ/SIFT1M/"
+filename = [ "recording_100_2_4.txt",  "recording_200_2_6.txt",  "recording_400_2_4.txt", "recording_200_2_4.txt"]
+legends = ["100_2_4", "200_2_6", "400_2_4", "200_2_4"]
+'''
 
-title = "SIFT1M / VQ_PQ"
-metric = "recall@1"
+title = "SIFT1M / PQ"
+metric = "recall@10"
 
 search_time_signal_string = "Finish SearchThe time usage: "
 recall_signal_string = "The " + metric + " for 1000 queries in parallel mode is: "
 
+basepath = "/home/yujian/Desktop/Recording_Files/PQ/SIFT1M/"
+filename = [ "recording_2_10.txt",  "recording_2_8.txt"]
+legends = ["2_10", "2_8"]
 
 
 plt.figure()
