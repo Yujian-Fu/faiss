@@ -32,8 +32,8 @@ const size_t M_HNSW[VQ_layers] = {};
 const size_t efConstruction [VQ_layers] = {};
 const size_t efSearch[VQ_layers] = {};
 
-const size_t M_PQ_layer[PQ_layers] = {2};
-const size_t nbits_PQ_layer[PQ_layers] = {8};
+const size_t M_PQ_layer[PQ_layers] = {4};
+const size_t nbits_PQ_layer[PQ_layers] = {4};
 
 const size_t selector_train_size = 100000;
 const size_t selector_group_size = 2000;
