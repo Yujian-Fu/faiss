@@ -54,7 +54,7 @@ const size_t num_recall = 3;
 
 const size_t result_k[num_recall] = {1, 10, 100};
 const size_t max_vectors[num_search_paras] = {1000, 2000, 3000, 4000, 5000, 6000, 7000, 8000, 9000, 10000};
-const size_t keep_space[layers * num_search_paras] = {20, 20, 25, 20, 30, 20, 35, 20, 40, 20, 45, 20, 50, 20, 55, 20, 60, 20, 65, 20};
+const size_t keep_space[layers * num_search_paras] = {20, 10, 25, 10, 30, 10, 35, 10, 40, 10, 45, 10, 50, 10, 55, 10, 60, 10, 65, 10};
 const size_t reranking_space[num_recall] = {10, 20, 150};
 const std::string search_mode = "parallel";
 
