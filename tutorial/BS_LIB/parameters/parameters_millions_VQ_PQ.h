@@ -9,7 +9,7 @@ const size_t layers = 2;
 const size_t VQ_layers = 1;
 const size_t PQ_layers = 1;
 const std::string index_type[layers] = {"VQ", "PQ"};
-const uint32_t ncentroids[layers] = {100, 0};
+const uint32_t ncentroids[layers] = {200, 0};
 
 const bool use_reranking = false;
 const bool use_HNSW_VQ = false;
