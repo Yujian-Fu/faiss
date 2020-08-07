@@ -84,7 +84,6 @@ int main(){
     trecorder.reset();
 #pragma omp parallel for
     for (size_t i = 0; i < query_set_size; i++){
-        record_output << "Query: " << i << std::endl;
         std::vector<std::vector<size_t>> result_distribution_test(3, std::vector<size_t>(centroid_num, 0));
         std::vector<std::vector<size_t>> result_visited_test(3, std::vector<size_t>(centroid_num, 0));
 
@@ -123,7 +122,6 @@ int main(){
                 query_search_result[i].push_back(result_visited_test[j][k]);
                 //std::cout << result_distribution_test[j][k] << " " << result_visited_test[j][k] << " ";
             }
-            std::cout << std::endl;
         }
     }
 
