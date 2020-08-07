@@ -38,7 +38,7 @@ typedef faiss::Index::idx_t idx_t;
 using namespace bslib;
 int main(){
     PrepareFolder((char *) ("/home/y/yujianfu/ivf-hnsw/" + model + "/" + dataset).c_str());
-    record_output.open(path_record, std::ios::app);
+    record_output.open(path_record, std::ios::out);
     readXvec<float>(train_input, train_set.data(), dimension, train_set_size, false, false);
     readXvec<float>(base_input, base_set.data(), dimension, base_set_size, false, false);
     readXvec<uint32_t>(gt_input, gt_set.data(), ngt, query_set_size, false, false);
@@ -119,8 +119,8 @@ int main(){
                 std::cout << result_distribution_test[j][k] << " " << result_visited_test[j][k] << " ";
             }
             std::cout << std::endl;
-            //for (size_t k = 0; k < max_centroids; k++){record_output << result_distribution_test[j][k] << " ";} record_output << std::endl;
-            //for (size_t k = 0; k < max_centroids; k++){record_output << result_visited_test[j][k] << " ";} record_output << std::endl << std::endl;
+            for (size_t k = 0; k < max_centroids; k++){record_output << result_distribution_test[j][k] << " ";} record_output << std::endl;
+            for (size_t k = 0; k < max_centroids; k++){record_output << result_visited_test[j][k] << " ";} record_output << std::endl << std::endl;
         }
     }
 }
