@@ -77,11 +77,9 @@ int main(){
         trecorder.reset();
         record_output << "Construction parameter: dataset: " << dataset << " train_size: " << train_set_size << " n_centroids: " << centroid_num << " iteration: " << clus.niter << std::endl; 
         std::vector<idx_t> base_assigned_ids(base_set_size); std::vector<float> base_assigned_dis(base_set_size);
-        std::vector<idx_t> query_assigned_ids(query_set_size); std::vector<float> query_assigned_dis(query_set_size);
         std::vector<idx_t> train_assigned_ids(train_set_size); std::vector<float> train_assigned_dis(train_set_size);
 
         index.search(base_set_size, base_set.data(), 1, base_assigned_dis.data(), base_assigned_ids.data());
-        index.search(query_set_size, query_set.data(), 1, query_assigned_dis.data(), query_assigned_ids.data());
         index.search(train_set_size, train_set.data(), 1, train_assigned_dis.data(), train_assigned_ids.data());
         trecorder.record_time_usage(record_output, "Assigned base vectors and query vectors ");
         trecorder.print_time_usage("Assigned base vectors and query vectors ");
@@ -92,7 +90,6 @@ int main(){
         for (size_t i = 0; i < train_set_size; i++){ avg_distance += train_assigned_dis[i];} avg_distance /= train_set_size;
         record_output << "Avg train distance: " << avg_distance << std::endl;
         for (size_t i = 0; i < centroid_num; i++){record_output << train_assigned_set[i].size() << " ";} record_output << std::endl;
-        for (size_t i = 0; i < query_set_size; i++){std::cout << query_assigned_ids[i] << " ";} std::cout << std::endl;
 
         //Quality analysis
         std::vector<std::vector<size_t>> assigned_set(centroid_num);
@@ -105,12 +102,13 @@ int main(){
         trecorder.reset();
 //#pragma omp parallel for
         for (size_t i = 0; i < query_set_size; i++){
+            const float * query = query_set.data() + i * dimension;
             std::vector<std::vector<size_t>> result_distribution_test(3, std::vector<size_t>(centroid_num, 0));
             std::vector<std::vector<size_t>> result_visited_test(3, std::vector<size_t>(centroid_num, 0));
 
             std::vector<idx_t> centroids_ids(centroid_num); std::vector<float> centroids_dis(centroid_num);
 
-            index.search(1, index.xb.data()+query_assigned_ids[i]*dimension, centroid_num, centroids_dis.data(), centroids_ids.data());
+            index.search(1, query, centroid_num, centroids_dis.data(), centroids_ids.data());
             
             for (size_t j = 0; j < 3; j++){
                 size_t recall_num = recall_test[j];
