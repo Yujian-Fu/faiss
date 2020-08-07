@@ -22,6 +22,7 @@
     size_t base_set_size = 1000000;
     size_t query_set_size = 1000;
     size_t ngt = 100;
+    bool use_sub_train_set = true;
 
     
     const std::string path_learn = "/home/y/yujianfu/ivf-hnsw/data/" + dataset + "/" + dataset +"_learn.fvecs";
@@ -51,8 +52,16 @@ int main(){
     readXvec<float>(base_input, base_set.data(), dimension, base_set_size, false, false);
     readXvec<uint32_t>(gt_input, gt_set.data(), ngt, query_set_size, false, false);
     readXvec<float> (query_input, query_set.data(), dimension, query_set_size, false, false);
+    
+    if (use_sub_train_set){
+        size_t query_subset_size = query_set_size / 5;
+        std::vector<float> query_subset(dimension * query_subset_size);
+        RandomSubset<float>(query_set.data(), query_subset.data(), dimension, query_set_size, query_subset_size);
+        query_set.resize(query_subset.size());
+        memcpy(query_set.data(), query_subset.data(), query_subset.size() * sizeof(float));
+    }
+    
     time_recorder trecorder;
-
     for (size_t centroid_num = 200; centroid_num < 250; centroid_num += 50){
 
         PrintMessage("Training vectors");
