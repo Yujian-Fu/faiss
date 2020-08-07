@@ -6,7 +6,7 @@
 
 //Parameters
     std::string dataset = "SIFT1M";
-    std::string model = "VQ";
+    std::string model = "models_VQ";
     size_t dimension = 128;
     size_t train_set_size = 100000;
     size_t base_set_size = 1000000;
@@ -21,7 +21,6 @@
 
     std::string path_record = "/home/y/yujianfu/ivf-hnsw/" + model + "/" + dataset + "/reasoning.txt";
 
-
     std::vector<float> train_set(dimension * train_set_size);
     std::vector<float> base_set(dimension * base_set_size);
     std::vector<float> query_set(dimension * query_set_size);
@@ -32,12 +31,13 @@
     std::ifstream base_input(path_base, std::ios::binary);
     std::ifstream gt_input(path_gt, std::ios::binary);
     std::ifstream query_input(path_query, std::ios::binary);
-    std::ofstream record_output(path_record, std::ios::binary | std::ios::out);
+    std::ofstream record_output;
+    
 
 typedef faiss::Index::idx_t idx_t;
 using namespace bslib;
 int main(){
-
+    record_output.open(path_record, std::ios::app);
     readXvec<float>(train_input, train_set.data(), dimension, train_set_size, false, false);
     readXvec<float>(base_input, base_set.data(), dimension, base_set_size, false, false);
     readXvec<float>(gt_input, gt_set.data(), ngt, base_set_size, false, false);
