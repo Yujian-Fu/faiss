@@ -108,8 +108,8 @@ int main(){
                     }
                 }
                 if (result_distribution_test[j][k] == recall_num){
-                    break;
                     max_centroids = k + 1;
+                    break;
                 }
             }
             std::cout << "Max centroids is: " << max_centroids << std::endl;
