@@ -126,20 +126,21 @@ int main(){
     }
 
     for (size_t i = 0; i < query_set_size; i++){
-        size_t max_centroids = 0;
+        size_t visiting_centroids = 0;
         record_output << "Query: " << i << std::endl;
         for (size_t j = 0; j < 3; j++){
+            size_t max_centroids = query_max_centroids[i * 3 + j];
             for (size_t k = 0; k < max_centroids; k++){
-                record_output << query_search_result[i][max_centroids + k] << " "; 
+                record_output << query_search_result[i][visiting_centroids + k] << " "; 
             }
             record_output << std::endl;
-            max_centroids += query_max_centroids[i * 3 + j];
+            visiting_centroids += max_centroids;
 
             for (size_t k = 0; k < max_centroids; k++){
-                record_output << query_search_result[i][max_centroids + k] << " "; 
+                record_output << query_search_result[i][visiting_centroids + k] << " "; 
             }
             record_output << std::endl;
-            max_centroids += query_max_centroids[i * 3 + j];
+            visiting_centroids += max_centroids;
         }
     }
     trecorder.record_time_usage(record_output, "Finished result analysis: ");
