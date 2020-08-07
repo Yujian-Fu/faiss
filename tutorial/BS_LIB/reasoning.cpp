@@ -5,18 +5,18 @@
 #include <faiss/Index.h>
 
 //Parameters
-    /*// SIFT dataset 
-    std::string dataset = "SIFT1M";
-    std::string model = "models_VQ";
-    size_t dimension = 128;
+    const std::string dataset = "SIFT1M";
+    const std::string model = "models_VQ";
+    const size_t dimension = 128;
     size_t train_set_size = 100000;
-    size_t base_set_size = 1000000;
-    size_t query_set_size = 1000;
-    size_t ngt = 100;
-    size_t recall_test_size = 3;
-    */
-
+    const size_t base_set_size = 1000000;
+    const size_t query_set_size = 1000;
+    const size_t ngt = 100;
+    const bool use_sub_train_set = false;
+    const size_t recall_test_size = 3;
     
+
+    /*
     const std::string dataset = "GIST1M";
     const std::string model = "models_VQ";
     const size_t dimension = 960;
@@ -26,8 +26,8 @@
     const size_t ngt = 100;
     const bool use_sub_train_set = true;
     const size_t recall_test_size = 3;
+    */
     
-
    /*
     const std::string dataset = "DEEP1M";
     const std::string model = "models_VQ";
@@ -102,9 +102,10 @@ int main(){
 
         std::vector<std::vector<idx_t>> train_assigned_set(centroid_num);
         for (size_t i = 0; i < train_set_size; i++){train_assigned_set[train_assigned_ids[i]].push_back(i);}
-        float avg_distance = 0;
+        float avg_distance, std_distance = 0;
         for (size_t i = 0; i < train_set_size; i++){ avg_distance += train_assigned_dis[i];} avg_distance /= train_set_size;
-        record_output << "Avg train distance: " << avg_distance << std::endl;
+        for (size_t i = 0; i < train_set_size; i++){ std_distance += (train_assigned_dis[i]-avg_distance) * (train_assigned_dis[i]-avg_distance);} std_distance /= (train_set_size-1);
+        record_output << "Avg train distance: " << avg_distance << " std train distance: " << std_distance << std::endl;
         for (size_t i = 0; i < centroid_num; i++){record_output << train_assigned_set[i].size() << " ";} record_output << std::endl;
 
         //Quality analysis
