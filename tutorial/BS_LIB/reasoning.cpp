@@ -5,6 +5,7 @@
 #include <faiss/Index.h>
 
 //Parameters
+    /*// SIFT dataset 
     std::string dataset = "SIFT1M";
     std::string model = "models_VQ";
     size_t dimension = 128;
@@ -12,6 +13,16 @@
     size_t base_set_size = 1000000;
     size_t query_set_size = 1000;
     size_t ngt = 100;
+    */
+
+    std::string dataset = "GIST1M";
+    std::string model = "models_VQ";
+    size_t dimension = 960;
+    size_t train_set_size = 500000;
+    size_t base_set_size = 1000000;
+    size_t query_set_size = 1000;
+    size_t ngt = 100;
+
     
     const std::string path_learn = "/home/y/yujianfu/ivf-hnsw/data/" + dataset + "/" + dataset +"_learn.fvecs";
     const std::string path_base = "/home/y/yujianfu/ivf-hnsw/data/" + dataset + "/" + dataset +"_base.fvecs";
@@ -24,7 +35,6 @@
     std::vector<float> query_set(dimension * query_set_size);
     std::vector<uint32_t> gt_set(ngt * base_set_size);
     
-
     std::ifstream train_input(path_learn, std::ios::binary);
     std::ifstream base_input(path_base, std::ios::binary);
     std::ifstream gt_input(path_gt, std::ios::binary);
@@ -43,7 +53,7 @@ int main(){
     readXvec<float> (query_input, query_set.data(), dimension, query_set_size, false, false);
     time_recorder trecorder;
 
-    for (size_t centroid_num = 200; centroid_num < 6000; centroid_num += 50){
+    for (size_t centroid_num = 200; centroid_num < 250; centroid_num += 50){
 
         PrintMessage("Training vectors");
         trecorder.reset();
