@@ -89,17 +89,18 @@ int main(){
         std::vector<idx_t> centroids_ids(centroid_num); std::vector<float> centroids_dis(centroid_num);
 
         index.search(1, index.xb.data()+query_assigned_ids[i]*dimension, centroid_num, centroids_dis.data(), centroids_ids.data());
-        std::unordered_set<idx_t> gt_test_set;
+        
         for (size_t j = 0; j < 3; j++){
             size_t recall_num = recall_test[j];
             size_t max_centroids = 0;
+            std::unordered_set<idx_t> gt_test_set;
             for (size_t k = 0; k < recall_num; k++){gt_test_set.insert(gt_set[i * ngt + k]); std::cout<< gt_set[i * ngt + k] << " ";}std::cout << std::endl;
 
             for (size_t k = 0; k < centroid_num; k++){
                 size_t centroid_id = centroids_ids[k];
 
                 result_distribution_test[j][k] = k == 0 ? 0 : result_distribution_test[j][k - 1];
-                result_visited_test[j][k] = k == 0 ? 0 : result_visited_test[j][k - 1] + assigned_set[centroid_id].size();
+                result_visited_test[j][k] = k == 0 ? assigned_set[centroid_id].size() : result_visited_test[j][k - 1] + assigned_set[centroid_id].size();
                 
                 for (size_t l = 0; l < assigned_set[centroid_id].size(); l++){
                     if (gt_test_set.count(assigned_set[centroid_id][l]) != 0){
@@ -108,7 +109,7 @@ int main(){
                 }
                 if (result_distribution_test[j][k] == recall_num){
                     break;
-                    max_centroids = k;
+                    max_centroids = k + 1;
                 }
             }
             std::cout << "Max centroids is: " << max_centroids << std::endl;
