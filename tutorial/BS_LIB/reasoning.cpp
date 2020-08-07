@@ -18,7 +18,6 @@
     const std::string path_base = "/home/y/yujianfu/ivf-hnsw/data/" + dataset + "/" + dataset +"_base.fvecs";
     const std::string path_gt = "/home/y/yujianfu/ivf-hnsw/data/" + dataset + "/" + dataset +"_groundtruth.ivecs";
     const std::string path_query = "/home/y/yujianfu/ivf-hnsw/data/" + dataset + "/" + dataset +"_query.fvecs";
-
     std::string path_record = "/home/y/yujianfu/ivf-hnsw/" + model + "/" + dataset + "/reasoning.txt";
 
     std::vector<float> train_set(dimension * train_set_size);
@@ -52,7 +51,7 @@ int main(){
     faiss::IndexFlatL2 index (dimension);
     clus.train (train_set_size, train_set.data(), index);
     
-    trecorder.record_time_usage(record_output, "Finish clustering with time usage: ");
+    trecorder.record_time_usage(record_output, "Finish clustering: ");
     trecorder.print_time_usage("Finish clustering with time usage: ");
     trecorder.reset();
     record_output << "Construction parameter: dataset: " << dataset << " train_size: " << train_set_size << " n_centroids: " << centroid_num << " iteration: " << clus.niter << std::endl; 
@@ -79,8 +78,11 @@ int main(){
     for (size_t i = 0; i < base_set_size; i++){assigned_set[base_assigned_ids[i]].push_back(i);}
     const size_t recall_test[3] = {1, 10, 100};
     std::vector<std::vector<size_t>> query_search_result(query_set_size);
+    std::vector<size_t> query_max_centroids(query_set_size * 3);
 
     PrintMessage("Analysing clustering quality");
+    trecorder.reset();
+#pragma omp parallel for
     for (size_t i = 0; i < query_set_size; i++){
         record_output << "Query: " << i << std::endl;
         std::vector<std::vector<size_t>> result_distribution_test(3, std::vector<size_t>(centroid_num, 0));
@@ -94,7 +96,7 @@ int main(){
             size_t recall_num = recall_test[j];
             size_t max_centroids = 0;
             std::unordered_set<idx_t> gt_test_set;
-            for (size_t k = 0; k < recall_num; k++){gt_test_set.insert(gt_set[i * ngt + k]); std::cout<< gt_set[i * ngt + k] << " ";}std::cout << std::endl;
+            for (size_t k = 0; k < recall_num; k++){gt_test_set.insert(gt_set[i * ngt + k]);} // std::cout<< gt_set[i * ngt + k] << " ";}std::cout << std::endl;
 
             for (size_t k = 0; k < centroid_num; k++){
                 size_t centroid_id = centroids_ids[k];
@@ -112,15 +114,35 @@ int main(){
                     break;
                 }
             }
-            std::cout << "Max centroids is: " << max_centroids << std::endl;
+            query_max_centroids[i * 3 + j] = max_centroids;
             for (size_t k = 0; k < max_centroids; k++){
                 query_search_result[i].push_back(result_distribution_test[j][k]);
+                
+            }
+            for (size_t k = 0; k < max_centroids; k++){
                 query_search_result[i].push_back(result_visited_test[j][k]);
-                std::cout << result_distribution_test[j][k] << " " << result_visited_test[j][k] << " ";
+                //std::cout << result_distribution_test[j][k] << " " << result_visited_test[j][k] << " ";
             }
             std::cout << std::endl;
-            for (size_t k = 0; k < max_centroids; k++){record_output << result_distribution_test[j][k] << " ";} record_output << std::endl;
-            for (size_t k = 0; k < max_centroids; k++){record_output << result_visited_test[j][k] << " ";} record_output << std::endl << std::endl;
         }
     }
+
+    for (size_t i = 0; i < query_set_size; i++){
+        size_t max_centroids = 0;
+        record_output << "Query: " << i << std::endl;
+        for (size_t j = 0; j < 3; j++){
+            for (size_t k = 0; k < max_centroids; k++){
+                record_output << query_search_result[i][max_centroids + k] << " "; 
+            }
+            record_output << std::endl;
+            max_centroids += query_max_centroids[i * 3 + j];
+
+            for (size_t k = 0; k < max_centroids; k++){
+                record_output << query_search_result[i][max_centroids + k] << " "; 
+            }
+            record_output << std::endl;
+            max_centroids += query_max_centroids[i * 3 + j];
+        }
+    }
+    trecorder.record_time_usage(record_output, "Finished result analysis: ");
 }
