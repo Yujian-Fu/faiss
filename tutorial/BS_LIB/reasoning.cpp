@@ -37,6 +37,7 @@
 typedef faiss::Index::idx_t idx_t;
 using namespace bslib;
 int main(){
+    PrepareFolder((char *) ("/home/y/yujianfu/ivf-hnsw/" + model + "/" + dataset).c_str());
     record_output.open(path_record, std::ios::app);
     readXvec<float>(train_input, train_set.data(), dimension, train_set_size, false, false);
     readXvec<float>(base_input, base_set.data(), dimension, base_set_size, false, false);
@@ -93,7 +94,7 @@ int main(){
         for (size_t j = 0; j < 3; j++){
             size_t recall_num = recall_test[j];
             size_t max_centroids = 0;
-            for (size_t k = 0; k < recall_num; k++){gt_test_set.insert(i * ngt + k);}
+            for (size_t k = 0; k < recall_num; k++){gt_test_set.insert(gt_set[i * ngt + k]);}
 
             for (size_t k = 0; k < centroid_num; k++){
                 size_t centroid_id = centroids_ids[k];
@@ -114,9 +115,11 @@ int main(){
             for (size_t k = 0; k < max_centroids; k++){
                 query_search_result[i].push_back(result_distribution_test[j][k]);
                 query_search_result[i].push_back(result_visited_test[j][k]);
+                std::cout << result_distribution_test[j][k] << " " << result_visited_test[j][k] << " ";
             }
-            for (size_t k = 0; k < max_centroids; k++){record_output << result_distribution_test[j][k] << " ";} record_output << std::endl;
-            for (size_t k = 0; k < max_centroids; k++){record_output << result_visited_test[j][k] << " ";} record_output << std::endl << std::endl;
+            std::cout << std::endl;
+            //for (size_t k = 0; k < max_centroids; k++){record_output << result_distribution_test[j][k] << " ";} record_output << std::endl;
+            //for (size_t k = 0; k < max_centroids; k++){record_output << result_visited_test[j][k] << " ";} record_output << std::endl << std::endl;
         }
     }
 }
