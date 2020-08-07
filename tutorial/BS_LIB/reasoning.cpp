@@ -28,7 +28,7 @@
     size_t recall_test_size = 3;
     */
 
-    const std::string dataset = "GIST1M";
+    const std::string dataset = "DEEP1M";
     const std::string model = "models_VQ";
     const size_t dimension = 256;
     size_t train_set_size =  100000;
@@ -38,7 +38,7 @@
     const bool use_sub_train_set = false;
     const size_t recall_test_size = 3;
     
-
+    
     const std::string path_learn = "/home/y/yujianfu/ivf-hnsw/data/" + dataset + "/" + dataset +"_learn.fvecs";
     const std::string path_base = "/home/y/yujianfu/ivf-hnsw/data/" + dataset + "/" + dataset +"_base.fvecs";
     const std::string path_gt = "/home/y/yujianfu/ivf-hnsw/data/" + dataset + "/" + dataset +"_groundtruth.ivecs";
