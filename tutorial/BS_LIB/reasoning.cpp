@@ -1,7 +1,12 @@
-#include "utils.h"
+#include "utils/utils.h"
 #include <unordered_set>
 #include <faiss/Clustering.h>
 #include <faiss/IndexFlat.h>
+#include <faiss/Index.h>
+
+typedef faiss::Index::idx_t idx_t;
+using namespace bslib;
+int main(){
 
 //Parameters
     std::string dataset = "SIFT1M";
@@ -33,8 +38,6 @@
     std::ifstream query_input(path_query, std::ios::binary);
     std::ofstream record_output(path_record, std::ios::binary);
 
-using namespace bslib;
-int main(){
     readXvec<float>(train_input, train_set.data(), dimension, train_set_size, false, false);
     readXvec<float>(base_input, base_set.data(), dimension, base_set_size, false, false);
     readXvec<float>(gt_input, gt_set.data(), ngt, base_set_size, false, false);
@@ -73,7 +76,7 @@ int main(){
         std::unordered_set<idx_t> gt_test_set;
         for (size_t j = 0; j < 3; j++){
             size_t recall_num = recall_test[j];
-            size_t max_centroids;
+            size_t max_centroids = 0;
             for (size_t k = 0; k < recall_num; k++){gt_test_set.insert(i * ngt + k);}
 
             for (size_t k = 0; k < centroid_num; k++){

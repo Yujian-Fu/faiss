@@ -9,7 +9,6 @@
 #include <dirent.h>
 
 
-typedef faiss::Index::idx_t idx_t;
 namespace bslib{
     struct time_recorder{
         std::chrono::steady_clock::time_point start_time;
@@ -165,7 +164,8 @@ namespace bslib{
         mkdir(FilePath, S_IRWXU); //Have the right to read, write and execute
     }
 
-    inline void HashMapping(size_t n, const idx_t * group_ids, idx_t * hash_ids, size_t hash_size){
+    template<typename T>
+    inline void HashMapping(size_t n, const T * group_ids, T * hash_ids, size_t hash_size){
 #pragma omp parallel for
         for (size_t i = 0; i < n; i++)
             hash_ids[i] = group_ids[i] % hash_size;
