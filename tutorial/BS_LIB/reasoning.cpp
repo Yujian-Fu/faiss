@@ -38,7 +38,7 @@
     const bool use_sub_train_set = false;
     const size_t recall_test_size = 3;
     
-    
+
     const std::string path_learn = "/home/y/yujianfu/ivf-hnsw/data/" + dataset + "/" + dataset +"_learn.fvecs";
     const std::string path_base = "/home/y/yujianfu/ivf-hnsw/data/" + dataset + "/" + dataset +"_base.fvecs";
     const std::string path_gt = "/home/y/yujianfu/ivf-hnsw/data/" + dataset + "/" + dataset +"_groundtruth.ivecs";
@@ -158,6 +158,7 @@ int main(){
             }
         }
 
+        std::vector<size_t> avg_max_centroids(recall_test_size, 0);
         for (size_t i = 0; i < query_set_size; i++){
             size_t visiting_centroids = 0;
             record_output << "Q: " << i << std::endl;
@@ -165,6 +166,7 @@ int main(){
                 
                 size_t max_centroids = query_max_centroids[i * recall_test_size + j];
                 record_output << "R@" << recall_test[j] << " MC: " << max_centroids << std::endl;
+                avg_max_centroids[j] += max_centroids;
                 for (size_t k = 0; k < max_centroids; k++){
                     record_output << query_search_result[i][visiting_centroids + k] << " "; 
                 }
@@ -178,6 +180,8 @@ int main(){
                 visiting_centroids += max_centroids;
             }
         }
+
+        record_output << "The average max centroids: " << float(avg_max_centroids[0]) / query_set_size << " " << float(avg_max_centroids[1]) / query_set_size << " " << float(avg_max_centroids[2]) / query_set_size << std::endl;
         trecorder.record_time_usage(record_output, "Finished result analysis: ");
     }
 }
