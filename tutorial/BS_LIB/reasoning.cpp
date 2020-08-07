@@ -129,7 +129,9 @@ int main(){
         size_t visiting_centroids = 0;
         record_output << "Query: " << i << std::endl;
         for (size_t j = 0; j < 3; j++){
+            
             size_t max_centroids = query_max_centroids[i * 3 + j];
+            record_output << "Recall@" << recall_test[j] << " Max centroids: " << max_centroids << std::endl;
             for (size_t k = 0; k < max_centroids; k++){
                 record_output << query_search_result[i][visiting_centroids + k] << " "; 
             }
