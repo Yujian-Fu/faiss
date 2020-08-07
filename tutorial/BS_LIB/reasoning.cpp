@@ -43,7 +43,7 @@ int main(){
     readXvec<float> (query_input, query_set.data(), dimension, query_set_size, false, false);
     time_recorder trecorder;
 
-    for (size_t centroid_num = 500; centroid_num < 600; centroid_num += 50){
+    for (size_t centroid_num = 200; centroid_num < 6000; centroid_num += 50){
 
         PrintMessage("Training vectors");
         trecorder.reset();
@@ -128,11 +128,11 @@ int main(){
 
         for (size_t i = 0; i < query_set_size; i++){
             size_t visiting_centroids = 0;
-            record_output << "Query: " << i << std::endl;
+            record_output << "Q: " << i << std::endl;
             for (size_t j = 0; j < 3; j++){
                 
                 size_t max_centroids = query_max_centroids[i * 3 + j];
-                record_output << "Recall@" << recall_test[j] << " Max centroids: " << max_centroids << std::endl;
+                record_output << "R@" << recall_test[j] << " MC: " << max_centroids << std::endl;
                 for (size_t k = 0; k < max_centroids; k++){
                     record_output << query_search_result[i][visiting_centroids + k] << " "; 
                 }
