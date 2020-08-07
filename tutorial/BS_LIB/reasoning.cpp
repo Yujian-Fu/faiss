@@ -103,7 +103,7 @@ int main(){
 
         PrintMessage("Analysing clustering quality");
         trecorder.reset();
-#pragma omp parallel for
+//#pragma omp parallel for
         for (size_t i = 0; i < query_set_size; i++){
             std::vector<std::vector<size_t>> result_distribution_test(3, std::vector<size_t>(centroid_num, 0));
             std::vector<std::vector<size_t>> result_visited_test(3, std::vector<size_t>(centroid_num, 0));
