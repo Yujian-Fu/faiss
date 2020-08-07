@@ -5,6 +5,7 @@
 #include <faiss/Index.h>
 
 //Parameters
+    /*
     const std::string dataset = "SIFT1M";
     const std::string model = "models_VQ";
     const size_t dimension = 128;
@@ -14,6 +15,7 @@
     const size_t ngt = 100;
     const bool use_sub_train_set = false;
     const size_t recall_test_size = 3;
+    */
     
 
     /*
@@ -28,7 +30,7 @@
     const size_t recall_test_size = 3;
     */
     
-   /*
+   
     const std::string dataset = "DEEP1M";
     const std::string model = "models_VQ";
     const size_t dimension = 256;
@@ -38,7 +40,7 @@
     const size_t ngt = 100;
     const bool use_sub_train_set = false;
     const size_t recall_test_size = 3;
-    */
+    
     
 
     const std::string path_learn = "/home/y/yujianfu/ivf-hnsw/data/" + dataset + "/" + dataset +"_learn.fvecs";
