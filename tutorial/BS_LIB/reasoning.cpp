@@ -13,8 +13,10 @@
     size_t base_set_size = 1000000;
     size_t query_set_size = 1000;
     size_t ngt = 100;
+    size_t recall_test_size = 3;
     */
 
+    /*
     std::string dataset = "GIST1M";
     std::string model = "models_VQ";
     size_t dimension = 960;
@@ -23,8 +25,20 @@
     size_t query_set_size = 1000;
     size_t ngt = 100;
     bool use_sub_train_set = true;
+    size_t recall_test_size = 3;
+    */
 
+    const std::string dataset = "GIST1M";
+    const std::string model = "models_VQ";
+    const size_t dimension = 256;
+    size_t train_set_size =  100000;
+    const size_t base_set_size = 1000000;
+    const size_t query_set_size = 1000;
+    const size_t ngt = 100;
+    const bool use_sub_train_set = false;
+    const size_t recall_test_size = 3;
     
+
     const std::string path_learn = "/home/y/yujianfu/ivf-hnsw/data/" + dataset + "/" + dataset +"_learn.fvecs";
     const std::string path_base = "/home/y/yujianfu/ivf-hnsw/data/" + dataset + "/" + dataset +"_base.fvecs";
     const std::string path_gt = "/home/y/yujianfu/ivf-hnsw/data/" + dataset + "/" + dataset +"_groundtruth.ivecs";
@@ -94,23 +108,23 @@ int main(){
         //Quality analysis
         std::vector<std::vector<size_t>> assigned_set(centroid_num);
         for (size_t i = 0; i < base_set_size; i++){assigned_set[base_assigned_ids[i]].push_back(i);}
-        const size_t recall_test[3] = {1, 10, 100};
+        const size_t recall_test[recall_test_size] = {1, 10, 100};
         std::vector<std::vector<size_t>> query_search_result(query_set_size);
-        std::vector<size_t> query_max_centroids(query_set_size * 3);
+        std::vector<size_t> query_max_centroids(query_set_size * recall_test_size);
 
         PrintMessage("Analysing clustering quality");
         trecorder.reset();
 #pragma omp parallel for
         for (size_t i = 0; i < query_set_size; i++){
             const float * query = query_set.data() + i * dimension;
-            std::vector<std::vector<size_t>> result_distribution_test(3, std::vector<size_t>(centroid_num, 0));
-            std::vector<std::vector<size_t>> result_visited_test(3, std::vector<size_t>(centroid_num, 0));
+            std::vector<std::vector<size_t>> result_distribution_test(recall_test_size, std::vector<size_t>(centroid_num, 0));
+            std::vector<std::vector<size_t>> result_visited_test(recall_test_size, std::vector<size_t>(centroid_num, 0));
 
             std::vector<idx_t> centroids_ids(centroid_num); std::vector<float> centroids_dis(centroid_num);
 
             index.search(1, query, centroid_num, centroids_dis.data(), centroids_ids.data());
             
-            for (size_t j = 0; j < 3; j++){
+            for (size_t j = 0; j < recall_test_size; j++){
                 size_t recall_num = recall_test[j];
                 size_t max_centroids = 0;
                 std::unordered_set<idx_t> gt_test_set;
@@ -132,7 +146,7 @@ int main(){
                         break;
                     }
                 }
-                query_max_centroids[i * 3 + j] = max_centroids;
+                query_max_centroids[i * recall_test_size + j] = max_centroids;
                 for (size_t k = 0; k < max_centroids; k++){
                     query_search_result[i].push_back(result_distribution_test[j][k]);
                     
@@ -147,9 +161,9 @@ int main(){
         for (size_t i = 0; i < query_set_size; i++){
             size_t visiting_centroids = 0;
             record_output << "Q: " << i << std::endl;
-            for (size_t j = 0; j < 3; j++){
+            for (size_t j = 0; j < recall_test_size; j++){
                 
-                size_t max_centroids = query_max_centroids[i * 3 + j];
+                size_t max_centroids = query_max_centroids[i * recall_test_size + j];
                 record_output << "R@" << recall_test[j] << " MC: " << max_centroids << std::endl;
                 for (size_t k = 0; k < max_centroids; k++){
                     record_output << query_search_result[i][visiting_centroids + k] << " "; 
