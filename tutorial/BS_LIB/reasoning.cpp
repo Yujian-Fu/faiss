@@ -11,7 +11,7 @@
     size_t train_set_size = 100000;
     size_t base_set_size = 1000000;
     size_t query_set_size = 1000;
-    size_t centroid_num = 500;
+    size_t centroid_num = 50;
     size_t ngt = 100;
     
     const std::string path_learn = "/home/y/yujianfu/ivf-hnsw/data/" + dataset + "/" + dataset +"_learn.fvecs";
@@ -73,7 +73,7 @@ int main(){
     for (size_t i = 0; i < train_set_size; i++){ avg_distance += train_assigned_dis[i];} avg_distance /= train_set_size;
     record_output << "Avg train distance: " << avg_distance << std::endl;
     for (size_t i = 0; i < centroid_num; i++){record_output << train_assigned_set[i].size() << " ";} record_output << std::endl;
-
+    for (size_t i = 0; i < query_set_size; i++){std::cout << query_assigned_ids[i] << " ";} std::cout << std::endl;
 
     //Quality analysis
     std::vector<std::vector<size_t>> assigned_set(centroid_num);
