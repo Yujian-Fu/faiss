@@ -11,7 +11,7 @@
     size_t train_set_size = 100000;
     size_t base_set_size = 1000000;
     size_t query_set_size = 1000;
-    size_t centroid_num = 1000;
+    size_t centroid_num = 500;
     size_t ngt = 100;
     
     const std::string path_learn = "/home/y/yujianfu/ivf-hnsw/data/" + dataset + "/" + dataset +"_learn.fvecs";
@@ -94,7 +94,7 @@ int main(){
         for (size_t j = 0; j < 3; j++){
             size_t recall_num = recall_test[j];
             size_t max_centroids = 0;
-            for (size_t k = 0; k < recall_num; k++){gt_test_set.insert(gt_set[i * ngt + k]);}
+            for (size_t k = 0; k < recall_num; k++){gt_test_set.insert(gt_set[i * ngt + k]); std::cout<< gt_set[i * ngt + k] << " ";}std::cout << std::endl;
 
             for (size_t k = 0; k < centroid_num; k++){
                 size_t centroid_id = centroids_ids[k];
@@ -112,6 +112,7 @@ int main(){
                     max_centroids = k;
                 }
             }
+            std::cout << "Max centroids is: " << max_centroids << std::endl;
             for (size_t k = 0; k < max_centroids; k++){
                 query_search_result[i].push_back(result_distribution_test[j][k]);
                 query_search_result[i].push_back(result_visited_test[j][k]);
