@@ -24,7 +24,7 @@
     std::vector<float> train_set(dimension * train_set_size);
     std::vector<float> base_set(dimension * base_set_size);
     std::vector<float> query_set(dimension * query_set_size);
-    std::vector<float> gt_set(ngt * base_set_size);
+    std::vector<uint32_t> gt_set(ngt * base_set_size);
     
 
     std::ifstream train_input(path_learn, std::ios::binary);
@@ -41,7 +41,7 @@ int main(){
     record_output.open(path_record, std::ios::app);
     readXvec<float>(train_input, train_set.data(), dimension, train_set_size, false, false);
     readXvec<float>(base_input, base_set.data(), dimension, base_set_size, false, false);
-    readXvec<float>(gt_input, gt_set.data(), ngt, base_set_size, false, false);
+    readXvec<uint32_t>(gt_input, gt_set.data(), ngt, query_set_size, false, false);
     readXvec<float> (query_input, query_set.data(), dimension, query_set_size, false, false);
 
     PrintMessage("Training vectors");
