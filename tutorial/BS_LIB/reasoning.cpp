@@ -45,7 +45,6 @@ int main(){
     readXvec<float> (query_input, query_set.data(), dimension, query_set_size, false, false);
 
     PrintMessage("Training vectors");
-    std::vector<float> centroids(dimension * centroid_num);
     time_recorder trecorder;
     trecorder.reset();
     faiss::Clustering clus (dimension, centroid_num);
@@ -89,7 +88,7 @@ int main(){
 
         std::vector<idx_t> centroids_ids(centroid_num); std::vector<float> centroids_dis(centroid_num);
 
-        index.search(1, centroids.data()+query_assigned_ids[i]*dimension, centroid_num, centroids_dis.data(), centroids_ids.data());
+        index.search(1, index.xb.data()+query_assigned_ids[i]*dimension, centroid_num, centroids_dis.data(), centroids_ids.data());
         std::unordered_set<idx_t> gt_test_set;
         for (size_t j = 0; j < 3; j++){
             size_t recall_num = recall_test[j];
