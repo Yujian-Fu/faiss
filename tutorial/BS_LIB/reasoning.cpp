@@ -79,7 +79,7 @@ int main(){
     }
     
     time_recorder trecorder;
-    for (size_t centroid_num = 200; centroid_num < 250; centroid_num += 50){
+    for (size_t centroid_num = 200; centroid_num < 6050; centroid_num += 50){
 
         PrintMessage("Training vectors");
         trecorder.reset();
