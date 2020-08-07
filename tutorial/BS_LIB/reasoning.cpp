@@ -54,11 +54,12 @@ int main(){
     readXvec<float> (query_input, query_set.data(), dimension, query_set_size, false, false);
     
     if (use_sub_train_set){
-        size_t query_subset_size = query_set_size / 5;
-        std::vector<float> query_subset(dimension * query_subset_size);
-        RandomSubset<float>(query_set.data(), query_subset.data(), dimension, query_set_size, query_subset_size);
+        size_t train_subset_size = train_set_size / 5;
+        std::vector<float> query_subset(dimension * train_subset_size);
+        RandomSubset<float>(query_set.data(), query_subset.data(), dimension, query_set_size, train_subset_size);
         query_set.resize(query_subset.size());
         memcpy(query_set.data(), query_subset.data(), query_subset.size() * sizeof(float));
+        train_set_size = train_subset_size;
     }
     
     time_recorder trecorder;
