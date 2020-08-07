@@ -10,6 +10,12 @@ plt.figure()
 plt.plot(x, y)
 plt.show()
 '''
+
+'''
+basepath = "/home/yujian/Desktop/Recording_Files/PQ/SIFT1M/"
+filename = [ "recording_2_10.txt",  "recording_2_8.txt"]
+legends = ["2_10", "2_8"]
+'''
 '''
 basepath = "/home/yujian/Desktop/Recording_Files/VQ/SIFT1M/"
 filename = [ "recording_500.txt","recording_1000.txt", "recording_2000.txt", "recording_3000.txt", "recording_4000.txt", "recording_5000.txt"]
@@ -34,14 +40,17 @@ legends = ["100_2_4", "200_2_6", "400_2_4", "200_2_4"]
 '''
 
 title = "SIFT1M / PQ"
-metric = "recall@10"
+metric = "recall@100"
 
 search_time_signal_string = "Finish SearchThe time usage: "
 recall_signal_string = "The " + metric + " for 1000 queries in parallel mode is: "
 
-basepath = "/home/yujian/Desktop/Recording_Files/PQ/SIFT1M/"
-filename = [ "recording_2_10.txt",  "recording_2_8.txt"]
-legends = ["2_10", "2_8"]
+basepath = "/home/yujian/Desktop/Recording_Files/VQ/SIFT1M/"
+filename = [ "recording_500.txt","recording_1000.txt","recording_2000.txt","recording_3000.txt","recording_4000.txt", "recording_5000.txt",
+ "recording_500_reranking.txt","recording_1000_reranking.txt", "recording_2000_reranking.txt","recording_3000_reranking.txt",  "recording_4000_reranking.txt",
+ "recording_5000_reranking.txt"
+]
+legends = ["500", "1000", "2000", "3000", "4000", "5000", "500_reranking", "1000_reranking", "2000_reranking", "3000_reranking", "4000_reranking", "5000_reranking"]
 
 
 plt.figure()
