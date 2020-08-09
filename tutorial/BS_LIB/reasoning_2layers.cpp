@@ -64,7 +64,7 @@ int main(){
     const size_t layer2_centroid_num[second_layer_size] = {10, 20, 30, 40, 50};
 
     std::string path_record = "/home/y/yujianfu/ivf-hnsw/" + model + "/" + dataset + "/reasoning_" + model + "_" + std::to_string(layer1_centroid_num[0]) + "_" +
-                                std::to_string(layer1_centroid_num[first_layer_size]) + "_" + std::to_string(layer2_centroid_num[0]) + "_" + std::to_string(layer2_centroid_num[second_layer_size]) + ".txt";
+                                std::to_string(layer1_centroid_num[first_layer_size - 1]) + "_" + std::to_string(layer2_centroid_num[0]) + "_" + std::to_string(layer2_centroid_num[second_layer_size - 1]) + ".txt";
     record_output.open(path_record, std::ios::out);
 
     for (size_t temp1 = 0; temp1 < first_layer_size; temp1++){
