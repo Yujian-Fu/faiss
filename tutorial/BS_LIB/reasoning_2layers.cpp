@@ -165,10 +165,11 @@ int main(){
             }
             std_assigned_vectors /= assigned_set.size();
             record_output << "STD for num of assigned vectors for " << assigned_set.size() << " clusters: " << std_assigned_vectors << std::endl;
-            for (size_t i = 0; i < assigned_set.size(); i++){std::cout << assigned_set[i].size() << " ";}
+            for (size_t i = 0; i < assigned_set.size(); i++){std::cout << assigned_set[i].size() << " ";} std::cout << std::endl;
 
             std::vector<std::vector<idx_t>> first_assigned_set(centroid_num1);
             for (size_t i = 0; i < base_set_size; i++){first_assigned_set[base_assigned_ids[i] / centroid_num2].push_back(i);}
+            for (size_t i = 0; i < first_assigned_set.size(); i++){std::cout << first_assigned_set[i].size() << " ";}
 
             trecorder.reset();
             PrintMessage("Analysising the construction");
@@ -252,6 +253,7 @@ int main(){
 
                 max_query_centroids[i * 2] = max_first_centroids;
                 max_query_centroids[i*2 + 1] = max_second_centroids;
+                std::cout << max_first_centroids << " " << max_second_centroids << " " <<  first_level_distribution.size() << " " << second_level_distribution.size() << std::endl;
 
                 assert(first_level_distribution.size() == max_first_centroids);
                 assert(first_level_visited.size() == max_first_centroids);
