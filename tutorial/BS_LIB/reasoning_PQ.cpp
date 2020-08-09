@@ -117,6 +117,7 @@ int main(){
         for (size_t i = 0; i < train_set_size; i++){ std_distance += (train_assigned_dis[i]-avg_distance) * (train_assigned_dis[i]-avg_distance);} std_distance /= (train_set_size-1);
         record_output << "Avg train distance: " << avg_distance << " std train distance: " << std_distance << std::endl;
         for (size_t i = 0; i < centroid_num; i++){record_output << train_assigned_set[i].size() << " ";} record_output << std::endl;
+        
         index.search(sub_train_set_size, sub_train_set.data(), 1, sub_assigned_dists.data(), sub_assigned_ids.data());
 
         trecorder.reset();
