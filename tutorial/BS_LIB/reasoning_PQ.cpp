@@ -140,6 +140,7 @@ int main(){
         
         for (size_t nbits_index = 0; nbits_index < 2; nbits_index++){
             trecorder.reset();
+            std::cout << "Training PQ with " << nbits_settings[nbits_index] << " nbits" << std::endl;
             faiss::ProductQuantizer PQ(dimension, 8, nbits_settings[nbits_index]);
             record_output << "Training PQ with " << nbits_settings[nbits_index] << " nbits" << std::endl;
             PQ.verbose = true;
