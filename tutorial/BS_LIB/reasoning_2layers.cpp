@@ -168,7 +168,13 @@ int main(){
             std::cout << "The assigned set" << std::endl; for (size_t i = 0; i < assigned_set.size(); i++){std::cout << assigned_set[i].size() << " ";} std::cout << std::endl;
 
             std::vector<std::vector<idx_t>> first_assigned_set(centroid_num1);
-            for (size_t i = 0; i < base_set_size; i++){first_assigned_set[base_assigned_ids[i] / centroid_num2].push_back(i);}
+            for (size_t i = 0; i < centroid_num1; i++){
+                for (size_t j = 0; j < centroid_num2; j++){
+                    for (size_t k = 0; k < assigned_set[i * centroid_num2 + j].size(); k++){
+                        first_assigned_set[i].push_back(assigned_set[i * centroid_num2 + j][k]);
+                    }
+                }
+            }
             std::cout << "The first assigned set" << std::endl; for (size_t i = 0; i < first_assigned_set.size(); i++){std::cout << first_assigned_set[i].size() << " ";} std::cout << std::endl;
 
             trecorder.reset();
@@ -202,7 +208,7 @@ int main(){
                             first_level_distribution[j] += 1;
                         }
                     }
-                    first_level_visited.push_back(j == 0 ? 0 : first_level_visited[j-1] + first_assigned_set[centroid_id].size());
+                    first_level_visited.push_back(j == 0 ? first_assigned_set[centroid_id].size() : first_level_visited[j-1] + first_assigned_set[centroid_id].size());
                     if (first_level_distribution[j] >= recall_num){
                         max_first_centroids = j + 1;
                         break;
