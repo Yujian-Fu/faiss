@@ -33,7 +33,7 @@
     const std::string path_base = "/home/y/yujianfu/ivf-hnsw/data/" + dataset + "/" + dataset +"_base.fvecs";
     const std::string path_gt = "/home/y/yujianfu/ivf-hnsw/data/" + dataset + "/" + dataset +"_groundtruth.ivecs";
     const std::string path_query = "/home/y/yujianfu/ivf-hnsw/data/" + dataset + "/" + dataset +"_query.fvecs";
-    std::string path_record = "/home/y/yujianfu/ivf-hnsw/" + model + "/" + dataset + "/reasoning_" + model + ".txt";
+    
 
     std::vector<float> train_set(dimension * train_set_size);
     std::vector<float> base_set(dimension * base_set_size);
@@ -50,16 +50,20 @@ typedef faiss::Index::idx_t idx_t;
 using namespace bslib;
 int main(){
     PrepareFolder((char *) ("/home/y/yujianfu/ivf-hnsw/" + model + "/" + dataset).c_str());
-    record_output.open(path_record, std::ios::out);
+    
     readXvec<float>(train_input, train_set.data(), dimension, train_set_size, false, false);
     readXvec<float>(base_input, base_set.data(), dimension, base_set_size, false, false);
     readXvec<uint32_t>(gt_input, gt_set.data(), ngt, query_set_size, false, false);
     readXvec<float> (query_input, query_set.data(), dimension, query_set_size, false, false);
 
     time_recorder trecorder;
-    const size_t first_layer_size = 15, second_layer_size = 15;
-    const size_t layer1_centroid_num[first_layer_size] = {10, 20, 30, 40, 50, 60, 70, 80, 90, 100, 110, 120, 130, 140, 150};
-    const size_t layer2_centroid_num[second_layer_size] = {10, 20, 30, 40, 50, 60, 70, 80, 90, 100, 110, 120, 130, 140, 150};
+    const size_t first_layer_size = 5, second_layer_size = 5;
+    const size_t layer1_centroid_num[first_layer_size] = {10, 20, 30, 40, 50};
+    const size_t layer2_centroid_num[second_layer_size] = {10, 20, 30, 40, 50};
+
+    std::string path_record = "/home/y/yujianfu/ivf-hnsw/" + model + "/" + dataset + "/reasoning_" + model + "_" + std::to_string(layer1_centroid_num[0]) + "_" +
+                                std::to_string(layer1_centroid_num[first_layer_size]) + "_" + std::to_string(layer2_centroid_num[0]) + "_" + std::to_string(layer2_centroid_num[second_layer_size]) + ".txt";
+    record_output.open(path_record, std::ios::out);
 
     for (size_t temp1 = 0; temp1 < first_layer_size; temp1++){
         for (size_t temp2 = 0; temp2 < second_layer_size; temp2++){
