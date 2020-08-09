@@ -80,6 +80,13 @@ int main(){
 
     const size_t nbits_settings[2] = {8, 12};
     
+    //Compute the sub train set for PQ training 
+    size_t sub_train_set_size = train_set_size / 10;
+    std::vector<idx_t> sub_assigned_ids(sub_train_set_size);
+    std::vector<float> sub_assigned_dists(sub_train_set_size);
+    std::vector<float> sub_train_set(dimension * sub_train_set_size);
+    RandomSubset(train_set.data(), sub_train_set.data(), dimension, train_set_size, sub_train_set_size);
+
     time_recorder trecorder;
     for (size_t centroid_num = 1000; centroid_num < 5500; centroid_num += 500){
 
@@ -110,7 +117,7 @@ int main(){
         for (size_t i = 0; i < train_set_size; i++){ std_distance += (train_assigned_dis[i]-avg_distance) * (train_assigned_dis[i]-avg_distance);} std_distance /= (train_set_size-1);
         record_output << "Avg train distance: " << avg_distance << " std train distance: " << std_distance << std::endl;
         for (size_t i = 0; i < centroid_num; i++){record_output << train_assigned_set[i].size() << " ";} record_output << std::endl;
-        
+        index.search(sub_train_set_size, sub_train_set.data(), 1, sub_assigned_dists.data(), sub_assigned_ids.data());
 
         trecorder.reset();
         std::vector<float> base_set_residual(dimension * base_set_size);
@@ -122,27 +129,16 @@ int main(){
         }
         trecorder.print_time_usage("Computed base residuals");
 
-        //Compute the sub train set for PQ training 
-        size_t sub_train_set_size = train_set_size / 10;
-        std::vector<float> sub_train_set(dimension * sub_train_set_size);
-        RandomSubset(train_set.data(), sub_train_set.data(), dimension, train_set_size, sub_train_set_size);
-        train_set.resize(sub_train_set_size * dimension);
-        memcpy(train_set.data(), sub_train_set.data(), dimension * sub_train_set_size * sizeof(float));
-        train_set_size = sub_train_set_size;
-
-        train_assigned_ids.resize(train_set_size);
-        train_assigned_dis.resize(train_set_size);
-        index.search(train_set_size, train_set.data(), 1, train_assigned_dis.data(), train_assigned_ids.data());
 
         trecorder.reset();
-        std::vector<float> train_set_residual(dimension * train_set_size);
+        std::vector<float> sub_train_set_residual(dimension * sub_train_set_size);
 #pragma omp parallel for
-        for (size_t i = 0; i < train_set_size; i++){
-            const idx_t centroid_id = train_assigned_ids[i];
+        for (size_t i = 0; i < sub_train_set_size; i++){
+            const idx_t centroid_id = sub_assigned_ids[i];
             const float * centroid = index.xb.data() + centroid_id * dimension;
-            faiss::fvec_madd(1, train_set.data() + i * dimension, -1.0, centroid, train_set_residual.data() + i * dimension);
+            faiss::fvec_madd(1, sub_train_set.data() + i * dimension, -1.0, centroid, sub_train_set_residual.data() + i * dimension);
         }
-        trecorder.print_time_usage("Computed train residuals");
+        trecorder.print_time_usage("Computed sub train residuals");
 
         std::vector<std::vector<idx_t>> assigned_set(centroid_num);
         for (size_t i = 0; i < base_set_size; i++){
@@ -157,7 +153,7 @@ int main(){
             faiss::ProductQuantizer PQ(dimension, 8, nbits_settings[nbits_index]);
             record_output << "Training PQ with " << nbits_settings[nbits_index] << " nbits" << std::endl;
             PQ.verbose = true;
-            PQ.train(train_set_size, train_set_residual.data());
+            PQ.train(sub_train_set_size, sub_train_set_residual.data());
             size_t code_size = PQ.code_size;
             std::vector<uint8_t> base_set_code(code_size * base_set_size);
             PQ.compute_code(base_set_residual.data(), base_set_code.data());
