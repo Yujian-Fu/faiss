@@ -265,11 +265,11 @@ int main(){
 
                 for (size_t j = 0; j < max_first_centroids; j++){
                     first_level_distributions[i][j] = first_level_distribution[j];
-                    second_level_distributions[i][j] = second_level_distribution[j];
+                    first_level_visited_vectors[i][j] = first_level_visited[j];   
                 }
 
                 for (size_t j = 0; j < max_second_centroids; j++){
-                    first_level_visited_vectors[i][j] = first_level_visited[j];
+                    second_level_distributions[i][j] = second_level_distribution[j];
                     second_level_visited_vectors[i][j] = second_level_visited[j];
                 }
             }
