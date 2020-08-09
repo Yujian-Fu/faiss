@@ -170,6 +170,7 @@ int main(){
             std::vector<std::vector<size_t>> result_visited_vectors(query_set_size);
 
             trecorder.reset();
+#pragma omp parallel for
             for (size_t i = 0; i < query_set_size; i++){
                 std::vector<size_t> result_distribution;
                 std::vector<size_t> result_visited;
