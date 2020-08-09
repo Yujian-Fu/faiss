@@ -13,7 +13,6 @@
     const size_t base_set_size = 1000000;
     const size_t query_set_size = 1000;
     const size_t ngt = 100;
-    const bool use_sub_train_set = false;
     const size_t recall_test_size = 3;
     */
     
@@ -23,7 +22,6 @@
     const size_t base_set_size = 1000000;
     const size_t query_set_size = 1000;
     const size_t ngt = 100;
-    const bool use_sub_train_set = false;
     const size_t recall_test_size = 3;
     
     const std::string model = "models_VQ_VQ";
@@ -39,7 +37,7 @@
     std::vector<float> base_set(dimension * base_set_size);
     std::vector<float> query_set(dimension * query_set_size);
     std::vector<uint32_t> gt_set(ngt * base_set_size);
-    
+
     std::ifstream train_input(path_learn, std::ios::binary);
     std::ifstream base_input(path_base, std::ios::binary);
     std::ifstream gt_input(path_gt, std::ios::binary);
@@ -55,15 +53,6 @@ int main(){
     readXvec<float>(base_input, base_set.data(), dimension, base_set_size, false, false);
     readXvec<uint32_t>(gt_input, gt_set.data(), ngt, query_set_size, false, false);
     readXvec<float> (query_input, query_set.data(), dimension, query_set_size, false, false);
-    
-    if (use_sub_train_set){
-        size_t train_subset_size = train_set_size / 5;
-        std::vector<float> query_subset(dimension * train_subset_size);
-        RandomSubset<float>(query_set.data(), query_subset.data(), dimension, train_set_size, train_subset_size);
-        query_set.resize(query_subset.size());
-        memcpy(query_set.data(), query_subset.data(), query_subset.size() * sizeof(float));
-        train_set_size = train_subset_size;
-    }
 
     time_recorder trecorder;
     const size_t first_layer_size = 15, second_layer_size = 15;
@@ -130,18 +119,29 @@ int main(){
                 }
             }
             else{
+                std::vector<std::vector<idx_t>> base_assigned_ids_indexes(centroid_num1, std::vector<idx_t> (base_set_size));
+                std::vector<std::vector<float>> base_assigned_dists_indexes(centroid_num1, std::vector<float> (base_set_size));
+
+#pragma omp parallel for
                 for (size_t i = 0; i < centroid_num1; i++){
-                    std::vector<idx_t> base_assigned_ids_index(base_set_size);
-                    std::vector<float> base_assigned_dists_index(base_set_size);
-                    index2[i].search(base_set_size, base_set.data(), 1, base_assigned_dists_index.data(), base_assigned_ids_index.data());
-                    for (size_t j = 0; j < base_set_size; j++){
-                        if (base_assigned_dists_index[j] < base_assigned_dists[j]){
-                            base_assigned_ids[j] = i * centroid_num2 + base_assigned_ids[j];
-                            base_assigned_dists[j] = base_assigned_dists_index[j];
+                    index2[i].search(base_set_size, base_set.data(), 1, base_assigned_dists_indexes[i].data(), base_assigned_ids_indexes[i].data());
+                }
+
+#pragma omp parallel for
+                for (size_t i = 0; i < base_set_size; i++){
+                    float min_distance = 1e9;
+                    idx_t min_id = 0;
+                    for (size_t j = 0; j < centroid_num1; j++){
+                        if (min_distance > base_assigned_ids_indexes[j][i]){
+                            min_id = j;
+                            min_distance = base_assigned_dists_indexes[j][i];
                         }
                     }
-                }
+                    base_assigned_ids[i] = base_assigned_ids_indexes[min_id][i];
+                    base_assigned_dists[i] = base_assigned_dists_indexes[min_id][i];    
+                }   
             }
+
 
             std::string message = "Assigned base vectors " + use_fast_assign ? "with fast assign" : "without fast assign";
             trecorder.record_time_usage(record_output, message);
