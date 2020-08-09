@@ -81,7 +81,7 @@ int main(){
     const size_t nbits_settings[2] = {8, 12};
     
     time_recorder trecorder;
-    for (size_t centroid_num = 6000; centroid_num < 10000; centroid_num += 100){
+    for (size_t centroid_num = 500; centroid_num < 5000; centroid_num += 200){
 
         PrintMessage("Training vectors");
         trecorder.reset();
