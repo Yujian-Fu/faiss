@@ -137,7 +137,7 @@ int main(){
                             min_distance = base_assigned_dists_indexes[j][i];
                         }
                     }
-                    base_assigned_ids[i] = base_assigned_ids_indexes[min_id][i];
+                    base_assigned_ids[i] = base_assigned_ids_indexes[min_id][i] + min_id * centroid_num2;
                     base_assigned_dists[i] = base_assigned_dists_indexes[min_id][i];    
                 }   
             }
@@ -161,11 +161,12 @@ int main(){
                 std_assigned_vectors += (assigned_set[i].size() - avg_assigned_vectors) * (assigned_set[i].size() - avg_assigned_vectors);
             }
             std_assigned_vectors /= assigned_set.size();
+            record_output << "STD for num of assigned vectors for " << assigned_set.size() << " clusters: " << std_assigned_vectors << std::endl;
 
             std::vector<std::vector<idx_t>> first_assigned_set(centroid_num1);
             for (size_t i = 0; i < base_set_size; i++){first_assigned_set[base_assigned_ids[i] / centroid_num2].push_back(i);}
 
-            record_output << "STD for num of assigned vectors for " << assigned_set.size() << " clusters: " << std_assigned_vectors << std::endl;
+            
             
             trecorder.reset();
             PrintMessage("Analysising the construction");
