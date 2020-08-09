@@ -162,13 +162,11 @@ int main(){
             }
             std_assigned_vectors /= assigned_set.size();
             record_output << "STD for num of assigned vectors for " << assigned_set.size() << " clusters: " << std_assigned_vectors << std::endl;
-            for (size_t i = 0; i < assigned_set.size(); i++){std::cout << assigned_set.size() << " ";}
+            for (size_t i = 0; i < assigned_set.size(); i++){std::cout << assigned_set[i].size() << " ";}
 
             std::vector<std::vector<idx_t>> first_assigned_set(centroid_num1);
             for (size_t i = 0; i < base_set_size; i++){first_assigned_set[base_assigned_ids[i] / centroid_num2].push_back(i);}
 
-            
-            
             trecorder.reset();
             PrintMessage("Analysising the construction");
             const size_t recall_num = 100;
