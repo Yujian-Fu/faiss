@@ -111,6 +111,7 @@ int main(){
         record_output << "Avg train distance: " << avg_distance << " std train distance: " << std_distance << std::endl;
         for (size_t i = 0; i < centroid_num; i++){record_output << train_assigned_set[i].size() << " ";} record_output << std::endl;
         
+        trecorder.reset();
         std::vector<float> base_set_residual(dimension * base_set_size);
 #pragma omp parallel for
         for (size_t i = 0; i < base_set_size; i++){
@@ -118,7 +119,9 @@ int main(){
             const float * centroid = index.xb.data() + centroid_id * dimension;
             faiss::fvec_madd(1, base_set.data() + i * dimension, -1.0, centroid, base_set_residual.data() + i * dimension);
         }
+        trecorder.print_time_usage("Computed base residuals");
 
+        trecorder.reset();
         std::vector<float> train_set_residual(dimension * train_set_size);
 #pragma omp parallel for
         for (size_t i = 0; i < train_set_size; i++){
@@ -126,6 +129,7 @@ int main(){
             const float * centroid = index.xb.data() + centroid_id * dimension;
             faiss::fvec_madd(1, train_set.data() + i * dimension, -1.0, centroid, train_set_residual.data() + i * dimension);
         }
+        trecorder.print_time_usage("Computed train residuals");
 
         std::vector<std::vector<idx_t>> assigned_set(centroid_num);
         for (size_t i = 0; i < base_set_size; i++){
