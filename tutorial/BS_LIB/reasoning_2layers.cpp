@@ -70,6 +70,7 @@ int main(){
             clus1.verbose = true;
             faiss::IndexFlatL2 index1(dimension);
             clus1.train(train_set_size, train_set.data(), index1);
+            record_output << "Construction parameter: dataset: " << dataset << " train_size: " << train_set_size << " n centroids: " << centroid_num1 << " " << centroid_num2 << " iteration: " << clus1.niter << std::endl;
             trecorder.record_time_usage(record_output, "Finish 1st layer clustering: ");
 
             std::vector<idx_t> train_set_ids(train_set_size);
@@ -127,7 +128,7 @@ int main(){
                     index2[i].search(base_set_size, base_set.data(), 1, base_assigned_dists_indexes[i].data(), base_assigned_ids_indexes[i].data());
                 }
 
-#pragma omp parallel for
+//#pragma omp parallel for
                 for (size_t i = 0; i < base_set_size; i++){
                     float min_distance = 1e9;
                     idx_t min_id = 0;
@@ -135,8 +136,11 @@ int main(){
                         if (min_distance > base_assigned_ids_indexes[j][i]){
                             min_id = j;
                             min_distance = base_assigned_dists_indexes[j][i];
+                            
                         }
+                       std::cout << base_assigned_dists_indexes[j][i] << " ";
                     }
+                     std::cout << std::endl << min_distance << " " << min_id <<  " " << base_assigned_ids_indexes[min_id][i] << std::endl;
                     base_assigned_ids[i] = base_assigned_ids_indexes[min_id][i] + min_id * centroid_num2;
                     base_assigned_dists[i] = base_assigned_dists_indexes[min_id][i];    
                 }   
