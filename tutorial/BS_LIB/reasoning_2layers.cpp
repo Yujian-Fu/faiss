@@ -186,7 +186,7 @@ int main(){
             std::vector<std::vector<size_t>> second_level_distributions(query_set_size);
             std::vector<std::vector<size_t>> second_level_visited_vectors(query_set_size);
 
-//#pragma omp parallel for
+#pragma omp parallel for
             for (size_t i = 0; i < query_set_size; i++){
                 std::vector<size_t> first_level_distribution;
                 std::vector<size_t> first_level_visited;
@@ -259,7 +259,6 @@ int main(){
 
                 max_query_centroids[i * 2] = max_first_centroids;
                 max_query_centroids[i * 2 + 1] = max_second_centroids;
-                std::cout << max_first_centroids << " " << max_second_centroids << " " <<  first_level_distribution.size() << " " << second_level_distribution.size() << std::endl;
 
                 assert(first_level_distribution.size() == max_first_centroids);
                 assert(first_level_visited.size() == max_first_centroids);
