@@ -135,7 +135,7 @@ int main(){
                     float min_distance = MIN_DISTANCE;
                     idx_t min_id = 0;
                     for (size_t j = 0; j < centroid_num1; j++){
-                        if (min_distance > base_assigned_ids_indexes[j][i]){
+                        if (min_distance > base_assigned_dists_indexes[j][i]){
                             min_id = j;
                             min_distance = base_assigned_dists_indexes[j][i];
                         }
