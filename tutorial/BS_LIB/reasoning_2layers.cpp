@@ -6,7 +6,7 @@
 #include <algorithm>
 #include <cassert>
 //Parameters
-    /*
+    
     const std::string dataset = "SIFT1M";
     const size_t dimension = 128;
     size_t train_set_size = 100000;
@@ -15,8 +15,9 @@
     const size_t ngt = 100;
     const size_t recall_test_size = 3;
     const float MIN_DISTANCE = 1e8;
-    */
     
+    
+    /*
     const std::string dataset = "DEEP1M";
     const size_t dimension = 256;
     size_t train_set_size =  100000;
@@ -25,7 +26,9 @@
     const size_t ngt = 100;
     const size_t recall_test_size = 3;
     const float MIN_DISTANCE = 100;
+    */
     
+
     const std::string model = "models_VQ_VQ";
     const bool use_fast_assign = false;
 
@@ -34,7 +37,6 @@
     const std::string path_gt = "/home/y/yujianfu/ivf-hnsw/data/" + dataset + "/" + dataset +"_groundtruth.ivecs";
     const std::string path_query = "/home/y/yujianfu/ivf-hnsw/data/" + dataset + "/" + dataset +"_query.fvecs";
     
-
     std::vector<float> train_set(dimension * train_set_size);
     std::vector<float> base_set(dimension * base_set_size);
     std::vector<float> query_set(dimension * query_set_size);
@@ -58,8 +60,8 @@ int main(){
 
     time_recorder trecorder;
     const size_t first_layer_size = 5, second_layer_size = 5;
-    const size_t layer1_centroid_num[first_layer_size] = {60, 70, 80, 90, 100};
-    const size_t layer2_centroid_num[second_layer_size] = {60, 70, 80, 90, 100};
+    const size_t layer1_centroid_num[first_layer_size] = {10, 20, 30, 40, 50};
+    const size_t layer2_centroid_num[second_layer_size] = {10, 20, 30, 40, 50};
 
     std::string path_record = "/home/y/yujianfu/ivf-hnsw/" + model + "/" + dataset + "/reasoning_" + model + "_" + std::to_string(layer1_centroid_num[0]) + "_" +
                                 std::to_string(layer1_centroid_num[first_layer_size]) + "_" + std::to_string(layer2_centroid_num[0]) + "_" + std::to_string(layer2_centroid_num[second_layer_size]) + ".txt";
