@@ -1,12 +1,13 @@
 import numpy as np 
 import matplotlib.pyplot as plt
 
-title = "SIFT1M / Num Centroids - Visited Vectors"
+dataset = "DEEP1M"
+title = dataset + " / Num Centroids - Visited Vectors"
 
 recording_proportion = [0.1, 0.5, 0.8, 1]
 recall_performance = [1, 10, 100]
 
-filepath = "/home/yujian/Desktop/Recording_Files/VQ/DEEP1M/reasoning.txt"
+filepath = "/home/yujian/Desktop/Recording_Files/VQ/" + dataset + "/reasoning.txt"
 
 # This is the figure for centroids - visited vectors (recall@K p%)
 # This is the figure for centroids - training time
@@ -34,20 +35,12 @@ for i in range(len(recall_performance)):
     for x in f1:
         if "n_centroids:" in x:
             n_centroids.append(x.split(" ")[-3])
-        
-        if "The average max centroids:" in x:
-            if recall_performance[i] == 1:
-                visited_vectors.append(np.mean(list(map(float, each_visited_vectors))))
-            else:
-                each_visited_length = len(visited_vectors) / len(recording_proportion)
-                for j in range(len(recording_proportion)):
-                    visited_vectors.append(np.mean(each_visited_vectors[each_visited_length * j : each_visited_length * (j+1)]))
-            each_visited_vectors = []
 
-        if "R@" + str(recall_performance[i]) in x: 
+
+        if "R@" + str(recall_performance[i]) + " MC:" in x: 
             max_visited_centroids = x.split(" ")[-1] 
             position = 0 
-            is_recording = True
+            is_recording = True 
         else: 
             position += 1 
         
@@ -63,23 +56,36 @@ for i in range(len(recall_performance)):
                 for j in range(len(recording_proportion)): 
                     recording_vectors = recall_performance[i] * recording_proportion[j] 
                     for k in range(len(visiting_vectors)): 
-                        if (recording_vectors <= visiting_vectors[k]): 
+                        if (recording_vectors <= float(visiting_vectors[k])): 
                             recording_position.append(k) 
                             break 
             if position == 2 and is_recording:
                 is_recording = False
                 for j in range(len(recording_proportion)):
-                    each_visited_vectors.append(x.split(" ")[recording_position])
+                    each_visited_vectors.append(x.split(" ")[recording_position[j]])
 
-    
+        if "The average max centroids:" in x:
+            if recall_performance[i] == 1:
+                visited_vectors.append(np.mean(list(map(float, each_visited_vectors))))
+            else:
+                each_visited_length = int(len(each_visited_vectors) / len(recording_proportion))
+                for j in range(len(recording_proportion)):
+                    sub_visited_vectors = [each_visited_vectors[temp * len(recording_proportion) + j] for temp in range(each_visited_length)]
+            
+                    
+                    visited_vectors.append(np.mean(list(map(float, sub_visited_vectors))))
+
+            each_visited_vectors = []
+
+
     if (recall_performance[i] == 1):
-        print(n_centroids)
-        print(visited_vectors)
         plt.plot(list(map(float, n_centroids)), visited_vectors)
+        visited_vectors = []
     else:
         for j in range(len(recording_proportion)):
-            sub_visited_vectors = visited_vectors[range(len(n_centroids)) * 3 + j]
-            plt.plot(n_centroids, sub_visited_vectors)
+            sub_visited_vectors = [visited_vectors[temp * len(recording_proportion) + j] for temp in range(len(n_centroids))]
+            plt.plot(list(map(float, n_centroids)), sub_visited_vectors)
+        visited_vectors = []
 
 
     plt.xticks(np.linspace(0, float(n_centroids[-1]), 5))

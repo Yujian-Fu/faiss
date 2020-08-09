@@ -69,15 +69,7 @@ int main(){
     readXvec<float>(base_input, base_set.data(), dimension, base_set_size, false, false);
     readXvec<uint32_t>(gt_input, gt_set.data(), ngt, query_set_size, false, false);
     readXvec<float> (query_input, query_set.data(), dimension, query_set_size, false, false);
-    
-    if (use_sub_train_set){
-        size_t train_subset_size = train_set_size / 5;
-        std::vector<float> query_subset(dimension * train_subset_size);
-        RandomSubset<float>(query_set.data(), query_subset.data(), dimension, train_set_size, train_subset_size);
-        query_set.resize(query_subset.size());
-        memcpy(query_set.data(), query_subset.data(), query_subset.size() * sizeof(float));
-        train_set_size = train_subset_size;
-    }
+
     
     time_recorder trecorder;
     for (size_t centroid_num = 6000; centroid_num < 10000; centroid_num += 100){
@@ -98,12 +90,12 @@ int main(){
 
         index.search(base_set_size, base_set.data(), 1, base_assigned_dis.data(), base_assigned_ids.data());
         index.search(train_set_size, train_set.data(), 1, train_assigned_dis.data(), train_assigned_ids.data());
-        trecorder.record_time_usage(record_output, "Assigned base vectors and query vectors ");
-        trecorder.print_time_usage("Assigned base vectors and query vectors ");
+        trecorder.record_time_usage(record_output, "Assigned base vectors and train vectors ");
+        trecorder.print_time_usage("Assigned base vectors and train vectors ");
 
         std::vector<std::vector<idx_t>> train_assigned_set(centroid_num);
         for (size_t i = 0; i < train_set_size; i++){train_assigned_set[train_assigned_ids[i]].push_back(i);}
-        float avg_distance, std_distance = 0;
+        float avg_distance = 0, std_distance = 0;
         for (size_t i = 0; i < train_set_size; i++){ avg_distance += train_assigned_dis[i];} avg_distance /= train_set_size;
         for (size_t i = 0; i < train_set_size; i++){ std_distance += (train_assigned_dis[i]-avg_distance) * (train_assigned_dis[i]-avg_distance);} std_distance /= (train_set_size-1);
         record_output << "Avg train distance: " << avg_distance << " std train distance: " << std_distance << std::endl;
@@ -135,7 +127,7 @@ int main(){
                 for (size_t k = 0; k < recall_num; k++){gt_test_set.insert(gt_set[i * ngt + k]);} // std::cout<< gt_set[i * ngt + k] << " ";}std::cout << std::endl;
 
                 for (size_t k = 0; k < centroid_num; k++){
-                    size_t centroid_id = centroids_ids[k];
+                    idx_t centroid_id = centroids_ids[k];
 
                     result_distribution_test[j][k] = k == 0 ? 0 : result_distribution_test[j][k - 1];
                     result_visited_test[j][k] = k == 0 ? assigned_set[centroid_id].size() : result_visited_test[j][k - 1] + assigned_set[centroid_id].size();
