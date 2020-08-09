@@ -5,7 +5,7 @@
 #include <faiss/Index.h>
 
 //Parameters
-    /*
+    
     const std::string dataset = "SIFT1M";
     const std::string model = "models_VQ";
     const size_t dimension = 128;
@@ -15,7 +15,7 @@
     const size_t ngt = 100;
     const bool use_sub_train_set = false;
     const size_t recall_test_size = 3;
-    */
+    
     
 
     /*
@@ -30,7 +30,7 @@
     const size_t recall_test_size = 3;
     */
     
-   
+    /*
     const std::string dataset = "DEEP1M";
     const std::string model = "models_VQ";
     const size_t dimension = 256;
@@ -40,6 +40,7 @@
     const size_t ngt = 100;
     const bool use_sub_train_set = false;
     const size_t recall_test_size = 3;
+    */
     
     
 
@@ -47,7 +48,7 @@
     const std::string path_base = "/home/y/yujianfu/ivf-hnsw/data/" + dataset + "/" + dataset +"_base.fvecs";
     const std::string path_gt = "/home/y/yujianfu/ivf-hnsw/data/" + dataset + "/" + dataset +"_groundtruth.ivecs";
     const std::string path_query = "/home/y/yujianfu/ivf-hnsw/data/" + dataset + "/" + dataset +"_query.fvecs";
-    std::string path_record = "/home/y/yujianfu/ivf-hnsw/" + model + "/" + dataset + "/reasoning.txt";
+    std::string path_record = "/home/y/yujianfu/ivf-hnsw/" + model + "/" + dataset + "/reasoning_6000.txt";
 
     std::vector<float> train_set(dimension * train_set_size);
     std::vector<float> base_set(dimension * base_set_size);
@@ -81,7 +82,7 @@ int main(){
     }
     
     time_recorder trecorder;
-    for (size_t centroid_num = 200; centroid_num < 6050; centroid_num += 50){
+    for (size_t centroid_num = 6000; centroid_num < 10000; centroid_num += 100){
 
         PrintMessage("Training vectors");
         trecorder.reset();
@@ -89,7 +90,7 @@ int main(){
         clus.verbose = true;
         faiss::IndexFlatL2 index (dimension);
         clus.train (train_set_size, train_set.data(), index);
-        
+
         trecorder.record_time_usage(record_output, "Finish clustering: ");
         trecorder.print_time_usage("Finish clustering with time usage: ");
         trecorder.reset();
