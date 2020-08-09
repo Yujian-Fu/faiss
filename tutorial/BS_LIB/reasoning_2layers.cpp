@@ -225,8 +225,8 @@ int main(){
 
                     index2[centroids_id].search(1, query, centroid_num2, index_dists.data(), index_ids.data());
                     for (size_t k = 0; k < centroid_num2; k++){
-                        all_dists[j * max_first_centroids + k] = index_dists[k];
-                        all_ids[j * max_first_centroids + k] = centroids_id * centroid_num2 + index_ids[k];
+                        all_dists[j * centroid_num2 + k] = index_dists[k];
+                        all_ids[j * centroid_num2 + k] = centroids_id * centroid_num2 + index_ids[k];
                     }
                 }
 
@@ -258,7 +258,7 @@ int main(){
                 }
 
                 max_query_centroids[i * 2] = max_first_centroids;
-                max_query_centroids[i*2 + 1] = max_second_centroids;
+                max_query_centroids[i * 2 + 1] = max_second_centroids;
                 std::cout << max_first_centroids << " " << max_second_centroids << " " <<  first_level_distribution.size() << " " << second_level_distribution.size() << std::endl;
 
                 assert(first_level_distribution.size() == max_first_centroids);
