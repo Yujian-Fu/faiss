@@ -112,6 +112,7 @@ int main(){
         for (size_t i = 0; i < centroid_num; i++){record_output << train_assigned_set[i].size() << " ";} record_output << std::endl;
         
         std::vector<float> base_set_residual(dimension * base_set_size);
+#pragma omp parallel for
         for (size_t i = 0; i < base_set_size; i++){
             const idx_t centroid_id = base_assigned_ids[i];
             const float * centroid = index.xb.data() + centroid_id * dimension;
@@ -119,6 +120,7 @@ int main(){
         }
 
         std::vector<float> train_set_residual(dimension * train_set_size);
+#pragma omp parallel for
         for (size_t i = 0; i < train_set_size; i++){
             const idx_t centroid_id = train_assigned_ids[i];
             const float * centroid = index.xb.data() + centroid_id * dimension;
