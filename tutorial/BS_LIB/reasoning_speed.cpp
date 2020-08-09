@@ -36,7 +36,9 @@
     const std::string path_base = "/home/y/yujianfu/ivf-hnsw/data/" + dataset + "/" + dataset +"_base.fvecs";
     const std::string path_gt = "/home/y/yujianfu/ivf-hnsw/data/" + dataset + "/" + dataset +"_groundtruth.ivecs";
     const std::string path_query = "/home/y/yujianfu/ivf-hnsw/data/" + dataset + "/" + dataset +"_query.fvecs";
+    std::string path_record = "/home/y/yujianfu/ivf-hnsw/" + model + "/" + dataset + "/reasoning_speed.txt";
     
+
     std::vector<float> train_set(dimension * train_set_size);
     std::vector<float> base_set(dimension * base_set_size);
     std::vector<float> query_set(dimension * query_set_size);
@@ -58,4 +60,19 @@ int main(){
     readXvec<uint32_t>(gt_input, gt_set.data(), ngt, query_set_size, false, false);
     readXvec<float> (query_input, query_set.data(), dimension, query_set_size, false, false);
 
+    const size_t centroid_num[2] = {1000, 2000};
+    const size_t centroid_num1[4] = {10, 100, 20, 100};
+    const size_t centroid_num2[4] = {100, 10, 100, 20};
+    time_recorder trecorder;
+
+    // The 1 layer structure
+    for (size_t i = 0; i < 2; i++)
+        faiss::Clustering clus (dimension, centroid_num[i]);
+        clus.verbose = true;
+        faiss::IndexFlat index(dimension);
+        clus.train(train_set_size, train_set.data(), index);
+
+        std::vector<idx_t> base_assigned_ids(base_set_size); std::
+
     
+

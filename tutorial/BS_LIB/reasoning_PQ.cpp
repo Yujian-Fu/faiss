@@ -81,7 +81,7 @@ int main(){
     const size_t nbits_settings[2] = {8, 12};
     
     time_recorder trecorder;
-    for (size_t centroid_num = 200; centroid_num < 5000; centroid_num += 200){
+    for (size_t centroid_num = 1000; centroid_num < 5500; centroid_num += 500){
 
         PrintMessage("Training vectors");
         trecorder.reset();
@@ -111,6 +111,7 @@ int main(){
         record_output << "Avg train distance: " << avg_distance << " std train distance: " << std_distance << std::endl;
         for (size_t i = 0; i < centroid_num; i++){record_output << train_assigned_set[i].size() << " ";} record_output << std::endl;
         
+
         trecorder.reset();
         std::vector<float> base_set_residual(dimension * base_set_size);
 #pragma omp parallel for
@@ -120,6 +121,18 @@ int main(){
             faiss::fvec_madd(1, base_set.data() + i * dimension, -1.0, centroid, base_set_residual.data() + i * dimension);
         }
         trecorder.print_time_usage("Computed base residuals");
+
+        //Compute the sub train set for PQ training 
+        size_t sub_train_set_size = train_set_size / 10;
+        std::vector<float> sub_train_set(dimension * sub_train_set_size);
+        RandomSubset(train_set.data(), sub_train_set.data(), dimension, train_set_size, sub_train_set_size);
+        train_set.resize(sub_train_set_size * dimension);
+        memcpy(train_set.data(), sub_train_set.data(), dimension * sub_train_set_size * sizeof(float));
+        train_set_size = sub_train_set_size;
+
+        train_assigned_ids.resize(train_set_size);
+        train_assigned_dis.resize(train_set_size);
+        index.search(train_set_size, train_set.data(), 1, train_assigned_dis.data(), train_assigned_ids.data());
 
         trecorder.reset();
         std::vector<float> train_set_residual(dimension * train_set_size);
@@ -194,7 +207,9 @@ int main(){
                         PQ.decode(base_set_code.data() + base_id * code_size, decoded_residuals.data());
                         std::vector<float> reconstructed_vector(dimension);
                         faiss::fvec_madd(1, decoded_residuals.data(), 1.0, index.xb.data() + centroid_id*dimension, reconstructed_vector.data());
-                        float base_norm = faiss::fvec_norm_L2sqr(reconstructed_vector.data(), dimension);
+                        std::vector<float> query_base_residual_vector(dimension);
+                        faiss::fvec_madd(1, reconstructed_vector.data(), -1.0, query, query_base_residual_vector.data());
+                        float base_norm = faiss::fvec_norm_L2sqr(query_base_residual_vector.data(), dimension);
                         if (base_norm < heap_dists[0]){
                             faiss::maxheap_pop(recall_num, heap_dists.data(), heap_ids.data());
                             faiss::maxheap_push(recall_num, heap_dists.data(), heap_ids.data(), base_norm, base_id);
@@ -255,6 +270,7 @@ int main(){
 
             record_output << "The average max centroids " << float(avg_max_centroids) / query_set_size << std::endl;
             trecorder.record_time_usage(record_output, "Finished result analysis: ");
+            trecorder.print_time_usage("Finished result analysis: ");
         }
     }
 }

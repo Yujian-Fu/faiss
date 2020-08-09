@@ -256,7 +256,7 @@ int main(){
                             second_level_distribution[j] += 1;
                         }
                     }
-                    second_level_visited.push_back(j == 0 ? 0 : second_level_visited[j-1] + assigned_set[index_id].size());
+                    second_level_visited.push_back(j == 0 ? assigned_set[index_id].size() : second_level_visited[j-1] + assigned_set[index_id].size());
                     if (second_level_distribution[j] >= recall_num){
                         max_second_centroids = j + 1;
                         break;
