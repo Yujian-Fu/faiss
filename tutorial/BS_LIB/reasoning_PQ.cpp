@@ -167,7 +167,7 @@ int main(){
             std::vector<std::vector<size_t>> result_visited_vectors(query_set_size);
 
             trecorder.reset();
-#pragma omp parallel for
+//#pragma omp parallel for
             for (size_t i = 0; i < query_set_size; i++){
                 std::vector<size_t> result_distribution;
                 std::vector<size_t> result_visited;
@@ -193,7 +193,6 @@ int main(){
                     result_distribution.push_back(j == 0? 0 : result_distribution[j-1]);
                     result_PQ_distribution.push_back(0);
                     result_visited.push_back(j == 0? assigned_set[centroid_id].size() : result_visited[j-1] + assigned_set[centroid_id].size());
-
 
                     for (size_t k = 0; k < assigned_set[centroid_id].size(); k++){
                         if (gt_test_set.count(assigned_set[centroid_id][k]) != 0){
