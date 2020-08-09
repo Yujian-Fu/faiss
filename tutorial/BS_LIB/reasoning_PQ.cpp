@@ -142,6 +142,7 @@ int main(){
             trecorder.reset();
             faiss::ProductQuantizer PQ(dimension, 8, nbits_settings[nbits_index]);
             record_output << "Training PQ with " << nbits_settings[nbits_index] << " nbits" << std::endl;
+            PQ.verbose = true;
             PQ.train(train_set_size, train_set_residual.data());
             size_t code_size = PQ.code_size;
             std::vector<uint8_t> base_set_code(code_size * base_set_size);
