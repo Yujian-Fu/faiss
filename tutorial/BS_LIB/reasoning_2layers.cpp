@@ -130,7 +130,7 @@ int main(){
                     index2[i].search(base_set_size, base_set.data(), 1, base_assigned_dists_indexes[i].data(), base_assigned_ids_indexes[i].data());
                 }
 
-//#pragma omp parallel for
+#pragma omp parallel for
                 for (size_t i = 0; i < base_set_size; i++){
                     float min_distance = MIN_DISTANCE;
                     idx_t min_id = 0;
@@ -139,9 +139,7 @@ int main(){
                             min_id = j;
                             min_distance = base_assigned_dists_indexes[j][i];
                         }
-                       std::cout << base_assigned_dists_indexes[j][i] << " " << min_distance << " ";
                     }
-                     std::cout << std::endl << min_distance << " " << min_id <<  " " << base_assigned_ids_indexes[min_id][i] << std::endl;
                     base_assigned_ids[i] = base_assigned_ids_indexes[min_id][i] + min_id * centroid_num2;
                     base_assigned_dists[i] = base_assigned_dists_indexes[min_id][i];    
                 }   
