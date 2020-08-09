@@ -14,6 +14,7 @@
     const size_t query_set_size = 1000;
     const size_t ngt = 100;
     const size_t recall_test_size = 3;
+    const float MIN_DISTANCE = 1e8;
     */
     
     const std::string dataset = "DEEP1M";
@@ -23,6 +24,7 @@
     const size_t query_set_size = 1000;
     const size_t ngt = 100;
     const size_t recall_test_size = 3;
+    const float MIN_DISTANCE = 100;
     
     const std::string model = "models_VQ_VQ";
     const bool use_fast_assign = false;
@@ -130,15 +132,14 @@ int main(){
 
 //#pragma omp parallel for
                 for (size_t i = 0; i < base_set_size; i++){
-                    float min_distance = 1e9;
+                    float min_distance = MIN_DISTANCE;
                     idx_t min_id = 0;
                     for (size_t j = 0; j < centroid_num1; j++){
                         if (min_distance > base_assigned_ids_indexes[j][i]){
                             min_id = j;
                             min_distance = base_assigned_dists_indexes[j][i];
-                            
                         }
-                       std::cout << base_assigned_dists_indexes[j][i] << " ";
+                       std::cout << base_assigned_dists_indexes[j][i] << " " << min_distance << " ";
                     }
                      std::cout << std::endl << min_distance << " " << min_id <<  " " << base_assigned_ids_indexes[min_id][i] << std::endl;
                     base_assigned_ids[i] = base_assigned_ids_indexes[min_id][i] + min_id * centroid_num2;
