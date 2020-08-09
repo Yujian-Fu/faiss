@@ -61,7 +61,7 @@ int main(){
     time_recorder trecorder;
     const size_t first_layer_size = 5, second_layer_size = 5;
     const size_t layer1_centroid_num[first_layer_size] = {10, 20, 30, 40, 50};
-    const size_t layer2_centroid_num[second_layer_size] = {10, 20, 30, 40, 50};
+    const size_t layer2_centroid_num[second_layer_size] = {60, 70, 80, 90, 100};
 
     std::string path_record = "/home/y/yujianfu/ivf-hnsw/" + model + "/" + dataset + "/reasoning_" + model + "_" + std::to_string(layer1_centroid_num[0]) + "_" +
                                 std::to_string(layer1_centroid_num[first_layer_size - 1]) + "_" + std::to_string(layer2_centroid_num[0]) + "_" + std::to_string(layer2_centroid_num[second_layer_size - 1]) + ".txt";
