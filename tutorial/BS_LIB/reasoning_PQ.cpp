@@ -117,7 +117,7 @@ int main(){
         for (size_t i = 0; i < train_set_size; i++){ std_distance += (train_assigned_dis[i]-avg_distance) * (train_assigned_dis[i]-avg_distance);} std_distance /= (train_set_size-1);
         record_output << "Avg train distance: " << avg_distance << " std train distance: " << std_distance << std::endl;
         for (size_t i = 0; i < centroid_num; i++){record_output << train_assigned_set[i].size() << " ";} record_output << std::endl;
-        
+
         index.search(sub_train_set_size, sub_train_set.data(), 1, sub_assigned_dists.data(), sub_assigned_ids.data());
 
         trecorder.reset();
@@ -126,7 +126,7 @@ int main(){
         for (size_t i = 0; i < base_set_size; i++){
             const idx_t centroid_id = base_assigned_ids[i];
             const float * centroid = index.xb.data() + centroid_id * dimension;
-            faiss::fvec_madd(1, base_set.data() + i * dimension, -1.0, centroid, base_set_residual.data() + i * dimension);
+            faiss::fvec_madd(dimension, base_set.data() + i * dimension, -1.0, centroid, base_set_residual.data() + i * dimension);
         }
         trecorder.print_time_usage("Computed base residuals");
 
@@ -137,7 +137,7 @@ int main(){
         for (size_t i = 0; i < sub_train_set_size; i++){
             const idx_t centroid_id = sub_assigned_ids[i];
             const float * centroid = index.xb.data() + centroid_id * dimension;
-            faiss::fvec_madd(1, sub_train_set.data() + i * dimension, -1.0, centroid, sub_train_set_residual.data() + i * dimension);
+            faiss::fvec_madd(dimension, sub_train_set.data() + i * dimension, -1.0, centroid, sub_train_set_residual.data() + i * dimension);
         }
         trecorder.print_time_usage("Computed sub train residuals");
 
@@ -204,9 +204,9 @@ int main(){
                         std::vector<float> decoded_residuals(dimension);
                         PQ.decode(base_set_code.data() + base_id * code_size, decoded_residuals.data());
                         std::vector<float> reconstructed_vector(dimension);
-                        faiss::fvec_madd(1, decoded_residuals.data(), 1.0, index.xb.data() + centroid_id*dimension, reconstructed_vector.data());
+                        faiss::fvec_madd(dimension, decoded_residuals.data(), 1.0, index.xb.data() + centroid_id*dimension, reconstructed_vector.data());
                         std::vector<float> query_base_residual_vector(dimension);
-                        faiss::fvec_madd(1, reconstructed_vector.data(), -1.0, query, query_base_residual_vector.data());
+                        faiss::fvec_madd(dimension, reconstructed_vector.data(), -1.0, query, query_base_residual_vector.data());
                         float base_norm = faiss::fvec_norm_L2sqr(query_base_residual_vector.data(), dimension);
                         if (base_norm < heap_dists[0]){
                             faiss::maxheap_pop(recall_num, heap_dists.data(), heap_ids.data());
