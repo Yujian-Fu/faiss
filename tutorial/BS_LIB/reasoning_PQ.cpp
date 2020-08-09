@@ -195,9 +195,6 @@ int main(){
                     result_visited.push_back(j == 0? assigned_set[centroid_id].size() : result_visited[j-1] + assigned_set[centroid_id].size());
 
                     for (size_t k = 0; k < assigned_set[centroid_id].size(); k++){
-                        if (gt_test_set.count(assigned_set[centroid_id][k]) != 0){
-                            result_distribution[j] += 1;
-                        }
 
                         idx_t base_id = assigned_set[centroid_id][k];
                         std::vector<float> decoded_residuals(dimension);
@@ -210,6 +207,14 @@ int main(){
                         if (base_norm < heap_dists[0]){
                             faiss::maxheap_pop(recall_num, heap_dists.data(), heap_ids.data());
                             faiss::maxheap_push(recall_num, heap_dists.data(), heap_ids.data(), base_norm, base_id);
+                        }
+                        if (gt_test_set.count(assigned_set[centroid_id][k]) != 0){
+                            result_distribution[j] += 1;
+                            std::cout << base_norm << " " << std::endl;
+                            for (size_t temp = 0; temp < recall_num; temp++){
+                                std::cout << heap_ids[temp] << " " << heap_dists[temp] << " "; 
+                            }
+                            std::cout << std::endl;
                         }
                     }
 
