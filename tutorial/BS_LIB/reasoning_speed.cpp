@@ -105,7 +105,7 @@ int main(){
         trecorder.record_time_usage(record_output, message);
         PrintMessage("Finished 1 layer searching");
 
-
+        trecorder.reset();
         std::vector<uint8_t> base_vector_codes(10000 * code_size);
         std::vector<float> base_vectors(10000 * dimension);
         const float * query = query_set.data();
