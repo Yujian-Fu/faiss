@@ -83,7 +83,7 @@ int main(){
     const size_t centroid_num2[4] = {100, 10, 100, 20};
     const size_t centroid_keep_space1[4] = {2, 50, 4, 50};
     const size_t centroid_keep_space2[4] = {50, 2, 50, 4};
-    const size_t repeat_time = 100000;
+    const size_t repeat_time = 1000;
     record_output << "The repeat times for measuring is " << repeat_time << std::endl;
 
     time_recorder trecorder;
