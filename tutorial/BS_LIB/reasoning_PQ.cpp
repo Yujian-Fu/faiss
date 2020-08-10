@@ -14,7 +14,7 @@ Draw the figure with different centroid setting
 */
 
 // Parameters
-    /*
+    
     const std::string dataset = "SIFT1M";
     const std::string model = "models_VQ";
     const size_t dimension = 128;
@@ -24,8 +24,8 @@ Draw the figure with different centroid setting
     const size_t ngt = 100;
     const bool use_sub_train_set = false;
     const size_t recall_test_size = 3;
-    const size_t nbits = 12;
-    */
+    const size_t nbits = 8;
+    
     
     /*
     const std::string dataset = "GIST1M";
@@ -39,7 +39,7 @@ Draw the figure with different centroid setting
     const size_t recall_test_size = 3;
     */
     
-    
+    /*
     const std::string dataset = "DEEP1M";
     const std::string model = "models_VQ";
     const size_t dimension = 256;
@@ -50,6 +50,7 @@ Draw the figure with different centroid setting
     const bool use_sub_train_set = false;
     const size_t recall_test_size = 3;
     const size_t nbits = 12;
+    */
     
     
 
