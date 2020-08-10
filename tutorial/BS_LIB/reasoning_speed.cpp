@@ -83,7 +83,7 @@ int main(){
     const size_t centroid_num2[4] = {100, 10, 100, 20};
     const size_t centroid_keep_space1[4] = {2, 50, 4, 50};
     const size_t centroid_keep_space2[4] = {50, 2, 50, 4};
-    const size_t repeat_time = 1000;
+    const size_t repeat_time = 10;
     record_output << "The repeat times for measuring is " << repeat_time << std::endl;
 
     time_recorder trecorder;
@@ -105,6 +105,7 @@ int main(){
         }
         std::string message = "Finished searching 1 layer:  ncentroids: " + std::to_string(centroid_num[i]) + " search_space: " + std::to_string(centroid_keep_space[i]);
         trecorder.record_time_usage(record_output, message);
+        PrintMessage("Finished 1 layer searching");
 
 
         std::vector<uint8_t> base_vector_codes(10000 * code_size);
@@ -121,6 +122,7 @@ int main(){
         message = "Finish computing PQ distance for 10000 vectors";
         trecorder.record_time_usage(record_output, message);
 
+        PrintMessage("Finished compute PQ distance");
 
         trecorder.reset();
         query = query_set.data();
@@ -134,6 +136,8 @@ int main(){
         }
         message = "Finished computing actual distance for 10000 vectors";
         trecorder.record_time_usage(record_output, message);
+
+        PrintMessage("Finished compute L2 distance");
     
     }
 
@@ -184,6 +188,7 @@ int main(){
         }
         std::string message = "Finished searching 2 layer:  ncentroids: " + std::to_string(centroid_num1[i]) + " " + std::to_string(centroid_num2[i]) + " search_space: " + std::to_string(centroid_keep_space1[i]) + " " + std::to_string(centroid_keep_space2[i]);
         trecorder.record_time_usage(record_output, message);
+        PrintMessage("Finished compute 2 layer distance");
     }
 }
 

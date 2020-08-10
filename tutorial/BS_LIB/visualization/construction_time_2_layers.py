@@ -1,7 +1,7 @@
 import numpy as np 
 import matplotlib.pyplot as plt
 
-dataset = "SIFT1M"
+dataset = "DEEP1M"
 title = dataset + " / Parameter Setting - Construction Time"
 filenames = ["/reasoning_models_VQ_VQ_10_50_10_50.txt", "/reasoning_models_VQ_VQ_10_50_60_100.txt", 
             "/reasoning_models_VQ_VQ_60_100_10_50.txt", "/reasoning_models_VQ_VQ_60_100_60_100.txt"]

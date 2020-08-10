@@ -1,7 +1,7 @@
 import numpy as np 
 import matplotlib.pyplot as plt
 
-dataset = "SIFT1M"
+dataset = "DEEP1M"
 title = dataset + " / Centroids - Visited Vectors"
 
 legends = ["1", "5", "10", "50", "80", "100"]
@@ -74,10 +74,10 @@ for i in range(len(recall_performance)):
     plt.plot(list(sorted_x_centroids), list(sorted_recall_visited_performance))
 
 
-my_y_ticks = np.arange(0, 120000, 10000)
+#my_y_ticks = np.arange(0, 120000, 10000)
 plt.xlabel("Centroid Setting")
 plt.ylabel("Visited Vectors")
-plt.yticks(my_y_ticks)
+#plt.yticks(my_y_ticks)
 plt.xticks(rotation=60)
 plt.legend(legends)
 plt.title(title)
