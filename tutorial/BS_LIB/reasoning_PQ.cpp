@@ -23,6 +23,7 @@ Draw the figure with different centroid setting
     const size_t ngt = 100;
     const bool use_sub_train_set = false;
     const size_t recall_test_size = 3;
+    const size_t nbits = 8;
     
     /*
     const std::string dataset = "GIST1M";
@@ -54,7 +55,7 @@ Draw the figure with different centroid setting
     const std::string path_base = "/home/y/yujianfu/ivf-hnsw/data/" + dataset + "/" + dataset +"_base.fvecs";
     const std::string path_gt = "/home/y/yujianfu/ivf-hnsw/data/" + dataset + "/" + dataset +"_groundtruth.ivecs";
     const std::string path_query = "/home/y/yujianfu/ivf-hnsw/data/" + dataset + "/" + dataset +"_query.fvecs";
-    std::string path_record = "/home/y/yujianfu/ivf-hnsw/" + model + "/" + dataset + "/reasoning_PQ.txt";
+    std::string path_record = "/home/y/yujianfu/ivf-hnsw/" + model + "/" + dataset + "/reasoning_PQ_" + std::to_string(nbits) + ".txt";
 
     std::vector<float> train_set(dimension * train_set_size);
     std::vector<float> base_set(dimension * base_set_size);
@@ -77,11 +78,9 @@ int main(){
     readXvec<float>(base_input, base_set.data(), dimension, base_set_size, false, false);
     readXvec<uint32_t>(gt_input, gt_set.data(), ngt, query_set_size, false, false);
     readXvec<float> (query_input, query_set.data(), dimension, query_set_size, false, false);
-
-    const size_t nbits_settings[2] = {8, 12};
     
     //Compute the sub train set for PQ training 
-    size_t sub_train_set_size = train_set_size / 10;
+    size_t sub_train_set_size = nbits == 8? train_set_size / 10 : train_set_size / 5;
     std::vector<idx_t> sub_assigned_ids(sub_train_set_size);
     std::vector<float> sub_assigned_dists(sub_train_set_size);
     std::vector<float> sub_train_set(dimension * sub_train_set_size);
@@ -148,132 +147,131 @@ int main(){
 
         size_t recall_num = 100;
         
-        for (size_t nbits_index = 0; nbits_index < 2; nbits_index++){
-            trecorder.reset();
-            std::cout << "Training PQ with " << nbits_settings[nbits_index] << " nbits" << std::endl;
-            faiss::ProductQuantizer PQ(dimension, 8, nbits_settings[nbits_index]);
-            record_output << "Training PQ with " << nbits_settings[nbits_index] << " nbits" << std::endl;
-            PQ.verbose = true;
-            PQ.train(sub_train_set_size, sub_train_set_residual.data());
-            size_t code_size = PQ.code_size;
-            std::vector<uint8_t> base_set_code(code_size * base_set_size);
-            PQ.compute_codes(base_set_residual.data(), base_set_code.data(), base_set_size);
-            trecorder.record_time_usage(record_output, "Finished training PQ and compute codes: ");
 
-            PrintMessage("Analysing PQ loss to recall");
-            std::vector<size_t> query_max_centroids(query_set_size);
-            std::vector<std::vector<size_t>> result_distributions(query_set_size);
-            std::vector<std::vector<size_t>> result_PQ_distributions(query_set_size);
-            std::vector<std::vector<size_t>> result_visited_vectors(query_set_size);
+        trecorder.reset();
+        std::cout << "Training PQ with " << nbits << " nbits" << std::endl;
+        faiss::ProductQuantizer PQ(dimension, 8, nbits);
+        record_output << "Training PQ with " << nbits << " nbits" << std::endl;
+        PQ.verbose = true;
+        PQ.train(sub_train_set_size, sub_train_set_residual.data());
+        size_t code_size = PQ.code_size;
+        std::vector<uint8_t> base_set_code(code_size * base_set_size);
+        PQ.compute_codes(base_set_residual.data(), base_set_code.data(), base_set_size);
+        trecorder.record_time_usage(record_output, "Finished training PQ and compute codes: ");
 
-            trecorder.reset();
+        PrintMessage("Analysing PQ loss to recall");
+        std::vector<size_t> query_max_centroids(query_set_size);
+        std::vector<std::vector<size_t>> result_distributions(query_set_size);
+        std::vector<std::vector<size_t>> result_PQ_distributions(query_set_size);
+        std::vector<std::vector<size_t>> result_visited_vectors(query_set_size);
+
+        trecorder.reset();
 #pragma omp parallel for
-            for (size_t i = 0; i < query_set_size; i++){
-                std::vector<size_t> result_distribution;
-                std::vector<size_t> result_visited;
-                std::vector<size_t> result_PQ_distribution;
+        for (size_t i = 0; i < query_set_size; i++){
+            std::vector<size_t> result_distribution;
+            std::vector<size_t> result_visited;
+            std::vector<size_t> result_PQ_distribution;
 
-                std::vector<idx_t> centroids_ids(centroid_num);
-                std::vector<float> centroids_dists(centroid_num);
+            std::vector<idx_t> centroids_ids(centroid_num);
+            std::vector<float> centroids_dists(centroid_num);
 
-                const float * query = query_set.data() + i * dimension;
-                index.search(1, query, centroid_num, centroids_dists.data(), centroids_ids.data());
+            const float * query = query_set.data() + i * dimension;
+            index.search(1, query, centroid_num, centroids_dists.data(), centroids_ids.data());
 
-                size_t max_centroids = 0;
-                std::unordered_set<idx_t> gt_test_set;
-                for (size_t j = 0; j < recall_num; j++){gt_test_set.insert(gt_set[ i * ngt + j]);}
+            size_t max_centroids = 0;
+            std::unordered_set<idx_t> gt_test_set;
+            for (size_t j = 0; j < recall_num; j++){gt_test_set.insert(gt_set[ i * ngt + j]);}
 
-                std::vector<idx_t> heap_ids(recall_num);
-                std::vector<float> heap_dists(recall_num);
-                faiss::maxheap_heapify(recall_num, heap_dists.data(), heap_ids.data());
-                
-                for (size_t j = 0; j < centroid_num; j++){
-                    idx_t centroid_id = centroids_ids[j];
+            std::vector<idx_t> heap_ids(recall_num);
+            std::vector<float> heap_dists(recall_num);
+            faiss::maxheap_heapify(recall_num, heap_dists.data(), heap_ids.data());
+            
+            for (size_t j = 0; j < centroid_num; j++){
+                idx_t centroid_id = centroids_ids[j];
 
-                    result_distribution.push_back(j == 0? 0 : result_distribution[j-1]);
-                    result_PQ_distribution.push_back(0);
-                    result_visited.push_back(j == 0? assigned_set[centroid_id].size() : result_visited[j-1] + assigned_set[centroid_id].size());
+                result_distribution.push_back(j == 0? 0 : result_distribution[j-1]);
+                result_PQ_distribution.push_back(0);
+                result_visited.push_back(j == 0? assigned_set[centroid_id].size() : result_visited[j-1] + assigned_set[centroid_id].size());
 
-                    for (size_t k = 0; k < assigned_set[centroid_id].size(); k++){
+                for (size_t k = 0; k < assigned_set[centroid_id].size(); k++){
 
-                        idx_t base_id = assigned_set[centroid_id][k];
-                        std::vector<float> decoded_residuals(dimension);
-                        PQ.decode(base_set_code.data() + base_id * code_size, decoded_residuals.data());
-                        std::vector<float> reconstructed_vector(dimension);
-                        faiss::fvec_madd(dimension, decoded_residuals.data(), 1.0, index.xb.data() + centroid_id*dimension, reconstructed_vector.data());
-                        std::vector<float> query_base_residual_vector(dimension);
-                        faiss::fvec_madd(dimension, reconstructed_vector.data(), -1.0, query, query_base_residual_vector.data());
-                        float base_norm = faiss::fvec_norm_L2sqr(query_base_residual_vector.data(), dimension);
-                        if (base_norm < heap_dists[0]){
-                            faiss::maxheap_pop(recall_num, heap_dists.data(), heap_ids.data());
-                            faiss::maxheap_push(recall_num, heap_dists.data(), heap_ids.data(), base_norm, base_id);
-                        }
-                        if (gt_test_set.count(assigned_set[centroid_id][k]) != 0){
-                            result_distribution[j] += 1;
-                            std::cout << base_norm << " " << std::endl;
-                            for (size_t temp = 0; temp < recall_num; temp++){
-                                std::cout << heap_ids[temp] << " " << heap_dists[temp] << " "; 
-                            }
-                            std::cout << std::endl;
-                        }
+                    idx_t base_id = assigned_set[centroid_id][k];
+                    std::vector<float> decoded_residuals(dimension);
+                    PQ.decode(base_set_code.data() + base_id * code_size, decoded_residuals.data());
+                    std::vector<float> reconstructed_vector(dimension);
+                    faiss::fvec_madd(dimension, decoded_residuals.data(), 1.0, index.xb.data() + centroid_id*dimension, reconstructed_vector.data());
+                    std::vector<float> query_base_residual_vector(dimension);
+                    faiss::fvec_madd(dimension, reconstructed_vector.data(), -1.0, query, query_base_residual_vector.data());
+                    float base_norm = faiss::fvec_norm_L2sqr(query_base_residual_vector.data(), dimension);
+                    if (base_norm < heap_dists[0]){
+                        faiss::maxheap_pop(recall_num, heap_dists.data(), heap_ids.data());
+                        faiss::maxheap_push(recall_num, heap_dists.data(), heap_ids.data(), base_norm, base_id);
                     }
-
-                    for (size_t k = 0; k < recall_num; k++){
-                        if (gt_test_set.count(heap_ids[k]) != 0){
-                            result_PQ_distribution[j] += 1;
+                    if (gt_test_set.count(assigned_set[centroid_id][k]) != 0){
+                        result_distribution[j] += 1;
+                        std::cout << base_norm << " " << std::endl;
+                        for (size_t temp = 0; temp < recall_num; temp++){
+                            std::cout << heap_ids[temp] << " " << heap_dists[temp] << " "; 
                         }
-                    }
-
-                    if (result_distribution[j] >= recall_num){
-                        max_centroids = j + 1;
-                        break;
+                        std::cout << std::endl;
                     }
                 }
-                query_max_centroids[i] = max_centroids;
 
-                assert(result_visited.size() == max_centroids);
-                assert(result_distribution.size() == max_centroids);
-                assert(result_PQ_distribution.size() == max_centroids);
+                for (size_t k = 0; k < recall_num; k++){
+                    if (gt_test_set.count(heap_ids[k]) != 0){
+                        result_PQ_distribution[j] += 1;
+                    }
+                }
 
-                result_distributions[i].resize(max_centroids);
-                result_PQ_distributions[i].resize(max_centroids);
-                result_visited_vectors[i].resize(max_centroids);
-
-                for(size_t j = 0; j < max_centroids; j++){
-                    result_visited_vectors[i][j] = result_visited[j];
-                    result_PQ_distributions[i][j] = result_PQ_distribution[j];
-                    result_distributions[i][j] = result_distribution[j];
+                if (result_distribution[j] >= recall_num){
+                    max_centroids = j + 1;
+                    break;
                 }
             }
+            query_max_centroids[i] = max_centroids;
 
-            size_t avg_max_centroids = 0;
-            for (size_t i = 0; i < query_set_size; i++){
-                record_output << "Q: " << i << std::endl;
+            assert(result_visited.size() == max_centroids);
+            assert(result_distribution.size() == max_centroids);
+            assert(result_PQ_distribution.size() == max_centroids);
 
-                size_t max_centroids = query_max_centroids[i];
-                avg_max_centroids += max_centroids;
-                record_output << "MC: " << max_centroids << std::endl;
+            result_distributions[i].resize(max_centroids);
+            result_PQ_distributions[i].resize(max_centroids);
+            result_visited_vectors[i].resize(max_centroids);
 
-                for (size_t j = 0; j < max_centroids; j++){
-                    record_output << result_distributions[i][j] << " ";
-                }
-                record_output << std::endl;
-
-                for (size_t j = 0; j < max_centroids; j++){
-                    record_output << result_PQ_distributions[i][j] << " ";
-                }
-                record_output << std::endl;
-
-                for (size_t j = 0; j < max_centroids; j++){
-                    record_output << result_visited_vectors[i][j] << " ";
-                }
-                record_output << std::endl;
+            for(size_t j = 0; j < max_centroids; j++){
+                result_visited_vectors[i][j] = result_visited[j];
+                result_PQ_distributions[i][j] = result_PQ_distribution[j];
+                result_distributions[i][j] = result_distribution[j];
             }
-
-            record_output << "The average max centroids " << float(avg_max_centroids) / query_set_size << std::endl;
-            trecorder.record_time_usage(record_output, "Finished result analysis: ");
-            trecorder.print_time_usage("Finished result analysis: ");
         }
+
+        size_t avg_max_centroids = 0;
+        for (size_t i = 0; i < query_set_size; i++){
+            record_output << "Q: " << i << std::endl;
+
+            size_t max_centroids = query_max_centroids[i];
+            avg_max_centroids += max_centroids;
+            record_output << "MC: " << max_centroids << std::endl;
+
+            for (size_t j = 0; j < max_centroids; j++){
+                record_output << result_distributions[i][j] << " ";
+            }
+            record_output << std::endl;
+
+            for (size_t j = 0; j < max_centroids; j++){
+                record_output << result_PQ_distributions[i][j] << " ";
+            }
+            record_output << std::endl;
+
+            for (size_t j = 0; j < max_centroids; j++){
+                record_output << result_visited_vectors[i][j] << " ";
+            }
+            record_output << std::endl;
+        }
+
+        record_output << "The average max centroids " << float(avg_max_centroids) / query_set_size << std::endl;
+        trecorder.record_time_usage(record_output, "Finished result analysis: ");
+        trecorder.print_time_usage("Finished result analysis: ");
     }
 }
         
