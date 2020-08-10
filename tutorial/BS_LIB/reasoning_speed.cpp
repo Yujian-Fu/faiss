@@ -162,6 +162,7 @@ int main(){
         std::vector<faiss::Clustering *> clus2(centroid_num1[i]);
         std::vector<faiss::IndexFlatL2> index2(centroid_num1[i]);
 
+#pragma omp parallel for
         for (size_t j = 0; j < centroid_num1[i]; j++){
             size_t sub_train_set_size = train_set_second[j].size() / dimension;
             clus2[j] = new faiss::Clustering(dimension, centroid_num2[i]);

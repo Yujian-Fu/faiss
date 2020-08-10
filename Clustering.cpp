@@ -24,7 +24,7 @@
 namespace faiss {
 
 ClusteringParameters::ClusteringParameters ():
-    niter(20),
+    niter(10),
     nredo(1),
     verbose(false),
     spherical(false),
