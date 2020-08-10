@@ -71,7 +71,7 @@ typedef faiss::Index::idx_t idx_t;
 using namespace bslib;
 int main(){
     PrepareFolder((char *) ("/home/y/yujianfu/ivf-hnsw/" + model + "/" + dataset).c_str());
-    
+    record_output.open(path_record, std::ios::out);
     readXvec<float>(train_input, train_set.data(), dimension, train_set_size, false, false);
     readXvec<float>(base_input, base_set.data(), dimension, base_set_size, false, false);
     readXvec<uint32_t>(gt_input, gt_set.data(), ngt, query_set_size, false, false);
