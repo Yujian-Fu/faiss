@@ -211,11 +211,6 @@ int main(){
                     }
                     if (gt_test_set.count(assigned_set[centroid_id][k]) != 0){
                         result_distribution[j] += 1;
-                        std::cout << base_norm << " " << std::endl;
-                        for (size_t temp = 0; temp < recall_num; temp++){
-                            std::cout << heap_ids[temp] << " " << heap_dists[temp] << " "; 
-                        }
-                        std::cout << std::endl;
                     }
                 }
 
