@@ -83,7 +83,7 @@ int main(){
     const size_t centroid_num2[4] = {100, 10, 100, 20};
     const size_t centroid_keep_space1[4] = {2, 50, 4, 50};
     const size_t centroid_keep_space2[4] = {50, 2, 50, 4};
-    const size_t repeat_time = 10;
+    const size_t repeat_time = 1000;
     record_output << "The repeat times for measuring is " << repeat_time << std::endl;
 
     time_recorder trecorder;
@@ -99,10 +99,8 @@ int main(){
         clus.train(train_set_size, train_set.data(), index);
 
         trecorder.reset();
-        for (size_t repeat = 0; repeat < repeat_time; repeat++){
-            std::vector<idx_t> base_assigned_ids(base_set_size * centroid_keep_space[i]); std::vector<float> base_assigned_dists(base_set_size * centroid_keep_space[i]);
-            index.search(base_set_size, base_set.data(), centroid_keep_space[i], base_assigned_dists.data(), base_assigned_ids.data());
-        }
+        std::vector<idx_t> base_assigned_ids(base_set_size * centroid_keep_space[i]); std::vector<float> base_assigned_dists(base_set_size * centroid_keep_space[i]);
+        index.search(base_set_size, base_set.data(), centroid_keep_space[i], base_assigned_dists.data(), base_assigned_ids.data());
         std::string message = "Finished searching 1 layer:  ncentroids: " + std::to_string(centroid_num[i]) + " search_space: " + std::to_string(centroid_keep_space[i]);
         trecorder.record_time_usage(record_output, message);
         PrintMessage("Finished 1 layer searching");
@@ -127,6 +125,7 @@ int main(){
         trecorder.reset();
         query = query_set.data();
         for (size_t repeat = 0; repeat < repeat_time; repeat++){
+#pragma omp parallel for
             for (size_t j = 0; j < 10000; j++){
                 std::vector<float> residual(dimension);
                 const float * base_vector = base_set.data() + j * dimension;
@@ -174,17 +173,16 @@ int main(){
         trecorder.reset();
         std::vector<idx_t> base_assigned_id_1st(base_set_size * centroid_keep_space1[i]);
         std::vector<float> base_assigned_dist_1st(base_set_size * centroid_keep_space1[i]);
-        for (size_t repeat = 0; repeat < repeat_time; repeat++){
-            index1.search(base_set_size, base_set.data(), centroid_keep_space1[i], base_assigned_dist_1st.data(), base_assigned_id_1st.data());
-            std::vector<idx_t> base_assigned_ids_2nd(base_set_size * centroid_keep_space1[i] * centroid_keep_space2[i]);
-            std::vector<float> base_assigned_dists_2nd(base_set_size * centroid_keep_space1[i] * centroid_keep_space2[i]);
+
+        index1.search(base_set_size, base_set.data(), centroid_keep_space1[i], base_assigned_dist_1st.data(), base_assigned_id_1st.data());
+        std::vector<idx_t> base_assigned_ids_2nd(base_set_size * centroid_keep_space1[i] * centroid_keep_space2[i]);
+        std::vector<float> base_assigned_dists_2nd(base_set_size * centroid_keep_space1[i] * centroid_keep_space2[i]);
 #pragma omp parallel for
-            for (size_t j = 0; j < base_set_size; j++){
-                const float * base_vector = base_set.data() + j * dimension;
-                for (size_t k = 0; k < centroid_keep_space1[i]; k++){
-                    const size_t search_id = base_assigned_id_1st[j * centroid_keep_space1[i] + k];
-                    index2[search_id].search(1, base_vector, centroid_keep_space2[i], base_assigned_dists_2nd.data() + j * centroid_keep_space1[i] * centroid_keep_space2[i] + k * centroid_keep_space2[i], base_assigned_ids_2nd.data() + j * centroid_keep_space1[i] * centroid_keep_space2[i] + k * centroid_keep_space2[i]);
-                }
+        for (size_t j = 0; j < base_set_size; j++){
+            const float * base_vector = base_set.data() + j * dimension;
+            for (size_t k = 0; k < centroid_keep_space1[i]; k++){
+                const size_t search_id = base_assigned_id_1st[j * centroid_keep_space1[i] + k];
+                index2[search_id].search(1, base_vector, centroid_keep_space2[i], base_assigned_dists_2nd.data() + j * centroid_keep_space1[i] * centroid_keep_space2[i] + k * centroid_keep_space2[i], base_assigned_ids_2nd.data() + j * centroid_keep_space1[i] * centroid_keep_space2[i] + k * centroid_keep_space2[i]);
             }
         }
         std::string message = "Finished searching 2 layer:  ncentroids: " + std::to_string(centroid_num1[i]) + " " + std::to_string(centroid_num2[i]) + " search_space: " + std::to_string(centroid_keep_space1[i]) + " " + std::to_string(centroid_keep_space2[i]);
