@@ -157,7 +157,7 @@ int main(){
             PQ.train(sub_train_set_size, sub_train_set_residual.data());
             size_t code_size = PQ.code_size;
             std::vector<uint8_t> base_set_code(code_size * base_set_size);
-            PQ.compute_code(base_set_residual.data(), base_set_code.data());
+            PQ.compute_codes(base_set_residual.data(), base_set_code.data(), base_set_size);
             trecorder.record_time_usage(record_output, "Finished training PQ and compute codes: ");
 
             PrintMessage("Analysing PQ loss to recall");
@@ -167,7 +167,7 @@ int main(){
             std::vector<std::vector<size_t>> result_visited_vectors(query_set_size);
 
             trecorder.reset();
-//#pragma omp parallel for
+#pragma omp parallel for
             for (size_t i = 0; i < query_set_size; i++){
                 std::vector<size_t> result_distribution;
                 std::vector<size_t> result_visited;
