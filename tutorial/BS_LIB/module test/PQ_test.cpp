@@ -25,13 +25,16 @@ int main(){
     size_t k = 10;
     time_recorder Trecorder;
 
-    
     Trecorder.reset();
     faiss::IndexFlatL2 index_flat(dimension);
     std::vector<idx_t> labels(k * nq);
     std::vector<float> dists(k * nq);
+    Trecorder.print_time_usage("Training flat index");
+    
+
     index_flat.add(nb, xb);
     index_flat.search(nq, xq, k, dists.data(), labels.data());
+    Trecorder.print_time_usage("Searching for flat index");
 
     size_t nlist = 100;
     size_t M = 8;
@@ -42,10 +45,13 @@ int main(){
     index_pq.verbose = true;
     index_pq.train(nb / 10, xb);
     index_pq.add(nb, xb);
+    Trecorder.print_time_usage("Training PQ index");
 
 
     index_pq.nprobe = 10;
     index_pq.search(nq, xq, k, dists.data(), labels.data());
+    Trecorder.print_time_usage("Searching for PQ index");
+
     size_t sum_correctness = 0;
     for (size_t i = 0; i < nq; i++){
         std::unordered_set<idx_t> gt_set;
