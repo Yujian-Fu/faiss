@@ -9,7 +9,7 @@ using namespace bslib;
 int main(){
 
     int dimension = 128;                            // dimension
-    int nb = 1000000;                       // database size
+    int nb = 100000;                       // database size
     int nq = 1000;                        // nb of queries
     float *xb = new float[dimension * nb];
     float *xq = new float[dimension * nq];
