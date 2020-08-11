@@ -23,7 +23,7 @@ int main(){
     }
 
     size_t k = 10;
-    time_recorder Trecorder;
+    time_recorder Trecorder = time_recorder();
 
     Trecorder.reset();
     faiss::IndexFlatL2 index_flat(dimension);
@@ -49,7 +49,7 @@ int main(){
 
 
     index_pq.nprobe = 10;
-    index_pq.search(nq, xq, k, dists.data(), labels.data());
+    index_pq.search(nq, xq, k, pq_dists.data(), pq_labels.data());
     Trecorder.print_time_usage("Searching for PQ index");
 
     size_t sum_correctness = 0;
