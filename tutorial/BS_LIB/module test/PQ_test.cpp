@@ -1,5 +1,6 @@
 #include<faiss/IndexFlat.h>
 #include<faiss/IndexIVFPQ.h>
+#include <faiss/IndexHNSW.h>
 #include <unordered_set>
 #include "../utils/utils.h"
 
@@ -36,6 +37,31 @@ int main(){
     index_flat.search(nq, xq, k, dists.data(), labels.data());
     Trecorder.print_time_usage("Searching for flat index");
 
+    size_t M_HNSW = 100;
+    std::vector<idx_t> HNSW_labels(k * nq);
+    std::vector<float> HNSW_dists(k * nq);
+    faiss::IndexHNSWFlat index_HNSW(dimension, M_HNSW);
+    
+    index_HNSW.train(nb / 10, xb);
+    index_HNSW.add(nb, xb);
+
+    index_HNSW.search(nq, xq, k, HNSW_dists.data(), HNSW_labels.data());
+    size_t sum_correctness = 0;
+    for (size_t i = 0; i < nq; i++){
+        std::unordered_set<idx_t> gt_set;
+        for (size_t j = 0; j < k; j++){
+            gt_set.insert(labels[i * k + j]);
+        }
+        for (size_t j = 0; j < k; j++){
+            if (gt_set.count(HNSW_labels[i * k + j]) != 0){
+                sum_correctness ++;
+            }
+        }
+    }
+    std::cout << "The recall for HNSW k = " << k << " is: " << float(sum_correctness) / (k * nq) << std::endl; 
+
+
+
     size_t nlist = 100;
     size_t M = 8;
     std::vector<idx_t> pq_labels(k * nq);
@@ -52,7 +78,7 @@ int main(){
     index_pq.search(nq, xq, k, pq_dists.data(), pq_labels.data());
     Trecorder.print_time_usage("Searching for PQ index");
 
-    size_t sum_correctness = 0;
+    sum_correctness = 0;
     for (size_t i = 0; i < nq; i++){
         std::unordered_set<idx_t> gt_set;
         for (size_t j = 0; j < k; j++){
@@ -65,6 +91,6 @@ int main(){
         }
     }
 
-    std::cout << "The recall for k = " << k << " is: " << float(sum_correctness) / (k * nq) << std::endl; 
+    std::cout << "The recall for PQ k = " << k << " is: " << float(sum_correctness) / (k * nq) << std::endl; 
 
 }
