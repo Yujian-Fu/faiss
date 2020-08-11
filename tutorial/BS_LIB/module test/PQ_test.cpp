@@ -22,7 +22,7 @@ int main(){
         xq[dimension * i] += i / 1000.;
     }
 
-    size_t k = 10;
+    size_t k = 100;
     time_recorder Trecorder = time_recorder();
 
     Trecorder.reset();
