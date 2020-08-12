@@ -94,6 +94,16 @@ int main(){
     std::cout << "The recall for PQ k = " << k << " is: " << float(sum_correctness) / (k * nq) << std::endl; 
 
 
+    faiss::ClusteringParameters CP; // Try different settings of CP
+    CP.niter = 40;
+    std::vector<float> centroids(dimension * nlist);
+    faiss::Clustering clus(dimension, nlist);
+    faiss::IndexFlatL2 index_assign(dimension);
+    clus.train(nb / 10, xb, index_assign);
     
+
+
+
+
 
 }

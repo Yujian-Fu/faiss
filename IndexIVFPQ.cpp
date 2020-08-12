@@ -844,7 +844,7 @@ struct IVFPQScannerT: QueryTables {
     IVFPQScannerT (const IndexIVFPQ & ivfpq, const IVFSearchParameters *params):
         QueryTables (ivfpq, params)
     {
-        FAISS_THROW_IF_NOT (pq.nbits == 8);
+        //FAISS_THROW_IF_NOT (pq.nbits == 8);
         assert(METRIC_TYPE == metric_type);
     }
 
