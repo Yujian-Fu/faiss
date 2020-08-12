@@ -67,7 +67,7 @@ int main(){
     std::vector<idx_t> pq_labels(k * nq);
     std::vector<float> pq_dists(k * nq);
     faiss::IndexFlatL2 quantizer(dimension);
-    faiss::IndexIVFPQ index_pq(&quantizer, dimension, nlist, M, 8);
+    faiss::IndexIVFPQ index_pq(&quantizer, dimension, nlist, M, 10);
     index_pq.verbose = true;
     index_pq.train(nb / 10, xb);
     index_pq.add(nb, xb);
