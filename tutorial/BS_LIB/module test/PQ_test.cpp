@@ -93,4 +93,7 @@ int main(){
 
     std::cout << "The recall for PQ k = " << k << " is: " << float(sum_correctness) / (k * nq) << std::endl; 
 
+
+    
+
 }
