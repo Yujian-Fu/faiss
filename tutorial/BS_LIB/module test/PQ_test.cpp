@@ -9,9 +9,17 @@ typedef faiss::Index::idx_t idx_t;
 using namespace bslib;
 int main(){
 
-    int dimension = 128;                            // dimension
+    std::vector <size_t> test_vector(100, 1);
+    PrintMessage("The otigin vector");
+    for (size_t i = 0; i < 100; i++){ std::cout << test_vector[i] << " ";} std::cout << std::endl;
+    test_vector.resize(1000);
+    PrintMessage("The resized vector");
+    for (size_t i = 0; i < 1000; i++){ std::cout << test_vector[i] << " ";} std::cout << std::endl;
+    exit(0);
+
+    int dimension = 128;                   // dimension
     int nb = 100000;                       // database size
-    int nq = 1000;                        // nb of queries
+    int nq = 1000;                         // nb of queries
     float *xb = new float[dimension * nb];
     float *xq = new float[dimension * nq];
     for(int i = 0; i < nb; i++) {
@@ -103,7 +111,18 @@ int main(){
     clus.train(nb / 10, xb, index_assign);
     
     faiss::ProductQuantizer PQ(dimension, M, nbits);
-    
+    std::vector<idx_t> base_labels(nb);
+    std::vector<float> base_dists(nb);
+
+    index_assign.search(nb, xb, 1, base_dists.data(), base_labels.data());
+
+    std::vector<std::vector<idx_t>> inverted_index(nlist);
+    // Build inverted index list
+    std::vector <size_t> inverted_index_accumulation(nlist, 0);
+    for (size_t i = 0; i < nb; i++){
+        inverted_index_accumulation[base_labels[i]] ++;
+    }
+
 
 
 
