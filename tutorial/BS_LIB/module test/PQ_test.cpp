@@ -6,15 +6,18 @@
 
 typedef faiss::Index::idx_t idx_t;
 
+/**
+ * The result of the 
+ * */
 using namespace bslib;
 int main(){
 
     std::vector <size_t> test_vector(100, 1);
     PrintMessage("The otigin vector");
     for (size_t i = 0; i < 100; i++){ std::cout << test_vector[i] << " ";} std::cout << std::endl;
-    test_vector.resize(1000, 2);
+    test_vector.resize(50, 2);
     PrintMessage("The resized vector");
-    for (size_t i = 0; i < 1000; i++){ std::cout << test_vector[i] << " ";} std::cout << std::endl;
+    for (size_t i = 0; i < 50; i++){ std::cout << test_vector[i] << " ";} std::cout << std::endl;
     exit(0);
 
     int dimension = 128;                   // dimension
