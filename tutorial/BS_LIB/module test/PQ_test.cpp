@@ -64,10 +64,11 @@ int main(){
 
     size_t nlist = 100;
     size_t M = 8;
+    size_t nbits = 10;
     std::vector<idx_t> pq_labels(k * nq);
     std::vector<float> pq_dists(k * nq);
     faiss::IndexFlatL2 quantizer(dimension);
-    faiss::IndexIVFPQ index_pq(&quantizer, dimension, nlist, M, 10);
+    faiss::IndexIVFPQ index_pq(&quantizer, dimension, nlist, M, nbits);
     index_pq.verbose = true;
     index_pq.train(nb / 10, xb);
     index_pq.add(nb, xb);
@@ -100,6 +101,8 @@ int main(){
     faiss::Clustering clus(dimension, nlist);
     faiss::IndexFlatL2 index_assign(dimension);
     clus.train(nb / 10, xb, index_assign);
+    
+    faiss::ProductQuantizer PQ(dimension, M, nbits);
     
 
 
