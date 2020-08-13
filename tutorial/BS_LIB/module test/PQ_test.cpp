@@ -208,6 +208,10 @@ int main(){
                     sum_prod_distance += distance_table[l * M + base_code[l]];
                 }
                 sum_distance = qc_dist + b_norm - c_norm - 2 * sum_prod_distance;
+                std::vector <float> qb_residual(dimension);
+                faiss::fvec_madd(1, query, -1.0, xb + sequence_id + dimension, qb_residual.data());
+                float qb_dist = faiss::fvec_norm_L2sqr(qb_residual.data(), dimension);
+                std::cout << qc_dist << " " << b_norm << " " << c_norm << " " << sum_prod_distance << " " << qb_dist << std::endl;
                 if (sum_distance < result_dists[0]){
                     faiss::maxheap_pop(k_result, result_dists.data(), result_labels.data());
                     faiss::maxheap_push(k_result, result_dists.data(), result_labels.data(), sum_distance, sequence_id);
