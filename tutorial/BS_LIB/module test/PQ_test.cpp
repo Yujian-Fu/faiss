@@ -105,14 +105,6 @@ int main(){
     }
 
     std::cout << "The recall for PQ k = " << k_result << " is: " << float(sum_correctness) / (k_result * nq) << std::endl; 
-    for (size_t i = 0; i < nq; i++){
-        for (size_t j = 0; j < k_result; j++){
-            float actual_dist = faiss::fvec_L2sqr(xq + i * dimension, xb + pq_labels[i * k_result + j] * dimension, dimension);
-            std::cout << actual_dist << " " << pq_dists[i * k_result + j] << "         ";
-        }
-    }
-    
-    exit(0);
     // My implementation of IVFPQ
     
     
