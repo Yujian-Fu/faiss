@@ -73,7 +73,7 @@ int main(){
         }
     }
     std::cout << "The recall for HNSW k = " << k_result << " is: " << float(sum_correctness) / (k_result * nq) << std::endl; 
-
+        */
 
     std::vector<idx_t> pq_labels(k_result * nq);
     std::vector<float> pq_dists(k_result * nq);
@@ -83,6 +83,7 @@ int main(){
     index_pq.train(nb / 10, xb);
     index_pq.add(nb, xb);
     Trecorder.print_time_usage("Training PQ index");
+    
 
 
     index_pq.nprobe = nprobe;
@@ -103,8 +104,8 @@ int main(){
     }
 
     std::cout << "The recall for PQ k = " << k_result << " is: " << float(sum_correctness) / (k_result * nq) << std::endl; 
-    */
 
+    exit(0);
     // My implementation of IVFPQ
     faiss::ClusteringParameters CP; // Try different settings of CP
     CP.niter = 40;
