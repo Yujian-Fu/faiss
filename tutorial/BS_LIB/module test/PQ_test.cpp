@@ -148,13 +148,18 @@ int main(){
     }
     for (size_t i = 0; i < 100; i++){
         for (size_t j = 0; j < dimension; j++){
-            std::cout << residual[i * dimension + j] << " ";
-        }
-        std::cout << std::endl;
-        for (size_t j = 0; j < dimension; j++){
             std::cout << xb[i * dimension + j] << " ";
         }
         std::cout << std::endl;
+                for (size_t j = 0; j < dimension; j++){
+            std::cout << index_assign.xb[i * dimension + j] << " ";
+        }
+        std::cout << std::endl;
+        for (size_t j = 0; j < dimension; j++){
+            std::cout << residual[i * dimension + j] << " ";
+        }
+        std::cout << std::endl;
+
     }
     exit(0);
     PQ.verbose = true;
