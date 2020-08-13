@@ -79,6 +79,7 @@ int main(){
     std::vector<float> pq_dists(k_result * nq);
     faiss::IndexFlatL2 quantizer(dimension);
     faiss::IndexIVFPQ index_pq(&quantizer, dimension, nlist, M, nbits);
+    size_t ksub = index_pq.pq.ksub;
     index_pq.verbose = true;
     index_pq.train(nb / 10, xb);
     index_pq.add(nb, xb);
@@ -113,60 +114,37 @@ int main(){
     
     exit(0);
     // My implementation of IVFPQ
-    faiss::ClusteringParameters CP; // Try different settings of CP
-    CP.niter = 40;
-    faiss::Clustering clus(dimension, nlist, CP);
-    faiss::IndexFlatL2 index_assign(dimension);
-    clus.verbose =  true;
-    clus.train(nb / 10, xb, index_assign);
     
-    faiss::ProductQuantizer PQ(dimension, M, nbits);
-    size_t code_size = PQ.code_size;
+    
+    size_t code_size = index_pq.pq.code_size;
     std::vector<idx_t> base_labels(nb);
     std::vector<float> base_dists(nb);
 
     Trecorder.reset();
-    index_assign.search(nb, xb, 1, base_dists.data(), base_labels.data());
+    index_pq.quantizer->search(nb, xb, 1, base_dists.data(), base_labels.data());
     Trecorder.print_time_usage("Assigned the base vectors");
 
     std::vector<std::vector<idx_t>> inverted_index(nlist);
     // Build inverted index list
-    std::vector <size_t> inverted_index_accumulation(nlist, 0);
     for (size_t i = 0; i < nb; i++){
-        inverted_index_accumulation[base_labels[i]] ++;
-    }
-    for (size_t i = 0; i < nlist; i++){
-        inverted_index[i].resize(inverted_index_accumulation[i]);
-    }
-    std::vector<size_t> inverted_index_pointer(nlist, 0);
-    
-    for (size_t i = 0; i < nb; i++){
-        size_t group_label = base_labels[i];
-        inverted_index[group_label][inverted_index_pointer[group_label]] = i;
-        inverted_index_pointer[group_label] ++;
+        inverted_index[base_labels[i]].push_back(i);
     }
     Trecorder.print_time_usage("Constructed Inverted Index");
 
     // Compute the residual and encode the residual
     std::vector<float> residual(dimension * nb);
-#pragma omp parallel for
-    for (size_t i = 0; i < nb; i++){
-        idx_t group_label = base_labels[i];
-        faiss::fvec_madd(dimension, xb + i * dimension, -1.0, index_assign.xb.data() + group_label * dimension, residual.data() + i * dimension); 
-    }
-
-    PQ.verbose = true;
-    PQ.train(nb / 10, residual.data());
-    Trecorder.print_time_usage("Trained PQ");
+    index_pq.quantizer->compute_residual_n(nb, xb, residual.data(), base_labels.data());
 
     std::vector<uint8_t> residual_code(code_size * nb);
-    PQ.compute_codes(residual.data(), residual_code.data(), nb);
+    index_pq.pq.compute_codes(residual.data(), residual_code.data(), nb);
+
+    std::vector<float> centroids(dimension * nlist);
     std::vector<float> centroid_norm(nlist, 0);
     std::vector<float> base_norm(nb, 0);
 
-    faiss::fvec_norms_L2sqr(centroid_norm.data(), index_assign.xb.data(), dimension, nlist);
+    index_pq.quantizer->reconstruct_n(0, nlist, centroids.data());
+    faiss::fvec_norms_L2sqr(centroid_norm.data(), centroids.data(), dimension, nlist);
     faiss::fvec_norms_L2sqr(base_norm.data(), xb, dimension, nb);
-
 
     /**
      * The size for one distance table is M * ksub 
@@ -190,11 +168,11 @@ int main(){
 
         std::vector <idx_t> query_labels(nprobe);
         std::vector <float> query_dists(nprobe);
-        std::vector<float> distance_table(PQ.M * PQ.ksub);
-        PQ.compute_inner_prod_table(query, distance_table.data());
+        std::vector<float> distance_table(M * ksub);
+        index_pq.pq.compute_inner_prod_table(query, distance_table.data());
 
         faiss::maxheap_heapify(k_result, result_dists.data(), result_labels.data());
-        index_assign.search(1, query, nprobe, query_dists.data(), query_labels.data());
+        index_pq.quantizer->search(1, query, nprobe, query_dists.data(), query_labels.data());
         for (size_t j = 0; j < nprobe; j++){
             size_t group_label = query_labels[j];
             size_t group_size = inverted_index[group_label].size();
@@ -210,11 +188,17 @@ int main(){
                 uint8_t * base_code = residual_code.data() + sequence_id * code_size;
 
                 for (size_t l = 0; l < M; l++){
-                    sum_prod_distance += distance_table[l * PQ.ksub + base_code[l]];
+                    sum_prod_distance += distance_table[l * ksub + base_code[l]];
                 }
                 sum_distance = qc_dist + b_norm - c_norm - 2 * sum_prod_distance;
 
+                for (size_t temp = 0; temp < k_result; temp++){
+                    if (sequence_id == pq_labels[i * k_result + temp]){
+                        std::cout << sum_distance << " " << pq_dists[i * k_result + temp] << " " << faiss::fvec_L2sqr(query, xb + sequence_id * dimension, dimension) << std::endl;
+                    }
+                }
 
+                /*
                 for (size_t l = 0; l < code_size; l++){std::cout << (float) base_code[l] << " ";} std::cout << std::endl;
                 std::cout << "Recording data" << qc_dist << " " << b_norm << " " << c_norm << " " << sum_prod_distance << " " << sum_distance << " " << std::endl;
                 
@@ -234,7 +218,7 @@ int main(){
                 float test_c_norm = faiss::fvec_norm_L2sqr(index_assign.xb.data() + group_label * dimension, dimension);
 
                 std::cout << "Actual data" << test_qc_dist << " " << test_b_norm << " " << test_c_norm << " " <<  test_prod_distance << " " << test_prod_actual_distance << " " << test_qb_dist << std::endl;
-                
+                */
 
 
                 if (sum_distance < result_dists[0]){
