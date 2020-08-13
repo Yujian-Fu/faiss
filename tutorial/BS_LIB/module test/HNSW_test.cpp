@@ -1,5 +1,6 @@
 #include "../HNSWlib/hnswalg.h"
 #include <faiss/IndexFlat.h>
+#include "../utils/utils.h"
 
 /**
  * 
@@ -7,16 +8,19 @@
  **/
 
 typedef faiss::Index::idx_t idx_t;
+using namespace bslib;
 int main(){
     size_t dimension = 128;
     size_t M_HNSW = 100;
     size_t efConstruction = 200;
     size_t nb = 1000;
-    size_t nq = 100;
+    size_t nq = 1000;
     size_t k_result = 10;
     size_t efSearch = 50;
     std::vector<float> xb(dimension * nb);
     std::vector<float> xq(dimension * nq);
+    time_recorder Trecorder  = time_recorder();
+
 
     for(int i = 0; i < nb; i++) {
         for(int j = 0; j < dimension; j++) xb[dimension * i + j] = drand48();
@@ -31,9 +35,12 @@ int main(){
     faiss::IndexFlatL2 index_flat(dimension);
     index_flat.add(nb, xb.data());
 
+    Trecorder.reset();
     std::vector<idx_t> flat_ids(nq * k_result);
     std::vector<float> flat_dists(nq * k_result);
     index_flat.search(nq, xq.data(), k_result, flat_dists.data(), flat_ids.data());
+    Trecorder.print_time_usage("IndexFlat search finished: ");
+
 
     std::vector<idx_t> HNSW_ids(nq * efSearch);
     std::vector<float> HNSW_dists(nq * efSearch);
@@ -42,6 +49,7 @@ int main(){
         quantizer->addPoint(xb.data() + i * dimension);
     }
 
+    Trecorder.reset();
 #pragma omp parallel for
     for (size_t i = 0; i < nq; i++){
         const float * query = xq.data() + i * dimension;
@@ -52,6 +60,7 @@ int main(){
             result_queue.pop();
         }
     }
+    Trecorder.print_time_usage("HNSW search finished: ");
 
     size_t sum_correctness = 0;
     for (size_t i = 0; i < nq; i++){
