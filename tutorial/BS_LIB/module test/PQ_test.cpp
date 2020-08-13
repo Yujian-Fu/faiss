@@ -248,7 +248,7 @@ int main(){
         }
 
         for (size_t j = 0; j < k_result; j++){
-            if (gt_set.count(result_labels[j])){
+            if (gt_set.count(result_labels[j]) != 0){
                 query_correctness[i] ++;
             }
         }
@@ -257,6 +257,6 @@ int main(){
     for (size_t i = 0; i < nq; i++){
         sum_correctness += query_correctness[i];
     }
-    std::cout << "The recall for IVFPQ implementation is: " << sum_correctness / (nq * k_result) << std::endl;
+    std::cout << "The recall for IVFPQ implementation is: " << float(sum_correctness) / (nq * k_result) << std::endl;
 
 }
