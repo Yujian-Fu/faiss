@@ -20,7 +20,7 @@ int main(){
     int nq = 1000;                         // nb of queries
     size_t nlist = 100;
     size_t M = 8;
-    size_t nbits = 10;
+    size_t nbits = 8;
     size_t nprobe = 10;
     size_t sum_correctness = 0;
 
@@ -74,7 +74,6 @@ int main(){
     std::cout << "The recall for HNSW k = " << k_result << " is: " << float(sum_correctness) / (k_result * nq) << std::endl; 
 
 
-
     std::vector<idx_t> pq_labels(k_result * nq);
     std::vector<float> pq_dists(k_result * nq);
     faiss::IndexFlatL2 quantizer(dimension);
@@ -108,7 +107,6 @@ int main(){
     // My implementation of IVFPQ
     faiss::ClusteringParameters CP; // Try different settings of CP
     CP.niter = 40;
-    std::vector<float> centroids(dimension * nlist);
     faiss::Clustering clus(dimension, nlist, CP);
     faiss::IndexFlatL2 index_assign(dimension);
     clus.verbose =  true;
@@ -146,7 +144,7 @@ int main(){
 #pragma omp parallel for
     for (size_t i = 0; i < nb; i++){
         idx_t group_label = base_labels[i];
-        faiss::fvec_madd(1, xb + i * dimension, -1.0, centroids.data() + group_label * dimension, residual.data() + i * dimension); 
+        faiss::fvec_madd(1, xb + i * dimension, -1.0, index_assign.xb.data() + group_label * dimension, residual.data() + i * dimension); 
     }
     PQ.verbose = true;
     PQ.train(nb / 10, residual.data());
