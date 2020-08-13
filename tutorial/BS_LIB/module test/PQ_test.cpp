@@ -204,6 +204,8 @@ int main(){
                     sum_prod_distance += distance_table[l * PQ.ksub + base_code[l]];
                 }
                 sum_distance = qc_dist + b_norm - c_norm - 2 * sum_prod_distance;
+                float test_qb_dist = faiss::fvec_L2sqr(query, xb + sequence_id * dimension, dimension);
+                std::cout << sum_distance << " " << test_qb_dist << " " << std::endl;
 
                 /*
                 std::cout << qc_dist << " " << b_norm << " " << c_norm << " " << sum_prod_distance << " " << sum_distance << " " << std::endl;
@@ -223,7 +225,7 @@ int main(){
                     test_prod_distance += reconstructed_residual[l] * query[l];
                 }
                 float test_qc_dist = faiss::fvec_L2sqr(query, index_assign.xb.data() + group_label*dimension, dimension);
-                float test_qb_dist = faiss::fvec_L2sqr(query, xb + sequence_id * dimension, dimension);
+
                 float test_b_norm = faiss::fvec_norm_L2sqr(xb + sequence_id * dimension, dimension);
                 float test_c_norm = faiss::fvec_norm_L2sqr(index_assign.xb.data() + group_label * dimension, dimension);
 

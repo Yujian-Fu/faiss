@@ -14,6 +14,7 @@ int main(){
     size_t nb = 1000;
     size_t nq = 100;
     size_t k_result = 10;
+    size_t efSearch = 50;
     std::vector<float> xb(dimension * nb);
     std::vector<float> xq(dimension * nq);
 
@@ -44,7 +45,7 @@ int main(){
 #pragma omp parallel for
     for (size_t i = 0; i < nq; i++){
         const float * query = xq.data() + i * dimension;
-        auto result_queue = quantizer->searchBaseLayer(query, k_result);
+        auto result_queue = quantizer->searchBaseLayer(query, efSearch);
         for (size_t j = 0; j < k_result; j++){
             HNSW_dists[i * k_result + j] = result_queue.top().first;
             HNSW_ids[i * k_result + j] = result_queue.top().second;
