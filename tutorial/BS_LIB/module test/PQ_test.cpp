@@ -175,7 +175,7 @@ int main(){
      **/ 
 
     std::vector<size_t> query_correctness(nq, 0);
-//#pragma omp parallel for
+#pragma omp parallel for
     for (size_t i = 0; i < nq; i++){
         const float * query = xq + i * dimension;
         std::vector <idx_t> result_labels(k_result);
