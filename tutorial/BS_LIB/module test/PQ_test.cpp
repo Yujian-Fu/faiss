@@ -151,6 +151,10 @@ int main(){
             std::cout << residual[i * dimension + j] << " ";
         }
         std::cout << std::endl;
+        for (size_t j = 0; j < dimension; j++){
+            std::cout << xb[i * dimension + j] << " ";
+        }
+        std::cout << std::endl;
     }
     exit(0);
     PQ.verbose = true;
