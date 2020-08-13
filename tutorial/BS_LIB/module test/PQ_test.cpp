@@ -208,10 +208,17 @@ int main(){
                 sum_distance = qc_dist + b_norm - c_norm - 2 * sum_prod_distance;
 
                 std::cout << qc_dist << " " << b_norm << " " << c_norm << " " << sum_prod_distance << " " << sum_distance << " " << std::endl;
+                for (size_t l = 0; l < code_size; l++){std::cout << (float) base_code[l] << " ";} std::cout << std::endl;
                 
+
+                std::vector<float> base_residual(dimension);
+                faiss::fvec_madd(1, xb + sequence_id * dimension, -1.0, index_assign.xb.data(), residual.data());
+                std::vector<uint8_t> base_residual_code(code_size);
+                PQ.compute_code(base_residual.data(), base_residual_code.data());
 
                 std::vector<float> reconstructed_residual(dimension);
                 PQ.decode(base_code, reconstructed_residual.data());
+
                 float test_prod_distance = 0;
                 for (size_t l = 0; l < dimension; l++){
                     test_prod_distance += reconstructed_residual[l] * query[l];
@@ -222,6 +229,9 @@ int main(){
                 float test_c_norm = faiss::fvec_norm_L2sqr(index_assign.xb.data() + group_label * dimension, dimension);
 
                 std::cout <<  test_qc_dist << " " << test_b_norm << " " << test_c_norm << " " <<  test_prod_distance << " " << test_qb_dist << " " << std::endl;
+                for (size_t l = 0; l < code_size; l++){std::cout << (float) base_residual_code[l] << " ";} std::cout << std::endl;
+
+
                 if (sum_distance < result_dists[0]){
                     faiss::maxheap_pop(k_result, result_dists.data(), result_labels.data());
                     faiss::maxheap_push(k_result, result_dists.data(), result_labels.data(), sum_distance, sequence_id);
