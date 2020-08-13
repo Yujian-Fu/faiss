@@ -197,7 +197,6 @@ int main(){
             float qc_dist = query_dists[j];
             float c_norm = centroid_norm[group_label];
 
-
             for (size_t k = 0; k < group_size; k++){
                 float sum_distance = 0;
                 float sum_prod_distance = 0;
@@ -205,20 +204,27 @@ int main(){
                 float b_norm = base_norm[sequence_id];
 
                 uint8_t * base_code = residual_code.data() + sequence_id * code_size;
+
+                for (size_t l = 0; l < M; l++){
+                    sum_prod_distance += distance_table[l * PQ.ksub + base_code[l]];
+                }
+                sum_distance = qc_dist + b_norm - c_norm - 2 * sum_prod_distance;
+
+                std::cout << qc_dist << " " << b_norm << " " << c_norm << " " << sum_prod_distance << " " << sum_distance << " " << std::endl;
+                
+
                 std::vector<float> reconstructed_residual(dimension);
                 PQ.decode(base_code, reconstructed_residual.data());
                 float test_prod_distance = 0;
                 for (size_t l = 0; l < dimension; l++){
                     test_prod_distance += reconstructed_residual[l] * query[l];
                 }
-                for (size_t l = 0; l < M; l++){
-                    sum_prod_distance += distance_table[l * PQ.ksub + base_code[l]];
-                }
-                sum_distance = qc_dist + b_norm - c_norm - 2 * sum_prod_distance;
-                std::vector <float> qb_residual(dimension);
-                faiss::fvec_madd(1, query, -1.0, xb + sequence_id + dimension, qb_residual.data());
-                float qb_dist = faiss::fvec_norm_L2sqr(qb_residual.data(), dimension);
-                std::cout << qc_dist << " " << b_norm << " " << c_norm << " " << sum_prod_distance << " " << test_prod_distance << " " << qb_dist << " " << sum_distance << " " << std::endl;
+                float test_qc_dist = faiss::fvec_L2sqr(query, index_assign.xb.data() + group_label*dimension, dimension);
+                float test_qb_dist = faiss::fvec_L2sqr(query, xb + sequence_id * dimension, dimension);
+                float test_b_norm = faiss::fvec_norm_L2sqr(xb + sequence_id * dimension, dimension);
+                float test_c_norm = faiss::fvec_norm_L2sqr(index_assign.xb.data() + group_label * dimension, dimension);
+
+                std::cout <<  test_qc_dist << " " << test_b_norm << " " << test_c_norm << " " <<  test_prod_distance << " " << test_qb_dist << " " << std::endl;
                 if (sum_distance < result_dists[0]){
                     faiss::maxheap_pop(k_result, result_dists.data(), result_labels.data());
                     faiss::maxheap_push(k_result, result_dists.data(), result_labels.data(), sum_distance, sequence_id);
