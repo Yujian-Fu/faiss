@@ -205,7 +205,8 @@ int main(){
                 }
                 sum_distance = qc_dist + b_norm - c_norm - 2 * sum_prod_distance;
                 float test_qb_dist = faiss::fvec_L2sqr(query, xb + sequence_id * dimension, dimension);
-                std::cout << sum_distance << " " << test_qb_dist << " " << std::endl;
+                for (size_t l = 0; l < code_size; l++){std::cout << float(base_code[l]) << " ";} std::cout << std::endl;
+                //std::cout << sum_distance << " " << test_qb_dist << " " << std::endl;
 
                 /*
                 std::cout << qc_dist << " " << b_norm << " " << c_norm << " " << sum_prod_distance << " " << sum_distance << " " << std::endl;
