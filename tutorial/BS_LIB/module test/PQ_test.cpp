@@ -111,6 +111,7 @@ int main(){
     std::vector<float> centroids(dimension * nlist);
     faiss::Clustering clus(dimension, nlist);
     faiss::IndexFlatL2 index_assign(dimension);
+    clus.verbose =  true;
     clus.train(nb / 10, xb, index_assign);
     
     faiss::ProductQuantizer PQ(dimension, M, nbits);
@@ -118,7 +119,9 @@ int main(){
     std::vector<idx_t> base_labels(nb);
     std::vector<float> base_dists(nb);
 
+    Trecorder.reset();
     index_assign.search(nb, xb, 1, base_dists.data(), base_labels.data());
+    Trecorder.print_time_usage("Assigned the base vectors");
 
     std::vector<std::vector<idx_t>> inverted_index(nlist);
     // Build inverted index list
@@ -136,6 +139,7 @@ int main(){
         inverted_index[group_label][inverted_index_pointer[group_label]] = i;
         inverted_index_pointer[group_label] ++;
     }
+    Trecorder.print_time_usage("Constructed Inverted Index");
 
     // Compute the residual and encode the residual
     std::vector<float> residual(dimension * nb);
@@ -144,6 +148,9 @@ int main(){
         idx_t group_label = base_labels[i];
         faiss::fvec_madd(1, xb + i * dimension, -1.0, centroids.data() + group_label * dimension, residual.data() + i * dimension); 
     }
+    PQ.verbose = true;
+    PQ.train(nb / 10, xb);
+    Trecorder.print_time_usage("Trained PQ");
 
     std::vector<uint8_t> residual_code(code_size * nb);
     PQ.compute_code(residual.data(), residual_code.data());
@@ -171,6 +178,7 @@ int main(){
      **/ 
     std::vector<float> distance_tables(nq * M * PQ.ksub);
     PQ.compute_inner_prod_tables(nq, xq, distance_tables.data());
+    Trecorder.print_time_usage("Computed prod table");
     // This is the product between sub_query andd sub_centroids
 
     std::vector<size_t> query_correctness(nq, 0);
