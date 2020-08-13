@@ -173,8 +173,6 @@ int main(){
      *            ||query - centroids||^2 + ||residual_PQ + centroids||^2 - ||centroids||^2 - 2 * query * residual_PQ  
      * So you need the norm of centroid and base vector 
      **/ 
-    Trecorder.print_time_usage("Computed prod table");
-    // This is the product between sub_query andd sub_centroids
 
     std::vector<size_t> query_correctness(nq, 0);
 //#pragma omp parallel for
@@ -185,7 +183,7 @@ int main(){
 
         std::vector <idx_t> query_labels(nprobe);
         std::vector <float> query_dists(nprobe);
-        std::vector<float> distance_table(PQ.M * PQ.nbits);
+        std::vector<float> distance_table(PQ.M * PQ.ksub);
         PQ.compute_inner_prod_table(query, distance_table.data());
 
         faiss::maxheap_heapify(k_result, result_dists.data(), result_labels.data());
