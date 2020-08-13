@@ -46,9 +46,9 @@ int main(){
     for (size_t i = 0; i < nq; i++){
         const float * query = xq.data() + i * dimension;
         auto result_queue = quantizer->searchBaseLayer(query, efSearch);
-        for (size_t j = 0; j < k_result; j++){
-            HNSW_dists[(i + 1) * k_result - j - 1] = result_queue.top().first;
-            HNSW_ids[(i + 1) * k_result - j - 1] = result_queue.top().second;
+        for (size_t j = 0; j < efSearch; j++){
+            HNSW_dists[(i + 1) * efSearch - j - 1] = result_queue.top().first;
+            HNSW_ids[(i + 1) * efSearch - j - 1] = result_queue.top().second;
             result_queue.pop();
         }
     }
