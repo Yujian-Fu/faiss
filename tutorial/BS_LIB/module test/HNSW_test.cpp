@@ -16,7 +16,7 @@ int main(){
     size_t nb = 1000;
     size_t nq = 1000;
     size_t k_result = 10;
-    size_t efSearch = 50;
+    size_t efSearch = 20;
     std::vector<float> xb(dimension * nb);
     std::vector<float> xq(dimension * nq);
     time_recorder Trecorder  = time_recorder();
