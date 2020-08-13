@@ -35,8 +35,8 @@ int main(){
     std::vector<float> flat_dists(nq * k_result);
     index_flat.search(nq, xq.data(), k_result, flat_dists.data(), flat_ids.data());
 
-    std::vector<idx_t> HNSW_ids(nq * k_result);
-    std::vector<float> HNSW_dists(nq * k_result);
+    std::vector<idx_t> HNSW_ids(nq * efSearch);
+    std::vector<float> HNSW_dists(nq * efSearch);
     hnswlib::HierarchicalNSW * quantizer = new hnswlib::HierarchicalNSW(dimension, nb, M_HNSW, 2 * M_HNSW, efConstruction);
     for (size_t i = 0; i < nb; i++){
         quantizer->addPoint(xb.data() + i * dimension);
@@ -47,8 +47,8 @@ int main(){
         const float * query = xq.data() + i * dimension;
         auto result_queue = quantizer->searchBaseLayer(query, efSearch);
         for (size_t j = 0; j < k_result; j++){
-            HNSW_dists[i * k_result + j] = result_queue.top().first;
-            HNSW_ids[i * k_result + j] = result_queue.top().second;
+            HNSW_dists[(i + 1) * k_result - j - 1] = result_queue.top().first;
+            HNSW_ids[(i + 1) * k_result - j - 1] = result_queue.top().second;
             result_queue.pop();
         }
     }
@@ -61,7 +61,7 @@ int main(){
         }
         
         for (size_t j = 0; j < k_result; j++){
-            if (gt_set.count(HNSW_ids[i * k_result + j]) != 0){
+            if (gt_set.count(HNSW_ids[i * efSearch + j]) != 0){
                 sum_correctness ++;
             }
         }
