@@ -205,7 +205,7 @@ int main(){
 
                 uint8_t * base_code = residual_code.data() + sequence_id * code_size;
                 for (size_t l = 0; l < M; l++){
-                    sum_prod_distance += distance_table[l * M + base_code[l]];
+                    sum_prod_distance += distance_table[l * PQ.ksub + base_code[l]];
                 }
                 sum_distance = qc_dist + b_norm - c_norm - 2 * sum_prod_distance;
                 std::vector <float> qb_residual(dimension);
