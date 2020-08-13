@@ -10,7 +10,6 @@ typedef faiss::Index::idx_t idx_t;
 int main(){
     size_t dimension = 128;
     size_t M_HNSW = 100;
-    size_t num_centroids = 1000;
     size_t efConstruction = 200;
     size_t nb = 100000;
     size_t nq = 1000;
@@ -37,7 +36,7 @@ int main(){
 
     std::vector<idx_t> HNSW_ids(nq * k_result);
     std::vector<float> HNSW_dists(nq * k_result);
-    hnswlib::HierarchicalNSW * quantizer = new hnswlib::HierarchicalNSW(dimension, num_centroids, M_HNSW, 2 * M_HNSW, efConstruction);
+    hnswlib::HierarchicalNSW * quantizer = new hnswlib::HierarchicalNSW(dimension, nb, M_HNSW, 2 * M_HNSW, efConstruction);
     for (size_t i = 0; i < nb; i++){
         quantizer->addPoint(xb.data() + i * dimension);
     }
