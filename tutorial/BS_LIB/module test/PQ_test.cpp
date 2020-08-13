@@ -205,6 +205,7 @@ int main(){
                 }
                 sum_distance = qc_dist + b_norm - c_norm - 2 * sum_prod_distance;
 
+                /*
                 std::cout << qc_dist << " " << b_norm << " " << c_norm << " " << sum_prod_distance << " " << sum_distance << " " << std::endl;
                 for (size_t l = 0; l < code_size; l++){std::cout << (float) base_code[l] << " ";} std::cout << std::endl;
                 
@@ -228,6 +229,7 @@ int main(){
 
                 std::cout <<  test_qc_dist << " " << test_b_norm << " " << test_c_norm << " " <<  test_prod_distance << " " << test_qb_dist << " " << std::endl;
                 for (size_t l = 0; l < code_size; l++){std::cout << (float) base_residual_code[l] << " ";} std::cout << std::endl;
+                */
 
 
                 if (sum_distance < result_dists[0]){
