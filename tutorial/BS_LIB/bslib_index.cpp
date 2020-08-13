@@ -841,6 +841,11 @@ namespace bslib{
       * d = || x - y_C ||^2 - || y_C ||^2 + || y_C + y_R ||^2 - 2 * (x|y_R)
       *        -----------------------------   -----------------   -----------
       *                     term 1                   term 2           term 3
+     * distance = ||query - (centroids + residual_PQ)||^2
+     *            ||query - centroids||^2 + ||residual_PQ|| ^2 - 2 * (query - centroids) * residual_PQ
+     *            ||query - centroids||^2 + ||residual_PQ|| ^2 - 2 * query * residual_PQ + 2 * centroids * residual_PQ
+     *            ||query - centroids||^2 + ||residual_PQ + centroids||^2 - ||centroids||^2 - 2 * query * residual_PQ 
+     * 
       * Term1 can be computed in assigning the queries
       * Term2 is the norm of base vectors
       * Term3 is the inner product between x and y_R
