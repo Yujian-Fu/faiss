@@ -73,7 +73,7 @@ int main(){
         }
     }
     std::cout << "The recall for HNSW k = " << k_result << " is: " << float(sum_correctness) / (k_result * nq) << std::endl; 
-        */
+
 
     std::vector<idx_t> pq_labels(k_result * nq);
     std::vector<float> pq_dists(k_result * nq);
@@ -83,7 +83,6 @@ int main(){
     index_pq.train(nb / 10, xb);
     index_pq.add(nb, xb);
     Trecorder.print_time_usage("Training PQ index");
-    
 
 
     index_pq.nprobe = nprobe;
@@ -104,8 +103,8 @@ int main(){
     }
 
     std::cout << "The recall for PQ k = " << k_result << " is: " << float(sum_correctness) / (k_result * nq) << std::endl; 
+    */
 
-    exit(0);
     // My implementation of IVFPQ
     faiss::ClusteringParameters CP; // Try different settings of CP
     CP.niter = 40;
@@ -207,11 +206,11 @@ int main(){
                     sum_prod_distance += distance_table[l * PQ.ksub + base_code[l]];
                 }
                 sum_distance = qc_dist + b_norm - c_norm - 2 * sum_prod_distance;
-                float test_qb_dist = faiss::fvec_L2sqr(query, xb + sequence_id * dimension, dimension);
+                
                 for (size_t l = 0; l < code_size; l++){std::cout << float(base_code[l]) << " ";} std::cout << std::endl;
-                //std::cout << sum_distance << " " << test_qb_dist << " " << std::endl;
 
-                /*
+
+                
                 std::cout << qc_dist << " " << b_norm << " " << c_norm << " " << sum_prod_distance << " " << sum_distance << " " << std::endl;
                 for (size_t l = 0; l < code_size; l++){std::cout << (float) base_code[l] << " ";} std::cout << std::endl;
                 
@@ -229,13 +228,13 @@ int main(){
                     test_prod_distance += reconstructed_residual[l] * query[l];
                 }
                 float test_qc_dist = faiss::fvec_L2sqr(query, index_assign.xb.data() + group_label*dimension, dimension);
-
+                float test_qb_dist = faiss::fvec_L2sqr(query, xb + sequence_id * dimension, dimension);
                 float test_b_norm = faiss::fvec_norm_L2sqr(xb + sequence_id * dimension, dimension);
                 float test_c_norm = faiss::fvec_norm_L2sqr(index_assign.xb.data() + group_label * dimension, dimension);
 
                 std::cout <<  test_qc_dist << " " << test_b_norm << " " << test_c_norm << " " <<  test_prod_distance << " " << test_qb_dist << " " << std::endl;
                 for (size_t l = 0; l < code_size; l++){std::cout << (float) base_residual_code[l] << " ";} std::cout << std::endl;
-                */
+                
 
 
                 if (sum_distance < result_dists[0]){
