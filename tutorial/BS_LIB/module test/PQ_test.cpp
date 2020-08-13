@@ -153,7 +153,7 @@ int main(){
     Trecorder.print_time_usage("Trained PQ");
 
     std::vector<uint8_t> residual_code(code_size * nb);
-    PQ.compute_code(residual.data(), residual_code.data());
+    PQ.compute_codes(residual.data(), residual_code.data(), nb);
     std::vector<float> centroid_norm(nlist, 0);
     std::vector<float> base_norm(nb, 0);
 
