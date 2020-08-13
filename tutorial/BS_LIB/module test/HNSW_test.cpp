@@ -11,8 +11,8 @@ int main(){
     size_t dimension = 128;
     size_t M_HNSW = 100;
     size_t efConstruction = 200;
-    size_t nb = 100000;
-    size_t nq = 1000;
+    size_t nb = 1000;
+    size_t nq = 100;
     size_t k_result = 10;
     std::vector<float> xb(dimension * nb);
     std::vector<float> xq(dimension * nq);
