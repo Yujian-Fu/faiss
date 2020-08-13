@@ -146,6 +146,13 @@ int main(){
         idx_t group_label = base_labels[i];
         faiss::fvec_madd(1, xb + i * dimension, -1.0, index_assign.xb.data() + group_label * dimension, residual.data() + i * dimension); 
     }
+    for (size_t i = 0; i < 100; i++){
+        for (size_t j = 0; j < dimension; j++){
+            std::cout << residual[i * dimension + j] << " ";
+        }
+        std::cout << std::endl;
+    }
+    exit(0);
     PQ.verbose = true;
     PQ.train(nb / 10, residual.data());
     Trecorder.print_time_usage("Trained PQ");
