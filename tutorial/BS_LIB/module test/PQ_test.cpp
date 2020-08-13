@@ -179,7 +179,7 @@ int main(){
     // This is the product between sub_query andd sub_centroids
 
     std::vector<size_t> query_correctness(nq, 0);
-#pragma omp parallel for
+//#pragma omp parallel for
     for (size_t i = 0; i < nq; i++){
         const float * distance_table = distance_tables.data() + i * M * PQ.ksub;
         const float * query = xq + i * dimension;
