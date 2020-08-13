@@ -42,7 +42,7 @@ int main(){
         quantizer->addPoint(xb.data() + i * dimension);
     }
 
-#pragma omp parallel for
+//#pragma omp parallel for
     for (size_t i = 0; i < nq; i++){
         const float * query = xq.data() + i * dimension;
         auto result_queue = quantizer->searchBaseLayer(query, k_result);
