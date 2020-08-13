@@ -157,12 +157,10 @@ int main(){
     std::vector<float> centroid_norm(nlist, 0);
     std::vector<float> base_norm(nb, 0);
 
-    for (size_t i = 0; i < nlist; i++){
-        faiss::fvec_norms_L2sqr(centroid_norm.data(), index_assign.xb.data(), dimension, nlist);
-    }
-    for (size_t i = 0; i < nb; i++){
-        faiss::fvec_norms_L2sqr(base_norm.data(), xb, dimension, nb);
-    }
+
+    faiss::fvec_norms_L2sqr(centroid_norm.data(), index_assign.xb.data(), dimension, nlist);
+    faiss::fvec_norms_L2sqr(base_norm.data(), xb, dimension, nb);
+
 
     /**
      * The size for one distance table is M * ksub 
