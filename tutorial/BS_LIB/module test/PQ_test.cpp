@@ -39,11 +39,9 @@ int main(){
     size_t k_result = 10;
     time_recorder Trecorder = time_recorder();
 
-    Trecorder.reset();
     faiss::IndexFlatL2 index_flat(dimension);
     std::vector<idx_t> labels(k_result * nq);
     std::vector<float> dists(k_result * nq);
-    Trecorder.print_time_usage("Training flat index");
     
     Trecorder.reset();
     index_flat.add(nb, xb);
@@ -84,9 +82,6 @@ int main(){
     index_pq.train(nb / 10, xb);
     index_pq.add(nb, xb);
 
-    Trecorder.print_time_usage("Training PQ index");
-
-
     index_pq.nprobe = nprobe;
     Trecorder.reset();
     index_pq.search(nq, xq, k_result, pq_dists.data(), pq_labels.data());
@@ -113,16 +108,13 @@ int main(){
     std::vector<idx_t> base_labels(nb);
     std::vector<float> base_dists(nb);
 
-    Trecorder.reset();
     index_pq.quantizer->search(nb, xb, 1, base_dists.data(), base_labels.data());
-    Trecorder.print_time_usage("Assigned the base vectors");
 
     std::vector<std::vector<idx_t>> inverted_index(nlist);
     // Build inverted index list
     for (size_t i = 0; i < nb; i++){
         inverted_index[base_labels[i]].push_back(i);
     }
-    Trecorder.print_time_usage("Constructed Inverted Index");
 
     // Compute the residual and encode the residual
     std::vector<float> residual(dimension * nb);
@@ -222,7 +214,7 @@ int main(){
     for (size_t i = 0; i < nq; i++){
         sum_correctness += query_correctness[i];
     }
-    
+
     std::cout << "The recall for IVFPQ implementation is: " << float(sum_correctness) / (nq * k_result) << std::endl;
 
 }
