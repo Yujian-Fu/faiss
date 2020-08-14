@@ -111,7 +111,6 @@ int main(){
 
     faiss::ProductQuantizer * PQ = new faiss::ProductQuantizer(dimension, M, nbits);
 
-
     size_t code_size = PQ->code_size;
     size_t ksub = PQ->ksub;
     std::vector<idx_t> base_labels(nb);
@@ -129,6 +128,7 @@ int main(){
     std::vector<float> residual(dimension * nb);
     index_assign->compute_residual_n(nb, xb, residual.data(), base_labels.data());
 
+    PQ->verbose = true;
     PQ->train(nb / 10, residual.data());
 
     std::vector<uint8_t> residual_code(code_size * nb);
