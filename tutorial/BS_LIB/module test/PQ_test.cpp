@@ -130,13 +130,6 @@ int main(){
     std::vector<uint8_t> residual_code(code_size * nb);
     index_pq.pq.compute_codes(residual.data(), residual_code.data(), nb);
 
-    std::vector<float> centroids(dimension * nlist);
-    std::vector<float> centroid_norm(nlist, 0);
-    std::vector<float> base_norm(nb, 0);
-
-    index_pq.quantizer->reconstruct_n(0, nlist, centroids.data());
-    faiss::fvec_norms_L2sqr(centroid_norm.data(), centroids.data(), dimension, nlist);
-    faiss::fvec_norms_L2sqr(base_norm.data(), xb, dimension, nb);
 
     /**
      * The size for one distance table is M * ksub 
@@ -145,12 +138,28 @@ int main(){
      * distance table to get the sum distance
      * 
      * distance = ||query - (centroids + residual_PQ)||^2 
-     *            ||query - centroids||^2 + ||residual_PQ|| ^2 - 2 * (query - centroids) * residual_PQ 
-     *            ||query - centroids||^2 + ||residual_PQ|| ^2 - 2 * query * residual_PQ + 2 * centroids * residual_PQ 
-     *            ||query - centroids||^2 + ||residual_PQ + centroids||^2 - ||centroids||^2 - 2 * query * residual_PQ  
+     *          = ||query - centroids||^2 + ||residual_PQ|| ^2 - 2 * (query - centroids) * residual_PQ 
+     *          = ||query - centroids||^2 + ||residual_PQ|| ^2 + 2 * centroids * residual_PQ - 2 * query * residual_PQ
+     *          = ... + sum{}
      * So you need the norm of centroid and base vector 
      **/ 
 
+    std::vector<float> pre_computed_tables(nlist * M * ksub);
+    size_t dsub = dimension / M;
+    for (size_t i = 0; i < nlist; i++){
+        std::vector<float> quantizer_centroid(dimension);
+        index_pq.quantizer->reconstruct(i, quantizer_centroid.data());
+        for (size_t m = 0; m < M; m++){
+            const float * quantizer_sub_centroid = quantizer_centroid.data() + m * dsub;
+            
+            for (size_t k = 0; k < ksub; k++){
+                const float * pq_sub_centroid = index_pq.pq.get_centroids(m, k);
+                float residual_PQ_norm = faiss::fvec_norm_L2sqr(pq_sub_centroid, ksub);
+                float prod_quantizer_pq = faiss::fvec_inner_product(quantizer_sub_centroid, pq_sub_centroid, dsub);
+                pre_computed_tables[i * M * ksub + m * ksub + k] = residual_PQ_norm + 2 * prod_quantizer_pq;
+            }
+        }
+    }
     std::vector<size_t> query_correctness(nq, 0);
 //#pragma omp parallel for
     for (size_t i = 0; i < nq; i++){
@@ -169,20 +178,23 @@ int main(){
             size_t group_label = query_labels[j];
             size_t group_size = inverted_index[group_label].size();
             float qc_dist = query_dists[j];
-            float c_norm = centroid_norm[group_label];
 
             for (size_t k = 0; k < group_size; k++){
                 float sum_distance = 0;
                 float sum_prod_distance = 0;
+                float table_distance = 0;
                 idx_t sequence_id = inverted_index[group_label][k];
-                float b_norm = base_norm[sequence_id];
 
                 uint8_t * base_code = residual_code.data() + sequence_id * code_size;
 
                 for (size_t l = 0; l < M; l++){
                     sum_prod_distance += distance_table[l * ksub + base_code[l]];
                 }
-                sum_distance = qc_dist + b_norm - c_norm - 2 * sum_prod_distance;
+
+                for (size_t l = 0; l < M; l++){
+                    table_distance += pre_computed_tables[group_label * M * ksub + l * ksub + base_code[l]];
+                }
+                sum_distance = qc_dist + table_distance - 2 * sum_prod_distance;
 
                 for (size_t temp = 0; temp < k_result; temp++){
                     if (sequence_id == pq_labels[i * k_result + temp]){
