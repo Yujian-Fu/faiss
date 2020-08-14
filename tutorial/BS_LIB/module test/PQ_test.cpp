@@ -20,7 +20,7 @@ int main(){
     int nb = 100000;                       // database size
     int nq = 1000;                         // nb of queries
     size_t nlist = 100;
-    size_t M = 8;
+    size_t M = 4;
     size_t nbits = 8;
     size_t nprobe = 10;
     size_t sum_correctness = 0;
