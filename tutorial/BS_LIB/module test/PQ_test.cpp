@@ -18,7 +18,7 @@ int main(){
 
     int dimension = 128;                   // dimension
     int nb = 100000;                       // database size
-    int nq = 1000;                         // nb of queries
+    int nq = 100;                         // nb of queries
     size_t nlist = 100;
     size_t M = 4;
     size_t nbits = 8;
@@ -107,7 +107,7 @@ int main(){
     
     // My implementation of IVFPQ
     faiss::ClusteringParameters CP;
-    CP.niter = 55;
+    CP.niter = 100;
     faiss::Clustering clus(dimension, nlist, CP);
     faiss::IndexFlatL2 quantizer_assign(dimension);
 
@@ -169,6 +169,7 @@ int main(){
             }
         }
     }
+
     Trecorder.reset();
     std::vector <idx_t> result_labels(nq * k_result);
     std::vector <float> result_dists(nq * k_result);
@@ -184,6 +185,7 @@ int main(){
 
         faiss::maxheap_heapify(k_result, result_dists.data() + result_position, result_labels.data() + result_position);
         quantizer_assign.search(1, query, nprobe, query_dists.data(), query_labels.data());
+        
         for (size_t j = 0; j < nprobe; j++){
             size_t group_label = query_labels[j];
             size_t group_size = inverted_index[group_label].size();
@@ -199,11 +201,9 @@ int main(){
 
                 for (size_t l = 0; l < M; l++){
                     sum_prod_distance += distance_table[l * ksub + base_code[l]];
-                }
-
-                for (size_t l = 0; l < M; l++){
                     table_distance += pre_computed_tables[group_label * M * ksub + l * ksub + base_code[l]];
                 }
+
                 sum_distance = qc_dist + table_distance - 2 * sum_prod_distance;
 
                 if (sum_distance < result_dists[result_position]){
@@ -217,7 +217,7 @@ int main(){
     sum_correctness = 0;
     for (size_t i = 0; i < nq; i++){
         std::unordered_set<idx_t> gt_set;
-        
+
         for (size_t j = 0; j < k_result; j++){
             gt_set.insert(labels[i * k_result + j]);
         }

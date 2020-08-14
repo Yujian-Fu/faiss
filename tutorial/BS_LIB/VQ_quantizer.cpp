@@ -94,7 +94,7 @@ namespace bslib{
      * train_data_ids: the ids for train vectors        size: train_set_size
      * 
      **/
-    void VQ_quantizer::update_train_ids(const float * train_data, idx_t * train_data_ids, size_t train_set_size){
+    void VQ_quantizer::search_all(const size_t n, const float * train_data, idx_t * train_data_ids){
         faiss::IndexFlatL2 centroid_index(dimension);
         std::vector<float> one_centroid(dimension);
 
