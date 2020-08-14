@@ -154,7 +154,7 @@ int main(){
             
             for (size_t k = 0; k < ksub; k++){
                 const float * pq_sub_centroid = index_pq.pq.get_centroids(m, k);
-                float residual_PQ_norm = faiss::fvec_norm_L2sqr(pq_sub_centroid, ksub);
+                float residual_PQ_norm = faiss::fvec_norm_L2sqr(pq_sub_centroid, dsub);
                 float prod_quantizer_pq = faiss::fvec_inner_product(quantizer_sub_centroid, pq_sub_centroid, dsub);
                 pre_computed_tables[i * M * ksub + m * ksub + k] = residual_PQ_norm + 2 * prod_quantizer_pq;
             }
