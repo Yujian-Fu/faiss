@@ -170,7 +170,7 @@ int main(){
         }
     }
     Trecorder.reset();
-    std::vector<float> distance_tables(nlist * M * ksub);
+    std::vector<float> distance_tables(nq * M * ksub);
     PQ->compute_inner_prod_tables(nq, xq, distance_tables.data());
     std::vector <idx_t> result_labels(k_result * nq);
     std::vector <float> result_dists(k_result * nq);
@@ -181,7 +181,6 @@ int main(){
         std::vector <idx_t> query_labels(nprobe);
         std::vector <float> query_dists(nprobe);
         quantizer_assign.search(1, query, nprobe, query_dists.data(), query_labels.data());
-
 
         faiss::maxheap_heapify(k_result, result_dists.data() + i * k_result, result_labels.data() + i * k_result);
         
@@ -211,8 +210,8 @@ int main(){
                 }
             }
         }
-
     }
+
     Trecorder.print_time_usage("Finished IVFPQ search");
     // Computing the correct num
     sum_correctness = 0;
