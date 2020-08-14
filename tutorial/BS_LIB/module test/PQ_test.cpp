@@ -170,20 +170,21 @@ int main(){
         }
     }
     Trecorder.reset();
-    std::vector<float> distance_tables(nq * M * ksub);
-    PQ->compute_inner_prod_tables(nq, xq, distance_tables.data());
-    std::vector <idx_t> result_labels(k_result * nq);
-    std::vector <float> result_dists(k_result * nq);
-
+    std::vector<size_t> query_correctness(nq, 0);
+    std::vector <idx_t> result_labels(nq * k_result);
+    std::vector <float> result_dists(nq * k_result);
 #pragma omp parallel for
     for (size_t i = 0; i < nq; i++){
         const float * query = xq + i * dimension;
+        const size_t result_position = i * k_result;
+
         std::vector <idx_t> query_labels(nprobe);
         std::vector <float> query_dists(nprobe);
-        quantizer_assign.search(1, query, nprobe, query_dists.data(), query_labels.data());
+        std::vector<float> distance_table(M * ksub);
+        PQ->compute_inner_prod_table(query, distance_table.data());
 
-        faiss::maxheap_heapify(k_result, result_dists.data() + i * k_result, result_labels.data() + i * k_result);
-        
+        faiss::maxheap_heapify(k_result, result_dists.data() + result_position, result_labels.data() + result_position);
+        quantizer_assign.search(1, query, nprobe, query_dists.data(), query_labels.data());
         for (size_t j = 0; j < nprobe; j++){
             size_t group_label = query_labels[j];
             size_t group_size = inverted_index[group_label].size();
@@ -198,22 +199,21 @@ int main(){
                 uint8_t * base_code = residual_code.data() + sequence_id * code_size;
 
                 for (size_t l = 0; l < M; l++){
-                    sum_prod_distance += distance_tables[group_label * M * ksub + l * ksub + base_code[l]];
-                    table_distance += pre_computed_tables[group_label * M * ksub + l * ksub + base_code[l]];
+                    sum_prod_distance += distance_table[l * ksub + base_code[l]];
                 }
 
+                for (size_t l = 0; l < M; l++){
+                    table_distance += pre_computed_tables[group_label * M * ksub + l * ksub + base_code[l]];
+                }
                 sum_distance = qc_dist + table_distance - 2 * sum_prod_distance;
 
-                if (sum_distance < result_dists[i * k_result]){
-                    faiss::maxheap_pop(k_result, result_dists.data() + i * k_result, result_labels.data() + i * k_result);
-                    faiss::maxheap_push(k_result, result_dists.data() + i * k_result, result_labels.data() + i * k_result, sum_distance, sequence_id);
+                if (sum_distance < result_dists[result_position]){
+                    faiss::maxheap_pop(k_result, result_dists.data() + result_position, result_labels.data() + result_position);
+                    faiss::maxheap_push(k_result, result_dists.data() + result_position, result_labels.data() + result_position, sum_distance, sequence_id);
                 }
             }
         }
     }
-
-    Trecorder.print_time_usage("Finished IVFPQ search");
-    // Computing the correct num
     sum_correctness = 0;
     for (size_t i = 0; i < nq; i++){
         std::unordered_set<idx_t> gt_set;
@@ -226,6 +226,11 @@ int main(){
                 sum_correctness ++;
             }
         }
+    }
+    Trecorder.print_time_usage("Finished IVFPQ search");
+    sum_correctness = 0;
+    for (size_t i = 0; i < nq; i++){
+        sum_correctness += query_correctness[i];
     }
 
     std::cout << "The recall for IVFPQ implementation is: " << float(sum_correctness) / (nq * k_result) << std::endl;
