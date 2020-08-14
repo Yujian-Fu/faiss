@@ -24,6 +24,7 @@ int main(){
     size_t nbits = 8;
     size_t nprobe = 100;
     size_t sum_correctness = 0;
+    size_t ksub = 0;
 
     float *xb = new float[dimension * nb];
     float *xq = new float[dimension * nq];
@@ -71,13 +72,14 @@ int main(){
         }
     }
     std::cout << "The recall for HNSW k = " << k_result << " is: " << float(sum_correctness) / (k_result * nq) << std::endl; 
+    */
 
 
     std::vector<idx_t> pq_labels(k_result * nq);
     std::vector<float> pq_dists(k_result * nq);
     faiss::IndexFlatL2 quantizer(dimension);
     faiss::IndexIVFPQ index_pq(&quantizer, dimension, nlist, M, nbits);
-    size_t ksub = index_pq.pq.ksub;
+    ksub = index_pq.pq.ksub;
     index_pq.verbose = true;
     index_pq.train(nb / 10, xb);
     index_pq.add(nb, xb);
@@ -102,7 +104,7 @@ int main(){
 
 
     std::cout << "The recall for PQ k = " << k_result << " is: " << float(sum_correctness) / (k_result * nq) << std::endl; 
-    */
+    
     // My implementation of IVFPQ
     faiss::Clustering clus(dimension, nlist);
     clus.verbose = true;
@@ -112,7 +114,7 @@ int main(){
     faiss::ProductQuantizer * PQ = new faiss::ProductQuantizer(dimension, M, nbits);
 
     size_t code_size = PQ->code_size;
-    size_t ksub = PQ->ksub;
+    ksub = PQ->ksub;
     std::vector<idx_t> base_labels(nb);
     std::vector<float> base_dists(nb);
 
