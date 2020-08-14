@@ -106,6 +106,9 @@ int main(){
     std::cout << "The recall for PQ k = " << k_result << " is: " << float(sum_correctness) / (k_result * nq) << std::endl; 
     
     // My implementation of IVFPQ
+    faiss::Clustering clus(dimension, nlist);
+    faiss::IndexFlatL2 quantizer_assign(dimension);
+    clus.train(nb / 10, xb, quantizer_assign);
 
     faiss::ProductQuantizer * PQ = new faiss::ProductQuantizer(dimension, M, nbits);
 
@@ -114,7 +117,7 @@ int main(){
     std::vector<idx_t> base_labels(nb);
     std::vector<float> base_dists(nb);
 
-    quantizer.search(nb, xb, 1, base_dists.data(), base_labels.data());
+    quantizer_assign.search(nb, xb, 1, base_dists.data(), base_labels.data());
 
     std::vector<std::vector<idx_t>> inverted_index(nlist);
     // Build inverted index list
@@ -124,7 +127,7 @@ int main(){
 
     // Compute the residual and encode the residual
     std::vector<float> residual(dimension * nb);
-    quantizer.compute_residual_n(nb, xb, residual.data(), base_labels.data());
+    quantizer_assign.compute_residual_n(nb, xb, residual.data(), base_labels.data());
 
     PQ->verbose = true;
     PQ->train(nb / 10, residual.data());
@@ -150,7 +153,7 @@ int main(){
     size_t dsub = dimension / M;
     for (size_t i = 0; i < nlist; i++){
         std::vector<float> quantizer_centroid(dimension);
-        quantizer.reconstruct(i, quantizer_centroid.data());
+        quantizer_assign.reconstruct(i, quantizer_centroid.data());
         for (size_t m = 0; m < M; m++){
             const float * quantizer_sub_centroid = quantizer_centroid.data() + m * dsub;
             
@@ -176,7 +179,7 @@ int main(){
         PQ->compute_inner_prod_table(query, distance_table.data());
 
         faiss::maxheap_heapify(k_result, result_dists.data(), result_labels.data());
-        quantizer.search(1, query, nprobe, query_dists.data(), query_labels.data());
+        quantizer_assign.search(1, query, nprobe, query_dists.data(), query_labels.data());
         for (size_t j = 0; j < nprobe; j++){
             size_t group_label = query_labels[j];
             size_t group_size = inverted_index[group_label].size();
