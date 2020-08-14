@@ -222,6 +222,7 @@ int main(){
     for (size_t i = 0; i < nq; i++){
         sum_correctness += query_correctness[i];
     }
+    
     std::cout << "The recall for IVFPQ implementation is: " << float(sum_correctness) / (nq * k_result) << std::endl;
 
 }
