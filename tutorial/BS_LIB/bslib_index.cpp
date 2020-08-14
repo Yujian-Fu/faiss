@@ -656,7 +656,7 @@ namespace bslib{
 
         assert((n_vq + n_lq + n_pq) == this->layers);
         memcpy(assigned_ids, group_ids.data(), n * sizeof(idx_t));
-        //for (size_t i = 0; i < n; i++){assigned_ids[i] = group_ids[i];}
+
     }
 
 

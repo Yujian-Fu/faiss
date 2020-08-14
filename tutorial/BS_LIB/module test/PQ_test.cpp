@@ -107,7 +107,7 @@ int main(){
     
     // My implementation of IVFPQ
     faiss::ClusteringParameters CP;
-    CP.niter = 50;
+    CP.niter = 55;
     faiss::Clustering clus(dimension, nlist, CP);
     faiss::IndexFlatL2 quantizer_assign(dimension);
 
