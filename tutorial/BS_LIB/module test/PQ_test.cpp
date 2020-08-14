@@ -22,7 +22,7 @@ int main(){
     size_t nlist = 100;
     size_t M = 4;
     size_t nbits = 8;
-    size_t nprobe = 10;
+    size_t nprobe = 100;
     size_t sum_correctness = 0;
 
     float *xb = new float[dimension * nb];
