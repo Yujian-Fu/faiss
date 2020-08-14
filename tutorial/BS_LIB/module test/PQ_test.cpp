@@ -18,7 +18,7 @@ int main(){
 
     int dimension = 128;                   // dimension
     int nb = 100000;                       // database size
-    int nq = 100;                         // nb of queries
+    int nq = 1000;                         // nb of queries
     size_t nlist = 100;
     size_t M = 4;
     size_t nbits = 8;
@@ -45,7 +45,7 @@ int main(){
     std::vector<float> dists(k_result * nq);
     Trecorder.print_time_usage("Training flat index");
     
-
+    Trecorder.reset();
     index_flat.add(nb, xb);
     index_flat.search(nq, xq, k_result, dists.data(), labels.data());
     Trecorder.print_time_usage("Searching for flat index");
@@ -88,6 +88,7 @@ int main(){
 
 
     index_pq.nprobe = nprobe;
+    Trecorder.reset();
     index_pq.search(nq, xq, k_result, pq_dists.data(), pq_labels.data());
     Trecorder.print_time_usage("Searching for PQ index");
 
@@ -160,8 +161,9 @@ int main(){
             }
         }
     }
+    Trecorder.reset();
     std::vector<size_t> query_correctness(nq, 0);
-//#pragma omp parallel for
+#pragma omp parallel for
     for (size_t i = 0; i < nq; i++){
         const float * query = xq + i * dimension;
         std::vector <idx_t> result_labels(k_result);
@@ -196,29 +198,6 @@ int main(){
                 }
                 sum_distance = qc_dist + table_distance - 2 * sum_prod_distance;
 
-                /*
-                for (size_t l = 0; l < code_size; l++){std::cout << (float) base_code[l] << " ";} std::cout << std::endl;
-                std::cout << "Recording data" << qc_dist << " " << b_norm << " " << c_norm << " " << sum_prod_distance << " " << sum_distance << " " << std::endl;
-                
-            
-                std::vector<float> reconstructed_residual(dimension);
-                PQ.decode(base_code, reconstructed_residual.data());
-
-                float test_prod_distance = 0;
-                for (size_t l = 0; l < dimension; l++){
-                    test_prod_distance += reconstructed_residual[l] * query[l];
-                }
-
-                float test_prod_actual_distance = faiss::fvec_inner_product(residual.data() + sequence_id * dimension, query, dimension);
-                float test_qc_dist = faiss::fvec_L2sqr(query, index_assign.xb.data() + group_label*dimension, dimension);
-                float test_qb_dist = faiss::fvec_L2sqr(query, xb + sequence_id * dimension, dimension);
-                float test_b_norm = faiss::fvec_norm_L2sqr(xb + sequence_id * dimension, dimension);
-                float test_c_norm = faiss::fvec_norm_L2sqr(index_assign.xb.data() + group_label * dimension, dimension);
-
-                std::cout << "Actual data" << test_qc_dist << " " << test_b_norm << " " << test_c_norm << " " <<  test_prod_distance << " " << test_prod_actual_distance << " " << test_qb_dist << std::endl;
-                */
-
-
                 if (sum_distance < result_dists[0]){
                     faiss::maxheap_pop(k_result, result_dists.data(), result_labels.data());
                     faiss::maxheap_push(k_result, result_dists.data(), result_labels.data(), sum_distance, sequence_id);
@@ -238,6 +217,7 @@ int main(){
             }
         }
     }
+    Trecorder.print_time_usage("Finished IVFPQ search");
     sum_correctness = 0;
     for (size_t i = 0; i < nq; i++){
         sum_correctness += query_correctness[i];
