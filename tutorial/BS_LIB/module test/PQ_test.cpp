@@ -170,7 +170,6 @@ int main(){
         }
     }
     Trecorder.reset();
-    std::vector<size_t> query_correctness(nq, 0);
     std::vector <idx_t> result_labels(nq * k_result);
     std::vector <float> result_dists(nq * k_result);
 #pragma omp parallel for
@@ -214,9 +213,11 @@ int main(){
             }
         }
     }
+    Trecorder.print_time_usage("Finished IVFPQ search");
     sum_correctness = 0;
     for (size_t i = 0; i < nq; i++){
         std::unordered_set<idx_t> gt_set;
+        
         for (size_t j = 0; j < k_result; j++){
             gt_set.insert(labels[i * k_result + j]);
         }
@@ -226,11 +227,6 @@ int main(){
                 sum_correctness ++;
             }
         }
-    }
-    Trecorder.print_time_usage("Finished IVFPQ search");
-    sum_correctness = 0;
-    for (size_t i = 0; i < nq; i++){
-        sum_correctness += query_correctness[i];
     }
 
     std::cout << "The recall for IVFPQ implementation is: " << float(sum_correctness) / (nq * k_result) << std::endl;
