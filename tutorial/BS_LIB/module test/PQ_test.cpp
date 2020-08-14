@@ -71,7 +71,7 @@ int main(){
         }
     }
     std::cout << "The recall for HNSW k = " << k_result << " is: " << float(sum_correctness) / (k_result * nq) << std::endl; 
-*/
+
 
     std::vector<idx_t> pq_labels(k_result * nq);
     std::vector<float> pq_dists(k_result * nq);
@@ -100,15 +100,24 @@ int main(){
         }
     }
 
+
     std::cout << "The recall for PQ k = " << k_result << " is: " << float(sum_correctness) / (k_result * nq) << std::endl; 
+    */
     // My implementation of IVFPQ
-    
-    
-    size_t code_size = index_pq.pq.code_size;
+    faiss::Clustering clus(dimension, nlist);
+    clus.verbose = true;
+    faiss::IndexFlatL2 * index_assign = new faiss::IndexFlatL2(dimension);
+    clus.train(nb / 10, xb, *index_assign);
+
+    faiss::ProductQuantizer * PQ = new faiss::ProductQuantizer(dimension, M, nbits);
+
+
+    size_t code_size = PQ->code_size;
+    size_t ksub = PQ->ksub;
     std::vector<idx_t> base_labels(nb);
     std::vector<float> base_dists(nb);
 
-    index_pq.quantizer->search(nb, xb, 1, base_dists.data(), base_labels.data());
+    index_assign->search(nb, xb, 1, base_dists.data(), base_labels.data());
 
     std::vector<std::vector<idx_t>> inverted_index(nlist);
     // Build inverted index list
@@ -118,10 +127,12 @@ int main(){
 
     // Compute the residual and encode the residual
     std::vector<float> residual(dimension * nb);
-    index_pq.quantizer->compute_residual_n(nb, xb, residual.data(), base_labels.data());
+    index_assign->compute_residual_n(nb, xb, residual.data(), base_labels.data());
+
+    PQ->train(nb / 10, residual.data());
 
     std::vector<uint8_t> residual_code(code_size * nb);
-    index_pq.pq.compute_codes(residual.data(), residual_code.data(), nb);
+    PQ->compute_codes(residual.data(), residual_code.data(), nb);
 
 
     /**
@@ -141,12 +152,12 @@ int main(){
     size_t dsub = dimension / M;
     for (size_t i = 0; i < nlist; i++){
         std::vector<float> quantizer_centroid(dimension);
-        index_pq.quantizer->reconstruct(i, quantizer_centroid.data());
+        index_assign->reconstruct(i, quantizer_centroid.data());
         for (size_t m = 0; m < M; m++){
             const float * quantizer_sub_centroid = quantizer_centroid.data() + m * dsub;
             
             for (size_t k = 0; k < ksub; k++){
-                const float * pq_sub_centroid = index_pq.pq.get_centroids(m, k);
+                const float * pq_sub_centroid = PQ->get_centroids(m, k);
                 float residual_PQ_norm = faiss::fvec_norm_L2sqr(pq_sub_centroid, dsub);
                 float prod_quantizer_pq = faiss::fvec_inner_product(quantizer_sub_centroid, pq_sub_centroid, dsub);
                 pre_computed_tables[i * M * ksub + m * ksub + k] = residual_PQ_norm + 2 * prod_quantizer_pq;
@@ -164,10 +175,10 @@ int main(){
         std::vector <idx_t> query_labels(nprobe);
         std::vector <float> query_dists(nprobe);
         std::vector<float> distance_table(M * ksub);
-        index_pq.pq.compute_inner_prod_table(query, distance_table.data());
+        PQ->compute_inner_prod_table(query, distance_table.data());
 
         faiss::maxheap_heapify(k_result, result_dists.data(), result_labels.data());
-        index_pq.quantizer->search(1, query, nprobe, query_dists.data(), query_labels.data());
+        index_assign->search(1, query, nprobe, query_dists.data(), query_labels.data());
         for (size_t j = 0; j < nprobe; j++){
             size_t group_label = query_labels[j];
             size_t group_size = inverted_index[group_label].size();
