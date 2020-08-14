@@ -18,7 +18,7 @@ int main(){
 
     int dimension = 128;                   // dimension
     int nb = 100000;                       // database size
-    int nq = 1000;                         // nb of queries
+    int nq = 100;                         // nb of queries
     size_t nlist = 100;
     size_t M = 4;
     size_t nbits = 8;
