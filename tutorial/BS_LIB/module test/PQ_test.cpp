@@ -106,8 +106,12 @@ int main(){
     std::cout << "The recall for PQ k = " << k_result << " is: " << float(sum_correctness) / (k_result * nq) << std::endl; 
     
     // My implementation of IVFPQ
-    faiss::Clustering clus(dimension, nlist);
+    faiss::ClusteringParameters CP;
+    CP.niter = 40;
+    faiss::Clustering clus(dimension, nlist, CP);
     faiss::IndexFlatL2 quantizer_assign(dimension);
+
+    clus.verbose = true;
     clus.train(nb / 10, xb, quantizer_assign);
 
     faiss::ProductQuantizer * PQ = new faiss::ProductQuantizer(dimension, M, nbits);
