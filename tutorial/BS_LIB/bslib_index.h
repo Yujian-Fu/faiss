@@ -27,7 +27,6 @@ struct Bslib_Index{
     bool use_reranking;
     bool use_HNSW_VQ;
     bool use_HNSW_group;
-    bool use_norm_quantization;
     bool use_OPQ;
     bool use_hash;
     size_t reranking_space;
@@ -53,9 +52,7 @@ struct Bslib_Index{
     std::vector<float> centroid_norms;
     //std::vector<uint8_t> centroid_norm_codes;
 
-    std::vector<std::vector<uint8_t>> base_norm_codes;
     std::vector<std::vector<uint8_t>> base_codes;
-    std::vector<std::vector<float>> base_norm;
     std::vector<std::vector<idx_t>> base_sequence_ids;
     std::vector<std::vector<idx_t>> base_pre_hash_ids;
 
@@ -63,7 +60,7 @@ struct Bslib_Index{
     std::vector<float> train_data; // Initialized in build_quantizers (without reading)
     std::vector<idx_t> train_data_ids; // Initialized in build_quantizers (without reading)
 
-    explicit Bslib_Index(const size_t dimension, const size_t layers, const std::string * index_type, const bool use_HNSW_VQ, const bool use_norm_quantization);
+    explicit Bslib_Index(const size_t dimension, const size_t layers, const std::string * index_type, const bool use_HNSW_VQ);
 
     void build_quantizers(const uint32_t * ncentroids, const std::string path_quantizer, const std::string path_learn, const size_t * num_train, const std::vector<HNSW_para> HNSW_paras, const std::vector<PQ_para> PQ_paras);
     

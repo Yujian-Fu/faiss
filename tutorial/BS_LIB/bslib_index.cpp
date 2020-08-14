@@ -6,12 +6,11 @@ namespace bslib{
     /**
      * The initialize function for BSLIB struct 
      **/
-    Bslib_Index::Bslib_Index(const size_t dimension, const size_t layers, const std::string * index_type, const bool use_HNSW_VQ,  const bool use_norm_quantization):
+    Bslib_Index::Bslib_Index(const size_t dimension, const size_t layers, const std::string * index_type, const bool use_HNSW_VQ):
         dimension(dimension), layers(layers){
 
             this->use_HNSW_VQ = use_HNSW_VQ;
             this->use_HNSW_group = use_HNSW_group;
-            this->use_norm_quantization = use_norm_quantization;
             this->use_OPQ = use_OPQ;
 
             this->index_type.resize(layers);
@@ -264,68 +263,6 @@ namespace bslib{
             read_quantizers(path_quantizer);
             std::cout << "Checking the quantizers read from file " << std::endl;
             std::cout << "The number of quantizers: " << this->vq_quantizer_index.size() << " " << this->lq_quantizer_index.size() << " " << this->pq_quantizer_index.size() << std::endl;
-
-            /*
-            this->train_data.resize(this->nt * this->dimension);
-            std::cout << "Loading learn set from " << path_learn << std::endl;
-            std::ifstream learn_input(path_learn, std::ios::binary);
-            readXvecFvec<learn_data_type>(learn_input, this->train_data.data(), this->dimension, this->nt, true);
-            this->train_data_idxs.resize(this->nt);
-            for (size_t i = 0; i < this->nt; i++){
-                this->train_data_idxs[i] = 0;
-            }
-            if (this->use_subset){
-                ShowMessage("Using subset of the train set, saving sub train set");
-                std::vector<float> train_subset(this->subnt * this->dimension);
-                RandomSubset(this->train_data.data(), train_subset.data(), this->dimension, this->nt, this->subnt);
-                train_data.resize(this->subnt * this->dimension);
-                for (size_t i = 0; i < subnt * dimension; i++){
-                    this->train_data[i] = train_subset[i];
-                }
-                this->nt = this->subnt;
-                CheckResult<float>(this->train_data.data(), this->dimension);
-            }
-
-            assert(index_type.size() == layers && index_type[0] != "LQ");
-            std::cout << "adding layers to the index structure " << std::endl;
-
-            
-
-            this->max_group_size = 10000;
-           std::cout << "reading the VQ centroids " << std::endl;
-           std::ifstream quantizer_input(path_quantizer, std::ios::binary);
-            VQ_quantizer vq_quantizer = VQ_quantizer(this->dimension, 1, 10000);
-            std::vector<float> centroids(10000 * this->dimension);
-            readXvec<float>(quantizer_input, centroids.data(), dimension, 10000, true);
-            faiss::IndexFlatL2 * centroid_quantizer = new faiss::IndexFlatL2(dimension);
-            centroid_quantizer->add(10000, centroids.data());
-            vq_quantizer.L2_quantizers.push_back(centroid_quantizer);
-            this->vq_quantizer_index.push_back(vq_quantizer);
-            
-            std::cout << this->vq_quantizer_index[0].L2_quantizers.size() << " " << this->vq_quantizer_index[0].L2_quantizers[0]->xb.size() << " " << std::endl;
-            
-            size_t group_size = this->train_data.size() / dimension;
-            std::vector<float> centroid_distances(group_size);
-            std::vector<idx_t> centroid_idxs(group_size);
-
-            this->vq_quantizer_index[0].L2_quantizers[0]->search(group_size, this->train_data.data(), 1, centroid_distances.data(), centroid_idxs.data());
-            for (size_t j = 0; j < group_size; j++){
-                this->train_data_idxs[j] = centroid_idxs[j];
-            }
-
-
-            uint32_t nc_per_group = ncentroids[1];
-            std::vector<float> upper_centroids (ncentroids[0]*dimension);
-            std::vector<idx_t> nn_centroids_idxs(ncentroids[0]*ncentroids[1]);
-            std::vector<float> nn_centroids_dists(ncentroids[0]*ncentroids[1]);
-            this->vq_quantizer_index[0].compute_nn_centroids(nc_per_group, upper_centroids.data(), nn_centroids_dists.data(), nn_centroids_idxs.data());
-            std::cout << "Adding lq quantizer" << std::endl;
-            add_lq_quantizer(ncentroids[0], ncentroids[1], upper_centroids.data(), nn_centroids_idxs.data(), nn_centroids_dists.data(), false);
-            for (size_t i = 0; i < this->lq_quantizer_index[0].alphas.size(); i++){
-                std::cout << lq_quantizer_index[0].alphas[i] << " ";
-            }
-            std::cout << std::endl;
-            */
         }
 
         else
@@ -376,7 +313,6 @@ namespace bslib{
             }
             else if(index_type[i] == "LQ"){
                 assert (i >= 1);
-
                 upper_centroids.resize(nc_upper * dimension);
                 nn_centroids_idxs.resize(nc_upper * nc_per_group);
                 nn_centroids_dists.resize(nc_upper * nc_per_group);
@@ -458,24 +394,6 @@ namespace bslib{
         std::cout << "Writing PQ codebook to " << path_pq << std::endl;
         faiss::write_ProductQuantizer(& this->pq, path_pq.c_str());
 
-        if (use_norm_quantization){
-            std::cout << "Decoding the residual data and train norm product quantizer" << std::endl;
-            std::vector<float> reconstructed_x(dimension * train_set_size);
-            decode(train_set_size, residuals.data(), this->train_data_ids.data(), reconstructed_x.data());
-
-            std::vector<float> xnorm(train_set_size);
-            for (size_t i = 0; i < train_set_size; i++){
-                xnorm[i] = faiss::fvec_norm_L2sqr(reconstructed_x.data() + i * dimension, dimension);
-            }
-            this->norm_pq = faiss::ProductQuantizer(1, this->norm_M, this->nbits);
-            this->norm_code_size = this->norm_pq.code_size;
-
-            std::cout << "Training the norm pq" << std::endl;
-            this->norm_pq.verbose = true;
-            this->norm_pq.train(train_set_size, xnorm.data());
-            std::cout << "Writing norm_PQ codebook to " << path_norm_pq << std::endl;
-            faiss::write_ProductQuantizer(& this->norm_pq, path_norm_pq.c_str());
-        }
     }
     
     /**
@@ -529,6 +447,7 @@ namespace bslib{
             if (use_hash){this->base_pre_hash_ids[group_id][group_position] = batch_pre_hash_ids[i];}
         }
 
+        /*
         std::vector<float> decoded_residuals(n * dimension);
         this->pq.decode(batch_codes.data(), decoded_residuals.data(), n);
         
@@ -560,6 +479,7 @@ namespace bslib{
                 this->base_norm[group_id][group_position] = xnorms[i];
             }
         }
+        */
     }
 
     /**
@@ -767,7 +687,6 @@ namespace bslib{
         else if (k == m){
             memcpy(sub_dists, all_dists, k * sizeof(float));
             memcpy(sub_labels, all_labels, k * sizeof(idx_t));
-            //for (size_t i = 0; i < m; i++){sub_dists[i] = all_dists[i];sub_labels[i] = all_labels[i];}
         }
         else{
             std::cout << "k should be at least as large as m in keep_k_min function " << std::endl;
