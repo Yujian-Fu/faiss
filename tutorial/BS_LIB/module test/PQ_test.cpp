@@ -121,7 +121,7 @@ int main(){
     std::vector<idx_t> base_labels(nb);
     std::vector<float> base_dists(nb);
 
-    index_pq.quantizer->search(nb, xb, 1, base_dists.data(), base_labels.data());
+    quantizer_assign.search(nb, xb, 1, base_dists.data(), base_labels.data());
 
     std::vector<std::vector<idx_t>> inverted_index(nlist);
     // Build inverted index list
@@ -131,7 +131,7 @@ int main(){
 
     // Compute the residual and encode the residual
     std::vector<float> residual(dimension * nb);
-    index_pq.quantizer->compute_residual_n(nb, xb, residual.data(), base_labels.data());
+    quantizer_assign.compute_residual_n(nb, xb, residual.data(), base_labels.data());
 
     PQ->verbose = true;
     PQ->train(nb / 10, residual.data());
@@ -157,7 +157,7 @@ int main(){
     size_t dsub = dimension / M;
     for (size_t i = 0; i < nlist; i++){
         std::vector<float> quantizer_centroid(dimension);
-        index_pq.quantizer->reconstruct(i, quantizer_centroid.data());
+        quantizer_assign.reconstruct(i, quantizer_centroid.data());
         for (size_t m = 0; m < M; m++){
             const float * quantizer_sub_centroid = quantizer_centroid.data() + m * dsub;
             
@@ -170,20 +170,21 @@ int main(){
         }
     }
     Trecorder.reset();
-    std::vector<size_t> query_correctness(nq, 0);
+    std::vector<float> distance_tables(nlist * M * ksub);
+    PQ->compute_inner_prod_tables(nq, xq, distance_tables.data());
+    std::vector <idx_t> result_labels(k_result * nq);
+    std::vector <float> result_dists(k_result * nq);
+
 #pragma omp parallel for
     for (size_t i = 0; i < nq; i++){
         const float * query = xq + i * dimension;
-        std::vector <idx_t> result_labels(k_result);
-        std::vector <float> result_dists(k_result);
-
         std::vector <idx_t> query_labels(nprobe);
         std::vector <float> query_dists(nprobe);
-        std::vector<float> distance_table(M * ksub);
-        PQ->compute_inner_prod_table(query, distance_table.data());
+        quantizer_assign.search(1, query, nprobe, query_dists.data(), query_labels.data());
 
-        faiss::maxheap_heapify(k_result, result_dists.data(), result_labels.data());
-        index_pq.quantizer->search(1, query, nprobe, query_dists.data(), query_labels.data());
+
+        faiss::maxheap_heapify(k_result, result_dists.data() + i * k_result, result_labels.data() + i * k_result);
+        
         for (size_t j = 0; j < nprobe; j++){
             size_t group_label = query_labels[j];
             size_t group_size = inverted_index[group_label].size();
@@ -198,37 +199,34 @@ int main(){
                 uint8_t * base_code = residual_code.data() + sequence_id * code_size;
 
                 for (size_t l = 0; l < M; l++){
-                    sum_prod_distance += distance_table[l * ksub + base_code[l]];
-                }
-
-                for (size_t l = 0; l < M; l++){
+                    sum_prod_distance += distance_tables[group_label * M * ksub + l * ksub + base_code[l]];
                     table_distance += pre_computed_tables[group_label * M * ksub + l * ksub + base_code[l]];
                 }
+
                 sum_distance = qc_dist + table_distance - 2 * sum_prod_distance;
 
-                if (sum_distance < result_dists[0]){
-                    faiss::maxheap_pop(k_result, result_dists.data(), result_labels.data());
-                    faiss::maxheap_push(k_result, result_dists.data(), result_labels.data(), sum_distance, sequence_id);
+                if (sum_distance < result_dists[i * k_result]){
+                    faiss::maxheap_pop(k_result, result_dists.data() + i * k_result, result_labels.data() + i * k_result);
+                    faiss::maxheap_push(k_result, result_dists.data() + i * k_result, result_labels.data() + i * k_result, sum_distance, sequence_id);
                 }
             }
         }
 
-        // Computing the correct num
+    }
+    Trecorder.print_time_usage("Finished IVFPQ search");
+    // Computing the correct num
+    sum_correctness = 0;
+    for (size_t i = 0; i < nq; i++){
         std::unordered_set<idx_t> gt_set;
         for (size_t j = 0; j < k_result; j++){
             gt_set.insert(labels[i * k_result + j]);
         }
 
         for (size_t j = 0; j < k_result; j++){
-            if (gt_set.count(result_labels[j]) != 0){
-                query_correctness[i] ++;
+            if (gt_set.count(result_labels[i * k_result + j]) != 0){
+                sum_correctness ++;
             }
         }
-    }
-    Trecorder.print_time_usage("Finished IVFPQ search");
-    sum_correctness = 0;
-    for (size_t i = 0; i < nq; i++){
-        sum_correctness += query_correctness[i];
     }
 
     std::cout << "The recall for IVFPQ implementation is: " << float(sum_correctness) / (nq * k_result) << std::endl;
