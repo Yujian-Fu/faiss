@@ -196,12 +196,6 @@ int main(){
                 }
                 sum_distance = qc_dist + table_distance - 2 * sum_prod_distance;
 
-                for (size_t temp = 0; temp < k_result; temp++){
-                    if (sequence_id == pq_labels[i * k_result + temp]){
-                        std::cout << sum_distance << " " << pq_dists[i * k_result + temp] << " " << faiss::fvec_L2sqr(query, xb + sequence_id * dimension, dimension) << std::endl;
-                    }
-                }
-
                 /*
                 for (size_t l = 0; l < code_size; l++){std::cout << (float) base_code[l] << " ";} std::cout << std::endl;
                 std::cout << "Recording data" << qc_dist << " " << b_norm << " " << c_norm << " " << sum_prod_distance << " " << sum_distance << " " << std::endl;
