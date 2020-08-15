@@ -140,7 +140,7 @@ int main(){
 
     if (use_OPQ){
         faiss::OPQMatrix * matrix = new faiss::OPQMatrix(dimension, M);
-        matrix->verbose = true; matrix->max_train_points = nb / 10; matrix->niter = 70;
+        matrix->verbose = false; matrix->max_train_points = nb / 10; matrix->niter = 70;
         matrix->train(nb / 10, residual.data()); 
         std::vector<float> copy_residual(dimension * nb);
         memcpy(copy_residual.data(), residual.data(), nb * dimension * sizeof(float));

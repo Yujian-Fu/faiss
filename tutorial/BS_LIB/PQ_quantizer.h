@@ -22,6 +22,7 @@ namespace bslib{
         void compute_residual_group_id(size_t n, const idx_t * group_idxs, const float * x, float * residuals);
         void recover_residual_group_id(size_t n, const idx_t * group_idxs, const float * residuals, float * x);
         void search_in_group(size_t n, const float * queries, const idx_t * group_idxs, float * result_dists,idx_t * result_labels, size_t keep_space);
+        void search_all(size_t n, const float * queries, idx_t * result_labels);
         void multi_sequence_sort(const idx_t group_id, const float * dist_sequence, size_t keep_space, float * result_dists, idx_t * result_labels);
         float get_centroid_norms(const idx_t group_id);
     };

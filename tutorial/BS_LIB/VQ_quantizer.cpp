@@ -87,11 +87,11 @@ namespace bslib{
      * This is the function for updating the ids for train set data
      * 
      * Input:
-     * train_data: the new train data for next layer     size: train_set_size * dimension
-     * train_set_size: the size for train set
+     * train_data: the new train data for next layer     size: n * dimension
+     * n: the size for query_set
      * 
      * Output:
-     * train_data_ids: the ids for train vectors        size: train_set_size
+     * train_data_ids: the ids for train vectors        size: n
      * 
      **/
     void VQ_quantizer::search_all(const size_t n, const float * train_data, idx_t * train_data_ids){
@@ -105,8 +105,8 @@ namespace bslib{
             }
         }
 
-        std::vector<float> result_dists(train_set_size);
-        centroid_index.search(train_set_size, train_data, 1, result_dists.data(), train_data_ids);
+        std::vector<float> result_dists(n);
+        centroid_index.search(n, train_data, 1, result_dists.data(), train_data_ids);
     }
     
 
