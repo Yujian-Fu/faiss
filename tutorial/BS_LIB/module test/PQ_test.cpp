@@ -4,6 +4,7 @@
 #include <unordered_set>
 #include <faiss/utils/distances.h>
 #include "../utils/utils.h"
+#include <faiss/VectorTransform.h>
 
 typedef faiss::Index::idx_t idx_t;
 
@@ -16,6 +17,8 @@ typedef faiss::Index::idx_t idx_t;
 using namespace bslib;
 int main(){
 
+    bool use_OPQ = false;
+
     int dimension = 128;                   // dimension
     int nb = 100000;                       // database size
     int nq = 100;                         // nb of queries
@@ -25,6 +28,7 @@ int main(){
     size_t nprobe = 100;
     size_t sum_correctness = 0;
     size_t ksub = 0;
+    faiss::LinearTransform * OPQMatrix;
 
     float *xb = new float[dimension * nb];
     float *xq = new float[dimension * nq];
@@ -103,6 +107,7 @@ int main(){
         }
     }
 
+
     std::cout << "The recall for PQ k = " << k_result << " is: " << float(sum_correctness) / (k_result * nq) << std::endl; 
     
     // My implementation of IVFPQ
@@ -133,9 +138,24 @@ int main(){
     std::vector<float> residual(dimension * nb);
     quantizer_assign.compute_residual_n(nb, xb, residual.data(), base_labels.data());
 
+    if (use_OPQ){
+        faiss::OPQMatrix * matrix = new faiss::OPQMatrix(dimension, M);
+        matrix->verbose = true; matrix->max_train_points = nb / 10; matrix->niter = 70;
+        matrix->train(nb / 10, residual.data()); 
+        std::vector<float> copy_residual(dimension * nb);
+        memcpy(copy_residual.data(), residual.data(), nb * dimension * sizeof(float));
+        OPQMatrix = matrix;
+        OPQMatrix->apply_noalloc(nb, copy_residual.data(), residual.data());
+
+        std::vector<float> copy_centrodis(nlist * dimension);
+        OPQMatrix->apply_noalloc(nlist, quantizer_assign.xb.data(), copy_centrodis.data());
+        memcpy(quantizer_assign.xb.data(), copy_centrodis.data(), nlist * dimension * sizeof(float));
+    }
+
     PQ->verbose = true;
     PQ->train(nb / 10, residual.data());
 
+    
     std::vector<uint8_t> residual_code(code_size * nb);
     PQ->compute_codes(residual.data(), residual_code.data(), nb);
 
@@ -175,7 +195,7 @@ int main(){
     std::vector <float> result_dists(nq * k_result);
 #pragma omp parallel for
     for (size_t i = 0; i < nq; i++){
-        const float * query = xq + i * dimension;
+        const float * query = use_OPQ ? OPQMatrix->apply(1, xq + i * dimension) : xq + i * dimension ;
         const size_t result_position = i * k_result;
 
         std::vector <idx_t> query_labels(nprobe);
