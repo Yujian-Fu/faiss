@@ -17,7 +17,7 @@ typedef faiss::Index::idx_t idx_t;
 using namespace bslib;
 int main(){
 
-    bool use_OPQ = true;
+    bool use_OPQ = false;
 
     int dimension = 128;                   // dimension
     int nb = 100000;                       // database size
@@ -30,8 +30,18 @@ int main(){
     size_t ksub = 0;
     faiss::LinearTransform * OPQMatrix;
 
+    std::string dataset = "SIFT1M";
+
+    std::string path_base = "/home/y/yujianfu/ivf-hnsw/data/" + dataset + "/" + dataset +"_base.fvecs";
+    std::string path_query = "/home/y/yujianfu/ivf-hnsw/data/" + dataset + "/" + dataset +"_query.fvecs";
+    
+    
     float *xb = new float[dimension * nb];
     float *xq = new float[dimension * nq];
+    std::ifstream base_file(path_base, std::ios::binary); std::ifstream query_file(path_query, std::ios::binary);
+    readXvec<float>(base_file, xb, dimension, nb, false, false);
+    readXvec<float>(query_file, xq, dimension, nq, false, false);
+    /*
     for(int i = 0; i < nb; i++) {
         for(int j = 0; j < dimension; j++) xb[dimension * i + j] = drand48();
         xb[dimension * i] += i / 1000.;
@@ -39,7 +49,8 @@ int main(){
     for(int i = 0; i < nq; i++) {
         for(int j = 0; j < dimension; j++) xq[dimension * i + j] = drand48();
         xq[dimension * i] += i / 1000.;
-    }
+    }*/
+
 
     size_t k_result = 10;
     time_recorder Trecorder = time_recorder();
@@ -141,7 +152,7 @@ int main(){
     if (use_OPQ){
         faiss::OPQMatrix * matrix = new faiss::OPQMatrix(dimension, M);
         matrix->verbose = false; matrix->max_train_points = nb / 10; matrix->niter = 70;
-        matrix->train(nb / 10, residual.data()); 
+        matrix->train(nb / 10, residual.data());
         std::vector<float> copy_residual(dimension * nb);
         memcpy(copy_residual.data(), residual.data(), nb * dimension * sizeof(float));
         OPQMatrix = matrix;
