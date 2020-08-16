@@ -305,8 +305,29 @@ namespace bslib{
 
 
     /**
-     * This is the function for 
+     * This is the function for search in all groups
      **/
+    void PQ_quantizer::search_all(const size_t n, const float * query_data, idx_t * query_data_ids){
+        std::vector<idx_t> query_group_labels(n  * nc_upper);
+        std::vector<float> query_group_dists(n * nc_upper);
+#pragma omp parallel for
+        for (size_t i = 0; i < nc_upper; i++){
+            std::vector<idx_t> query_group_idxs(n, i);
+            search_in_group(n, query_data, query_group_idxs.data(), query_group_dists.data() + i * n, query_group_labels.data() + i * n, 1);
+        }
+
+        for (size_t i = 0; i < n; i++){
+            float min_dis = query_group_dists[i];
+            query_data_ids[i] = query_group_labels[i];
+
+            for (size_t j = 1; j < nc_upper; j++){
+                if (query_group_dists[i * j] < min_dis){
+                    min_dis = query_group_dists[i * j];
+                    query_data_ids[i] = query_group_labels[i * j];
+                }
+            }
+        }
+    }
 
     /**
      * 

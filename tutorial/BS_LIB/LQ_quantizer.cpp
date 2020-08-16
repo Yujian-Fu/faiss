@@ -146,13 +146,13 @@ namespace bslib{
      * n: the size for query set
      * 
      * Output:
-     * train_data_ids: the ids for train vectors        size: n
+     * train_data_ids: the ids for train vectors        size: n * k
      * 
      **/
 
-    void LQ_quantizer::search_all(size_t n, const float * train_data, idx_t * train_data_ids){
-        faiss::IndexFlatL2 centroid_index(dimension);
-        std::vector<float> one_centroid(dimension);
+    void LQ_quantizer::search_all(const size_t n, const size_t k, const float * query_data, idx_t * query_data_ids){
+        faiss::IndexFlatL2 centroid_index(dimension * k);
+        std::vector<float> one_centroid(dimension * k);
 
         for (size_t group_id = 0; group_id < nc_upper; group_id++){
             for (size_t inner_group_id = 0; inner_group_id < nc_per_group; inner_group_id++){
@@ -162,7 +162,7 @@ namespace bslib{
         }
 
         std::vector<float> result_dists(n);
-        centroid_index.search(n, train_data, 1, result_dists.data(), train_data_ids);
+        centroid_index.search(n, query_data, k, result_dists.data(), query_data_ids);
     }
 
 

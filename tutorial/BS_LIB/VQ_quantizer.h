@@ -25,7 +25,7 @@ namespace bslib{
         void compute_residual_group_id(size_t n, const idx_t * labels, const float * x, float * residuals); 
         void recover_residual_group_id(size_t n, const idx_t * labels, const float * residuals, float * x);
         void search_in_group(size_t n, const float * queries, const idx_t * group_idxs, float * result_dists, idx_t * result_labels, size_t keep_space);
-        void search_all(const size_t n, const float * train_data, idx_t * train_data_ids);
+        void search_all(const size_t n, const size_t k, const float * query_data, idx_t * query_data_ids);
         void compute_nn_centroids(size_t k, float * nn_centroids, float * nn_dists, idx_t * labels);
         void write_HNSW(std::ofstream & output);
         void read_HNSW(std::ifstream & input);

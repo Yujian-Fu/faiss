@@ -577,86 +577,18 @@ namespace bslib{
      * 
      **/
     void Bslib_Index::assign(const size_t n, const float * assign_data, idx_t * assigned_ids){
-        bool report_time = false;
-        std::vector<idx_t> group_ids (n, 0);
-        std::vector<float> group_dists(n, 0.0);
-
-        size_t n_vq = 0;
-        size_t n_lq = 0;
-        size_t n_pq = 0;
-        size_t group_size = 0;
-        clock_t starttime, endtime;
-
-        //The size for results should be: n * group_size * search_space
-        std::vector<float> result_dists(this->max_group_size * n * 1, 0);
-        std::vector<idx_t> result_labels (this->max_group_size * n * 1, 0);
-        //search_space is num_group * group_size, num_group should always be 1 in assigning
-        size_t search_space = 1;
-        //The keep_space is always 1 for assign
-        const size_t keep_space = 1;
-
-        for (size_t i = 0; i < this->layers; i++){
-            assert(n_lq + n_vq + n_pq == i);
-
-            if (index_type[i] == "VQ"){
-                starttime = clock();
-                group_size = vq_quantizer_index[n_vq].nc_per_group;
-                vq_quantizer_index[n_vq].search_in_group(n, assign_data, group_ids.data(), result_dists.data(), result_labels.data(), 1);
-                //Update the group_idxs for VQ layer
-                if (use_HNSW_VQ){
-                    for (size_t j = 0; j < n; j++){group_ids[j] = result_labels[j * group_size]; group_dists[j] = result_dists[j * group_size];}
-                }    
-                else{
-#pragma omp parallel for
-                    for (size_t j = 0; j < n; j++){keep_k_min(group_size, 1, result_dists.data()+j*group_size, result_labels.data()+j*group_size, group_dists.data()+j, group_ids.data()+j);}
-                }
-                n_vq ++;
-                endtime = clock();
-                if(report_time) std::cout << "Time for searching in VQ layer: " << float(endtime - starttime) / CLOCKS_PER_SEC << std::endl;
-            }
-
-            else if(index_type[i] == "LQ"){
-                clock_t starttime = clock();
-                group_size = lq_quantizer_index[n_lq].nc_per_group;
-                //Copying the upper layer result for LQ layer usage
-                //This search space is the search space for upper search space = upper group size * 1
-                //The group size is the nc_per_group in this layer
-                std::vector<idx_t> upper_result_labels(n * search_space);
-                std::vector<float> upper_result_dists(n * search_space);
-                memcpy(upper_result_labels.data(), result_labels.data(), n * search_space * sizeof(idx_t));
-                memcpy(upper_result_dists.data(), result_dists.data(), n * search_space * sizeof(float));
-                //for (size_t j = 0; j < n * search_space; j++){upper_result_labels[j] = result_labels[j]; upper_result_dists[j] = result_dists[j];}
-
-                lq_quantizer_index[n_lq].search_in_group(n, assign_data, upper_result_labels.data(), upper_result_dists.data(), search_space, group_ids.data(), result_dists.data(), result_labels.data());
-                //Update the group_ids for LQ layer
-#pragma omp parallel for
-                for (size_t j = 0; j < n; j++){keep_k_min(group_size, 1, result_dists.data()+j*group_size, result_labels.data()+j*group_size, group_dists.data()+j, group_ids.data()+j);}
-                n_lq ++;
-                endtime = clock();
-                if(report_time) std::cout << "Time in LQ layer: " << float(endtime - starttime) / CLOCKS_PER_SEC << std::endl;
-            }
-            else if (index_type[i] == "PQ"){
-                starttime = clock();
-                std::vector<float> pq_result_dists(n, 0);
-                std::vector<idx_t> pq_result_labels(n, 0);
-                pq_quantizer_index[n_pq].search_in_group(n, assign_data, group_ids.data(), pq_result_dists.data(), pq_result_labels.data(), keep_space);
-                //for (size_t j = 0; j < n; j++){group_ids[j] = result_labels[j]; group_dists[j] = result_dists[j];}
-                memcpy(group_ids.data(), pq_result_labels.data(), n * sizeof(idx_t));
-                memcpy(group_dists.data(),pq_result_dists.data(), n * sizeof(float));
-                n_pq ++;
-                endtime = clock();
-                if(report_time) std::cout << "Time in PQ layer" << float(endtime - starttime) / CLOCKS_PER_SEC << std::endl;
-            }
-            else{
-                std::cout << "The type name is wrong with " << index_type[i] << "!" << std::endl;
-                exit(0); 
-            }
-            search_space = group_size * keep_space;
+        if (index_type[layers - 1] == "VQ"){
+            size_t n_vq = vq_quantizer_index.size();
+            vq_quantizer_index[n_vq - 1].search_all(n, 1, assign_data, assigned_ids);
         }
-
-        assert((n_vq + n_lq + n_pq) == this->layers);
-        memcpy(assigned_ids, group_ids.data(), n * sizeof(idx_t));
-
+        else if(index_type[layers - 1] == "LQ"){
+            size_t n_lq = lq_quantizer_index.size();
+            lq_quantizer_index[n_lq - 1].search_all(n, 1, assign_data, assigned_ids);
+        }
+        else if(index[layers - 1] == "PQ"){
+            size_t n_pq = pq_quantizer_index.size();
+            pq_quantizer_index[n_pq - 1].search_all(n, 1, assign_data, assigned_ids);
+        }
     }
 
 
