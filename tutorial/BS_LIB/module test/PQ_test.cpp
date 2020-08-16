@@ -14,6 +14,22 @@ typedef faiss::Index::idx_t idx_t;
  * If the second length is smaller than the first length, then all the part is the origin value
  * !!!!! fvec_madd the first parameter is dimension!!!!
  **/
+
+/**
+ * The procession of use OPQ:
+ * Train:
+ * use residual to train the OPQ matrix
+ * Use the rotated residual to train the PQ
+ * 
+ * Assign:
+ * assign the origin vector and origin centroids
+ * 
+ * Add_batch:
+ * compute and rotate the residuals
+ * rotate the residual with pretrained PQ
+ * 
+ * rotate the centroids for further searching
+ **/
 using namespace bslib;
 int main(){
 
@@ -151,7 +167,7 @@ int main(){
 
     if (use_OPQ){
         faiss::OPQMatrix * matrix = new faiss::OPQMatrix(dimension, M);
-        matrix->verbose = false; matrix->max_train_points = nb / 10; matrix->niter = 70;
+        matrix->verbose = false; matrix->max_train_points = nb / 10;
         matrix->train(nb / 10, residual.data());
         std::vector<float> copy_residual(dimension * nb);
         memcpy(copy_residual.data(), residual.data(), nb * dimension * sizeof(float));
@@ -161,6 +177,9 @@ int main(){
         std::vector<float> copy_centrodis(nlist * dimension);
         OPQMatrix->apply_noalloc(nlist, quantizer.xb.data(), copy_centrodis.data());
         memcpy(quantizer.xb.data(), copy_centrodis.data(), nlist * dimension * sizeof(float));
+
+
+
     }
 
     PQ->verbose = true;
