@@ -585,12 +585,11 @@ namespace bslib{
             size_t n_lq = lq_quantizer_index.size();
             lq_quantizer_index[n_lq - 1].search_all(n, 1, assign_data, assigned_ids);
         }
-        else if(index[layers - 1] == "PQ"){
+        else if(index_type[layers - 1] == "PQ"){
             size_t n_pq = pq_quantizer_index.size();
-            pq_quantizer_index[n_pq - 1].search_all(n, 1, assign_data, assigned_ids);
+            pq_quantizer_index[n_pq - 1].search_all(n, assign_data, assigned_ids);
         }
     }
-
 
     /**
      * 
@@ -692,6 +691,7 @@ namespace bslib{
       * d = || x - y_C ||^2 - || y_C ||^2 + || y_C + y_R ||^2 - 2 * (x|y_R)
       *        -----------------------------   -----------------   -----------
       *                     term 1                   term 2           term 3
+     * 
      * distance = ||query - (centroids + residual_PQ)||^2
      *            ||query - centroids||^2 + ||residual_PQ|| ^2 - 2 * (query - centroids) * residual_PQ
      *            ||query - centroids||^2 + ||residual_PQ|| ^2 - 2 * query * residual_PQ + 2 * centroids * residual_PQ
