@@ -153,7 +153,6 @@ int main(){
     std::vector<idx_t> base_labels(nb);
     std::vector<float> base_dists(nb);
 
-
     quantizer.search(nb, xb, 1, base_dists.data(), base_labels.data());
 
     std::vector<std::vector<idx_t>> inverted_index(nlist);
@@ -178,14 +177,15 @@ int main(){
         std::vector<float> copy_centrodis(nlist * dimension);
         OPQMatrix->apply_noalloc(nlist, quantizer.xb.data(), copy_centrodis.data());
         memcpy(quantizer.xb.data(), copy_centrodis.data(), nlist * dimension * sizeof(float));
+
     }
 
-    //PQ->verbose = true;
-    //PQ->train(nb / 10, residual.data());
+    PQ->verbose = true;
+    PQ->train(nb / 10, residual.data());
 
     
     std::vector<uint8_t> residual_code(code_size * nb);
-    index_pq.pq.compute_codes(residual.data(), residual_code.data(), nb);
+    PQ->compute_codes(residual.data(), residual_code.data(), nb);
 
 
     /**
@@ -221,8 +221,7 @@ int main(){
     Trecorder.reset();
     std::vector <idx_t> result_labels(nq * k_result);
     std::vector <float> result_dists(nq * k_result);
-    float flat_search_time = 0, table_search_time = 0;
-//#pragma omp parallel for
+#pragma omp parallel for
     for (size_t i = 0; i < nq; i++){
         const float * query = use_OPQ ? OPQMatrix->apply(1, xq + i * dimension) : xq + i * dimension ;
         const size_t result_position = i * k_result;
@@ -230,20 +229,14 @@ int main(){
         std::vector <idx_t> query_labels(nprobe);
         std::vector <float> query_dists(nprobe);
         std::vector<float> distance_table(M * ksub);
-        index_pq.pq.compute_inner_prod_table(query, distance_table.data());
+        PQ->compute_inner_prod_table(query, distance_table.data());
 
         faiss::maxheap_heapify(k_result, result_dists.data() + result_position, result_labels.data() + result_position);
-        
-        Trecorder.reset();
         quantizer.search(1, query, nprobe, query_dists.data(), query_labels.data());
-        flat_search_time += Trecorder.get_time_usage() / nlist;
         
-        Trecorder.reset();
-        size_t visited_vectors = 0;
         for (size_t j = 0; j < nprobe; j++){
             size_t group_label = query_labels[j];
             size_t group_size = inverted_index[group_label].size();
-            visited_vectors += group_size;
             float qc_dist = query_dists[j];
 
             for (size_t k = 0; k < group_size; k++){
@@ -267,10 +260,8 @@ int main(){
                 }
             }
         }
-        table_search_time += Trecorder.get_time_usage() / visited_vectors;
     }
     Trecorder.print_time_usage("Finished IVFPQ search");
-    std::cout << "The time for searching flat and table distance " << flat_search_time << " " << table_search_time << " " << flat_search_time/table_search_time << std::endl;
     sum_correctness = 0;
     for (size_t i = 0; i < nq; i++){
         std::unordered_set<idx_t> gt_set;

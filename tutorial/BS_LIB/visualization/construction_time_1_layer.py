@@ -14,7 +14,6 @@ for filepath in filepaths:
     f1 = file.readlines()
 
     for x in f1:
-        if 
         if "Finish clustering: The time usage: " in x:
             clustering_time = float(x.split("Finish clustering: The time usage: ")[1].split(" ")[0])
             construction_time.append(clustering_time)
