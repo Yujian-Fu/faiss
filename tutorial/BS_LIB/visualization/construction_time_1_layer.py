@@ -5,7 +5,7 @@ dataset = "DEEP1M"
 title = dataset + " / Centroid Setting - Construction Time"
 
 filepaths = ["/home/yujian/Desktop/Recording_Files/VQ/" + dataset + "/reasoning.txt", "/home/yujian/Desktop/Recording_Files/VQ/" + dataset + "/reasoning_6000.txt"]
-construction_time = []
+visited_centroids = []
 construction_centroids = []
 
 for filepath in filepaths:
