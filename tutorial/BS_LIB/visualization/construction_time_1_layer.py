@@ -30,8 +30,8 @@ for filepath in filepaths:
             position = 0
 
         if record_1:
-            clustering_time = float(x.split("Finish clustering: The time usage: ")[1].split(" ")[0])
-            construction_time.append(clustering_time)
+            visited_centroid = float(x.split("Finish clustering: The time usage: ")[1].split(" ")[0])
+            .append(clustering_time)
         
         if "Construction parameter: dataset: "+dataset+" train_size: 100000 n_centroids: " in x:
             centroids = float(x.split("Construction parameter: dataset: "+dataset+" train_size: 100000 n_centroids: ")[1].split(" ")[0])

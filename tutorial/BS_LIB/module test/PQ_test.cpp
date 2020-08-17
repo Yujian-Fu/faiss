@@ -40,7 +40,7 @@ int main(){
     int nb = 100000;                       // database size
     int nq = 100;                         // nb of queries
     size_t nlist = 100;
-    size_t M = 4;
+    size_t M = 8;
     size_t nbits = 8;
     size_t nprobe = 100;
     size_t sum_correctness = 0;
@@ -52,7 +52,7 @@ int main(){
 
     std::string path_base = "/home/y/yujianfu/ivf-hnsw/data/" + dataset + "/" + dataset +"_base.fvecs";
     std::string path_query = "/home/y/yujianfu/ivf-hnsw/data/" + dataset + "/" + dataset +"_query.fvecs";
-    std::string path_record = "/home/y/yujianfu/ivf-hnsw/VQ/" + dataset + "/recording_reranking_space.txt";
+    std::string path_record = "/home/y/yujianfu/ivf-hnsw/VQ/" + dataset + "/recording_reranking_space_" + std::to_string(M) + "_" + std::to_string(nbits) + "_" + ".txt";
     
     
     float *xb = new float[dimension * nb];

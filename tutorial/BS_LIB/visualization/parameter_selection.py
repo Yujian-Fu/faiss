@@ -15,6 +15,7 @@ filepaths = ["/home/yujian/Desktop/Recording_Files/VQ/" + dataset + "/reasoning.
 
 # This is the figure for 
 
+
 for i in range(len(recall_performance)):
     title1 = title + " / Recall@ " + str(recall_performance[i])
     legends = ["1"] if recall_performance[i] == 1 else ["0.1", "0.5", "0.8", "1"] 
@@ -73,7 +74,6 @@ for i in range(len(recall_performance)):
                     for j in range(len(recording_proportion)):
                         sub_visited_vectors = [each_visited_vectors[temp * len(recording_proportion) + j] for temp in range(each_visited_length)]
                 
-                        
                         visited_vectors.append(np.mean(list(map(float, sub_visited_vectors))))
 
                 each_visited_vectors = []
