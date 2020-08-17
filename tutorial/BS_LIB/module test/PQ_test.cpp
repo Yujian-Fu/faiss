@@ -270,7 +270,7 @@ int main(){
         table_search_time += Trecorder.get_time_usage() / visited_vectors;
     }
     Trecorder.print_time_usage("Finished IVFPQ search");
-    std::cout << "The time for searching flat and table distance " << flat_search_time << " " << table_search_time << flat_search_time/table_search_time << std::endl;
+    std::cout << "The time for searching flat and table distance " << flat_search_time << " " << table_search_time << " " << flat_search_time/table_search_time << std::endl;
     sum_correctness = 0;
     for (size_t i = 0; i < nq; i++){
         std::unordered_set<idx_t> gt_set;
