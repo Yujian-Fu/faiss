@@ -33,6 +33,10 @@ namespace bslib{
             void print_time_usage(std::string s){
                 std::cout << s << " The time usage: " << getTimeConsumption() / 1000000 << " s "<< std::endl; 
             }
+
+            float get_time_usage(){
+                return getTimeConsumption() / 1000000;
+            }
     };
 
     struct memory_recorder{
