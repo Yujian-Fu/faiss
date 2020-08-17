@@ -5,6 +5,7 @@
 #include <faiss/utils/distances.h>
 #include "../utils/utils.h"
 #include <faiss/VectorTransform.h>
+#include <algorithm>
 
 typedef faiss::Index::idx_t idx_t;
 
@@ -51,6 +52,7 @@ int main(){
 
     std::string path_base = "/home/y/yujianfu/ivf-hnsw/data/" + dataset + "/" + dataset +"_base.fvecs";
     std::string path_query = "/home/y/yujianfu/ivf-hnsw/data/" + dataset + "/" + dataset +"_query.fvecs";
+    std::string path_record = "/home/y/yujianfu/ivf-hnsw/VQ/" + dataset + "/recording_reranking_space.txt";
     
     
     float *xb = new float[dimension * nb];
@@ -69,8 +71,14 @@ int main(){
     }*/
 
 
-    size_t k_result = 10;
+    size_t k_result = 100;
     time_recorder Trecorder = time_recorder();
+
+    std::ofstream record_file;
+    record_file.open(path_record, std::ios::app);
+    
+    for (nlist = 100; nlist < 2000; nlist++){
+
 
     faiss::IndexFlatL2 index_flat(dimension);
     std::vector<idx_t> labels(k_result * nq);
@@ -222,6 +230,7 @@ int main(){
     Trecorder.reset();
     std::vector <idx_t> result_labels(nq * k_result);
     std::vector <float> result_dists(nq * k_result);
+    std::vector<size_t> max_reranking_space(nq * 3);
 #pragma omp parallel for
     for (size_t i = 0; i < nq; i++){
         const float * query = use_OPQ ? OPQMatrix->apply(1, xq + i * dimension) : xq + i * dimension ;
@@ -234,11 +243,16 @@ int main(){
 
         faiss::maxheap_heapify(k_result, result_dists.data() + result_position, result_labels.data() + result_position);
         quantizer.search(1, query, nprobe, query_dists.data(), query_labels.data());
+        std::vector<float> computed_distance;
+        std::vector<idx_t> computed_label;
+        size_t visited_vectors = 0;
         
+
         for (size_t j = 0; j < nprobe; j++){
             size_t group_label = query_labels[j];
             size_t group_size = inverted_index[group_label].size();
             float qc_dist = query_dists[j];
+            visited_vectors += group_size;
 
             for (size_t k = 0; k < group_size; k++){
                 float sum_distance = 0;
@@ -254,6 +268,8 @@ int main(){
                 }
 
                 sum_distance = qc_dist + table_distance - 2 * sum_prod_distance;
+                computed_distance.push_back(sum_distance);
+                computed_label.push_back(sequence_id);
 
                 if (sum_distance < result_dists[result_position]){
                     faiss::maxheap_pop(k_result, result_dists.data() + result_position, result_labels.data() + result_position);
@@ -261,6 +277,49 @@ int main(){
                 }
             }
         }
+
+        std::vector<idx_t> search_dist_index(visited_vectors);
+        uint32_t x=0;
+        std::iota(search_dist_index.begin(),search_dist_index.end(),x++);
+        std::sort(search_dist_index.begin(),search_dist_index.end(), [&](int i,int j){return computed_distance[i]<computed_distance[j];});
+        size_t visited_1 = 0, visited_10 = 0, visited_100 = 0;
+        std::unordered_set<idx_t> set_1, set_10, set_100;
+        
+        for (size_t j = 0; j < 100; j++){
+            if (j < 1)
+                set_1.insert(labels[i * k_result]);
+            if (j < 10)
+                set_10.insert(labels[i * k_result + j]);
+            set_100.insert(labels[i * k_result + j]);
+            }
+        for (size_t j = 0; j < visited_vectors; j++){
+            if (set_1.count(computed_label[search_dist_index[j]]) != 0){
+                visited_1 ++;
+                visited_10 ++;
+                visited_100 ++;
+            }
+            else if(set_10.count(computed_label[search_dist_index[j]]) != 0){
+                visited_10 ++;
+                visited_100 ++;
+            }
+            else if (set_100.count(computed_label[search_dist_index[j]]) != 0){
+                visited_100 ++;
+            }
+
+            if (visited_1 == 1){
+                max_reranking_space[i * 3 + 0] = j;
+                visited_1 = -1;
+            }
+            if (visited_10 == 10){
+                max_reranking_space[i * 3 + 1] = j;
+                visited_10 = -1;
+            }
+            if(visited_100 == 100){
+                max_reranking_space[i * 3 + 2] = j;
+                visited_100 = -1;
+            }
+        }
+
     }
     Trecorder.print_time_usage("Finished IVFPQ search");
     sum_correctness = 0;
@@ -279,4 +338,7 @@ int main(){
     }
 
     std::cout << "The recall for IVFPQ implementation is: " << float(sum_correctness) / (nq * k_result) << std::endl;
+    record_file << "The VQ centroids: " << nlist << std::endl;
+    for (size_t i = 0; i < max_reranking_space.size(); i++){record_file << max_reranking_space[i] << " ";} record_file << std::endl;
+}
 }
