@@ -44,6 +44,7 @@ int main(){
     size_t nprobe = 100;
     size_t sum_correctness = 0;
     size_t ksub = 0;
+    size_t code_size = 0;
     faiss::LinearTransform * OPQMatrix;
 
     std::string dataset = "SIFT1M";
@@ -105,13 +106,14 @@ int main(){
     std::cout << "The recall for HNSW k = " << k_result << " is: " << float(sum_correctness) / (k_result * nq) << std::endl; 
     */
 
-
+   
     std::vector<idx_t> pq_labels(k_result * nq);
     std::vector<float> pq_dists(k_result * nq);
     faiss::IndexFlatL2 quantizer(dimension);
 
     faiss::IndexIVFPQ index_pq(&quantizer, dimension, nlist, M, nbits);
     ksub = index_pq.pq.ksub;
+    code_size = index_pq.pq.code_size;
     index_pq.verbose = true;
     index_pq.train(nb / 10, xb);
     index_pq.add(nb, xb);
@@ -134,22 +136,21 @@ int main(){
         }
     }
 
-
     std::cout << "The recall for PQ k = " << k_result << " is: " << float(sum_correctness) / (k_result * nq) << std::endl; 
     
     // My implementation of IVFPQ
-    faiss::ClusteringParameters CP;
-    CP.niter = 100;
-    faiss::Clustering clus(dimension, nlist, CP);
-    faiss::IndexFlatL2 quantizer_assign(dimension);
+    //faiss::ClusteringParameters CP;
+    //CP.niter = 100;
+    //faiss::Clustering clus(dimension, nlist, CP);
+    //faiss::IndexFlatL2 quantizer_assign(dimension);
 
-    clus.verbose = true;
-    clus.train(nb / 10, xb, quantizer_assign);
+    //clus.verbose = true;
+    //clus.train(nb / 10, xb, quantizer_assign);
 
-    faiss::ProductQuantizer * PQ = new faiss::ProductQuantizer(dimension, M, nbits);
+    //faiss::ProductQuantizer * PQ = new faiss::ProductQuantizer(dimension, M, nbits);
 
-    size_t code_size = PQ->code_size;
-    ksub = PQ->ksub;
+    //size_t code_size = PQ->code_size;
+    //ksub = PQ->ksub;
     std::vector<idx_t> base_labels(nb);
     std::vector<float> base_dists(nb);
 
@@ -180,12 +181,12 @@ int main(){
 
     }
 
-    PQ->verbose = true;
-    PQ->train(nb / 10, residual.data());
+    //PQ->verbose = true;
+    //PQ->train(nb / 10, residual.data());
 
     
     std::vector<uint8_t> residual_code(code_size * nb);
-    PQ->compute_codes(residual.data(), residual_code.data(), nb);
+    index_pq.pq.compute_codes(residual.data(), residual_code.data(), nb);
 
 
     /**
@@ -210,7 +211,7 @@ int main(){
             const float * quantizer_sub_centroid = quantizer_centroid.data() + m * dsub;
             
             for (size_t k = 0; k < ksub; k++){
-                const float * pq_sub_centroid = PQ->get_centroids(m, k);
+                const float * pq_sub_centroid = index_pq.pq.get_centroids(m, k);
                 float residual_PQ_norm = faiss::fvec_norm_L2sqr(pq_sub_centroid, dsub);
                 float prod_quantizer_pq = faiss::fvec_inner_product(quantizer_sub_centroid, pq_sub_centroid, dsub);
                 pre_computed_tables[i * M * ksub + m * ksub + k] = residual_PQ_norm + 2 * prod_quantizer_pq;
@@ -229,7 +230,7 @@ int main(){
         std::vector <idx_t> query_labels(nprobe);
         std::vector <float> query_dists(nprobe);
         std::vector<float> distance_table(M * ksub);
-        PQ->compute_inner_prod_table(query, distance_table.data());
+        index_pq.pq.compute_inner_prod_table(query, distance_table.data());
 
         faiss::maxheap_heapify(k_result, result_dists.data() + result_position, result_labels.data() + result_position);
         quantizer.search(1, query, nprobe, query_dists.data(), query_labels.data());
@@ -278,5 +279,4 @@ int main(){
     }
 
     std::cout << "The recall for IVFPQ implementation is: " << float(sum_correctness) / (nq * k_result) << std::endl;
-
 }

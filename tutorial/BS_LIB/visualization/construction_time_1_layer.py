@@ -8,12 +8,19 @@ filepaths = ["/home/yujian/Desktop/Recording_Files/VQ/" + dataset + "/reasoning.
 visited_centroids = []
 eighty_visited_centoids = []
 construction_centroids = []
+record_1 = False
+record_2 = False
+record_3 = False 
 
 for filepath in filepaths:
     file = open(filepath, "r")
     f1 = file.readlines()
 
     for x in f1:
+        if "R@1 MC:" in x:
+            
+
+
         if "Finish clustering: The time usage: " in x:
             clustering_time = float(x.split("Finish clustering: The time usage: ")[1].split(" ")[0])
             construction_time.append(clustering_time)
