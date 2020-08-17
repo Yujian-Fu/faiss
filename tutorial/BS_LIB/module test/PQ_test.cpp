@@ -77,7 +77,7 @@ int main(){
     std::ofstream record_file;
     record_file.open(path_record, std::ios::app);
     
-    for (nlist = 100; nlist < 2000; nlist++){
+    for (nlist = 100; nlist < 2000; nlist+=200){
 
 
     faiss::IndexFlatL2 index_flat(dimension);

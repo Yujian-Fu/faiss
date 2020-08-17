@@ -18,6 +18,9 @@ position = 0
 query_start = False
 recording_position = []
 recording_visited_vectors = []
+first_visited_centroids = []
+second_visited_centroids = []
+avg_second_visited_centroids = []
 
 plt.figure()
 
@@ -31,6 +34,7 @@ for filepath in filepaths:
         if "n centroids:" in x:
             centroids = x.split("n centroids:")[-1].split(" ")[1:3]
             x_axis = centroids[0] + " " + centroids[1]
+            first_visited_centroids.append(float(centroids[0]))
             x_centroids.append(x_axis)
         
         if "Q:" in x:
@@ -49,11 +53,13 @@ for filepath in filepaths:
                             recording_position[j] = i
 
 
+
             if position == 5:
                 query_start = False
                 second_visited_vectors = list(map(float, x.split(" ")[0:-1]))
                 for i in range(len(recall_performance)):
                     assert(recording_position[i] >= 0)
+                    second_visited_centroids.append(recording_position[i] + 1)
                     x_visited_vectors.append(second_visited_vectors[recording_position[i]])
 
         if "Finished result analysis:" in x:

@@ -2,7 +2,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 
 dataset = "DEEP1M"
-title = dataset + " / Num Centroids - Visited Vectors"
+title = dataset + " / Num Centroids - Search Time"
 
 recording_proportion = [0.1, 0.5, 0.8, 1]
 recall_performance = [1, 10, 100]

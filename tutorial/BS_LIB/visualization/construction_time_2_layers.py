@@ -7,7 +7,7 @@ filenames = ["/reasoning_models_VQ_VQ_10_50_10_50.txt", "/reasoning_models_VQ_VQ
             "/reasoning_models_VQ_VQ_60_100_10_50.txt", "/reasoning_models_VQ_VQ_60_100_60_100.txt"]
 
 filepaths = ["/home/yujian/Desktop/Recording_Files/VQ_VQ/" + dataset + filenames[i] for i in range(len(filenames))]
-
+distance_ratio = 400
 x_centroids = []
 sum_time = []
 first_layer_time = 0
