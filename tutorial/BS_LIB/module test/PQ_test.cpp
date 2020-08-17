@@ -52,7 +52,7 @@ int main(){
 
     std::string path_base = "/home/y/yujianfu/ivf-hnsw/data/" + dataset + "/" + dataset +"_base.fvecs";
     std::string path_query = "/home/y/yujianfu/ivf-hnsw/data/" + dataset + "/" + dataset +"_query.fvecs";
-    std::string path_record = "/home/y/yujianfu/ivf-hnsw/VQ/" + dataset + "/recording_reranking_space_" + std::to_string(M) + "_" + std::to_string(nbits) + "_" + ".txt";
+    std::string path_record = "/home/y/yujianfu/ivf-hnsw/models_VQ/" + dataset + "/recording_reranking_space_" + std::to_string(M) + "_" + std::to_string(nbits) + "_" + ".txt";
     
     
     float *xb = new float[dimension * nb];

@@ -15,7 +15,7 @@ filepaths = ["/home/yujian/Desktop/Recording_Files/VQ/" + dataset + "/reasoning.
 
 # This is the figure for 
 
-
+distance_ratio = 400
 for i in range(len(recall_performance)):
     title1 = title + " / Recall@ " + str(recall_performance[i])
     legends = ["1"] if recall_performance[i] == 1 else ["0.1", "0.5", "0.8", "1"] 
@@ -25,6 +25,8 @@ for i in range(len(recall_performance)):
     n_centroids = []
     visited_vectors = []
     each_visited_vectors = []
+    visited_centroids = []
+    each_visited_centroids = []
 
     for filepath in filepaths:
         file = open(filepath, "r")
@@ -49,6 +51,7 @@ for i in range(len(recall_performance)):
             if recall_performance[i] == 1 and is_recording: 
                 if position == 2: 
                     each_visited_vectors.append(x.split(" ")[-2])
+                    each_visited_centroids.append(len(x.split(" ")) - 1)
                     is_recording = False
             
             else: 
@@ -60,6 +63,7 @@ for i in range(len(recall_performance)):
                         for k in range(len(visiting_vectors)): 
                             if (recording_vectors <= float(visiting_vectors[k])): 
                                 recording_position.append(k) 
+                                each_visited_centroids.append(k+1)
                                 break 
                 if position == 2 and is_recording:
                     is_recording = False
@@ -69,30 +73,39 @@ for i in range(len(recall_performance)):
             if "The average max centroids:" in x:
                 if recall_performance[i] == 1:
                     visited_vectors.append(np.mean(list(map(float, each_visited_vectors))))
+                    visited_centroids.append(np.mean(list(map(float, each_visited_centroids))))
                 else:
                     each_visited_length = int(len(each_visited_vectors) / len(recording_proportion))
                     for j in range(len(recording_proportion)):
-                        sub_visited_vectors = [each_visited_vectors[temp * len(recording_proportion) + j] for temp in range(each_visited_length)]
-                
+                        sub_visited_vectors = [each_visited_vectors[temp * len(recording_proportion) + j] for temp in range(each_visited_length)]                
                         visited_vectors.append(np.mean(list(map(float, sub_visited_vectors))))
+                        
+                        sub_visited_centroids = [each_visited_centroids[temp * len(recording_proportion) + j] for temp in range(each_visited_length)] 
+                        visited_centroids.append(np.mean(list(map(float, sub_visited_centroids)))) 
 
                 each_visited_vectors = []
+                each_visited_centroids = []
 
 
     if (recall_performance[i] == 1):
-        plt.plot(list(map(float, n_centroids)), visited_vectors)
+        #plt.plot(list(map(float, n_centroids)), visited_vectors)
+        plt.plot(list(map(float, n_centroids)), list(np.array(visited_vectors) + distance_ratio * np.array(visited_centroids)))
         visited_vectors = []
     else:
         for j in range(len(recording_proportion)):
             sub_visited_vectors = [visited_vectors[temp * len(recording_proportion) + j] for temp in range(len(n_centroids))]
-            plt.plot(list(map(float, n_centroids)), sub_visited_vectors)
+            sub_visited_centroids = [visited_centroids[temp * len(recording_proportion) + j] for temp in range(len(n_centroids))]
+
+            #plt.plot(list(map(float, n_centroids)), sub_visited_vectors)
+            plt.plot(list(map(float, n_centroids)), list(np.array(sub_visited_vectors) + distance_ratio * np.array(sub_visited_centroids)))
+
         visited_vectors = []
 
 
     plt.xticks(np.arange(0, float(n_centroids[-1]), 1000))
     plt.legend(legends)
     plt.xlabel("num centroids")
-    plt.ylabel("visited vectors")
+    plt.ylabel("sum search time / T")
     plt.title(title1)
     plt.show()
 
