@@ -33,7 +33,7 @@ typedef faiss::Index::idx_t idx_t;
 using namespace bslib;
 int main(){
 
-    bool use_OPQ = true;
+    bool use_OPQ = false;
 
     int dimension = 128;                   // dimension
     int nb = 100000;                       // database size
@@ -153,6 +153,7 @@ int main(){
     std::vector<idx_t> base_labels(nb);
     std::vector<float> base_dists(nb);
 
+
     quantizer.search(nb, xb, 1, base_dists.data(), base_labels.data());
 
     std::vector<std::vector<idx_t>> inverted_index(nlist);
@@ -178,16 +179,14 @@ int main(){
         OPQMatrix->apply_noalloc(nlist, quantizer.xb.data(), copy_centrodis.data());
         memcpy(quantizer.xb.data(), copy_centrodis.data(), nlist * dimension * sizeof(float));
 
-
-
     }
 
-    PQ->verbose = true;
-    PQ->train(nb / 10, residual.data());
+    //PQ->verbose = true;
+    //PQ->train(nb / 10, residual.data());
 
     
     std::vector<uint8_t> residual_code(code_size * nb);
-    PQ->compute_codes(residual.data(), residual_code.data(), nb);
+    index_pq.pq.compute_codes(residual.data(), residual_code.data(), nb);
 
 
     /**
@@ -231,7 +230,7 @@ int main(){
         std::vector <idx_t> query_labels(nprobe);
         std::vector <float> query_dists(nprobe);
         std::vector<float> distance_table(M * ksub);
-        PQ->compute_inner_prod_table(query, distance_table.data());
+        index_pq.pq.compute_inner_prod_table(query, distance_table.data());
 
         faiss::maxheap_heapify(k_result, result_dists.data() + result_position, result_labels.data() + result_position);
         quantizer.search(1, query, nprobe, query_dists.data(), query_labels.data());
