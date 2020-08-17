@@ -339,6 +339,6 @@ int main(){
 
     std::cout << "The recall for IVFPQ implementation is: " << float(sum_correctness) / (nq * k_result) << std::endl;
     record_file << "The VQ centroids: " << nlist << std::endl;
-    for (size_t i = 0; i < max_reranking_space.size(); i++){record_file << max_reranking_space[i] << " ";} record_file << std::endl;
+    for (size_t i = 0; i < max_reranking_space.size(); i++){record_file << max_reranking_space[i] << " "; std::cout << max_reranking_space[i] << " ";} record_file << std::endl; std::cout << std::endl;
 }
 }
