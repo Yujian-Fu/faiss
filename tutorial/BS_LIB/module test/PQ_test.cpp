@@ -34,7 +34,7 @@ typedef faiss::Index::idx_t idx_t;
 using namespace bslib;
 int main(){
 
-    bool use_OPQ = false;
+    bool use_OPQ = true;
 
     int dimension = 128;                   // dimension
     int nb = 100000;                       // database size
