@@ -175,7 +175,7 @@ int main(){
 
     if (use_OPQ){
         faiss::OPQMatrix * matrix = new faiss::OPQMatrix(dimension, M);
-        matrix->verbose = true; matrix->max_train_points = nb / 10;
+        matrix->verbose = false; matrix->max_train_points = nb / 10;
         matrix->train(nb / 10, residual.data());
         for (size_t i = 0; i < 100; i++){std::cout << matrix->A[i] << " ";} std::cout << std::endl << std::endl;
 
