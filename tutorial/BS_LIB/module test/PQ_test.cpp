@@ -169,14 +169,16 @@ int main(){
     // Compute the residual and encode the residual
     std::vector<float> residual(dimension * nb);
     quantizer.compute_residual_n(nb, xb, residual.data(), base_labels.data());
-    for (size_t i = 0; i < 100; i++){std::cout << residual[i] << " ";} std::cout << std::endl;
-    for (size_t i = 0; i < 100; i++){std::cout << quantizer.xb[i] << " ";} std::cout << std::endl;
+    for (size_t i = 0; i < 100; i++){std::cout << residual[i] << " ";} std::cout << std::endl << std::endl;
+    for (size_t i = 0; i < 100; i++){std::cout << quantizer.xb[i] << " ";} std::cout << std::endl << std::endl;
 
 
     if (use_OPQ){
         faiss::OPQMatrix * matrix = new faiss::OPQMatrix(dimension, M);
-        matrix->verbose = false; matrix->max_train_points = nb / 10;
+        matrix->verbose = true; matrix->max_train_points = nb / 10;
         matrix->train(nb / 10, residual.data());
+        for (size_t i = 0; i < 100; i++){std::cout << matrix->A[i] << " ";} std::cout << std::endl << std::endl;
+
         std::vector<float> copy_residual(dimension * nb);
         memcpy(copy_residual.data(), residual.data(), nb * dimension * sizeof(float));
         OPQMatrix = matrix;
@@ -185,11 +187,10 @@ int main(){
         std::vector<float> copy_centrodis(nlist * dimension);
         OPQMatrix->apply_noalloc(nlist, quantizer.xb.data(), copy_centrodis.data());
         memcpy(quantizer.xb.data(), copy_centrodis.data(), nlist * dimension * sizeof(float));
-        for (size_t i = 0; i < 100; i++){std::cout << matrix->A[i] << " ";} std::cout << std::endl;
     }
 
-    for (size_t i = 0; i < 100; i++){std::cout << residual[i] << " ";} std::cout << std::endl;
-    for (size_t i = 0; i < 100; i++){std::cout << quantizer.xb[i] << " ";} std::cout << std::endl;
+    for (size_t i = 0; i < 100; i++){std::cout << residual[i] << " ";} std::cout << std::endl << std::endl;
+    for (size_t i = 0; i < 100; i++){std::cout << quantizer.xb[i] << " ";} std::cout << std::endl << std::endl;
     PQ->verbose = true;
     PQ->train(nb / 10, residual.data());
 
