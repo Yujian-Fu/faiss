@@ -208,6 +208,7 @@ int main(){
      * distance = ||query - (centroids + residual_PQ)||^2 
      *          = ||query - centroids||^2 + ||residual_PQ|| ^2 - 2 * (query - centroids) * residual_PQ 
      *          = ||query - centroids||^2 + ||residual_PQ|| ^2 + 2 * centroids * residual_PQ - 2 * query * residual_PQ
+     *          = ||query - centroids||^2 + ||residual_PQ + centroids|| ^2 - ||centroids||^2 - 2 * query * residual_PQ
      *          = ... + sum{}
      * So you need the norm of centroid and base vector 
      **/ 
@@ -229,10 +230,20 @@ int main(){
         }
     }
 
+    std::vector<float> reconstructed_base_vector(nb * dimension);
+    std::vector<float> reconstructed_base_norm(nb);
+    std::vector<float> centroids_norm(nlist);
+    std::vector<float> reconstructed_residual(nb * dimension);
+    PQ->decode(residual_code.data(), reconstructed_residual.data());
+    faiss::fvec_madd(nb * dimension, quantizer.xb.data(), 1.0, reconstructed_residual.data(), reconstructed_base_vector.data());
+    faiss::fvec_norms_L2sqr(reconstructed_base_vector.data(), reconstructed_base_norm.data(), dimension, nb);
+    faiss::fvec_norms_L2sqr(quantizer.xb.data(), centroids_norm.data(), dimension, nlist);
+
+
     Trecorder.reset();
     std::vector <idx_t> result_labels(nq * k_result);
     std::vector <float> result_dists(nq * k_result);
-#pragma omp parallel for
+//#pragma omp parallel for
     for (size_t i = 0; i < nq; i++){
         const float * query = use_OPQ ? OPQMatrix->apply(1, xq + i * dimension) : xq + i * dimension ;
         const size_t result_position = i * k_result;
@@ -257,6 +268,7 @@ int main(){
 
             for (size_t k = 0; k < group_size; k++){
                 float sum_distance = 0;
+                float norm_distance = 0;
                 float sum_prod_distance = 0;
                 float table_distance = 0;
                 idx_t sequence_id = inverted_index[group_label][k];
@@ -269,6 +281,8 @@ int main(){
                 }
 
                 sum_distance = qc_dist + table_distance - 2 * sum_prod_distance;
+                norm_distance = qc_dist + reconstructed_base_norm[sequence_id] - centroids_norm[group_label] - 2 * sum_prod_distance;
+                std::cout << "The sum distance: " << sum_distance << " The norm distance: " << norm_distance << " ";
                 computed_distance.push_back(sum_distance);
                 computed_label.push_back(sequence_id);
 
@@ -278,6 +292,7 @@ int main(){
                 }
             }
         }
+        exit(0);
     }
     Trecorder.print_time_usage("Finished IVFPQ search");
     sum_correctness = 0;
