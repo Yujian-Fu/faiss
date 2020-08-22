@@ -70,15 +70,11 @@ int main(){
         xq[dimension * i] += i / 1000.;
     }*/
 
-
     size_t k_result = 100;
     time_recorder Trecorder = time_recorder();
 
     std::ofstream record_file;
     record_file.open(path_record, std::ios::app);
-    
-    for (nlist = 100; nlist < 2000; nlist+=200){
-
 
     faiss::IndexFlatL2 index_flat(dimension);
     std::vector<idx_t> labels(k_result * nq);
@@ -155,10 +151,10 @@ int main(){
     //clus.verbose = true;
     //clus.train(nb / 10, xb, quantizer_assign);
 
-    //faiss::ProductQuantizer * PQ = new faiss::ProductQuantizer(dimension, M, nbits);
+    faiss::ProductQuantizer * PQ = new faiss::ProductQuantizer(dimension, M, nbits);
 
-    //size_t code_size = PQ->code_size;
-    //ksub = PQ->ksub;
+    code_size = PQ->code_size;
+    ksub = PQ->ksub;
     std::vector<idx_t> base_labels(nb);
     std::vector<float> base_dists(nb);
 
@@ -186,15 +182,14 @@ int main(){
         std::vector<float> copy_centrodis(nlist * dimension);
         OPQMatrix->apply_noalloc(nlist, quantizer.xb.data(), copy_centrodis.data());
         memcpy(quantizer.xb.data(), copy_centrodis.data(), nlist * dimension * sizeof(float));
-
     }
 
-    //PQ->verbose = true;
-    //PQ->train(nb / 10, residual.data());
+    PQ->verbose = true;
+    PQ->train(nb / 10, residual.data());
 
     
     std::vector<uint8_t> residual_code(code_size * nb);
-    index_pq.pq.compute_codes(residual.data(), residual_code.data(), nb);
+    PQ->compute_codes(residual.data(), residual_code.data(), nb);
 
 
     /**
@@ -219,7 +214,7 @@ int main(){
             const float * quantizer_sub_centroid = quantizer_centroid.data() + m * dsub;
             
             for (size_t k = 0; k < ksub; k++){
-                const float * pq_sub_centroid = index_pq.pq.get_centroids(m, k);
+                const float * pq_sub_centroid = PQ->get_centroids(m, k);
                 float residual_PQ_norm = faiss::fvec_norm_L2sqr(pq_sub_centroid, dsub);
                 float prod_quantizer_pq = faiss::fvec_inner_product(quantizer_sub_centroid, pq_sub_centroid, dsub);
                 pre_computed_tables[i * M * ksub + m * ksub + k] = residual_PQ_norm + 2 * prod_quantizer_pq;
@@ -230,7 +225,6 @@ int main(){
     Trecorder.reset();
     std::vector <idx_t> result_labels(nq * k_result);
     std::vector <float> result_dists(nq * k_result);
-    std::vector<size_t> max_reranking_space(nq * 3);
 #pragma omp parallel for
     for (size_t i = 0; i < nq; i++){
         const float * query = use_OPQ ? OPQMatrix->apply(1, xq + i * dimension) : xq + i * dimension ;
@@ -239,7 +233,7 @@ int main(){
         std::vector <idx_t> query_labels(nprobe);
         std::vector <float> query_dists(nprobe);
         std::vector<float> distance_table(M * ksub);
-        index_pq.pq.compute_inner_prod_table(query, distance_table.data());
+        PQ->compute_inner_prod_table(query, distance_table.data());
 
         faiss::maxheap_heapify(k_result, result_dists.data() + result_position, result_labels.data() + result_position);
         quantizer.search(1, query, nprobe, query_dists.data(), query_labels.data());
@@ -277,49 +271,6 @@ int main(){
                 }
             }
         }
-
-        std::vector<idx_t> search_dist_index(visited_vectors);
-        uint32_t x=0;
-        std::iota(search_dist_index.begin(),search_dist_index.end(),x++);
-        std::sort(search_dist_index.begin(),search_dist_index.end(), [&](int i,int j){return computed_distance[i]<computed_distance[j];});
-        size_t visited_1 = 0, visited_10 = 0, visited_100 = 0;
-        std::unordered_set<idx_t> set_1, set_10, set_100;
-        
-        for (size_t j = 0; j < 100; j++){
-            if (j < 1)
-                set_1.insert(labels[i * k_result]);
-            if (j < 10)
-                set_10.insert(labels[i * k_result + j]);
-            set_100.insert(labels[i * k_result + j]);
-            }
-        for (size_t j = 0; j < visited_vectors; j++){
-            if (set_1.count(computed_label[search_dist_index[j]]) != 0){
-                visited_1 ++;
-                visited_10 ++;
-                visited_100 ++;
-            }
-            else if(set_10.count(computed_label[search_dist_index[j]]) != 0){
-                visited_10 ++;
-                visited_100 ++;
-            }
-            else if (set_100.count(computed_label[search_dist_index[j]]) != 0){
-                visited_100 ++;
-            }
-
-            if (visited_1 == 1){
-                max_reranking_space[i * 3 + 0] = j;
-                visited_1 = -1;
-            }
-            if (visited_10 == 10){
-                max_reranking_space[i * 3 + 1] = j;
-                visited_10 = -1;
-            }
-            if(visited_100 == 100){
-                max_reranking_space[i * 3 + 2] = j;
-                visited_100 = -1;
-            }
-        }
-
     }
     Trecorder.print_time_usage("Finished IVFPQ search");
     sum_correctness = 0;
@@ -336,9 +287,6 @@ int main(){
             }
         }
     }
-
     std::cout << "The recall for IVFPQ implementation is: " << float(sum_correctness) / (nq * k_result) << std::endl;
-    record_file << "The VQ centroids: " << nlist << std::endl;
-    for (size_t i = 0; i < max_reranking_space.size(); i++){record_file << max_reranking_space[i] << " "; std::cout << max_reranking_space[i] << " ";} record_file << std::endl; std::cout << std::endl;
-}
+
 }

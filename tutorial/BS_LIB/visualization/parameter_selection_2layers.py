@@ -2,7 +2,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 
 dataset = "DEEP1M"
-title = dataset + " / Centroids - Visited Vectors"
+title = dataset + " / Centroids - Search Time"
 
 legends = ["1", "5", "10", "50", "80", "100"]
 recall_performance = [1, 5, 10, 50, 80, 100]
@@ -10,7 +10,7 @@ filenames = ["/reasoning_models_VQ_VQ_10_50_10_50.txt", "/reasoning_models_VQ_VQ
             "/reasoning_models_VQ_VQ_60_100_10_50.txt", "/reasoning_models_VQ_VQ_60_100_60_100.txt"]
 
 filepaths = ["/home/yujian/Desktop/Recording_Files/VQ_VQ/" + dataset + filenames[i] for i in range(len(filenames))]
-
+distance_ratio = 400
 x_centroids = []
 x_visited_vectors = []
 avg_x_visited_vectors = []
@@ -67,22 +67,32 @@ for filepath in filepaths:
             for i in range(len(recall_performance)):
                 avg_visited_vectors = np.mean([x_visited_vectors[temp * len(recall_performance) + i] for temp in range(1000)])
                 avg_x_visited_vectors.append(avg_visited_vectors)
-            x_visited_vectors = []
 
-recall_visited_performance = np.array([avg_x_visited_vectors[temp * len(recall_performance)] for temp in range(len(x_centroids))])
-inds = (-recall_visited_performance).argsort()
+                avg_second_visited_centroid = np.mean([second_visited_centroids[temp * len(recall_performance) + i] for temp in range(1000)])
+                avg_second_visited_centroids.append(avg_second_visited_centroid)
+            x_visited_vectors = []
+            second_visited_centroids = []
+
+
+print(x_centroids, x_centroids[0].split(" "))
+sum_centroids = np.array([float(x_centroids[i].split(" ")[0]) * float(x_centroids[i].split(" ")[1]) for i in range(len(x_centroids))])
+print(sum_centroids)
+inds = (sum_centroids).argsort()
 
 for i in range(len(recall_performance)):
 
     recall_visited_performance = np.array([avg_x_visited_vectors[temp * len(recall_performance) + i] for temp in range(len(x_centroids))])
+    second_visited_centroids_num = np.array([avg_second_visited_centroids[temp * len(recall_performance) + i] for temp in range(len(x_centroids))])
+    search_time_performance = recall_visited_performance + distance_ratio * (np.array(first_visited_centroids) + second_visited_centroids_num)
     sorted_x_centroids = np.array(x_centroids)[inds]
     sorted_recall_visited_performance = recall_visited_performance[inds]
-    plt.plot(list(sorted_x_centroids), list(sorted_recall_visited_performance))
+    search_time_performance = search_time_performance[inds]
+    plt.plot(list(sorted_x_centroids), list(search_time_performance))
 
 
 #my_y_ticks = np.arange(0, 120000, 10000)
 plt.xlabel("Centroid Setting")
-plt.ylabel("Visited Vectors")
+plt.ylabel("Search Time")
 #plt.yticks(my_y_ticks)
 plt.xticks(rotation=60)
 plt.legend(legends)
