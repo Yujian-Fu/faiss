@@ -34,7 +34,7 @@ typedef faiss::Index::idx_t idx_t;
 using namespace bslib;
 int main(){
 
-    bool use_OPQ = true;
+    bool use_OPQ = false;
 
     int dimension = 128;                   // dimension
     int nb = 100000;                       // database size
@@ -194,7 +194,6 @@ int main(){
     PQ->verbose = true;
     PQ->train(nb / 10, residual.data());
 
-    
     std::vector<uint8_t> residual_code(code_size * nb);
     PQ->compute_codes(residual.data(), residual_code.data(), nb);
 
