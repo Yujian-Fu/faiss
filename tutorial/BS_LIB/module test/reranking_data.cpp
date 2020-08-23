@@ -201,16 +201,19 @@ int main(){
             for (size_t j = 0; j < gt_target[index]; j++){
                 gt_set.insert(labels[i * k_result + j]);
             }
+            std::cout << "Finished Insertion" << std::endl;
             for (size_t j = 0; j < visited_vectors; i++){
+                std::cout << j << " ";
                 if (gt_set.count(computed_label[search_dist_index[j]]) != 0){
                     visited_gt ++;
-                    std::cout << search_dist_index[j] << " ";
+                    std::cout << "Count ++ " << visited_gt << " ";
                 }
                 if (visited_gt >= gt_target[index]){
                     reranking_space = j;
                     break;
                 }
             }
+
             record_file << gt_target[index] << " " << reranking_space << std::endl;
             std::cout << std::endl << gt_target[index] << " " << reranking_space << " ";
         }
