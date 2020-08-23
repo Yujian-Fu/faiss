@@ -18,7 +18,7 @@ int main(){
     size_t nlist = 1000;
     size_t M = 8;
     size_t nbits = 8;
-    size_t nprobe = 10;
+    size_t nprobe = 50;
     size_t sum_correctness = 0;
     size_t ksub = 0;
     size_t code_size = 0;
@@ -210,7 +210,7 @@ int main(){
                 }
             }
 
-            record_file << gt_target[index] << " " << reranking_space << std::endl;
+            record_file << gt_target[index] << " " << reranking_space << " " << visited_gt << std::endl;
         }
     }
     Trecorder.print_time_usage("Finished IVFPQ search");

@@ -6,59 +6,59 @@
 
 //Parameters
     
-    const std::string dataset = "SIFT1M";
-    const std::string model = "models_VQ";
-    const size_t dimension = 128;
-    size_t train_set_size = 100000;
-    const size_t base_set_size = 1000000;
-    const size_t query_set_size = 1000;
-    const size_t ngt = 100;
-    const bool use_sub_train_set = false;
-    const size_t recall_test_size = 3;
+const std::string dataset = "SIFT1M";
+const std::string model = "models_VQ";
+const size_t dimension = 128;
+size_t train_set_size = 100000;
+const size_t base_set_size = 1000000;
+const size_t query_set_size = 1000;
+const size_t ngt = 100;
+const bool use_sub_train_set = false;
+const size_t recall_test_size = 3;
+
+
+/*
+const std::string dataset = "GIST1M";
+const std::string model = "models_VQ";
+const size_t dimension = 960;
+size_t train_set_size = 500000;
+const size_t base_set_size = 1000000;
+const size_t query_set_size = 1000;
+const size_t ngt = 100;
+const bool use_sub_train_set = true;
+const size_t recall_test_size = 3;
+*/
+
+/*
+const std::string dataset = "DEEP1M";
+const std::string model = "models_VQ";
+const size_t dimension = 256;
+size_t train_set_size =  100000;
+const size_t base_set_size = 1000000;
+const size_t query_set_size = 1000;
+const size_t ngt = 100;
+const bool use_sub_train_set = false;
+const size_t recall_test_size = 3;
+*/
+
     
 
-    /*
-    const std::string dataset = "GIST1M";
-    const std::string model = "models_VQ";
-    const size_t dimension = 960;
-    size_t train_set_size = 500000;
-    const size_t base_set_size = 1000000;
-    const size_t query_set_size = 1000;
-    const size_t ngt = 100;
-    const bool use_sub_train_set = true;
-    const size_t recall_test_size = 3;
-    */
-    
-    /*
-    const std::string dataset = "DEEP1M";
-    const std::string model = "models_VQ";
-    const size_t dimension = 256;
-    size_t train_set_size =  100000;
-    const size_t base_set_size = 1000000;
-    const size_t query_set_size = 1000;
-    const size_t ngt = 100;
-    const bool use_sub_train_set = false;
-    const size_t recall_test_size = 3;
-    */
-    
-    
+const std::string path_learn = "/home/y/yujianfu/ivf-hnsw/data/" + dataset + "/" + dataset +"_learn.fvecs";
+const std::string path_base = "/home/y/yujianfu/ivf-hnsw/data/" + dataset + "/" + dataset +"_base.fvecs";
+const std::string path_gt = "/home/y/yujianfu/ivf-hnsw/data/" + dataset + "/" + dataset +"_groundtruth.ivecs";
+const std::string path_query = "/home/y/yujianfu/ivf-hnsw/data/" + dataset + "/" + dataset +"_query.fvecs";
+std::string path_record = "/home/y/yujianfu/ivf-hnsw/" + model + "/" + dataset + "/reasoning_6000.txt";
 
-    const std::string path_learn = "/home/y/yujianfu/ivf-hnsw/data/" + dataset + "/" + dataset +"_learn.fvecs";
-    const std::string path_base = "/home/y/yujianfu/ivf-hnsw/data/" + dataset + "/" + dataset +"_base.fvecs";
-    const std::string path_gt = "/home/y/yujianfu/ivf-hnsw/data/" + dataset + "/" + dataset +"_groundtruth.ivecs";
-    const std::string path_query = "/home/y/yujianfu/ivf-hnsw/data/" + dataset + "/" + dataset +"_query.fvecs";
-    std::string path_record = "/home/y/yujianfu/ivf-hnsw/" + model + "/" + dataset + "/reasoning_6000.txt";
+std::vector<float> train_set(dimension * train_set_size);
+std::vector<float> base_set(dimension * base_set_size);
+std::vector<float> query_set(dimension * query_set_size);
+std::vector<uint32_t> gt_set(ngt * base_set_size);
 
-    std::vector<float> train_set(dimension * train_set_size);
-    std::vector<float> base_set(dimension * base_set_size);
-    std::vector<float> query_set(dimension * query_set_size);
-    std::vector<uint32_t> gt_set(ngt * base_set_size);
-    
-    std::ifstream train_input(path_learn, std::ios::binary);
-    std::ifstream base_input(path_base, std::ios::binary);
-    std::ifstream gt_input(path_gt, std::ios::binary);
-    std::ifstream query_input(path_query, std::ios::binary);
-    std::ofstream record_output;
+std::ifstream train_input(path_learn, std::ios::binary);
+std::ifstream base_input(path_base, std::ios::binary);
+std::ifstream gt_input(path_gt, std::ios::binary);
+std::ifstream query_input(path_query, std::ios::binary);
+std::ofstream record_output;
     
 
 typedef faiss::Index::idx_t idx_t;
@@ -71,7 +71,7 @@ int main(){
     readXvec<uint32_t>(gt_input, gt_set.data(), ngt, query_set_size, false, false);
     readXvec<float> (query_input, query_set.data(), dimension, query_set_size, false, false);
 
-    
+
     time_recorder trecorder;
     for (size_t centroid_num = 6000; centroid_num < 10000; centroid_num += 100){
 
