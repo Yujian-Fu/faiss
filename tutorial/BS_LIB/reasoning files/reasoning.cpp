@@ -69,6 +69,7 @@ int main(){
     
     for (size_t dataset_index = 0; dataset_index < 3; dataset_index++){
         const std::string path_base = path_list[dataset_index];
+        std::cout << "Processing dataset " << path_base << std::endl;
         size_t base_set_size = size_list[dataset_index];
         size_t train_set_size = base_set_size / 10;
         size_t query_set_size = 1000;
