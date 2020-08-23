@@ -19,7 +19,6 @@ for filepath in filepaths:
     file = open(filepath, "r")
     f1 = file.readlines()
 
-
     for x in f1:
         if "n centroids:" in x:
             centroids = x.split("n centroids:")[-1].split(" ")[1:3]

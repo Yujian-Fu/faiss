@@ -28,7 +28,7 @@ for dataset in real_dataset_list:
         utils.fvecs_write(sample_dataset_file, sample_dataset)
 '''
 
-size_list = ["10K", "100K", "1000K", "10000K"]
+size_list = ["10K", "100K", "1000K"]
 
 
 dataset = "Gaussian"
