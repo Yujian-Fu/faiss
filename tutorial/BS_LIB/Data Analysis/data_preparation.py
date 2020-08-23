@@ -18,7 +18,7 @@ for dataset in real_dataset_list:
         sample_dataset_file = dataset_path + "analysis/" + dataset + "_" + size + ".fvecs"
         print("read dataset from ", dataset_file)
         real_dataset = utils.fvecs_read(dataset_file)
-        sample_size = float(size.split("K")[0])
+        sample_size = int(size.split("K")[0])
         sample_dataset = dataset[random.sample(range(real_dataset.shape[0]), sample_size * 1000), :]
         utils.fvecs_write(sample_dataset_file, sample_dataset)
 
