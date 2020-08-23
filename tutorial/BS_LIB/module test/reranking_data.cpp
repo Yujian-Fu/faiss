@@ -18,7 +18,7 @@ int main(){
     size_t nlist = 100;
     size_t M = 8;
     size_t nbits = 8;
-    size_t nprobe = 10;
+    size_t nprobe = 5;
     size_t sum_correctness = 0;
     size_t ksub = 0;
     size_t code_size = 0;
@@ -191,6 +191,7 @@ int main(){
         record_file << "n d_1st / d_10th " << computed_distance[search_dist_index[0]] / computed_distance[search_dist_index[9]] << std::endl;
         record_file << "search times / n update times " << float(visited_vectors) / float(update_times) << std::endl;
 
+        std::cout << "Visited vectors: " << visited_vectors << std::endl;
         size_t gt_target[7] = {1, 8, 9, 10, 80, 90, 100};
         for(size_t index = 0; index < 7; index++){
             size_t visited_gt = 0;
@@ -203,6 +204,7 @@ int main(){
             for (size_t j = 0; j < visited_vectors; i++){
                 if (gt_set.count(computed_label[search_dist_index[j]]) != 0){
                     visited_gt ++;
+                    std::cout << search_dist_index[j] << " ";
                 }
                 if (visited_gt >= gt_target[index]){
                     reranking_space = j;
@@ -210,8 +212,8 @@ int main(){
                 }
             }
             record_file << gt_target[index] << " " << reranking_space << std::endl;
-            std::cout << gt_target[index] << " " << reranking_space << " ";
-        }        
+            std::cout << std::endl << gt_target[index] << " " << reranking_space << " ";
+        }
     }
     Trecorder.print_time_usage("Finished IVFPQ search");
     sum_correctness = 0;
