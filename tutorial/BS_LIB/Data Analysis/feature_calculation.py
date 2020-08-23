@@ -9,8 +9,8 @@ from scipy.stats import kurtosis
 from scipy.stats import skew
 
 k_result = 5
-path_list = utils.get_dataset_path_gaussian()
-feature_path = "/home/y/yujianfu/ivf-hnsw/data/analysis/LID_entropy_record_gaussian.txt"
+path_list = utils.get_dataset_path_real()
+feature_path = "/home/y/yujianfu/ivf-hnsw/data/analysis/LID_entropy_record_real.txt"
 feature_file = open(feature_path, "w")
 
 
