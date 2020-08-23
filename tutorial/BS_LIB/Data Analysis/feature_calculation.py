@@ -22,6 +22,7 @@ for dataset_path in path_list:
     entropy = utils.compute_entropy(dataset)
     LID = utils.compute_LID(dataset)
     dataset_name = dataset_path.split(".")[0].split("/")[-1]
+    print(dataset_name + "   " + str(LID) + "   " + str(entropy) + "\n")
     feature_file.write(dataset_name + "   " + str(LID) + "   " + str(entropy) + "\n")
 
 '''
