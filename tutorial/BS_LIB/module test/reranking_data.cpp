@@ -39,7 +39,7 @@ int main(){
     time_recorder Trecorder = time_recorder();
 
     std::ofstream record_file;
-    record_file.open(path_record, std::ios::app);
+    record_file.open(path_record, std::ios::out);
 
     faiss::IndexFlatL2 index_flat(dimension);
     std::vector<idx_t> labels(k_result * nq);
@@ -190,7 +190,6 @@ int main(){
         record_file << "n d_10th: " << computed_distance[search_dist_index[9]] << std::endl;
         record_file << "n d_1st / d_10th " << computed_distance[search_dist_index[0]] / computed_distance[search_dist_index[9]] << std::endl;
         record_file << "search times / n update times " << float(visited_vectors) / float(update_times) << std::endl;
-
 
         size_t gt_target[7] = {1, 8, 9, 10, 80, 90, 100};
         for(size_t index = 0; index < 7; index++){
