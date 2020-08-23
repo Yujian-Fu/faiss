@@ -15,10 +15,10 @@ int main(){
     int dimension = 128;                   // dimension
     int nb = 1000000;                       // database size
     int nq = 1000;                         // nb of queries
-    size_t nlist = 100;
+    size_t nlist = 1000;
     size_t M = 8;
     size_t nbits = 8;
-    size_t nprobe = 5;
+    size_t nprobe = 10;
     size_t sum_correctness = 0;
     size_t ksub = 0;
     size_t code_size = 0;
@@ -35,7 +35,7 @@ int main(){
     readXvec<float>(base_file, xb, dimension, nb, false, false);
     readXvec<float>(query_file, xq, dimension, nq, false, false);
 
-    size_t k_result = 10;
+    size_t k_result = 100;
     time_recorder Trecorder = time_recorder();
 
     std::ofstream record_file;
@@ -121,7 +121,7 @@ int main(){
     record_file << "M: " << M << " nbits: " << nbits << std::endl;
 //#pragma omp parallel for
     for (size_t i = 0; i < nq; i++){
-
+        record_file << "Query: " << i << std::endl;
         const float * query = xq + i * dimension ;
         for (size_t j = 0; j < dimension; j++) {record_file << query[j] << " ";} record_file << std::endl;
 
@@ -191,10 +191,8 @@ int main(){
         record_file << "n d_1st / d_10th " << computed_distance[search_dist_index[0]] / computed_distance[search_dist_index[9]] << std::endl;
         record_file << "search times / n update times " << float(visited_vectors) / float(update_times) << std::endl;
 
-        std::cout << "Visited vectors: " << visited_vectors << std::endl;
         size_t gt_target[7] = {1, 8, 9, 10, 80, 90, 100};
         for(size_t index = 0; index < 7; index++){
-            std::cout << "Testing space " << gt_target[index] << std::endl;
             size_t visited_gt = 0;
             size_t reranking_space = visited_vectors;
 
@@ -202,12 +200,9 @@ int main(){
             for (size_t j = 0; j < gt_target[index]; j++){
                 gt_set.insert(labels[i * k_result + j]);
             }
-            std::cout << "Finished Insertion" << std::endl;
             for (size_t j = 0; j < visited_vectors; j++){
-                std::cout << j << " ";
                 if (gt_set.count(computed_label[search_dist_index[j]]) != 0){
                     visited_gt ++;
-                    std::cout << "Count ++ " << visited_gt << " ";
                 }
                 if (visited_gt >= gt_target[index]){
                     reranking_space = j;
@@ -216,7 +211,6 @@ int main(){
             }
 
             record_file << gt_target[index] << " " << reranking_space << std::endl;
-            std::cout << std::endl << gt_target[index] << " " << reranking_space << " ";
         }
     }
     Trecorder.print_time_usage("Finished IVFPQ search");
