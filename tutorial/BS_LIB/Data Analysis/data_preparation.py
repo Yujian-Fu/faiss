@@ -33,8 +33,14 @@ size_list = ["10K", "100K", "1000K", "10000K"]
 dataset = "Gaussian"
 mu = 10
 sigma = 0.1
-for size in size_list:
-    for dimension in range(100, 1000, 100):
+for dimension in range(100, 1000, 300):
+    query_dataset_file = dataset_path + "analysis/" + dataset + "_"  + str(dimension) + "_query.fvecs"
+    sample_dataset = np.zeros((1000, dimension))
+    for i in range(1000):
+        sample_dataset[i, :] = np.random.normal(mu, sigma, dimension)
+    utils.fvecs_write(sample_dataset_file, sample_dataset)
+
+    for size in size_list:
         sample_size = int(size.split("K")[0]) 
         sample_dataset_file = dataset_path + "analysis/" + dataset + "_" + str(sample_size) + "K_" + str(dimension) + "_base.fvecs"
         print("Generating dataset to ", sample_dataset_file)
@@ -45,14 +51,21 @@ for size in size_list:
 
 
 dataset = "Random"
-for size in size_list:
-    for dimension in range(100, 1000, 100):
-        sample_size = float(size.split("K")[0]) * 1000
+
+for dimension in range(100, 1000, 300):
+    query_dataset_file = dataset_path + "analysis/" + dataset + "_"  + str(dimension) + "_query.fvecs"
+    sample_dataset = np.zeros((1000, dimension))
+    for i in range(1000):
+        sample_dataset[i, :] = np.random.randint(0, 100, (1, dimension))
+    utils.fvecs_write(sample_dataset_file, sample_dataset)
+
+    for size in size_list:
+        sample_size = float(size.split("K")[0])
         sample_dataset_file = dataset_path + "analysis/" + dataset + "_" + str(sample_size) + "K_" + str(dimension) + "_base.fvecs"
         print("Generating dataset to ", sample_dataset_file)
         sample_dataset = np.zeros((sample_size* 1000, dimension))
         for i in range(sample_size* 1000):
-            sample_dataset[i, :] = np.random.randint(0, 100, (sample_size, dimension))
+            sample_dataset[i, :] = np.random.randint(0, 100, (1, dimension))
         utils.fvecs_write(sample_dataset_file, sample_dataset)
 
 
