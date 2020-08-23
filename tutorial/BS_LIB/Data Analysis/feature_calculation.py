@@ -57,7 +57,7 @@ for dataset_path in path_list:
     plt.xlabel("Distance")
     plt.ylabel("Proportion")
     plt.title(dataset_name)
-    fig_path = dataset_path.split(".")[0] + "distance.png"
+    fig_path = dataset_path.split(".")[0] + "_distance.png"
     plt.savefig(fig_path)
 
     '''
@@ -74,7 +74,7 @@ for dataset_path in path_list:
 
     for i in range(dataset.shape[0]):
         for j in range(k_result):
-            DG.add_weighted_edges_from([(i, labels[j + 1], distance[j + 1])])
+            DG.add_weighted_edges_from([(i, labels[i][j + 1], distance[i][j + 1])])
 
 
     '''
