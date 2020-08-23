@@ -6,11 +6,13 @@
 import numpy as np 
 import random 
 import utils 
+
+
+dataset_path = "/home/y/yujianfu/ivf-hnsw/data/"
 '''
 real_dataset_list = ["SIFT", "GIST", "DEEP"]
 size_list = ["10K", "100K"]
 
-dataset_path = "/home/y/yujianfu/ivf-hnsw/data/"
 
 for dataset in real_dataset_list:
     for size in size_list:
