@@ -177,8 +177,8 @@ int main(){
             if (j == nprobe - 1){
                 record_file << "n d_1st: " << result_dists[0] << std::endl;
                 record_file << "n d_10th: " << result_dists[9] << std::endl;
-                record_file << "n d_1st / d_10th" << result_dists[0] / result_dists[9] << std::endl;
-                record_file << "n update times / search times" << float(update_times) / float(visited_vectors) << std::endl;
+                record_file << "n d_1st / d_10th " << result_dists[0] / result_dists[9] << std::endl;
+                record_file << "n update times / search times " << float(update_times) / float(visited_vectors) << std::endl;
             }
         }
         std::vector<idx_t> search_dist_index(visited_vectors);
@@ -205,6 +205,7 @@ int main(){
                 }
             }
             record_file << gt_target[index] << " " << reranking_space << std::endl;
+            std::cout << gt_target[index] << " " << reranking_space << " ";
         }        
     }
     Trecorder.print_time_usage("Finished IVFPQ search");
