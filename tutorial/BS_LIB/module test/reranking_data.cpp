@@ -18,7 +18,7 @@ int main(){
     size_t nlist = 1000;
     size_t M = 8;
     size_t nbits = 8;
-    size_t nprobe = 50;
+    size_t nprobe = 100;
     size_t sum_correctness = 0;
     size_t ksub = 0;
     size_t code_size = 0;
@@ -190,9 +190,11 @@ int main(){
         record_file << "n d_10th: " << computed_distance[search_dist_index[9]] << std::endl;
         record_file << "n d_1st / d_10th " << computed_distance[search_dist_index[0]] / computed_distance[search_dist_index[9]] << std::endl;
         record_file << "search times / n update times " << float(visited_vectors) / float(update_times) << std::endl;
+        record_file << "Visited vectors: " << visited_vectors << std::endl;
 
-        size_t gt_target[7] = {1, 8, 9, 10, 80, 90, 100};
-        for(size_t index = 0; index < 7; index++){
+        const size_t target_size = 13;
+        size_t gt_target[target_size] = {1, 8, 9, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100};
+        for(size_t index = 0; index < target_size; index++){
             size_t visited_gt = 0;
             size_t reranking_space = visited_vectors;
 
