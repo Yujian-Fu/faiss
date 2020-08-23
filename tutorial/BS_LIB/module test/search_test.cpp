@@ -2,11 +2,11 @@
 #include "../parameters/parameters_millions_PQ.h"
 #include "../utils/utils.h"
 
-
 using namespace bslib;
 
 int main(){
     size_t dimension = 128;
+    size_t keep_space = 10;
     std::vector<float> base_set(dimension * nb);
     std::vector<float> train_set(dimension * train_size);
     std::vector<idx_t> train_ids(train_size, 0);
@@ -22,7 +22,7 @@ int main(){
     std::vector<idx_t> train_next_ids(train_size, 0);
     std::vector<float> train_dists(train_size, 0);
 
-    pq.search_in_group(train_size, train_set.data(), train_ids.data(), train_dists.data(), train_next_ids.data(), 10);
+    pq.search_in_group(train_size, train_set.data(), train_ids.data(), train_dists.data(), train_next_ids.data(), keep_space);
 
     std::cout << "The search result: " << std::endl;
     for (size_t i = 0; i < 100; i++){
