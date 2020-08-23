@@ -76,7 +76,7 @@ int main(){
     size_t dimension = 256;
     */
 
-    size_t dim_para = 400;
+    size_t dim_para = 1000;
     std::string dataset_name = "Random_" + std::to_string(dim_para);
     std::string path_list[3] = {"/home/y/yujianfu/ivf-hnsw/data/analysis/Random_10K_"+std::to_string(dim_para)+"_base.fvecs", "/home/y/yujianfu/ivf-hnsw/data/analysis/Random_10K_"+std::to_string(dim_para)+"_base.fvecs", "/home/y/yujianfu/ivf-hnsw/data/analysis/Random_10K_"+std::to_string(dim_para)+"_base.fvecs"};
     std::string path_query = "/home/y/yujianfu/ivf-hnsw/data/analysis/Random_"+std::to_string(dim_para)+"_query.fvecs";
