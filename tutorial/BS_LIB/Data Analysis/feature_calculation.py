@@ -124,7 +124,7 @@ for dataset_path in path_list:
     #Not implemented for directed type
     #OMEGA = nx.omega(DG)
 
-    result_string = dataset_name +"   " str(LID)+"   "+str(entropy)+"   "+str(dist_kurtosis)+"   "+str(dist_skew)+"   "+str(AC)+"   "+str(DSC)+"   "+str(DC_mean)+"   "+str(DC_median)+"   "+str(DC_std)+"   "+str(TS)+"\n"
+    result_string = dataset_name +"   " +str(LID)+"   "+str(entropy)+"   "+str(dist_kurtosis)+"   "+str(dist_skew)+"   "+str(AC)+"   "+str(DSC)+"   "+str(DC_mean)+"   "+str(DC_median)+"   "+str(DC_std)+"   "+str(TS)+"\n"
     feature_file.write(result_string)
 
 
