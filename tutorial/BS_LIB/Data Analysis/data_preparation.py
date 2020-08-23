@@ -30,7 +30,7 @@ for dataset in real_dataset_list:
 
 size_list = ["10K", "100K", "1000K", "10000K"]
 
-'''
+
 dataset = "Gaussian"
 mu = 10
 sigma = 0.1
@@ -68,5 +68,5 @@ for dimension in range(100, 1000, 300):
         for i in range(sample_size* 1000):
             sample_dataset[i, :] = np.random.randint(0, 100, (1, dimension))
         utils.fvecs_write(sample_dataset_file, sample_dataset)
-
+'''
 
