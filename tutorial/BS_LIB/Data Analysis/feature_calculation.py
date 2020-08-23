@@ -24,7 +24,7 @@ for dataset_path in path_list:
 
     print("Load dataset from ", dataset_path)
     dataset = utils.fvecs_read(dataset_path)
-    dimension = dataset.shape[0]
+    dimension = dataset.shape[1]
 
     #Compute the NN graph
     print("Computing the neighbors")
