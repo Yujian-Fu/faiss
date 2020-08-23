@@ -43,7 +43,7 @@ def compute_LID(dataset):
     return two_NN.twonn_dimension(dataset)
 
 #use https://github.com/gregversteeg/NPEET
-def compute_entropy(dataset, k = 100):
+def compute_entropy(dataset, k = 50):
     return ee.entropy(dataset, k)
 
 def get_dataset_path():

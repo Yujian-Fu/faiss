@@ -68,6 +68,7 @@ for dataset_path in path_list:
     entropy = utils.compute_entropy(dataset)
 
     #Analyze the property
+    print("Generating Directed Graph")
     DG = nx.DiGraph()
     DG.add_nodes_from(range(dataset.shape[0]))
 
