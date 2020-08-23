@@ -35,10 +35,9 @@ mu = 10
 sigma = 0.1
 for size in size_list:
     for dimension in range(100, 1000, 100):
-        sample_size = float(size.split("K")[0]) 
-        sample_dataset_file = dataset_path + "analysis/" + dataset + "_" + str(sample_size) + "K_" + str(dimension) + ".fvecs"
+        sample_size = int(size.split("K")[0]) 
+        sample_dataset_file = dataset_path + "analysis/" + dataset + "_" + str(sample_size) + "K_" + str(dimension) + "_base.fvecs"
         print("Generating dataset to ", sample_dataset_file)
-        dataset_file = dataset_path + dataset + size + dimension
         sample_dataset = np.zeros((sample_size * 1000, dimension))
         for i in range(sample_size * 1000):
             sample_dataset[i, :] = np.random.normal(mu, sigma, dimension)
@@ -49,9 +48,8 @@ dataset = "Random"
 for size in size_list:
     for dimension in range(100, 1000, 100):
         sample_size = float(size.split("K")[0]) * 1000
-        sample_dataset_file = dataset_path + "analysis/" + dataset + "_" + str(sample_size) + "K_" + str(dimension) + ".fvecs"
+        sample_dataset_file = dataset_path + "analysis/" + dataset + "_" + str(sample_size) + "K_" + str(dimension) + "_base.fvecs"
         print("Generating dataset to ", sample_dataset_file)
-        dataset_file = dataset_path + dataset + size + dimension
         sample_dataset = np.zeros((sample_size* 1000, dimension))
         for i in range(sample_size* 1000):
             sample_dataset[i, :] = np.random.randint(0, 100, (sample_size, dimension))
