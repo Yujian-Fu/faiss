@@ -48,14 +48,14 @@ typedef faiss::Index::idx_t idx_t;
 using namespace bslib;
 int main(){
     
-    /*
+    
     std::string dataset_name = "SIFT";
     std::string path_list[3] = {"/home/y/yujianfu/ivf-hnsw/data/analysis/SIFT_10K_base.fvecs", "/home/y/yujianfu/ivf-hnsw/data/analysis/SIFT_100K_base.fvecs", "/home/y/yujianfu/ivf-hnsw/data/analysis/SIFT_1000K_base.fvecs"};
     std::string path_query = "/home/y/yujianfu/ivf-hnsw/data/analysis/SIFT_query.fvecs";
     size_t size_list[3] = {10000, 100000, 1000000};
     const std::string path_record = "/home/y/yujianfu/ivf-hnsw/data/analysis/SIFT_reasoning.txt";
     size_t dimension = 128;
-    */
+    
     
 
     /*
@@ -76,14 +76,25 @@ int main(){
     size_t dimension = 256;
     */
 
+   /*
     std::string dataset_name = "Random_400";
     std::string path_list[3] = {"/home/y/yujianfu/ivf-hnsw/data/analysis/Random_10K_400_base.fvecs", "/home/y/yujianfu/ivf-hnsw/data/analysis/Random_10K_400_base.fvecs", "/home/y/yujianfu/ivf-hnsw/data/analysis/Random_10K_400_base.fvecs"};
     std::string path_query = "/home/y/yujianfu/ivf-hnsw/data/analysis/Random_400_query.fvecs";
     size_t size_list[3] = {10000, 100000, 1000000};
     const std::string path_record = "/home/y/yujianfu/ivf-hnsw/data/analysis/Random_400_reasoning.txt";
     size_t dimension = 400;
+    */
 
-   
+   /*
+    std::string dataset_name = "Random_400";
+    std::string path_list[3] = {"/home/y/yujianfu/ivf-hnsw/data/analysis/Random_10K_400_base.fvecs", "/home/y/yujianfu/ivf-hnsw/data/analysis/Random_10K_400_base.fvecs", "/home/y/yujianfu/ivf-hnsw/data/analysis/Random_10K_400_base.fvecs"};
+    std::string path_query = "/home/y/yujianfu/ivf-hnsw/data/analysis/Random_400_query.fvecs";
+    size_t size_list[3] = {10000, 100000, 1000000};
+    const std::string path_record = "/home/y/yujianfu/ivf-hnsw/data/analysis/Random_400_reasoning.txt";
+    size_t dimension = 400;
+    */
+
+
     const size_t recall_test_size = 3;
     const size_t ngt = 100;
     std::ofstream record_output;
@@ -127,7 +138,7 @@ int main(){
 
 
     time_recorder trecorder;
-    for (size_t centroid_num = base_set_size / 2000; centroid_num < base_set_size / 500; centroid_num += base_set_size / 1000){
+    for (size_t centroid_num = base_set_size / 2000; centroid_num < base_set_size / 200; centroid_num += base_set_size / 2000){
 
         PrintMessage("Training vectors");
         trecorder.reset();
