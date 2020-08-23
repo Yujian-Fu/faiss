@@ -21,7 +21,8 @@ for dataset in real_dataset_list:
         sample_size = int(size.split("K")[0])
         print(real_dataset.shape)
         print(sample_size)
-        sample_dataset = dataset[random.sample(range(real_dataset.shape[0]), sample_size * 1000), :]
+        index = random.sample(range(real_dataset.shape[0]), sample_size * 1000)
+        sample_dataset = dataset[index, :]
         utils.fvecs_write(sample_dataset_file, sample_dataset)
 
 
