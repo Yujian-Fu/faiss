@@ -38,7 +38,7 @@ for dimension in range(100, 1000, 300):
     sample_dataset = np.zeros((1000, dimension))
     for i in range(1000):
         sample_dataset[i, :] = np.random.normal(mu, sigma, dimension)
-    utils.fvecs_write(sample_dataset_file, sample_dataset)
+    utils.fvecs_write(query_dataset_file, sample_dataset)
 
     for size in size_list:
         sample_size = int(size.split("K")[0]) 
@@ -57,7 +57,7 @@ for dimension in range(100, 1000, 300):
     sample_dataset = np.zeros((1000, dimension))
     for i in range(1000):
         sample_dataset[i, :] = np.random.randint(0, 100, (1, dimension))
-    utils.fvecs_write(sample_dataset_file, sample_dataset)
+    utils.fvecs_write(query_dataset_file, sample_dataset)
 
     for size in size_list:
         sample_size = float(size.split("K")[0])
