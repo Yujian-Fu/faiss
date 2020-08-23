@@ -76,6 +76,7 @@ int main(){
     size_t dimension = 256;
     */
 
+   /*
     size_t dim_para = 1000;
     std::string dataset_name = "Random_" + std::to_string(dim_para);
     std::string path_list[3] = {"/home/y/yujianfu/ivf-hnsw/data/analysis/Random_10K_"+std::to_string(dim_para)+"_base.fvecs", "/home/y/yujianfu/ivf-hnsw/data/analysis/Random_10K_"+std::to_string(dim_para)+"_base.fvecs", "/home/y/yujianfu/ivf-hnsw/data/analysis/Random_10K_"+std::to_string(dim_para)+"_base.fvecs"};
@@ -83,16 +84,18 @@ int main(){
     size_t size_list[3] = {10000, 100000, 1000000};
     const std::string path_record = "/home/y/yujianfu/ivf-hnsw/data/analysis/Random_"+std::to_string(dim_para)+"_reasoning.txt";
     size_t dimension = dim_para;
+    */
     
 
-   /*
-    std::string dataset_name = "Random_400";
-    std::string path_list[3] = {"/home/y/yujianfu/ivf-hnsw/data/analysis/Random_10K_400_base.fvecs", "/home/y/yujianfu/ivf-hnsw/data/analysis/Random_10K_400_base.fvecs", "/home/y/yujianfu/ivf-hnsw/data/analysis/Random_10K_400_base.fvecs"};
-    std::string path_query = "/home/y/yujianfu/ivf-hnsw/data/analysis/Random_400_query.fvecs";
+   
+    size_t dim_para = 100;
+    std::string dataset_name = "Gaussian_" + std::to_string(dim_para);
+    std::string path_list[3] = {"/home/y/yujianfu/ivf-hnsw/data/analysis/Gaussian_10K_"+std::to_string(dim_para)+"_base.fvecs", "/home/y/yujianfu/ivf-hnsw/data/analysis/Gaussian_10K_"+std::to_string(dim_para)+"_base.fvecs", "/home/y/yujianfu/ivf-hnsw/data/analysis/Gaussian_10K_"+std::to_string(dim_para)+"_base.fvecs"};
+    std::string path_query = "/home/y/yujianfu/ivf-hnsw/data/analysis/Gaussian_"+std::to_string(dim_para)+"_query.fvecs";
     size_t size_list[3] = {10000, 100000, 1000000};
-    const std::string path_record = "/home/y/yujianfu/ivf-hnsw/data/analysis/Random_400_reasoning.txt";
-    size_t dimension = 400;
-    */
+    const std::string path_record = "/home/y/yujianfu/ivf-hnsw/data/analysis/Gaussian_"+std::to_string(dim_para)+"_reasoning.txt";
+    size_t dimension = dim_para;
+    
 
 
     const size_t recall_test_size = 3;
