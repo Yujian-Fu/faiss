@@ -36,37 +36,29 @@ mu = 10
 sigma = 0.1
 for dimension in range(100, 1000, 300):
     query_dataset_file = dataset_path + "analysis/" + dataset + "_"  + str(dimension) + "_query.fvecs"
-    sample_dataset = np.zeros((1000, dimension))
-    for i in range(1000):
-        sample_dataset[i, :] = np.random.normal(mu, sigma, dimension)
+    sample_dataset = np.random.normal(mu, sigma, (1000, dimension))
     utils.fvecs_write(query_dataset_file, sample_dataset)
 
     for size in size_list:
         sample_size = int(size.split("K")[0]) 
         sample_dataset_file = dataset_path + "analysis/" + dataset + "_" + str(sample_size) + "K_" + str(dimension) + "_base.fvecs"
         print("Generating dataset to ", sample_dataset_file)
-        sample_dataset = np.zeros((sample_size * 1000, dimension))
-        for i in range(sample_size * 1000):
-            sample_dataset[i, :] = np.random.normal(mu, sigma, dimension)
+        sample_dataset = np.random.normal(mu, sigma, (sample_size * 1000, dimension))
         utils.fvecs_write(sample_dataset_file, sample_dataset)
-'''
+
 
 dataset = "Random"
 
 for dimension in range(100, 1000, 300):
     query_dataset_file = dataset_path + "analysis/" + dataset + "_"  + str(dimension) + "_query.fvecs"
-    sample_dataset = np.zeros((1000, dimension))
-    for i in range(1000):
-        sample_dataset[i, :] = np.random.randint(0, 100, (1, dimension))
+    sample_dataset = np.random.randint(0, 100, (1000, dimension))
     utils.fvecs_write(query_dataset_file, sample_dataset)
 
     for size in size_list:
         sample_size = int(size.split("K")[0])
         sample_dataset_file = dataset_path + "analysis/" + dataset + "_" + str(sample_size) + "K_" + str(dimension) + "_base.fvecs"
         print("Generating dataset to ", sample_dataset_file)
-        sample_dataset = np.zeros((sample_size* 1000, dimension))
-        for i in range(sample_size* 1000):
-            sample_dataset[i, :] = np.random.randint(0, 100, (1, dimension))
+        sample_dataset = np.random.randint(0, 100, (sample_size* 1000, dimension))
         utils.fvecs_write(sample_dataset_file, sample_dataset)
-'''
+
 
