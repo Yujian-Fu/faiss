@@ -194,6 +194,7 @@ int main(){
         std::cout << "Visited vectors: " << visited_vectors << std::endl;
         size_t gt_target[7] = {1, 8, 9, 10, 80, 90, 100};
         for(size_t index = 0; index < 7; index++){
+            std::cout << "Testing space " << gt_target[index] << std::endl;
             size_t visited_gt = 0;
             size_t reranking_space = visited_vectors;
 
