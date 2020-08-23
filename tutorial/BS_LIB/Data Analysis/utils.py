@@ -53,7 +53,7 @@ def get_dataset_path():
     size_list = ["10K", "100K"]
     for dataset in real_dataset_list:
         for size in size_list:
-            sample_dataset_file = dataset_path + "analysis/" + dataset + size +"_base" + ".fvecs"
+            sample_dataset_file = dataset_path + "analysis/" + dataset + "_" + size +"_base" + ".fvecs"
             path_list.append(sample_dataset_file)
     
     size_list = ["10K", "100K", "1000K"]
