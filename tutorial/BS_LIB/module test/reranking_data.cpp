@@ -57,7 +57,7 @@ int main(){
     ksub = index_pq.pq.ksub;
     code_size = index_pq.pq.code_size;
     index_pq.verbose = true;
-    index_pq.train(nb / 10, xb);
+    index_pq.train(nb / 100, xb);
     index_pq.add(nb, xb);
 
     index_pq.nprobe = nprobe;
