@@ -61,7 +61,7 @@ for dimension in range(100, 1000, 300):
     utils.fvecs_write(query_dataset_file, sample_dataset)
 
     for size in size_list:
-        sample_size = float(size.split("K")[0])
+        sample_size = int(size.split("K")[0])
         sample_dataset_file = dataset_path + "analysis/" + dataset + "_" + str(sample_size) + "K_" + str(dimension) + "_base.fvecs"
         print("Generating dataset to ", sample_dataset_file)
         sample_dataset = np.zeros((sample_size* 1000, dimension))
