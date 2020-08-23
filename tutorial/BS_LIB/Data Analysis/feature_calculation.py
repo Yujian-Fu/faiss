@@ -8,7 +8,7 @@ import seaborn as sns
 from scipy.stats import kurtosis
 from scipy.stats import skew
 
-
+k_result = 5
 path_list = utils.get_dataset_path()
 feature_path = "/home/y/yujianfu/ivf-hnsw/data/analysis/feature_record.txt"
 feature_file = open(feature_path, "w")
@@ -21,11 +21,13 @@ for dataset_path in path_list:
     dist_path = dataset_path.split(".")[0] + "_dist.npy"
     label_path = dataset_path.split(".")[0] + "_labels.npy"
 
-    k_result = 5
+
+    print("Load dataset from ", dataset_path)
     dataset = utils.fvecs_read(dataset_path)
     dimension = dataset.shape[0]
 
     #Compute the NN graph
+    print("Computing the neighbors")
     if os.path.exists(dist_path):
         distance = np.load(dist_path)
         labels = np.load(label_path)
@@ -40,6 +42,7 @@ for dataset_path in path_list:
     '''
     Draw the distance distribution of the NN graph
     '''
+    print("Computing the skewness and the kurtosis")
     x = []
     for i in range(dataset.shape[0]):
         for j in range(k_result):
@@ -48,6 +51,7 @@ for dataset_path in path_list:
     dist_kurtosis = kurtosis(x)
     dist_skew = skew(x)
 
+    print("Generating the figure")
     sns.kdeplot(x, shade=True)
     sns.rugplot(x)
     plt.xlabel("Distance")
@@ -59,6 +63,7 @@ for dataset_path in path_list:
     '''
     Compute the LID and entropy of the dataset
     '''
+    print("Computing the LID and entropy")
     LID = utils.compute_LID(dataset)
     entropy = utils.compute_entropy(dataset)
 
@@ -85,6 +90,7 @@ for dataset_path in path_list:
     Re-check the requirement of those features 
     '''
 
+    print("Computing the graph features")
     AC = nx.average_clustering(DG)
 
     DSC = nx.degree_assortativity_coefficient(DG)
