@@ -48,24 +48,24 @@ typedef faiss::Index::idx_t idx_t;
 using namespace bslib;
 int main(){
     
-    
+    /*
     std::string dataset_name = "SIFT";
     std::string path_list[3] = {"/home/y/yujianfu/ivf-hnsw/data/analysis/SIFT_10K_base.fvecs", "/home/y/yujianfu/ivf-hnsw/data/analysis/SIFT_100K_base.fvecs", "/home/y/yujianfu/ivf-hnsw/data/analysis/SIFT_1000K_base.fvecs"};
     std::string path_query = "/home/y/yujianfu/ivf-hnsw/data/analysis/SIFT_query.fvecs";
     size_t size_list[3] = {10000, 100000, 1000000};
     const std::string path_record = "/home/y/yujianfu/ivf-hnsw/data/analysis/SIFT_reasoning.txt";
     size_t dimension = 128;
-    
+    */
     
 
-    /*
+    
     std::string dataset_name = "GIST";
     std::string path_list[3] = {"/home/y/yujianfu/ivf-hnsw/data/analysis/GIST_10K_base.fvecs", "/home/y/yujianfu/ivf-hnsw/data/analysis/GIST_100K_base.fvecs", "/home/y/yujianfu/ivf-hnsw/data/analysis/GIST_1000K_base.fvecs"};
     std::string path_query = "/home/y/yujianfu/ivf-hnsw/data/analysis/GIST_query.fvecs";
     size_t size_list[3] = {10000, 100000, 1000000};
     const std::string path_record = "/home/y/yujianfu/ivf-hnsw/data/analysis/GIST_reasoning.txt";
     size_t dimension = 960;
-    */
+    
 
     /*
     std::string dataset_name = "DEEP";
