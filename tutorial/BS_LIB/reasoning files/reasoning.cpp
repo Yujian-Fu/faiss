@@ -67,23 +67,23 @@ int main(){
     size_t dimension = 960;
     */
 
-    
+    /*
     std::string dataset_name = "DEEP";
     std::string path_list[3] = {"/home/y/yujianfu/ivf-hnsw/data/analysis/DEEP_10K_base.fvecs", "/home/y/yujianfu/ivf-hnsw/data/analysis/DEEP_100K_base.fvecs", "/home/y/yujianfu/ivf-hnsw/data/analysis/DEEP_1000K_base.fvecs"};
     std::string path_query = "/home/y/yujianfu/ivf-hnsw/data/analysis/DEEP_query.fvecs";
     size_t size_list[3] = {10000, 100000, 1000000};
     const std::string path_record = "/home/y/yujianfu/ivf-hnsw/data/analysis/DEEP_reasoning.txt";
     size_t dimension = 256;
-    
-
-   /*
-    std::string dataset_name = "Random_400";
-    std::string path_list[3] = {"/home/y/yujianfu/ivf-hnsw/data/analysis/Random_10K_400_base.fvecs", "/home/y/yujianfu/ivf-hnsw/data/analysis/Random_10K_400_base.fvecs", "/home/y/yujianfu/ivf-hnsw/data/analysis/Random_10K_400_base.fvecs"};
-    std::string path_query = "/home/y/yujianfu/ivf-hnsw/data/analysis/Random_400_query.fvecs";
-    size_t size_list[3] = {10000, 100000, 1000000};
-    const std::string path_record = "/home/y/yujianfu/ivf-hnsw/data/analysis/Random_400_reasoning.txt";
-    size_t dimension = 400;
     */
+
+    size_t dim_para = 100;
+    std::string dataset_name = "Random_" + std::to_string(dim_para);
+    std::string path_list[3] = {"/home/y/yujianfu/ivf-hnsw/data/analysis/Random_10K_"+std::to_string(dim_para)+"_base.fvecs", "/home/y/yujianfu/ivf-hnsw/data/analysis/Random_10K_"+std::to_string(dim_para)+"_base.fvecs", "/home/y/yujianfu/ivf-hnsw/data/analysis/Random_10K_"+std::to_string(dim_para)+"_base.fvecs"};
+    std::string path_query = "/home/y/yujianfu/ivf-hnsw/data/analysis/Random_"+std::to_string(dim_para)+"_query.fvecs";
+    size_t size_list[3] = {10000, 100000, 1000000};
+    const std::string path_record = "/home/y/yujianfu/ivf-hnsw/data/analysis/Random_"+std::to_string(dim_para)+"_reasoning.txt";
+    size_t dimension = dim_para;
+    
 
    /*
     std::string dataset_name = "Random_400";
