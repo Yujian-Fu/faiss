@@ -13,12 +13,12 @@ typedef faiss::Index::idx_t idx_t;
 using namespace bslib;
 int main(){
     int dimension = 128;                   // dimension
-    int nb = 100000;                       // database size
+    int nb = 1000000;                       // database size
     int nq = 1000;                         // nb of queries
     size_t nlist = 100;
     size_t M = 8;
     size_t nbits = 8;
-    size_t nprobe = 100;
+    size_t nprobe = 10;
     size_t sum_correctness = 0;
     size_t ksub = 0;
     size_t code_size = 0;
@@ -177,7 +177,7 @@ int main(){
 
                 record_file << "n / 2 d_1st: " << computed_distance[search_dist_index[0]] << std::endl;
                 record_file << "n / 2 d_10th: " << computed_distance[search_dist_index[9]] << std::endl;
-                record_file << "n / 2 d_1st / d_10th" << computed_distance[search_dist_index[0]] / computed_distance[search_dist_index[9]] << std::endl;
+                record_file << "n / 2 d_1st / d_10th " << computed_distance[search_dist_index[0]] / computed_distance[search_dist_index[9]] << std::endl;
                 record_file << "search times / n / 2 update times " << float(visited_vectors) / float(update_times) << std::endl;
             }
         }
