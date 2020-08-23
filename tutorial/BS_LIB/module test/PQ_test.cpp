@@ -60,15 +60,6 @@ int main(){
     std::ifstream base_file(path_base, std::ios::binary); std::ifstream query_file(path_query, std::ios::binary);
     readXvec<float>(base_file, xb, dimension, nb, false, false);
     readXvec<float>(query_file, xq, dimension, nq, false, false);
-    /*
-    for(int i = 0; i < nb; i++) {
-        for(int j = 0; j < dimension; j++) xb[dimension * i + j] = drand48();
-        xb[dimension * i] += i / 1000.;
-    }
-    for(int i = 0; i < nq; i++) {
-        for(int j = 0; j < dimension; j++) xq[dimension * i + j] = drand48();
-        xq[dimension * i] += i / 1000.;
-    }*/
 
     size_t k_result = 100;
     time_recorder Trecorder = time_recorder();
@@ -254,8 +245,6 @@ int main(){
 
         faiss::maxheap_heapify(k_result, result_dists.data() + result_position, result_labels.data() + result_position);
         quantizer.search(1, query, nprobe, query_dists.data(), query_labels.data());
-        std::vector<float> computed_distance;
-        std::vector<idx_t> computed_label;
         size_t visited_vectors = 0;
         
 
@@ -282,8 +271,6 @@ int main(){
                 sum_distance = qc_dist + table_distance - 2 * sum_prod_distance;
                 norm_distance = qc_dist + reconstructed_base_norm[sequence_id] - centroids_norm[group_label] - 2 * sum_prod_distance;
                 std::cout << "The sum distance: " << sum_distance << " The norm distance: " << norm_distance << " ";
-                computed_distance.push_back(sum_distance);
-                computed_label.push_back(sequence_id);
 
                 if (sum_distance < result_dists[result_position]){
                     faiss::maxheap_pop(k_result, result_dists.data() + result_position, result_labels.data() + result_position);
