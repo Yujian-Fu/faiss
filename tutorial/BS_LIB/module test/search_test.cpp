@@ -19,8 +19,8 @@ int main(){
     PQ_quantizer pq (dimension, 1, 2, 8);
 
     pq.build_centroids(train_set.data(), train_size, train_ids.data());
-    std::vector<idx_t> train_next_ids(train_size, 0);
-    std::vector<float> train_dists(train_size, 0);
+    std::vector<idx_t> train_next_ids(train_size * keep_space, 0);
+    std::vector<float> train_dists(train_size * keep_space, 0);
 
     pq.search_in_group(train_size, train_set.data(), train_ids.data(), train_dists.data(), train_next_ids.data(), keep_space);
 
