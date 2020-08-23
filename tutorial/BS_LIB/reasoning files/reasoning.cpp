@@ -88,7 +88,7 @@ int main(){
     
 
    
-    size_t dim_para = 400;
+    size_t dim_para = 700;
     std::string dataset_name = "Gaussian_" + std::to_string(dim_para);
     std::string path_list[3] = {"/home/y/yujianfu/ivf-hnsw/data/analysis/Gaussian_10K_"+std::to_string(dim_para)+"_base.fvecs", "/home/y/yujianfu/ivf-hnsw/data/analysis/Gaussian_10K_"+std::to_string(dim_para)+"_base.fvecs", "/home/y/yujianfu/ivf-hnsw/data/analysis/Gaussian_10K_"+std::to_string(dim_para)+"_base.fvecs"};
     std::string path_query = "/home/y/yujianfu/ivf-hnsw/data/analysis/Gaussian_"+std::to_string(dim_para)+"_query.fvecs";
