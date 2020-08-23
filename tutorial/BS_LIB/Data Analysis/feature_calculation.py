@@ -9,8 +9,8 @@ from scipy.stats import kurtosis
 from scipy.stats import skew
 
 k_result = 5
-path_list = utils.get_dataset_path_random()
-feature_path = "/home/y/yujianfu/ivf-hnsw/data/analysis/feature_record_random.txt"
+path_list = utils.get_dataset_path_gaussian()
+feature_path = "/home/y/yujianfu/ivf-hnsw/data/analysis/feature_record_gaussian.txt"
 feature_file = open(feature_path, "w")
 property_string = "Name   LID   entropy   dist_kurtosis   dist_skew   AC   DSC   DC_mean   DC_median   DC_std   TS\n"
 feature_file.write(property_string)
