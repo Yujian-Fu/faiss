@@ -8,8 +8,9 @@ import random
 import utils 
 
 
+
 dataset_path = "/home/y/yujianfu/ivf-hnsw/data/"
-'''
+
 real_dataset_list = ["SIFT", "GIST", "DEEP"]
 size_list = ["10K", "100K"]
 
@@ -21,16 +22,12 @@ for dataset in real_dataset_list:
         print("read dataset from ", dataset_file)
         real_dataset = utils.fvecs_read(dataset_file)
         sample_size = int(size.split("K")[0])
-        print(real_dataset.shape)
-        print(sample_size)
         index = random.sample(range(real_dataset.shape[0]), sample_size * 1000)
         sample_dataset = real_dataset[index, :]
         utils.fvecs_write(sample_dataset_file, sample_dataset)
-'''
+
 
 size_list = ["10K", "100K", "1000K"]
-
-
 dataset = "Gaussian"
 mu = 10
 sigma = 0.1

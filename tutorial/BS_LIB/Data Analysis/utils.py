@@ -45,3 +45,30 @@ def compute_LID(dataset):
 #use https://github.com/gregversteeg/NPEET
 def compute_entropy(dataset, k = 100):
     return ee.entropy(dataset, k)
+
+def get_dataset_path():
+    dataset_path = "/home/y/yujianfu/ivf-hnsw/data/"
+    path_list = []
+    real_dataset_list = ["SIFT", "GIST", "DEEP"]
+    size_list = ["10K", "100K"]
+    for dataset in real_dataset_list:
+        for size in size_list:
+            sample_dataset_file = dataset_path + "analysis/" + dataset + size +"_base" + ".fvecs"
+            path_list.append(sample_dataset_file)
+    
+    size_list = ["10K", "100K", "1000K"]
+    dataset = "Gaussian"
+    for dimension in range(100, 1100, 300):
+        for size in size_list:
+            sample_size = int(size.split("K")[0]) 
+            sample_dataset_file = dataset_path + "analysis/" + dataset + "_" + str(sample_size) + "K_" + str(dimension) + "_base.fvecs"
+            path_list.append(sample_dataset_file)
+    
+    dataset = "Random"
+    for dimension in range(100, 1100, 300):
+        for size in size_list:
+            sample_size = int(size.split("K")[0]) 
+            sample_dataset_file = dataset_path + "analysis/" + dataset + "_" + str(sample_size) + "K_" + str(dimension) + "_base.fvecs"
+            path_list.append(sample_dataset_file)
+
+    return path_list
