@@ -29,6 +29,7 @@ struct Bslib_Index{
     bool use_HNSW_group;
     bool use_OPQ;
     bool use_hash;
+    bool use_norm_quantization;
     size_t reranking_space;
 
     size_t M; // Initialized by training pq
@@ -49,8 +50,10 @@ struct Bslib_Index{
     faiss::ProductQuantizer norm_pq; // Initialized in train_pq
     faiss::LinearTransform opq_matrix;
 
+    std::vector<float> base_norms;
+    std::vector<uint8_t> base_norm_codes;
     std::vector<float> centroid_norms;
-    //std::vector<uint8_t> centroid_norm_codes;
+    std::vector<uint8_t> centroid_norm_codes;
 
     std::vector<std::vector<uint8_t>> base_codes;
     std::vector<std::vector<idx_t>> base_sequence_ids;
@@ -60,7 +63,7 @@ struct Bslib_Index{
     std::vector<float> train_data; // Initialized in build_quantizers (without reading)
     std::vector<idx_t> train_data_ids; // Initialized in build_quantizers (without reading)
 
-    explicit Bslib_Index(const size_t dimension, const size_t layers, const std::string * index_type, const bool use_HNSW_VQ);
+    explicit Bslib_Index(const size_t dimension, const size_t layers, const std::string * index_type, const bool use_HNSW_VQ, const bool use_norm_quantization);
 
     void build_quantizers(const uint32_t * ncentroids, const std::string path_quantizer, const std::string path_learn, const size_t * num_train, const std::vector<HNSW_para> HNSW_paras, const std::vector<PQ_para> PQ_paras);
     

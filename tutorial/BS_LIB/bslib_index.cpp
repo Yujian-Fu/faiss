@@ -6,9 +6,10 @@ namespace bslib{
     /**
      * The initialize function for BSLIB struct 
      **/
-    Bslib_Index::Bslib_Index(const size_t dimension, const size_t layers, const std::string * index_type, const bool use_HNSW_VQ):
+    Bslib_Index::Bslib_Index(const size_t dimension, const size_t layers, const std::string * index_type, const bool use_HNSW_VQ, const bool use_norm_quantization):
         dimension(dimension), layers(layers){
-
+            
+            this->use_norm_quantization = use_norm_quantization;
             this->use_HNSW_VQ = use_HNSW_VQ;
             this->use_HNSW_group = use_HNSW_group;
             this->use_OPQ = use_OPQ;
@@ -304,7 +305,7 @@ namespace bslib{
                 if (update_ids){
                     read_train_set(path_learn, this->train_size, num_train[i+1]);
                     std::cout << "Updating train set for the next layer" << std::endl;
-                    vq_quantizer_index[vq_quantizer_index.size() - 1].search_all(train_data_ids.size(), 1, train_data.data(), train_data_ids.data(), );
+                    vq_quantizer_index[vq_quantizer_index.size() - 1].search_all(train_data_ids.size(), 1, train_data.data(), train_data_ids.data());
                 }
 
                 std::cout << i << "th VQ quantizer added, check it " << std::endl;
@@ -338,7 +339,7 @@ namespace bslib{
                 if (update_ids){
                     read_train_set(path_learn, this->train_size, num_train[i+1]);
                     std::cout << "Updating train set for the next layer" << std::endl;
-                    lq_quantizer_index[lq_quantizer_index.size() - 1].update_train_ids(train_data_ids.size(), 1, train_data.data(), train_data_ids.data());
+                    lq_quantizer_index[lq_quantizer_index.size() - 1].search_all(train_data_ids.size(), 1, train_data.data(), train_data_ids.data());
                 }
 
                 std::cout << i << "th LQ quantizer added, check it " << std::endl;
@@ -439,7 +440,7 @@ namespace bslib{
         this->pq.compute_codes(residuals.data(), batch_codes.data(), n);
 
         //Add codes into index
-        for (size_t i = 0 ; i < n; i++){
+        for (size_t i = 0; i < n; i++){
             idx_t group_id = group_ids[i];
             size_t group_position = group_positions[i];
             for (size_t j = 0; j < this->code_size; j++){this->base_codes[group_id][group_position * code_size + j] = batch_codes[i * this->code_size + j];}
@@ -447,7 +448,6 @@ namespace bslib{
             if (use_hash){this->base_pre_hash_ids[group_id][group_position] = batch_pre_hash_ids[i];}
         }
 
-        /*
         std::vector<float> decoded_residuals(n * dimension);
         this->pq.decode(batch_codes.data(), decoded_residuals.data(), n);
         
@@ -460,26 +460,21 @@ namespace bslib{
 
         //The size of base_norm_code or base_norm should be initialized in main function
         if (use_norm_quantization){
-            assert(this->base_norm_codes.size() == this->final_group_num);
             std::vector<uint8_t> xnorm_codes (n * norm_code_size);
             this->norm_pq.compute_codes(xnorms.data(), xnorm_codes.data(), n);
             for (size_t i = 0 ; i < n; i++){
-                idx_t group_id = group_ids[i];
-                size_t group_position = group_positions[i];
+                idx_t sequence_id = sequence_ids[i];
                 for (size_t j =0; j < this->norm_code_size; j++){
-                    this->base_norm_codes[group_id][group_position * norm_code_size + j] = xnorm_codes[i * this->norm_code_size +j];
+                    this->base_norm_codes[sequence_id * norm_code_size + j] = xnorm_codes[i * this->norm_code_size +j];
                 }
             }
         }
         else{
-            assert(this->base_norm.size() == this->final_group_num);
             for (size_t i = 0; i < n; i++){
-                idx_t group_id = group_ids[i];
-                size_t group_position = group_positions[i];
-                this->base_norm[group_id][group_position] = xnorms[i];
+                idx_t sequence_id = sequence_ids[i];
+                this->base_norms[sequence_id] = xnorms[i];
             }
         }
-        */
     }
 
     /**
@@ -912,9 +907,10 @@ namespace bslib{
                         continue;
                     }
                     else{
+                        idx_t sequence_id = base_sequence_ids[group_id][m];
                         std::vector<float> base_reconstructed_norm(1);
-                        if (use_norm_quantization) norm_pq.decode(base_norm_codes[group_id].data() + m * norm_code_size, base_reconstructed_norm.data(), 1);
-                        float term2 = use_norm_quantization ? base_reconstructed_norm[0] : base_norm[group_id][m];
+                        if (use_norm_quantization) norm_pq.decode(base_norm_codes.data() + sequence_id * norm_code_size, base_reconstructed_norm.data(), 1);
+                        float term2 = use_norm_quantization ? base_reconstructed_norm[0] : base_norms[sequence_id];
                         float term3 = 2 * pq_L2sqr(code + m * code_size, precomputed_table.data());
                         float dist = term1 + term2 - term3;
                         query_search_dists[visited_vectors] = dist;
@@ -1242,23 +1238,16 @@ namespace bslib{
         std::ofstream output(path_index, std::ios::binary);
         output.write((char *) & this->final_group_num, sizeof(size_t));
 
+
         if (use_norm_quantization){
-            assert(base_codes.size() ==  final_group_num );
-            for (size_t i = 0; i < this->final_group_num; i++){
-                assert(base_norm_codes[i].size() / norm_code_size == base_sequence_ids[i].size());
-                size_t group_size = base_norm_codes[i].size();
-                output.write((char *) & group_size, sizeof(size_t));
-                output.write((char *) base_norm_codes[i].data(), group_size * sizeof(uint8_t));
-            }
+            size_t base_size = base_norm_codes.size() / norm_code_size;
+            output.write((char *) & base_size, sizeof(size_t));
+            output.write((char *) base_norm_codes.data(), base_norm_codes.size() * sizeof(uint8_t));
         }
         else{
-            assert(base_norm.size() == final_group_num);
-            for (size_t i = 0; i < this->final_group_num; i++){
-                assert((base_norm[i].size() == base_sequence_ids[i].size()));
-                size_t group_size = base_norm[i].size();
-                output.write((char *) & group_size, sizeof(size_t));
-                output.write((char *) base_norm[i].data(), group_size * sizeof(float));
-            }
+            size_t base_size = base_norms.size();
+            output.write((char *) & base_size, sizeof(size_t));
+            output.write((char *)base_norms.data(), base_norms.size() * sizeof(float));
         }
 
         if (use_hash){
@@ -1309,24 +1298,16 @@ namespace bslib{
         this->base_sequence_ids.resize(this->final_group_num);
 
         if (use_norm_quantization){
-            this->base_norm_codes.resize(this->final_group_num);
-            input.read((char *) & final_nc_input, sizeof(size_t));
-            assert(final_nc_input == this->final_group_num);
-            for (size_t i = 0; i < this->final_group_num; i++){
-                input.read((char *) & group_size_input, sizeof(size_t));
-                this->base_norm_codes[i].resize(group_size_input);
-                input.read((char *) base_norm_codes[i].data(), group_size_input * sizeof(uint8_t));
-            }
+            size_t base_size;
+            input.read((char *) & base_size, sizeof(size_t));
+            this->base_norm_codes.resize(base_size);
+            input.read((char *) base_norm_codes.data(), base_size * sizeof(uint8_t));
         }
         else{
-            this->base_norm.resize(this->final_group_num);
-            input.read((char *) & final_nc_input, sizeof(size_t));
-            assert(final_nc_input == this->final_group_num);
-            for (size_t i = 0; i < this->final_group_num; i++){
-                input.read((char *) & group_size_input, sizeof(size_t));
-                this->base_norm[i].resize(group_size_input);
-                input.read((char *) base_norm[i].data(), group_size_input * sizeof(float));
-            }
+            size_t base_size;
+            input.read((char *) & base_size, sizeof(size_t));
+            this->base_norms.resize(base_size);
+            input.read((char *) base_norms.data(), base_size * sizeof(float));
         }
 
         if (use_hash){
