@@ -46,16 +46,22 @@ def compute_LID(dataset):
 def compute_entropy(dataset):
     return ee.entropy(dataset)
 
-def get_dataset_path():
+def get_dataset_path_real():
     dataset_path = "/home/y/yujianfu/ivf-hnsw/data/"
     path_list = []
     real_dataset_list = ["SIFT", "GIST", "DEEP"]
     size_list = ["10K", "100K"]
     for dataset in real_dataset_list:
         for size in size_list:
-            sample_dataset_file = dataset_path + "analysis/" + dataset + "_" + size +"_base" + ".fvecs"
+            sample_dataset_file = dataset_path + "analysis/" + dataset + "_" + size +"_base.fvecs"
             path_list.append(sample_dataset_file)
-    
+
+    return path_list
+
+
+def get_dataset_path_random():
+    dataset_path = "/home/y/yujianfu/ivf-hnsw/data/"
+    path_list = []
     size_list = ["10K", "100K", "1000K"]
     dataset = "Gaussian"
     for dimension in range(100, 1100, 300):
@@ -64,11 +70,17 @@ def get_dataset_path():
             sample_dataset_file = dataset_path + "analysis/" + dataset + "_" + str(sample_size) + "K_" + str(dimension) + "_base.fvecs"
             path_list.append(sample_dataset_file)
     
+    return path_list 
+
+def get_dataset_path_gaussian():
+    dataset_path = "/home/y/yujianfu/ivf-hnsw/data/"
+    path_list = []
+    size_list = ["10K", "100K", "1000K"]
     dataset = "Random"
     for dimension in range(100, 1100, 300):
         for size in size_list:
             sample_size = int(size.split("K")[0]) 
             sample_dataset_file = dataset_path + "analysis/" + dataset + "_" + str(sample_size) + "K_" + str(dimension) + "_base.fvecs"
             path_list.append(sample_dataset_file)
-
+    
     return path_list

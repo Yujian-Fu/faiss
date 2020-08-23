@@ -9,10 +9,10 @@ from scipy.stats import kurtosis
 from scipy.stats import skew
 
 k_result = 5
-path_list = utils.get_dataset_path()
-feature_path = "/home/y/yujianfu/ivf-hnsw/data/analysis/feature_record.txt"
+path_list = utils.get_dataset_path_real()
+feature_path = "/home/y/yujianfu/ivf-hnsw/data/analysis/feature_record_real.txt"
 feature_file = open(feature_path, "w")
-property_string = "LID   entropy   dist_kurtosis   dist_skew   AC   DSC   DC_mean   DC_median   DC_std   TS   TD   RD\n"
+property_string = "LID   entropy   dist_kurtosis   dist_skew   AC   DSC   DC_mean   DC_median   DC_std   TS\n"
 feature_file.write(property_string)
 
 for dataset_path in path_list:
@@ -108,9 +108,9 @@ for dataset_path in path_list:
 
     TS = nx.transitivity(DG)
 
-    DT = nx.diameter(DG)
+    #DT = nx.diameter(DG)
 
-    RD = nx.radius(DG)
+    #RD = nx.radius(DG)
 
     #Not implemented for directed type
     #GE = nx.global_efficiency(DG)
@@ -124,7 +124,7 @@ for dataset_path in path_list:
     #Not implemented for directed type
     #OMEGA = nx.omega(DG)
 
-    result_string = str(LID)+"   "+str(entropy)+"   "+str(dist_kurtosis)+"   "+str(dist_skew)+"   "+str(AC)+"   "+str(DSC)+"   "+str(DC_mean)+"   "+str(DC_median)+"   "+str(DC_std)+"   "+str(TS)+"   "+str(DT)+"   "+str(RD)+"\n"
+    result_string = str(LID)+"   "+str(entropy)+"   "+str(dist_kurtosis)+"   "+str(dist_skew)+"   "+str(AC)+"   "+str(DSC)+"   "+str(DC_mean)+"   "+str(DC_median)+"   "+str(DC_std)+"   "+str(TS)+"\n"
     feature_file.write(result_string)
 
 
