@@ -48,25 +48,29 @@ typedef faiss::Index::idx_t idx_t;
 using namespace bslib;
 int main(){
     
-    /*
+    
     std::string dataset_name = "SIFT";
     std::string path_list[3] = {"/home/y/yujianfu/ivf-hnsw/data/analysis/SIFT_10K_base.fvecs", "/home/y/yujianfu/ivf-hnsw/data/analysis/SIFT_100K_base.fvecs", "/home/y/yujianfu/ivf-hnsw/data/analysis/SIFT_1000K_base.fvecs"};
     std::string path_query = "/home/y/yujianfu/ivf-hnsw/data/analysis/SIFT_query.fvecs";
     size_t size_list[3] = {10000, 100000, 1000000};
     const std::string path_record = "/home/y/yujianfu/ivf-hnsw/data/analysis/SIFT_reasoning.txt";
     size_t dimension = 128;
-    */
+    
 
+    /*
     std::string dataset_name = "GIST";
     std::string path_list[3] = {"/home/y/yujianfu/ivf-hnsw/data/analysis/GIST_10K_base.fvecs", "/home/y/yujianfu/ivf-hnsw/data/analysis/GIST_100K_base.fvecs", "/home/y/yujianfu/ivf-hnsw/data/analysis/GIST_1000K_base.fvecs"};
     std::string path_query = "/home/y/yujianfu/ivf-hnsw/data/analysis/GIST_query.fvecs";
     size_t size_list[3] = {10000, 100000, 1000000};
     const std::string path_record = "/home/y/yujianfu/ivf-hnsw/data/analysis/GIST_reasoning.txt";
     size_t dimension = 960;
+    */
    
     const size_t recall_test_size = 3;
     const size_t ngt = 100;
-    
+    std::ofstream record_output;
+    record_output.open(path_record, std::ios::out);
+
     for (size_t dataset_index = 0; dataset_index < 3; dataset_index++){
         const std::string path_base = path_list[dataset_index];
         std::cout << "Processing dataset " << path_base << std::endl;
@@ -91,12 +95,12 @@ int main(){
         std::ifstream base_input(path_base, std::ios::binary);
         //std::ifstream gt_input(path_gt, std::ios::binary);
         std::ifstream query_input(path_query, std::ios::binary);
-        std::ofstream record_output;
+        
     
 
 
         //PrepareFolder((char *) ("/home/y/yujianfu/ivf-hnsw/" + model + "/" + dataset).c_str());
-        record_output.open(path_record, std::ios::out);
+        
         //readXvec<float>(train_input, train_set.data(), dimension, train_set_size, false, false);
         readXvec<float>(base_input, base_set.data(), dimension, base_set_size, false, false);
         //readXvec<uint32_t>(gt_input, gt_set.data(), ngt, query_set_size, false, false);
