@@ -203,7 +203,7 @@ int main(){
                 gt_set.insert(labels[i * k_result + j]);
             }
             std::cout << "Finished Insertion" << std::endl;
-            for (size_t j = 0; j < visited_vectors; i++){
+            for (size_t j = 0; j < visited_vectors; j++){
                 std::cout << j << " ";
                 if (gt_set.count(computed_label[search_dist_index[j]]) != 0){
                     visited_gt ++;
