@@ -59,7 +59,7 @@ def get_dataset_path_real():
     return path_list
 
 
-def get_dataset_path_random():
+def get_dataset_path_gaussian():
     dataset_path = "/home/y/yujianfu/ivf-hnsw/data/"
     path_list = []
     size_list = ["10K", "100K", "1000K"]
@@ -72,7 +72,7 @@ def get_dataset_path_random():
     
     return path_list 
 
-def get_dataset_path_gaussian():
+def get_dataset_path_random():
     dataset_path = "/home/y/yujianfu/ivf-hnsw/data/"
     path_list = []
     size_list = ["10K", "100K", "1000K"]

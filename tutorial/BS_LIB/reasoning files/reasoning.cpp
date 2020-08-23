@@ -5,7 +5,8 @@
 #include <faiss/Index.h>
 
 //Parameters
-    
+
+/*
 const std::string dataset = "SIFT1M";
 const std::string model = "models_VQ";
 const size_t dimension = 128;
@@ -15,6 +16,7 @@ const size_t query_set_size = 1000;
 const size_t ngt = 100;
 const bool use_sub_train_set = false;
 const size_t recall_test_size = 3;
+*/
 
 
 /*
@@ -41,6 +43,21 @@ const bool use_sub_train_set = false;
 const size_t recall_test_size = 3;
 */
 
+std::string dataset_path = "/home/y/yujianfu/ivf-hnsw/data/";
+std::vector<std::string> path_list;
+size_t size_list[3] = {10, 100, 1000};
+std::string dataset_type = "Gaussian";
+for (size_t dimension = 100; dimension < 1100, dimension += 300){
+    for (size_t i = 0; i < 3; i++){
+        size = size_list[i];
+        std::string sample_dataset_file
+    }
+}
+
+for size in size_list:
+    sample_size = int(size.split("K")[0]) 
+    sample_dataset_file = dataset_path + "analysis/" + dataset + "_" + str(sample_size) + "K_" + str(dimension) + "_base.fvecs"
+    path_list.append(sample_dataset_file)
     
 
 const std::string path_learn = "/home/y/yujianfu/ivf-hnsw/data/" + dataset + "/" + dataset +"_learn.fvecs";
