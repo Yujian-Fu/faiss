@@ -168,23 +168,29 @@ int main(){
                     faiss::maxheap_push(k_result, result_dists.data() + result_position, result_labels.data() + result_position, sum_distance, sequence_id);
                 }
             }
+
             if (j == nprobe / 2){
-                record_file << "n / 2 d_1st: " << result_dists[0] << std::endl;
-                record_file << "n / 2 d_10th: " << result_dists[9] << std::endl;
-                record_file << "n / 2 d_1st / d_10th" << result_dists[0] / result_dists[9] << std::endl;
-                record_file << "n / 2 update times / search times" << float(update_times) / float(visited_vectors) << std::endl;
-            }
-            if (j == nprobe - 1){
-                record_file << "n d_1st: " << result_dists[0] << std::endl;
-                record_file << "n d_10th: " << result_dists[9] << std::endl;
-                record_file << "n d_1st / d_10th " << result_dists[0] / result_dists[9] << std::endl;
-                record_file << "n update times / search times " << float(update_times) / float(visited_vectors) << std::endl;
+                std::vector<idx_t> search_dist_index(visited_vectors);
+                size_t x = 0;
+                std::iota(search_dist_index.begin(), search_dist_index.end(), x++);
+                std::sort(search_dist_index.begin(), search_dist_index.end(), [&](int i,int j){return computed_distance[i]<computed_distance[j];});
+
+                record_file << "n / 2 d_1st: " << computed_distance[search_dist_index[0]] << std::endl;
+                record_file << "n / 2 d_10th: " << computed_distance[search_dist_index[9]] << std::endl;
+                record_file << "n / 2 d_1st / d_10th" << computed_distance[search_dist_index[0]] / computed_distance[search_dist_index[9]] << std::endl;
+                record_file << "search times / n / 2 update times " << float(visited_vectors) / float(update_times) << std::endl;
             }
         }
         std::vector<idx_t> search_dist_index(visited_vectors);
         size_t x = 0;
         std::iota(search_dist_index.begin(), search_dist_index.end(), x++);
         std::sort(search_dist_index.begin(), search_dist_index.end(), [&](int i,int j){return computed_distance[i]<computed_distance[j];});
+
+        record_file << "n d_1st: " << computed_distance[search_dist_index[0]] << std::endl;
+        record_file << "n d_10th: " << computed_distance[search_dist_index[9]] << std::endl;
+        record_file << "n d_1st / d_10th " << computed_distance[search_dist_index[0]] / computed_distance[search_dist_index[9]] << std::endl;
+        record_file << "search times / n update times " << float(visited_vectors) / float(update_times) << std::endl;
+
 
         size_t gt_target[7] = {1, 8, 9, 10, 80, 90, 100};
         for(size_t index = 0; index < 7; index++){
@@ -199,7 +205,7 @@ int main(){
                 if (gt_set.count(computed_label[search_dist_index[j]]) != 0){
                     visited_gt ++;
                 }
-                if (visited_gt == gt_target[index]){
+                if (visited_gt >= gt_target[index]){
                     reranking_space = j;
                     break;
                 }
