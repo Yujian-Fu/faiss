@@ -15,9 +15,8 @@ def inter(x):
             inter_x.append(type_x((int(x[i]) + int(x[i + 1])) / 2))
     return inter_x
 
-distance_ratio = 10
 
-def fit(x, y):
+def fit(x, y, size):
     #x = np.linspace(-10,10,100)  # 创建时间序列
     #p_value = [-2,5,10] # 原始数据的参数
     #noise = np.random.randn(len(x))  # 创建随机噪声
@@ -34,10 +33,21 @@ def fit(x, y):
     plt.plot(x,y_fitted,'-b', label ='Fitted curve')
 
     plt.text(x[0]/2, y[-1], funtion_string, ha='left', wrap=True)
+    if (size == 10000):
+        distance_ratio = 50
+    elif (size == 100000):
+        distance_ratio = 10
+    elif (size == 1000000):
+        distance_ratio = 5
     a3 = a3 + distance_ratio
     y_time = a1 * x**3 + a2*x**2+a3*x +a4
     plt.plot(x,y_time,'-b', label ='Actual Time')
-    turning_point_x = ((-2 * a2) + math.sqrt(4 * a2 * a2 - 12 * a1 * a3)) / (6 * a1)
+    print(a1, a2, a3, a4)
+    if (a1 > 0):
+        a11 = 0
+    else:
+        a11 = a1
+    turning_point_x = ((-2 * a2) + math.sqrt(4 * a2 * a2 - 12 * a11 * a3)) / (6 * a1)
     turning_point_y = a1 * turning_point_x**3 + a2*turning_point_x**2+a3*turning_point_x +a4
     print(turning_point_x, turning_point_y)
     plt.text(turning_point_x, turning_point_y,"(" + str(round(turning_point_x, 2)) + " , " + str(round(turning_point_y, 2)) + ")")
@@ -45,7 +55,7 @@ def fit(x, y):
     #plt.show()
 
 
-dataset = "SIFT"
+dataset = "Random_1000"
 
 recording_proportion = [1]
 recall_performance = [1, 10, 100]
@@ -84,6 +94,7 @@ for i in range(len(recall_performance)):
         dataset_recording = False
 
         for size in size_list:
+            plt.figure()
             dataset_name = dataset + " " +str(size) + " "
             title = dataset_name + " / Num Centroids - Search Time"
             title1 = title + " / Recall@ " + str(recall_performance[i])
@@ -150,7 +161,7 @@ for i in range(len(recall_performance)):
                 print(inter_n_centroids, inter_visited_vectors)
                 #plt.plot(list(map(float, inter_n_centroids)), inter_visited_vectors)
 
-                fit(np.array(np.array(list(map(float, inter_n_centroids)))), np.array(inter_visited_vectors))
+                fit(np.array(np.array(list(map(float, inter_n_centroids)))), np.array(inter_visited_vectors), size)
                 #plt.plot(list(map(float, n_centroids)), list(np.array(visited_vectors) + distance_ratio * np.array(visited_centroids)))
                 visited_vectors = []
             else:
@@ -159,7 +170,7 @@ for i in range(len(recall_performance)):
                     sub_visited_vectors = [visited_vectors[temp * len(recording_proportion) + j] for temp in range(len(n_centroids))]
                     inter_n_centroids = inter(n_centroids)
                     inter_sub_visited_vectors = inter(sub_visited_vectors)
-                    fit(np.array(np.array(list(map(float, inter_n_centroids)))), np.array(inter_sub_visited_vectors))
+                    fit(np.array(np.array(list(map(float, inter_n_centroids)))), np.array(inter_sub_visited_vectors), size)
                     #sub_visited_centroids = [visited_centroids[temp * len(recording_proportion) + j] for temp in range(len(n_centroids))]
                     #plt.plot(list(map(float, n_centroids)), sub_visited_vectors)
                     #plt.plot(list(map(float, n_centroids)), list(np.array(sub_visited_vectors) + distance_ratio * np.array(sub_visited_centroids)))
@@ -172,7 +183,7 @@ for i in range(len(recall_performance)):
             plt.xlabel("num centroids")
             plt.ylabel("sum search time / T")
             plt.title(title1)
-            plt.show()
+            plt.savefig("/home/yujian/Desktop/Recording_Files/VQ/analysis/" + dataset_name + "_" + str(recall_performance[i]))
 
 
 

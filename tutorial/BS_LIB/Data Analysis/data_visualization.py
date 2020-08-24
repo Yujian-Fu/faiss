@@ -6,17 +6,22 @@ This is for using the T-SNE lib to visualize the dataset
 import numpy as np
 from sklearn.manifold import TSNE
 import matplotlib.pyplot as plt
+import utils
 
-y = np.random.normal(0, 0.5, (100, 10))
-print(y.shape)
-tsne = TSNE(n_components=2)
-tsne.fit_transform(y)
-print(tsne.embedding_)
+dataset_path = "/home/yujian/Desktop/Recording_Files/VQ/analysis/"
+dataset_list = ["DEEP", "SIFT","GIST", "Random_100", "Random_400", "Random_700", "Random_1000", "Gaussian_100", "Gaussian_400", "Gaussian_700", "Gaussian_1000"]
 
-fig = plt.figure()
-plt.title("T-SNE Scatter Figure")
-plt.scatter(tsne.embedding_[:, 0],tsne.embedding_[:, 1],c = 'r',marker = 'o')
+for dataset_name in dataset_list:
+    dataset_file = dataset_path + dataset_name + "_query.fvecs"
+    dataset = utils.fvecs_read(dataset_file)
 
-plt.legend('x1')
-plt.show()
+    tsne = TSNE(n_components=2)
+    tsne.fit_transform(dataset)
+
+    fig = plt.figure()
+    title = dataset_name + " T-SNE Scatter"
+    plt.title(title)
+    plt.scatter(tsne.embedding_[:, 0],tsne.embedding_[:, 1],c = 'r',marker = 'o')
+    figure_path = dataset_path + dataset_name + "_T-SNE.png"
+    plt.save(figure_path)
 
