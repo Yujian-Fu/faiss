@@ -9,11 +9,11 @@ from scipy.stats import kurtosis
 from scipy.stats import skew
 
 k_result = 5
-path_list = utils.get_dataset_path_gaussian()
-feature_path = "/home/y/yujianfu/ivf-hnsw/data/analysis/feature_record_gaussian.txt"
+path_list = utils.get_dataset_path_real()
+feature_path = "/home/y/yujianfu/ivf-hnsw/data/analysis/LID_entropy_record_real.txt"
 feature_file = open(feature_path, "w")
 
-'''
+
 feature_file.write("Name   LID   Entropy\n")
 for dataset_path in path_list:
     print("Loading dataset from ", dataset_path)
@@ -24,9 +24,9 @@ for dataset_path in path_list:
     dataset_name = dataset_path.split(".")[0].split("/")[-1]
     print(dataset_name + "   " + str(LID) + "   " + str(entropy) + "\n")
     feature_file.write(dataset_name + "   " + str(LID) + "   " + str(entropy) + "\n")
+
+
 '''
-
-
 property_string = "Name   dist_kurtosis   dist_skew   AC   DSC   DC_mean   DC_median   DC_std   TS\n"
 feature_file.write(property_string)
 
@@ -142,7 +142,7 @@ for dataset_path in path_list:
     result_string = dataset_name +"   "+str(dist_kurtosis)+"   "+str(dist_skew)+"   "+str(AC)+"   "+str(DSC)+"   "+str(DC_mean)+"   "+str(DC_median)+"   "+str(DC_std)+"   "+str(TS)+"\n"
     print(result_string)
     feature_file.write(result_string)
-
+'''
 
 
 
