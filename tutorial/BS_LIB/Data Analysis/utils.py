@@ -50,7 +50,7 @@ def get_dataset_path_real():
     dataset_path = "/home/y/yujianfu/ivf-hnsw/data/"
     path_list = []
     real_dataset_list = ["SIFT", "GIST", "DEEP"]
-    size_list = ["10K", "100K", "1000K"]
+    size_list = ["10K", "100K"]
     for dataset in real_dataset_list:
         for size in size_list:
             sample_dataset_file = dataset_path + "analysis/" + dataset + "_" + size +"_base.fvecs"
@@ -62,7 +62,7 @@ def get_dataset_path_real():
 def get_dataset_path_gaussian():
     dataset_path = "/home/y/yujianfu/ivf-hnsw/data/"
     path_list = []
-    size_list = ["10K", "100K", "1000K"]
+    size_list = ["10K", "100K"]
     dataset = "Gaussian"
     for dimension in range(100, 1100, 300):
         for size in size_list:
@@ -75,7 +75,7 @@ def get_dataset_path_gaussian():
 def get_dataset_path_random():
     dataset_path = "/home/y/yujianfu/ivf-hnsw/data/"
     path_list = []
-    size_list = ["10K", "100K", "1000K"]
+    size_list = ["10K", "100K"]
     dataset = "Random"
     for dimension in range(100, 1100, 300):
         for size in size_list:
