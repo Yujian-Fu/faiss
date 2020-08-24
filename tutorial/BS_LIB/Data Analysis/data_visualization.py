@@ -8,7 +8,7 @@ from sklearn.manifold import TSNE
 import matplotlib.pyplot as plt
 import utils
 
-dataset_path = "/home/yujian/Desktop/Recording_Files/VQ/analysis/"
+dataset_path = "/home/y/yujianfu/ivf-hnsw/data/analysis/"
 dataset_list = ["DEEP", "SIFT","GIST", "Random_100", "Random_400", "Random_700", "Random_1000", "Gaussian_100", "Gaussian_400", "Gaussian_700", "Gaussian_1000"]
 
 for dataset_name in dataset_list:
@@ -23,5 +23,5 @@ for dataset_name in dataset_list:
     plt.title(title)
     plt.scatter(tsne.embedding_[:, 0],tsne.embedding_[:, 1],c = 'r',marker = 'o')
     figure_path = dataset_path + dataset_name + "_T-SNE.png"
-    plt.save(figure_path)
+    plt.savefig(figure_path)
 
