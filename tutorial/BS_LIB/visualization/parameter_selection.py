@@ -55,7 +55,7 @@ def fit(x, y, size):
     #plt.show()
 
 
-dataset = "Random_1000"
+dataset = "Random_700"
 
 recording_proportion = [1]
 recall_performance = [1, 10, 100]

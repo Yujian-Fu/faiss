@@ -22,10 +22,35 @@ int main(){
     std::vector<idx_t> train_next_ids(train_size * keep_space, 0);
     std::vector<float> train_dists(train_size * keep_space, 0);
 
+    time_recorder Trecorder = time_recorder();
+    Trecorder.reset();
     pq.search_in_group(train_size, train_set.data(), train_ids.data(), train_dists.data(), train_next_ids.data(), keep_space);
+    Trecorder.print_time_usage("The time for search in PQ layer: ");
 
     std::cout << "The search result: " << std::endl;
     for (size_t i = 0; i < 100; i++){
         std::cout << train_next_ids[i] << " ";
     }
+    std::cout << std::endl;
+
+    size_t sum_centroids = pq.nc;
+    std::vector<float> all_centroids(sum_centroids * dimension);
+    for (size_t i = 0; i < sum_centroids; i++){
+        std::vector<float> each_centroid(dimension);
+        pq.compute_final_centroid(i, all_centroids.data() + i * dimension);
+    }
+    faiss::IndexFlatL2 index(dimension);
+    index.add(sum_centroids, all_centroids.data());
+    std::vector<float> index_dist(train_size * keep_space);
+    std::vector<idx_t> index_labels(train_size * keep_space);
+    Trecorder.reset();
+    index.search(train_size, train_set.data(), keep_space, index_dist.data(), index_labels.data());
+    Trecorder.print_time_usage("The time for search in L2 layer");
+    std::cout << "The search result: " << std::endl;
+    for (size_t i = 0; i < 100; i++){
+        std::cout << index_labels[i] << " ";
+    }
+    std::cout << std::endl;
+
+
 }
