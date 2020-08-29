@@ -48,7 +48,7 @@ int main(){
             correct ++;
         }
         else{
-            std::cout << i << index_labels[i] << " " << train_next_ids[i] << " " << index_dist[i] << " " << train_dists[i] << " ";
+            std::cout << i << " " << index_labels[i] << " " << train_next_ids[i] << " " << index_dist[i] << " " << train_dists[i] << " ";
         }
     }
     std::cout << std::endl;
