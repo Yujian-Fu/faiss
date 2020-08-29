@@ -190,10 +190,10 @@ namespace bslib{
            //From 0 to M-1
            std::iota(dist_index[i].begin(), dist_index[i].end(), x++);
 
-           //for (size_t j = 0; j < this->ksub; j++){
-            //   dist_seqs[i][j] = dist_sequence[i * this->ksub + j];
-           //}
-            std::sort(dist_index[i].begin(), dist_index[i].end(), [&](int a,int b){return dist_sequence[i * this->ksub + a]<dist_sequence[i * this->ksub + b];} );
+           for (size_t j = 0; j < this->ksub; j++){
+               dist_seqs[i][j] = dist_sequence[i * this->ksub + j];
+           }
+            std::sort(dist_index[i].begin(), dist_index[i].end(), [&](int a,int b){return dist_seqs[i][a]<dist_seqs[i][b];} );
        }
         period1 = (double) (clock() - start_t);
         
