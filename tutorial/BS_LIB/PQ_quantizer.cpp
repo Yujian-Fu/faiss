@@ -193,7 +193,7 @@ namespace bslib{
        }
 
        std::priority_queue<dist_pair, std::vector<dist_pair>, cmp> dist_queue;
-       std::vector<dist_pair> result_sequence;
+       std::vector<dist_pair> result_sequence(keep_space);
        std::vector<idx_t> visited_index;
 
        std::vector<idx_t> dist_ids(this->M, 0);
@@ -203,9 +203,10 @@ namespace bslib{
 
         for (size_t i = 0; i < this->M; i++){visited_index.push_back(origin_pair.second[i]);}
         dist_queue.push(origin_pair);
-        result_sequence.push_back(origin_pair);
+        result_sequence[0] = origin_pair;
 
-       while(result_sequence.size() < keep_space){
+
+        for (size_t i = 1; i < keep_space; i++){
            dist_pair top_pair = dist_queue.top();
            dist_queue.pop();
            for (size_t j = 0; j < this->M; j++){
@@ -262,8 +263,10 @@ namespace bslib{
                     }
                 }
             }
-            result_sequence.push_back(dist_queue.top());
+            result_sequence[i] = dist_queue.top();
         }
+
+#pragma omp parallel for
         for (size_t i = 0; i < keep_space; i++){
             
             dist_pair new_pair = result_sequence[i];
@@ -294,15 +297,11 @@ namespace bslib{
      * 
      **/
     void PQ_quantizer::search_in_group(size_t n, const float * queries, const idx_t * group_idxs, float * result_dists, idx_t * result_labels, size_t keep_space){
-#pragma omp parallel for
+//#pragma omp parallel for
         for (size_t i = 0; i < n; i++){
             idx_t group_id = group_idxs[i];
             std::vector<float> distance_table(this->M * this->ksub);
             this->PQs[group_id]->compute_distance_table(queries + i * dimension, distance_table.data());
-            //std::cout << "The distance table is: " << std::endl;
-            //for (size_t j = 0; j < M * ksub; j++){
-            //    std::cout << distance_table[j] << " ";
-            //}
             multi_sequence_sort(group_id, distance_table.data(), keep_space, result_dists + i * keep_space, result_labels + i * keep_space);
         }
     }
