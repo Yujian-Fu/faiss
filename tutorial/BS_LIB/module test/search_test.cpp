@@ -47,7 +47,11 @@ int main(){
         if (index_labels[i] == train_next_ids[i]){
             correct ++;
         }
+        else{
+            std::cout << i << " ";
+        }
     }
+    std::cout << std::endl;
     std::cout << "The correct num is: " << correct << std::endl;
 
 
