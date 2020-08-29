@@ -39,7 +39,8 @@ namespace bslib{
     /**
      * the pow function for ksub^pow
      **/
-    idx_t PQ_quantizer::new_pow(size_t ksub, size_t pow){
+
+    inline idx_t PQ_quantizer::new_pow(size_t ksub, size_t pow){
         idx_t result = 1;
         for (size_t i = 0; i < pow; i++){
             result *= ksub;
@@ -181,10 +182,6 @@ namespace bslib{
        std::vector<std::vector<float>> dist_seqs(this->M, std::vector<float>(this->ksub));
        std::vector<std::vector<idx_t>> dist_index(this->M, std::vector<idx_t>(this->ksub));
 
-        clock_t start_t;
-        double period1, period2, period3, period4;
-        start_t = clock();
-
        for (size_t i = 0; i < this->M; i++){
            uint32_t x = 0;
            //From 0 to M-1
@@ -195,9 +192,7 @@ namespace bslib{
            }
             std::sort(dist_index[i].begin(), dist_index[i].end(), [&](int a,int b){return dist_seqs[i][a]<dist_seqs[i][b];} );
        }
-        period1 = (double) (clock() - start_t);
         
-       start_t = clock();
        std::priority_queue<dist_pair, std::vector<dist_pair>, cmp> dist_queue;
        std::vector<dist_pair> result_sequence(keep_space);
        std::vector<idx_t> visited_index;
@@ -210,10 +205,7 @@ namespace bslib{
         for (size_t i = 0; i < this->M; i++){visited_index.push_back(origin_pair.second[i]);}
         dist_queue.push(origin_pair);
         result_sequence[0] = origin_pair;
-        period2 = (double) (clock() - start_t);
         
-
-        start_t = clock();
         for (size_t i = 1; i < keep_space; i++){
            dist_pair top_pair = dist_queue.top();
            dist_queue.pop();
@@ -273,9 +265,7 @@ namespace bslib{
             }
             result_sequence[i] = dist_queue.top();
         }
-        period3 = (double) (clock() - start_t);
 
-        start_t = clock();
         for (size_t i = 0; i < keep_space; i++){
             
             dist_pair new_pair = result_sequence[i];
@@ -289,11 +279,6 @@ namespace bslib{
             
             result_dists[i] = new_pair.first;
         }
-        period4 = (double) (clock() - start_t);
-
-        double sum_period = period1 + period2 + period3 + period4;
-        std::cout << "The time for several parts: " << period1 / sum_period << " " << period2 / sum_period << " " << period3 / sum_period << " " << period4 / sum_period;
-        std::cout << std::endl;
     }
 
     /**
