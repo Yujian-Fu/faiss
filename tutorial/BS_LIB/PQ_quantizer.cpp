@@ -180,7 +180,6 @@ namespace bslib{
        std::vector<std::vector<float>> dist_seqs(this->M, std::vector<float>(this->ksub));
        std::vector<std::vector<idx_t>> dist_index(this->M, std::vector<idx_t>(this->ksub));
 
-
 #pragma omp parallel for
        for (size_t i = 0; i < this->M; i++){
            uint32_t x = 0;
@@ -300,8 +299,7 @@ namespace bslib{
             idx_t group_id = group_idxs[i];
             std::vector<float> distance_table(this->M * this->ksub);
             this->PQs[group_id]->compute_distance_table(queries + i * dimension, distance_table.data());
-            std::cout << "The distance table is: " << std::endl;
-            
+            //std::cout << "The distance table is: " << std::endl;
             //for (size_t j = 0; j < M * ksub; j++){
             //    std::cout << distance_table[j] << " ";
             //}
