@@ -182,6 +182,7 @@ namespace bslib{
        std::vector<std::vector<float>> dist_seqs(this->M, std::vector<float>(this->ksub));
        std::vector<std::vector<idx_t>> dist_index(this->M, std::vector<idx_t>(this->ksub));
 
+#pragma omp parallel for
        for (size_t i = 0; i < this->M; i++){
            uint32_t x = 0;
            //From 0 to M-1
@@ -266,6 +267,7 @@ namespace bslib{
             result_sequence[i] = dist_queue.top();
         }
 
+#pragma omp parallel for
         for (size_t i = 0; i < keep_space; i++){
             
             dist_pair new_pair = result_sequence[i];
