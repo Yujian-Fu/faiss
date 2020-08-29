@@ -185,7 +185,7 @@ namespace bslib{
         double period1, period2, period3, period4;
         start_t = clock();
 
-#pragma omp parallel for
+//#pragma omp parallel for
        for (size_t i = 0; i < this->M; i++){
            uint32_t x = 0;
            //From 0 to M-1
@@ -198,7 +198,7 @@ namespace bslib{
        }
         period1 = (double) (clock() - start_t);
         
-        start_t = clock();
+       start_t = clock();
        std::priority_queue<dist_pair, std::vector<dist_pair>, cmp> dist_queue;
        std::vector<dist_pair> result_sequence(keep_space);
        std::vector<idx_t> visited_index;
