@@ -16,7 +16,7 @@ int main(){
 
     readXvec<float>(learn_file, train_set.data(), dimension, train_size);
     readXvec<float> (base_file, base_set.data(), dimension, nb);
-    PQ_quantizer pq (dimension, 1, 2, 8);
+    PQ_quantizer pq (dimension, 1, 2, 4);
 
     pq.build_centroids(train_set.data(), train_size, train_ids.data());
     std::vector<idx_t> train_next_ids(train_size * keep_space, 0);
@@ -27,11 +27,6 @@ int main(){
     pq.search_in_group(train_size, train_set.data(), train_ids.data(), train_dists.data(), train_next_ids.data(), keep_space);
     Trecorder.print_time_usage("The time for search in PQ layer: ");
 
-    std::cout << "The search result: " << std::endl;
-    for (size_t i = 0; i < 100; i++){
-        std::cout << train_next_ids[i] << " ";
-    }
-    std::cout << std::endl;
 
     size_t sum_centroids = pq.nc;
     std::vector<float> all_centroids(sum_centroids * dimension);
@@ -46,11 +41,14 @@ int main(){
     Trecorder.reset();
     index.search(train_size, train_set.data(), keep_space, index_dist.data(), index_labels.data());
     Trecorder.print_time_usage("The time for search in L2 layer");
-    std::cout << "The search result: " << std::endl;
-    for (size_t i = 0; i < 100; i++){
-        std::cout << index_labels[i] << " ";
+
+    size_t correct = 0;
+    for (size_t i = 0; i < train_size * keep_space; i++){
+        if (index_labels[i] == train_next_ids[i]){
+            correct ++;
+        }
     }
-    std::cout << std::endl;
+    std::cout << "The correct num is: " << correct << std::endl;
 
 
 }
