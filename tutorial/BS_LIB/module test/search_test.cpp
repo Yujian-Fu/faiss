@@ -6,7 +6,7 @@ using namespace bslib;
 
 int main(){
     size_t dimension = 128;
-    size_t keep_space = 10;
+    size_t keep_space = 1;
     std::vector<float> base_set(dimension * nb);
     std::vector<float> train_set(dimension * train_size);
     std::vector<idx_t> train_ids(train_size, 0);
