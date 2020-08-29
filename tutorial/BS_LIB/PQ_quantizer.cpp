@@ -292,8 +292,8 @@ namespace bslib{
         period4 = (double) (clock() - start_t);
 
         double sum_period = period1 + period2 + period3 + period4;
-        //std::cout << "The time for several parts: " << period1 / sum_period << " " << period2 / sum_period << " " << period3 / sum_period << " " << period4 / sum_period;
-        //std::cout << std::endl;
+        std::cout << "The time for several parts: " << period1 / sum_period << " " << period2 / sum_period << " " << period3 / sum_period << " " << period4 / sum_period;
+        std::cout << std::endl;
     }
 
     /**
