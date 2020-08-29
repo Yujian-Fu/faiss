@@ -16,7 +16,7 @@ int main(){
 
     readXvec<float>(learn_file, train_set.data(), dimension, train_size);
     readXvec<float> (base_file, base_set.data(), dimension, nb);
-    PQ_quantizer pq (dimension, 1, 2, 4);
+    PQ_quantizer pq (dimension, 1, 2, 8);
 
     pq.build_centroids(train_set.data(), train_size, train_ids.data());
     std::vector<idx_t> train_next_ids(train_size * keep_space, 0);
@@ -26,7 +26,6 @@ int main(){
     Trecorder.reset();
     pq.search_in_group(train_size, train_set.data(), train_ids.data(), train_dists.data(), train_next_ids.data(), keep_space);
     Trecorder.print_time_usage("The time for search in PQ layer: ");
-
 
     size_t sum_centroids = pq.nc;
     std::vector<float> all_centroids(sum_centroids * dimension);
