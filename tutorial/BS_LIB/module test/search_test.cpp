@@ -61,5 +61,6 @@ int main(){
     for (size_t i = 0; i < pq.nc; i++){
         std::cout << id_set[i] << " ";
     }
+    std::cout << std::endl;
 
 }
