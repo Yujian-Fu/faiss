@@ -208,7 +208,7 @@ namespace bslib{
         for (size_t i = 0; i < this->M; i++){visited_index.push_back(origin_pair.second[i]);}
         dist_queue.push(origin_pair);
         result_sequence[0] = origin_pair;
-        period1 = (double) ((clock() - start_t) / CLOCKS_PER_SEC);
+        period1 = (double) (clock() - start_t);
 
         start_t = clock();
         for (size_t i = 1; i < keep_space; i++){
@@ -270,7 +270,7 @@ namespace bslib{
             }
             result_sequence[i] = dist_queue.top();
         }
-        period2 = (double) ((clock() - start_t) / CLOCKS_PER_SEC);
+        period2 = (double) (clock() - start_t);
 
         start_t = clock();
 #pragma omp parallel for
@@ -287,7 +287,7 @@ namespace bslib{
             
             result_dists[i] = new_pair.first;
         }
-        period3 = (double) ((clock() - start_t) / CLOCKS_PER_SEC);
+        period3 = (double) (clock() - start_t);
         std::cout << "The time for several parts: " << period1 / (period3 + period2 + period1) << " " << period2 / (period3 + period2 + period1) << " " << period3 / (period3 + period2 + period1) << " ";
         std::cout << std::endl;
     }
