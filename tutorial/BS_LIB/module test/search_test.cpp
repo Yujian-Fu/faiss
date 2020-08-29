@@ -21,7 +21,8 @@ int main(){
     pq.build_centroids(train_set.data(), train_size, train_ids.data());
     std::vector<idx_t> train_next_ids(train_size * keep_space, 0);
     std::vector<float> train_dists(train_size * keep_space, 0);
-
+    
+    std::cout << "The nc of PQ layer: " << pq.nc << std::endl;
     time_recorder Trecorder = time_recorder();
     Trecorder.reset();
     pq.search_in_group(train_size, train_set.data(), train_ids.data(), train_dists.data(), train_next_ids.data(), keep_space);
