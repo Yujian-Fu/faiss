@@ -185,7 +185,6 @@ namespace bslib{
         double period1, period2, period3, period4;
         start_t = clock();
 
-//#pragma omp parallel for
        for (size_t i = 0; i < this->M; i++){
            uint32_t x = 0;
            //From 0 to M-1
@@ -277,7 +276,6 @@ namespace bslib{
         period3 = (double) (clock() - start_t);
 
         start_t = clock();
-#pragma omp parallel for
         for (size_t i = 0; i < keep_space; i++){
             
             dist_pair new_pair = result_sequence[i];
