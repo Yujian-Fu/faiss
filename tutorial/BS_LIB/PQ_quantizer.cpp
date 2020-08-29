@@ -292,8 +292,8 @@ namespace bslib{
         period4 = (double) (clock() - start_t);
 
         double sum_period = period1 + period2 + period3 + period4;
-        std::cout << "The time for several parts: " << period1 / sum_period << " " << period2 / sum_period << " " << period3 / sum_period << " " << period4 / sum_period;
-        std::cout << std::endl;
+        //std::cout << "The time for several parts: " << period1 / sum_period << " " << period2 / sum_period << " " << period3 / sum_period << " " << period4 / sum_period;
+        //std::cout << std::endl;
     }
 
     /**
@@ -311,7 +311,7 @@ namespace bslib{
      * 
      **/
     void PQ_quantizer::search_in_group(size_t n, const float * queries, const idx_t * group_idxs, float * result_dists, idx_t * result_labels, size_t keep_space){
-//#pragma omp parallel for
+#pragma omp parallel for
         for (size_t i = 0; i < n; i++){
             idx_t group_id = group_idxs[i];
             std::vector<float> distance_table(this->M * this->ksub);
