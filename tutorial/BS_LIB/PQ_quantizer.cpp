@@ -1,4 +1,5 @@
 #include "PQ_quantizer.h"
+#include <time.h>
 
 /**
  * pair (distance, index)
@@ -180,6 +181,9 @@ namespace bslib{
        std::vector<std::vector<float>> dist_seqs(this->M, std::vector<float>(this->ksub));
        std::vector<std::vector<idx_t>> dist_index(this->M, std::vector<idx_t>(this->ksub));
 
+        clock_t start_t;
+        double period1, period2, period3;
+        start_t = clock();
 #pragma omp parallel for
        for (size_t i = 0; i < this->M; i++){
            uint32_t x = 0;
@@ -204,8 +208,9 @@ namespace bslib{
         for (size_t i = 0; i < this->M; i++){visited_index.push_back(origin_pair.second[i]);}
         dist_queue.push(origin_pair);
         result_sequence[0] = origin_pair;
+        period1 = (double) ((clock() - start_t) / CLOCKS_PER_SEC);
 
-
+        start_t = clock();
         for (size_t i = 1; i < keep_space; i++){
            dist_pair top_pair = dist_queue.top();
            dist_queue.pop();
@@ -249,7 +254,7 @@ namespace bslib{
                         for (size_t k = 0; k < this->M; k++){
                             test_dist_idxs[k] = (k == j) ? top_pair.second[j] - 1 :(k == m) ? top_pair.second[m] + 1 : top_pair.second[k];
                         }
-                        if ( traversed(visited_index.data(), test_dist_idxs.data(), visited_index.size() / this->M)){
+                        if (traversed(visited_index.data(), test_dist_idxs.data(), visited_index.size() / this->M)){
                             for (size_t k = 0; k < this->M; k++){
                                 new_dist_idxs[k] = (k == m) ? top_pair.second[m] + 1 : top_pair.second[k];
                                 new_dist_sum += dist_seqs[k][dist_index[k][new_dist_idxs[k]]];
@@ -265,7 +270,9 @@ namespace bslib{
             }
             result_sequence[i] = dist_queue.top();
         }
+        period2 = (double) ((clock() - start_t) / CLOCKS_PER_SEC);
 
+        start_t = clock();
 #pragma omp parallel for
         for (size_t i = 0; i < keep_space; i++){
             
@@ -280,6 +287,9 @@ namespace bslib{
             
             result_dists[i] = new_pair.first;
         }
+        period3 = (double) ((clock() - start_t) / CLOCKS_PER_SEC);
+        std::cout << "The time for several parts: " << period1 / (period3 + period2 + period1) << " " << period2 / (period3 + period2 + period1) << " " << period3 / (period3 + period2 + period1) << " ";
+        std::cout << std::endl;
     }
 
     /**
@@ -297,7 +307,7 @@ namespace bslib{
      * 
      **/
     void PQ_quantizer::search_in_group(size_t n, const float * queries, const idx_t * group_idxs, float * result_dists, idx_t * result_labels, size_t keep_space){
-#pragma omp parallel for
+//#pragma omp parallel for
         for (size_t i = 0; i < n; i++){
             idx_t group_id = group_idxs[i];
             std::vector<float> distance_table(this->M * this->ksub);
