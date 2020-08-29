@@ -16,7 +16,7 @@ int main(){
 
     readXvec<float>(learn_file, train_set.data(), dimension, train_size);
     readXvec<float> (base_file, base_set.data(), dimension, nb);
-    PQ_quantizer pq (dimension, 1, 2, 8);
+    PQ_quantizer pq (dimension, 1, 2, 4);
 
     pq.build_centroids(train_set.data(), train_size, train_ids.data());
     std::vector<idx_t> train_next_ids(train_size * keep_space, 0);
@@ -54,5 +54,12 @@ int main(){
     std::cout << std::endl;
     std::cout << "The correct num is: " << correct << std::endl;
 
+    std::vector<size_t> id_set(pq.nc);
+    for (size_t i = 0; i < train_size * keep_space; i++){
+        id_set[index_labels[i]] ++;
+    }
+    for (size_t i = 0; i < pq.nc; i++){
+        std::cout << id_set[i] << " ";
+    }
 
 }
