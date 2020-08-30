@@ -69,7 +69,6 @@ int main(){
             vq_quantizer.search_in_group(1, base_set.data()+i * dimension, query_id.data(), result_dist.data(), result_labels.data(), first_keep_space);
 
             time_saver[0] += Trecorder.get_time_usage(); Trecorder.reset();
-            Trecorder.print_time_usage("Time for search");Trecorder.reset();
 
             query_id.resize(first_keep_space);
             query_dist.resize(first_keep_space);
