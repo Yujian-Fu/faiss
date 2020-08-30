@@ -305,6 +305,7 @@ namespace bslib{
                     std::vector<float> query_sub_centroid_vector(dimension);
                     faiss::fvec_madd(dimension, sub_centroid.data(), -1.0, query, query_sub_centroid_vector.data());
                     query_sub_centroids_dists[j] = faiss::fvec_norm_L2sqr(query_sub_centroid_vector.data(), dimension);
+                    std::cout << "Not in upper space " << std::endl;
                 }
             }
 
