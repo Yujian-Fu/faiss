@@ -59,7 +59,7 @@ int main(){
 
     for (size_t nb = 100; nb < 2000; nb += 100){
         
-//#pragma omp parallel for
+        std::vector<float> time_saver(4, 0);
         for (size_t i = 0; i < nb; i++){
             Trecorder.reset();
             std::vector<idx_t> query_id(1, 0);
@@ -68,27 +68,30 @@ int main(){
             std::vector<idx_t> result_labels(nc_1st);
             vq_quantizer.search_in_group(1, base_set.data()+i * dimension, query_id.data(), result_dist.data(), result_labels.data(), first_keep_space);
 
+            time_saver[0] += Trecorder.get_time_usage(); Trecorder.reset();
             Trecorder.print_time_usage("Time for search");Trecorder.reset();
+
             query_id.resize(first_keep_space);
             query_dist.resize(first_keep_space);
             keep_k_min(nc_1st, first_keep_space, result_dist.data(), result_labels.data(), query_dist.data(), query_id.data());
-            Trecorder.print_time_usage("Time for keep k min and resize");Trecorder.reset();
+            time_saver[1] += Trecorder.get_time_usage(); Trecorder.reset();
             
-
             result_dist.resize(first_keep_space * nc_2nd);
             result_labels.resize(first_keep_space * nc_2nd);
 
             for (size_t j = 0; j < first_keep_space; j++){
                 vq_quantizer_2nd.search_in_group(1, base_set.data() + i * dimension,  query_id.data() + j, result_dist.data() + j * nc_2nd, result_labels.data() + j * nc_2nd, second_keep_space);
             }
-            Trecorder.print_time_usage("Time for resize and search");Trecorder.reset();
+            time_saver[2] += Trecorder.get_time_usage(); Trecorder.reset();
 
             query_id.resize(first_keep_space * second_keep_space);
             query_dist.resize(first_keep_space * second_keep_space);
             keep_k_min(first_keep_space * nc_2nd, first_keep_space * second_keep_space, result_dist.data(), result_labels.data(), query_dist.data(), query_id.data());
             
-            Trecorder.print_time_usage("Time for keep k min and resize");Trecorder.reset();
+            time_saver[3] += Trecorder.get_time_usage(); Trecorder.reset();
         }
+        float sum = time_saver[0] + time_saver[1] + time_saver[2] + time_saver[3];
+        std::cout << "Time for " << nb << " queries: " << time_saver[0] / sum << " " << time_saver[1] / sum << " " << time_saver[2] / sum << " " << time_saver[3] / sum << std::endl;
     }
 
     std::cout << "\n\n";
