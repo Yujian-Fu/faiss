@@ -1,0 +1,89 @@
+#include "../VQ_quantizer.h"
+#include "../LQ_quantizer.h"
+#include "../parameters/parameters_millions_PQ.h"
+#include "../utils/utils.h"
+
+using namespace bslib;
+
+int main(){
+    size_t dimension = 128;
+    std::vector<float> base_set(dimension * nb);
+    std::vector<float> train_set(dimension * train_size);
+    std::vector<idx_t> train_ids(train_size, 0);
+
+    std::ifstream learn_file(path_learn, std::ios::binary);
+    std::ifstream base_file(path_base, std::ios::binary);
+
+    readXvec<float>(learn_file, train_set.data(), dimension, train_size);
+    readXvec<float> (base_file, base_set.data(), dimension, nb);
+
+    size_t nc_1st = 1000;
+    size_t nc_2nd = 10;
+    std::vector<float> first_layer_centroid(dimension * nc_1st);
+    VQ_quantizer vq_quantizer(dimension,1, nc_1st);
+    vq_quantizer.build_centroids(train_set.data(), train_size, train_ids.data());
+    vq_quantizer.search_all(train_size, 1, train_set.data(), train_ids.data());
+
+    std::vector<float> upper_centroids(dimension * nc_1st);
+    std::vector<float> nn_centroids_dists(dimension * nc_2nd);
+    std::vector<idx_t> nn_centroids_idxs(dimension * nc_2nd);
+    
+    vq_quantizer.compute_nn_centroids(nc_2nd, upper_centroids.data(), nn_centroids_dists.data(), nn_centroids_idxs.data());
+    LQ_quantizer lq_quantizer(dimension, nc_1st, nc_2nd, upper_centroids.data(), nn_centroids_idxs.data(), nn_centroids_dists.data());
+    lq_quantizer.build_centroids(train_set.data(), train_size, train_ids.data());
+
+    VQ_quantizer vq_quantizer_2nd(dimension, nc_1st, nc_2nd);
+    vq_quantizer_2nd.build_centroids(train_set.data(), train_size, train_ids.data());
+
+    /**
+     * To be tested:
+     * Layer type
+     * Num of queries
+     * upper space
+     * centroids
+     * keep space
+     * 
+     * Search time: 
+     * vq layer a * x + b, x is the number of query, (also need to consider use HNSW or L2)
+     * lq_layer: a1 * x1 + a2 * x2 + b
+     * The lq_layer should provide 
+    **/
+
+    //Time for LQ layer:
+    size_t first_keep_space = 10;
+    size_t second_keep_space = 2;
+    time_recorder Trecorder;
+
+    for (size_t nb = 100; nb < 2000; nb += 100){
+        
+        Trecorder.reset();
+#pragma omp parallel for
+        for (size_t i = 0; i < nb; i++){
+            std::vector<idx_t> query_id(1, 0);
+            std::vector<float> query_dist(1, 0);
+            std::vector<float> result_dist(nc_1st);
+            std::vector<idx_t> result_labels(nc_1st);
+            vq_quantizer.search_in_group(1, base_set.data()+i * dimension, query_id.data(), result_dist.data(), result_labels.data(), first_keep_space);
+
+            query_id.resize(first_keep_space);
+            query_dist.resize(first_keep_space);
+            keep_k_min(nc_1st, first_keep_space, result_dist.data(), result_labels.data(), query_dist.data(), query_id.data());
+
+            result_dist.resize(first_keep_space * nc_2nd);
+            result_labels.resize(first_keep_space * nc_2nd);
+
+            for (size_t j = 0; j < first_keep_space; j++){
+                vq_quantizer_2nd.search_in_group(1, base_set.data() + i * dimension,  query_id.data() + j, result_dist.data() + j * nc_2nd, result_labels.data() + j * nc_2nd, second_keep_space);
+            }
+
+            query_id.resize(first_keep_space * second_keep_space);
+            query_dist.resize(first_keep_space * second_keep_space);
+            keep_k_min(first_keep_space * nc_2nd, first_keep_space * second_keep_space, result_dist.data(), result_labels.data(), query_dist.data(), query_id.data());
+        }
+    }
+
+    std::cout << "Finish searching for VQ-VQ with " << nb << " queries \n";
+    Trecorder.print_time_usage("Time usage: ");
+}
+
+
