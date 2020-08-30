@@ -59,7 +59,7 @@ int main(){
 
     for (size_t nb = 100; nb < 2000; nb += 100){
         Trecorder.reset();
-#pragma omp parallel for
+//#pragma omp parallel for
         for (size_t i = 0; i < nb; i++){
             std::vector<idx_t> query_id(1, 0);
             std::vector<float> query_dist(1, 0);
@@ -86,10 +86,11 @@ int main(){
         Trecorder.print_time_usage("Time usage: ");
     }
 
+    std::cout << "\n\n";
 
     for (size_t nb = 100; nb < 2000; nb += 100){
         Trecorder.reset();
-#pragma omp parallel for
+//#pragma omp parallel for
         for (size_t i = 0; i < nb; i++){
             std::vector<idx_t> query_id(1, 0);
             std::vector<float> query_dist(1, 0);
