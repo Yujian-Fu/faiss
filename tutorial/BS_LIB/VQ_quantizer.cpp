@@ -138,7 +138,6 @@ namespace bslib{
                 auto result_queue = this->HNSW_quantizers[group_id]->searchBaseLayer(query, efSearch > k ? efSearch : k);
                 size_t result_length = result_queue.size();
                 assert (result_length >= k && result_length <= nc_per_group);
-
                 for (size_t j = 0; j < this->nc_per_group; j++){
                     if (j < result_length){
                         result_dists[i * nc_per_group + result_length - j - 1] = result_queue.top().first;
@@ -157,6 +156,7 @@ namespace bslib{
             for (size_t i = 0; i < n; i++){
                 idx_t group_id = group_ids[i];
                 const float * query = queries + i * dimension;
+#pragma omp parallel for
                 for (size_t j = 0; j < this->nc_per_group; j++){
                     std::vector<float> query_centroid_vector(dimension);
                     const float * target_centroid = this->L2_quantizers[group_id]->xb.data() + j * this->dimension;

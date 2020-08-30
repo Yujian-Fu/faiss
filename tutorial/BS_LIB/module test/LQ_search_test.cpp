@@ -78,7 +78,6 @@ int main(){
             result_dist.resize(first_keep_space * nc_2nd);
             result_labels.resize(first_keep_space * nc_2nd);
 
-#pragma omp parallel for
             for (size_t j = 0; j < first_keep_space; j++){
                 vq_quantizer_2nd.search_in_group(1, base_set.data() + i * dimension,  query_id.data() + j, result_dist.data() + j * nc_2nd, result_labels.data() + j * nc_2nd, second_keep_space);
             }
