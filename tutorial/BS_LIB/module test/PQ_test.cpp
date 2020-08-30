@@ -34,7 +34,7 @@ typedef faiss::Index::idx_t idx_t;
 using namespace bslib;
 int main(){
 
-    bool use_OPQ = true;
+    bool use_OPQ = false;
 
     int dimension = 128;                   // dimension
     int nb = 100000;                       // database size
@@ -244,7 +244,7 @@ int main(){
 
         faiss::maxheap_heapify(k_result, result_dists.data() + result_position, result_labels.data() + result_position);
         quantizer.search(1, query, nprobe, query_dists.data(), query_labels.data());
-        std::vector<float> computed_distance;
+        //std::vector<float> computed_distance;
         std::vector<idx_t> computed_label;
         size_t visited_vectors = 0;
         
@@ -269,8 +269,8 @@ int main(){
                 }
 
                 sum_distance = qc_dist + table_distance - 2 * sum_prod_distance;
-                computed_distance.push_back(sum_distance);
-                computed_label.push_back(sequence_id);
+                //computed_distance.push_back(sum_distance);
+                //computed_label.push_back(sequence_id);
 
                 if (sum_distance < result_dists[result_position]){
                     faiss::maxheap_pop(k_result, result_dists.data() + result_position, result_labels.data() + result_position);
