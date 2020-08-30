@@ -6,6 +6,11 @@
 using namespace bslib;
 
 int main(){
+
+    const std::string path_learn =     "/home/yujian/Downloads/similarity_search_datasets/ANN_SIFT1M/" + dataset +"_learn.fvecs";
+    const std::string path_base =      "/home/yujian/Downloads/similarity_search_datasets/ANN_SIFT1M/" + dataset +"_base.fvecs";
+
+    nb = 100000;
     size_t dimension = 128;
     std::vector<float> base_set(dimension * nb);
     std::vector<float> train_set(dimension * train_size);
