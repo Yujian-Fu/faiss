@@ -100,9 +100,9 @@ int main(){
             time_saver[3] += Trecorder.get_time_usage(); Trecorder.reset();
         }
         float sum = time_saver[0] + time_saver[1] + time_saver[2] + time_saver[3];
-        std::cout << "Time for " << nb << " queries: " << time_saver[0] / sum << ": " << time_saver[0] << " " << time_saver[1] / sum << ": " <<
-         time_saver[1] << " " << time_saver[2] / sum << ": " << time_saver[2] << " " << time_saver[3] / sum << ": " << time_saver[3] << " sum: " << sum << std::endl;
-    }
+        std::cout << "Time for " << nb << " queries: " << time_saver[0] << " " <<
+         time_saver[1] << " " << time_saver[2] << " " << time_saver[3] << " sum: " << sum << std::endl;    
+        }
 
     std::cout << "\n\n";
 
@@ -142,8 +142,8 @@ int main(){
             time_saver[3] += Trecorder.get_time_usage(); Trecorder.reset();
         }
         float sum = time_saver[0] + time_saver[1] + time_saver[2] + time_saver[3];
-        std::cout << "Time for " << nb << " queries: " << time_saver[0] / sum << ": " << time_saver[0] << " " << time_saver[1] / sum << ": " <<
-         time_saver[1] << " " << time_saver[2] / sum << ": " << time_saver[2] << " " << time_saver[3] / sum << ": " << time_saver[3] << " sum: " << sum << std::endl;
+        std::cout << "Time for " << nb << " queries: " << time_saver[0] << " " <<
+         time_saver[1] << " " << time_saver[2] << " " << time_saver[3] << " sum: " << sum << std::endl;
     }
 
 
