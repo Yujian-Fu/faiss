@@ -88,6 +88,7 @@ int main(){
             std::vector<float> upper_result_dists(nc_1st);
             memcpy(upper_result_labels.data(), result_labels.data(), nc_1st * sizeof(idx_t));
             memcpy(upper_result_dists.data(), result_dist.data(), nc_1st * sizeof(float));
+            Trecorder.reset();
 
             result_dist.resize(first_keep_space * nc_2nd);
             result_labels.resize(first_keep_space * nc_2nd);
@@ -108,7 +109,7 @@ int main(){
     }
 
     std::cout << "\n\n";
-    
+
     for (size_t nb = 100; nb < 2000; nb += 100){
         
         std::vector<float> time_saver(4, 0);
