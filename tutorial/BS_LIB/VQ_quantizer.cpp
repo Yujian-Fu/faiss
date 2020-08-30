@@ -156,7 +156,6 @@ namespace bslib{
             for (size_t i = 0; i < n; i++){
                 idx_t group_id = group_ids[i];
                 const float * query = queries + i * dimension;
-#pragma omp parallel for
                 for (size_t j = 0; j < this->nc_per_group; j++){
                     std::vector<float> query_centroid_vector(dimension);
                     const float * target_centroid = this->L2_quantizers[group_id]->xb.data() + j * this->dimension;
