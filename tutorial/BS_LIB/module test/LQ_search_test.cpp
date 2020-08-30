@@ -10,17 +10,17 @@ int main(){
     
     const std::string path_learn =     "/home/yujian/Downloads/similarity_search_datasets/ANN_SIFT1M/sift_learn.fvecs";
     const std::string path_base =      "/home/yujian/Downloads/similarity_search_datasets/ANN_SIFT1M/sift_base.fvecs";
-    const std::string path_record_VQ =  "/home/yujian/Downloads/similarity_search_datasets/ANN_SIFT1M/recording/VQ_VQ.txt";
-    const std::string path_record_LQ =  "/home/yujian/Downloads/similarity_search_datasets/ANN_SIFT1M/recording/VQ_LQ.txt";
-    const std::string path_record_PQ =  "/home/yujian/Downloads/similarity_search_datasets/ANN_SIFT1M/recording/VQ_PQ.txt";
+    //const std::string path_record_VQ =  "/home/yujian/Downloads/similarity_search_datasets/ANN_SIFT1M/recording/VQ_VQ.txt";
+    const std::string path_record_LQ =  "/home/yujian/Downloads/similarity_search_datasets/ANN_SIFT1M/recording/VQ_LQ_no_fast.txt";
+    //const std::string path_record_PQ =  "/home/yujian/Downloads/similarity_search_datasets/ANN_SIFT1M/recording/VQ_PQ.txt";
 
     std::ofstream VQ_record;
     std::ofstream LQ_record;
     std::ofstream PQ_record;
 
-    VQ_record.open(path_record_VQ, std::ios::binary);
+    //VQ_record.open(path_record_VQ, std::ios::binary);
     LQ_record.open(path_record_LQ, std::ios::binary);
-    PQ_record.open(path_record_PQ, std::ios::binary);
+    //PQ_record.open(path_record_PQ, std::ios::binary);
     nb = 100000;
     size_t search_space = 2000;
     size_t dimension = 128;
@@ -139,6 +139,7 @@ int main(){
 
     std::cout << "\n\n";
 
+    /*
     for (size_t nb = 100; nb <= search_space; nb += 100){
         
         std::vector<float> time_saver(4, 0);
@@ -179,6 +180,7 @@ int main(){
     }
 
     std::cout << "\n\n";
+    */
 
     }
     }

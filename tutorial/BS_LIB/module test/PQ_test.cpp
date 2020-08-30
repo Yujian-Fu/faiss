@@ -39,10 +39,6 @@ int main(){
     int dimension = 128;                   // dimension
     int nb = 100000;                       // database size
     int nq = 100;                         // nb of queries
-    size_t nlist = 100;
-    size_t M = 8;
-    size_t nbits = 8;
-    size_t nprobe = 100;
     size_t sum_correctness = 0;
     size_t ksub = 0;
     size_t code_size = 0;
@@ -50,14 +46,16 @@ int main(){
 
     std::string dataset = "SIFT1M";
 
+    std::string path_learn = "/home/y/yujianfu/ivf-hnsw/data/" + dataset + "/" + dataset +"_learn.fvecs";
     std::string path_base = "/home/y/yujianfu/ivf-hnsw/data/" + dataset + "/" + dataset +"_base.fvecs";
-    std::string path_query = "/home/y/yujianfu/ivf-hnsw/data/" + dataset + "/" + dataset +"_query.fvecs";
-    std::string path_record = "/home/y/yujianfu/ivf-hnsw/models_VQ/" + dataset + "/recording_reranking_space_" + std::to_string(M) + "_" + std::to_string(nbits) + "_" + ".txt";
-    
+
+    std::string path_record = "/home/y/yujianfu/ivf-hnsw/data/" + dataset + "/reranking_space.txt";
+    std::ofstream record_file;
+    record_file.open(path_record, std::ios::binary);
     
     float *xb = new float[dimension * nb];
     float *xq = new float[dimension * nq];
-    std::ifstream base_file(path_base, std::ios::binary); std::ifstream query_file(path_query, std::ios::binary);
+    std::ifstream base_file(path_base, std::ios::binary); std::ifstream query_file(path_learn, std::ios::binary);
     readXvec<float>(base_file, xb, dimension, nb, false, false);
     readXvec<float>(query_file, xq, dimension, nq, false, false);
     /*
@@ -70,11 +68,8 @@ int main(){
         xq[dimension * i] += i / 1000.;
     }*/
 
-    size_t k_result = 10;
+    size_t k_result = 100;
     time_recorder Trecorder = time_recorder();
-
-    std::ofstream record_file;
-    record_file.open(path_record, std::ios::app);
 
     faiss::IndexFlatL2 index_flat(dimension);
     std::vector<idx_t> labels(k_result * nq);
@@ -110,12 +105,19 @@ int main(){
     std::cout << "The recall for HNSW k = " << k_result << " is: " << float(sum_correctness) / (k_result * nq) << std::endl; 
     */
 
+    for (size_t M = 8; M <= 16; M += 4){
+        if (M == 12) continue;
+        for (size_t nbits = 6; nbits <= 8; nbits += 2){
+            for (size_t  nc = 200; nc <= 2000; nc += 200){
 
+    size_t nprobe = nc / 5;
+    record_file << "The PQ structure: M: " << M << " nbits: " << nbits <<  " nc: " << nc << std::endl; 
+    
     std::vector<idx_t> pq_labels(k_result * nq);
     std::vector<float> pq_dists(k_result * nq);
     faiss::IndexFlatL2 quantizer(dimension);
 
-    faiss::IndexIVFPQ index_pq(&quantizer, dimension, nlist, M, nbits);
+    faiss::IndexIVFPQ index_pq(&quantizer, dimension, nc, M, nbits);
     ksub = index_pq.pq.ksub;
     code_size = index_pq.pq.code_size;
     index_pq.verbose = true;
@@ -141,6 +143,7 @@ int main(){
     }
 
     std::cout << "The recall for PQ k = " << k_result << " is: " << float(sum_correctness) / (k_result * nq) << std::endl; 
+    record_file << "The recall for PQ k = " << k_result << " is: " << float(sum_correctness) / (k_result * nq) << std::endl; 
     
     // My implementation of IVFPQ
     //faiss::ClusteringParameters CP;
@@ -160,7 +163,7 @@ int main(){
 
     quantizer.search(nb, xb, 1, base_dists.data(), base_labels.data());
 
-    std::vector<std::vector<idx_t>> inverted_index(nlist);
+    std::vector<std::vector<idx_t>> inverted_index(nc);
     // Build inverted index list
     for (size_t i = 0; i < nb; i++){
         inverted_index[base_labels[i]].push_back(i);
@@ -184,9 +187,9 @@ int main(){
         OPQMatrix = matrix;
         OPQMatrix->apply_noalloc(nb, copy_residual.data(), residual.data());
 
-        std::vector<float> copy_centrodis(nlist * dimension);
-        OPQMatrix->apply_noalloc(nlist, quantizer.xb.data(), copy_centrodis.data());
-        memcpy(quantizer.xb.data(), copy_centrodis.data(), nlist * dimension * sizeof(float));
+        std::vector<float> copy_centrodis(nc * dimension);
+        OPQMatrix->apply_noalloc(nc, quantizer.xb.data(), copy_centrodis.data());
+        memcpy(quantizer.xb.data(), copy_centrodis.data(), nc * dimension * sizeof(float));
     }
 
     //for (size_t i = 0; i < 100; i++){std::cout << residual[i] << " ";} std::cout << std::endl << std::endl;
@@ -212,9 +215,9 @@ int main(){
      * So you need the norm of centroid and base vector 
      **/ 
 
-    std::vector<float> pre_computed_tables(nlist * M * ksub);
+    std::vector<float> pre_computed_tables(nc * M * ksub);
     size_t dsub = dimension / M;
-    for (size_t i = 0; i < nlist; i++){
+    for (size_t i = 0; i < nc; i++){
         std::vector<float> quantizer_centroid(dimension);
         quantizer.reconstruct(i, quantizer_centroid.data());
         for (size_t m = 0; m < M; m++){
@@ -229,10 +232,12 @@ int main(){
         }
     }
 
-    Trecorder.reset();
+    record_file << "The nprobe for search is: " << nprobe << std::endl;
+    //std::vector<float> query_time(nq, 0);
+    //std::vector<size_t> query_visited_vectors(nq, 0);
     std::vector <idx_t> result_labels(nq * k_result);
     std::vector <float> result_dists(nq * k_result);
-#pragma omp parallel for
+//#pragma omp parallel for
     for (size_t i = 0; i < nq; i++){
         const float * query = use_OPQ ? OPQMatrix->apply(1, xq + i * dimension) : xq + i * dimension ;
         const size_t result_position = i * k_result;
@@ -244,11 +249,11 @@ int main(){
 
         faiss::maxheap_heapify(k_result, result_dists.data() + result_position, result_labels.data() + result_position);
         quantizer.search(1, query, nprobe, query_dists.data(), query_labels.data());
-        //std::vector<float> computed_distance;
+        std::vector<float> computed_distance;
         std::vector<idx_t> computed_label;
         size_t visited_vectors = 0;
         
-
+        Trecorder.reset();
         for (size_t j = 0; j < nprobe; j++){
             size_t group_label = query_labels[j];
             size_t group_size = inverted_index[group_label].size();
@@ -269,8 +274,8 @@ int main(){
                 }
 
                 sum_distance = qc_dist + table_distance - 2 * sum_prod_distance;
-                //computed_distance.push_back(sum_distance);
-                //computed_label.push_back(sequence_id);
+                computed_distance.push_back(sum_distance);
+                computed_label.push_back(sequence_id);
 
                 if (sum_distance < result_dists[result_position]){
                     faiss::maxheap_pop(k_result, result_dists.data() + result_position, result_labels.data() + result_position);
@@ -278,7 +283,44 @@ int main(){
                 }
             }
         }
+
+        std::vector<idx_t> search_dist_index(visited_vectors);
+        size_t x = 0;
+        std::iota(search_dist_index.begin(), search_dist_index.end(), x++);
+        std::sort(search_dist_index.begin(), search_dist_index.end(), [&](int i,int j){return computed_distance[i]<computed_distance[j];});
+
+        size_t gt_found = 0;
+        size_t max_index = 0;
+        for (size_t index = 0; index < 100; index++){
+            idx_t target_label = labels[i * k_result + index];
+            std::vector<idx_t>::iterator target_index = std::find(computed_label.begin(), computed_label.end(), target_label);
+
+            if (target_index != computed_label.end()){
+                idx_t distance = std::distance(computed_label.begin(), target_index);
+                std::vector<idx_t>::iterator actual_index = std::find(search_dist_index.begin(), search_dist_index.end(), distance);
+                assert(actual_index != search_dist_index.end());
+                gt_found ++;
+                idx_t actual_distance = std::distance(search_dist_index.begin(), actual_index);
+                if (max_index < actual_distance){
+                    max_index = actual_distance;
+                }
+                record_file << gt_found << " " << max_index << " ";
+                std::cout << gt_found << " " << max_index << " ";
+            }
+        }
+        record_file << std::endl;
+        std::cout << std::endl;
+
+        //query_time[i] = Trecorder.get_time_usage();
+        //query_visited_vectors[i] = visited_vectors;
     }
+    
+    /*for (size_t i = 0; i < nq; i++){
+        std::cout << "Search base instances: " << query_visited_vectors[i] << " Search time: " << query_time[i] << std::endl;
+        record_file << "Search base instances: " << query_visited_vectors[i] << " Search time: " << query_time[i] << std::endl;
+    }*/
+
+    /*
     Trecorder.print_time_usage("Finished IVFPQ search");
     sum_correctness = 0;
     for (size_t i = 0; i < nq; i++){
@@ -294,6 +336,9 @@ int main(){
             }
         }
     }
-    std::cout << "The recall for IVFPQ implementation is: " << float(sum_correctness) / (nq * k_result) << std::endl;
-
+    std::cout << "The recall for IVFPQ implementation is: " << float(sum_correctness) / (nq * k_result) << " for nprobe = " << nprobe << std::endl;
+    */
+}
+}
+}
 }

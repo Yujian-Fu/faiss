@@ -282,7 +282,7 @@ namespace bslib{
                 idx_t * nn_id_index = std::find(upper_result_labels + i * upper_search_space, upper_result_labels + i * upper_search_space + upper_search_space, nn_id);
                 idx_t nn_index = nn_id_index - upper_result_labels + i * upper_search_space;
 
-                if (nn_index < upper_search_space){
+                if (nn_index > upper_search_space){
                     query_nn_dist = upper_result_dists [i * upper_search_space + nn_index];
                     idx_t * group_id_index = std::find(upper_result_labels + i * upper_search_space, upper_result_labels + i * upper_search_space + upper_search_space, group_id);
                     idx_t group_index = group_id_index - upper_result_labels + i * upper_search_space;

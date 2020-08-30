@@ -11,6 +11,8 @@ int main(){
     std::vector<float> base_set(dimension * nb);
     std::vector<float> train_set(dimension * train_size);
     std::vector<idx_t> train_ids(train_size, 0);
+    const std::string path_learn =     "/home/yujian/Downloads/similarity_search_datasets/ANN_SIFT1M/sift_learn.fvecs";
+    const std::string path_base =      "/home/yujian/Downloads/similarity_search_datasets/ANN_SIFT1M/sift_base.fvecs";
     const std::string path_record_PQ =  "/home/yujian/Downloads/similarity_search_datasets/ANN_SIFT1M/recording/VQ_PQ.txt";
     std::ofstream PQ_record;
     PQ_record.open(path_record_PQ, std::ios::binary);
