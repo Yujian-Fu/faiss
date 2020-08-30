@@ -17,7 +17,7 @@ int main(){
     readXvec<float>(learn_file, train_set.data(), dimension, train_size);
     readXvec<float> (base_file, base_set.data(), dimension, nb);
 
-    size_t nc_1st = 1000;
+    size_t nc_1st = 100;
     size_t nc_2nd = 10;
     std::vector<float> first_layer_centroid(dimension * nc_1st);
     VQ_quantizer vq_quantizer(dimension,1, nc_1st);
@@ -40,11 +40,14 @@ int main(){
      * Layer type
      * Num of queries
      * upper space
-     * centroids
+     * num centroids
      * keep space
      * 
      * Search time: 
      * vq layer a * x + b, x is the number of query, (also need to consider use HNSW or L2)
+     * 
+     * a = f(upper_space, nc, keep_space)
+     * 
      * lq_layer: a1 * x1 + a2 * x2 + b
      * The lq_layer should provide 
     **/
@@ -55,7 +58,6 @@ int main(){
     time_recorder Trecorder;
 
     for (size_t nb = 100; nb < 2000; nb += 100){
-        
         Trecorder.reset();
 #pragma omp parallel for
         for (size_t i = 0; i < nb; i++){
@@ -80,10 +82,10 @@ int main(){
             query_dist.resize(first_keep_space * second_keep_space);
             keep_k_min(first_keep_space * nc_2nd, first_keep_space * second_keep_space, result_dist.data(), result_labels.data(), query_dist.data(), query_id.data());
         }
+        std::cout << "Finish searching for VQ-VQ with " << nb << " queries \n";
+        Trecorder.print_time_usage("Time usage: ");
     }
 
-    std::cout << "Finish searching for VQ-VQ with " << nb << " queries \n";
-    Trecorder.print_time_usage("Time usage: ");
 
     for (size_t nb = 100; nb < 2000; nb += 100){
         Trecorder.reset();
@@ -114,10 +116,11 @@ int main(){
             query_dist.resize(first_keep_space * second_keep_space);
             keep_k_min(first_keep_space * nc_2nd, first_keep_space * second_keep_space, result_dist.data(), result_labels.data(), query_dist.data(), query_id.data());
         }
+        std::cout << "Finish searching for VQ-LQ with " << nb << " queries \n";
+        Trecorder.print_time_usage("Time usage: ");
     }
 
-    std::cout << "Finish searching for VQ-LQ with " << nb << " queries \n";
-    Trecorder.print_time_usage("Time usage: ");
+
 }
 
 
