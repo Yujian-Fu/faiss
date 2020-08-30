@@ -8,6 +8,7 @@
 #include <sys/stat.h>
 #include <dirent.h>
 
+typedef faiss::Index::idx_t idx_t;
 namespace bslib{
     struct time_recorder{
         std::chrono::steady_clock::time_point start_time;

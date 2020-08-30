@@ -182,7 +182,7 @@ namespace bslib{
        std::vector<std::vector<float>> dist_seqs(this->M, std::vector<float>(this->ksub));
        std::vector<std::vector<idx_t>> dist_index(this->M, std::vector<idx_t>(this->ksub));
 
-#pragma omp parallel for
+//#pragma omp parallel for
        for (size_t i = 0; i < this->M; i++){
            uint32_t x = 0;
            //From 0 to M-1
@@ -298,7 +298,7 @@ namespace bslib{
      * 
      **/
     void PQ_quantizer::search_in_group(size_t n, const float * queries, const idx_t * group_idxs, float * result_dists, idx_t * result_labels, size_t keep_space){
-#pragma omp parallel for
+//#pragma omp parallel for
         for (size_t i = 0; i < n; i++){
             idx_t group_id = group_idxs[i];
             std::vector<float> distance_table(this->M * this->ksub);

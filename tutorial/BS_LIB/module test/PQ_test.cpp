@@ -70,7 +70,7 @@ int main(){
         xq[dimension * i] += i / 1000.;
     }*/
 
-    size_t k_result = 100;
+    size_t k_result = 10;
     time_recorder Trecorder = time_recorder();
 
     std::ofstream record_file;
@@ -110,7 +110,7 @@ int main(){
     std::cout << "The recall for HNSW k = " << k_result << " is: " << float(sum_correctness) / (k_result * nq) << std::endl; 
     */
 
-   
+
     std::vector<idx_t> pq_labels(k_result * nq);
     std::vector<float> pq_dists(k_result * nq);
     faiss::IndexFlatL2 quantizer(dimension);

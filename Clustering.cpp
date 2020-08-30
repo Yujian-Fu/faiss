@@ -252,7 +252,7 @@ float kmeans_clustering (size_t d, size_t n, size_t k,
                          float *centroids)
 {
     Clustering clus (d, k);
-    clus.verbose = true;
+    clus.verbose = false;
     //clus.verbose = d * n * k > (1L << 30);
     // display logs if > 1Gflop per iteration
     IndexFlatL2 index (d);

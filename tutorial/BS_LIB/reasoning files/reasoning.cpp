@@ -76,8 +76,7 @@ int main(){
     size_t dimension = 256;
     */
 
-   
-    size_t dim_para = 700;
+    size_t dim_para = 100;
     std::string dataset_name = "Random_" + std::to_string(dim_para);
     std::string path_list[3] = {"/home/y/yujianfu/ivf-hnsw/data/analysis/Random_10K_"+std::to_string(dim_para)+"_base.fvecs", "/home/y/yujianfu/ivf-hnsw/data/analysis/Random_10K_"+std::to_string(dim_para)+"_base.fvecs", "/home/y/yujianfu/ivf-hnsw/data/analysis/Random_10K_"+std::to_string(dim_para)+"_base.fvecs"};
     std::string path_query = "/home/y/yujianfu/ivf-hnsw/data/analysis/Random_"+std::to_string(dim_para)+"_query.fvecs";
@@ -97,8 +96,6 @@ int main(){
     size_t dimension = dim_para;
     */
     
-
-
     const size_t recall_test_size = 3;
     const size_t ngt = 100;
     std::ofstream record_output;
@@ -130,8 +127,6 @@ int main(){
         std::ifstream query_input(path_query, std::ios::binary);
         
     
-
-
         //PrepareFolder((char *) ("/home/y/yujianfu/ivf-hnsw/" + model + "/" + dataset).c_str());
         
         //readXvec<float>(train_input, train_set.data(), dimension, train_set_size, false, false);
