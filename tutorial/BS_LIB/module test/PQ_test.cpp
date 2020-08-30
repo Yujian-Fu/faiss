@@ -151,10 +151,10 @@ int main(){
     //clus.verbose = true;
     //clus.train(nb / 10, xb, quantizer_assign);
 
-    faiss::ProductQuantizer * PQ = new faiss::ProductQuantizer(dimension, M, nbits);
+    //faiss::ProductQuantizer * PQ = new faiss::ProductQuantizer(dimension, M, nbits);
 
-    code_size = PQ->code_size;
-    ksub = PQ->ksub;
+    //code_size = PQ->code_size;
+    //ksub = PQ->ksub;
     std::vector<idx_t> base_labels(nb);
     std::vector<float> base_dists(nb);
 
@@ -169,8 +169,8 @@ int main(){
     // Compute the residual and encode the residual
     std::vector<float> residual(dimension * nb);
     quantizer.compute_residual_n(nb, xb, residual.data(), base_labels.data());
-    for (size_t i = 0; i < 100; i++){std::cout << residual[i] << " ";} std::cout << std::endl << std::endl;
-    for (size_t i = 0; i < 100; i++){std::cout << quantizer.xb[i] << " ";} std::cout << std::endl << std::endl;
+    //for (size_t i = 0; i < 100; i++){std::cout << residual[i] << " ";} std::cout << std::endl << std::endl;
+    //for (size_t i = 0; i < 100; i++){std::cout << quantizer.xb[i] << " ";} std::cout << std::endl << std::endl;
 
 
     if (use_OPQ){
@@ -189,14 +189,14 @@ int main(){
         memcpy(quantizer.xb.data(), copy_centrodis.data(), nlist * dimension * sizeof(float));
     }
 
-    for (size_t i = 0; i < 100; i++){std::cout << residual[i] << " ";} std::cout << std::endl << std::endl;
-    for (size_t i = 0; i < 100; i++){std::cout << quantizer.xb[i] << " ";} std::cout << std::endl << std::endl;
-    PQ->verbose = true;
-    PQ->train(nb / 10, residual.data());
+    //for (size_t i = 0; i < 100; i++){std::cout << residual[i] << " ";} std::cout << std::endl << std::endl;
+    //for (size_t i = 0; i < 100; i++){std::cout << quantizer.xb[i] << " ";} std::cout << std::endl << std::endl;
+    //PQ->verbose = true;
+    //PQ->train(nb / 10, residual.data());
 
     
     std::vector<uint8_t> residual_code(code_size * nb);
-    PQ->compute_codes(residual.data(), residual_code.data(), nb);
+    index_pq.pq.compute_codes(residual.data(), residual_code.data(), nb);
 
 
     /**
@@ -221,7 +221,7 @@ int main(){
             const float * quantizer_sub_centroid = quantizer_centroid.data() + m * dsub;
             
             for (size_t k = 0; k < ksub; k++){
-                const float * pq_sub_centroid = PQ->get_centroids(m, k);
+                const float * pq_sub_centroid = index_pq.pq.get_centroids(m, k);
                 float residual_PQ_norm = faiss::fvec_norm_L2sqr(pq_sub_centroid, dsub);
                 float prod_quantizer_pq = faiss::fvec_inner_product(quantizer_sub_centroid, pq_sub_centroid, dsub);
                 pre_computed_tables[i * M * ksub + m * ksub + k] = residual_PQ_norm + 2 * prod_quantizer_pq;
@@ -240,7 +240,7 @@ int main(){
         std::vector <idx_t> query_labels(nprobe);
         std::vector <float> query_dists(nprobe);
         std::vector<float> distance_table(M * ksub);
-        PQ->compute_inner_prod_table(query, distance_table.data());
+        index_pq.pq.compute_inner_prod_table(query, distance_table.data());
 
         faiss::maxheap_heapify(k_result, result_dists.data() + result_position, result_labels.data() + result_position);
         quantizer.search(1, query, nprobe, query_dists.data(), query_labels.data());
