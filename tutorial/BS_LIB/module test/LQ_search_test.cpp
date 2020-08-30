@@ -42,11 +42,21 @@ int main(){
      * upper space
      * num centroids
      * keep space
+     * dimension
      * 
      * Search time: 
-     * vq layer a * x + b, x is the number of query, (also need to consider use HNSW or L2)
+     * vq layer:
+     * Layer: 
+     * a * x + b, x is the number of query, (also need to consider use HNSW or L2)
+     * a = f(upper_keep_space, nc_per_group, dimension) = upper_keep_space * nc_per_group * alpha + belta
+     * alpha = dimension * gamma
+     * b = f(upper_keep_space, keep_space)
      * 
-     * a = f(upper_space, nc, keep_space)
+     * vq selection:
+     * Selection:
+     * m = upper_keep_space * nc_per_group
+     * n = upper_keep_space * keep_space
+     * c * m * n + d * m + e * n + f
      * 
      * lq_layer: a1 * x1 + a2 * x2 + b
      * The lq_layer should provide 
@@ -90,14 +100,15 @@ int main(){
             time_saver[3] += Trecorder.get_time_usage(); Trecorder.reset();
         }
         float sum = time_saver[0] + time_saver[1] + time_saver[2] + time_saver[3];
-        std::cout << "Time for " << nb << " queries: " << time_saver[0] / sum << " " << time_saver[1] / sum << " " << time_saver[2] / sum << " " << time_saver[3] / sum << std::endl;
+        std::cout << "Time for " << nb << " queries: " << time_saver[0] / sum << ": " << time_saver[0] << " " << time_saver[1] / sum << ": " <<
+         time_saver[1] << " " << time_saver[2] / sum << ": " << time_saver[2] << " " << time_saver[3] / sum << ": " << time_saver[3] << std::endl;
     }
 
     std::cout << "\n\n";
 
     for (size_t nb = 100; nb < 2000; nb += 100){
-        Trecorder.reset();
-//#pragma omp parallel for
+        std::vector<float> time_saver(4, 0);
+
         for (size_t i = 0; i < nb; i++){
             std::vector<idx_t> query_id(1, 0);
             std::vector<float> query_dist(1, 0);
@@ -105,9 +116,12 @@ int main(){
             std::vector<idx_t> result_labels(nc_1st);
             vq_quantizer.search_in_group(1, base_set.data()+i * dimension, query_id.data(), result_dist.data(), result_labels.data(), first_keep_space);
 
+            time_saver[0] += Trecorder.get_time_usage(); Trecorder.reset();
+
             query_id.resize(first_keep_space);
             query_dist.resize(first_keep_space);
             keep_k_min(nc_1st, first_keep_space, result_dist.data(), result_labels.data(), query_dist.data(), query_id.data());
+            time_saver[1] += Trecorder.get_time_usage(); Trecorder.reset();
 
             std::vector<idx_t> upper_result_labels(nc_1st);
             std::vector<float> upper_result_dists(nc_1st);
@@ -119,13 +133,17 @@ int main(){
             for (size_t j = 0; j < first_keep_space; j++){
                 lq_quantizer.search_in_group(1, base_set.data() + i * dimension, upper_result_labels.data(), upper_result_dists.data(), nc_1st, query_id.data() + j,   result_dist.data() + j * nc_2nd, result_labels.data() + j * nc_2nd);
             }
+            time_saver[2] += Trecorder.get_time_usage(); Trecorder.reset();
 
             query_id.resize(first_keep_space * second_keep_space);
             query_dist.resize(first_keep_space * second_keep_space);
             keep_k_min(first_keep_space * nc_2nd, first_keep_space * second_keep_space, result_dist.data(), result_labels.data(), query_dist.data(), query_id.data());
+        
+            time_saver[3] += Trecorder.get_time_usage(); Trecorder.reset();
         }
-        std::cout << "Finish searching for VQ-LQ with " << nb << " queries \n";
-        Trecorder.print_time_usage("Time usage: ");
+        float sum = time_saver[0] + time_saver[1] + time_saver[2] + time_saver[3];
+        std::cout << "Time for " << nb << " queries: " << time_saver[0] / sum << ": " << time_saver[0] << " " << time_saver[1] / sum << ": " <<
+         time_saver[1] << " " << time_saver[2] / sum << ": " << time_saver[2] << " " << time_saver[3] / sum << ": " << time_saver[3] << std::endl;
     }
 
 
