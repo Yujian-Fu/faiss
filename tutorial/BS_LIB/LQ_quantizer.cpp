@@ -273,6 +273,49 @@ namespace bslib{
         std::vector<std::vector<idx_t>> query_sequence_set(this->nc_upper);
 
         for (size_t i = 0; i < n; i++){
+            const float * query = queries + i * dimension;
+            const idx_t * query_upper_label = upper_result_labels + i * upper_search_space;
+            const float * query_upper_dists = upper_result_dists + i * upper_search_space;
+            const idx_t group_id = group_ids[i];
+            const float alpha = alphas[group_id];
+
+            std::vector<float> query_sub_centroids_dists(nc_per_group, 0);
+
+            for (size_t j = 0; j < nc_per_group; j++){
+                idx_t nn_id = nn_centroid_ids[group_id][j];
+                float query_nn_dist = Not_Found;
+                float query_group_dist = Not_Found;
+                for (size_t k = 0; k < upper_search_space; k++){
+                    if (query_upper_label[k] == nn_id){
+                        query_nn_dist = query_upper_dists[k];
+                    }
+                    if (query_upper_label[k] == group_id){
+                        query_group_dist = query_upper_dists[k];
+                    }
+                    if (query_nn_dist != Not_Found && query_group_dist != Not_Found)
+                        break;
+                }
+                if (query_nn_dist != Not_Found){
+                    float group_nn_dist = nn_centroid_dists[group_id][j];
+                    query_sub_centroids_dists[j] = alpha*(alpha-1)*group_nn_dist + (1-alpha)*query_group_dist + alpha*query_nn_dist;
+                }
+                else{
+                    std::vector<float> sub_centroid(dimension);
+                    compute_final_centroid(group_id, j, sub_centroid.data());
+                    std::vector<float> query_sub_centroid_vector(dimension);
+                    faiss::fvec_madd(dimension, sub_centroid.data(), -1.0, query, query_sub_centroid_vector.data());
+                    query_sub_centroids_dists[j] = faiss::fvec_norm_L2sqr(query_sub_centroid_vector.data(), dimension);
+                }
+            }
+
+            for (size_t j = 0; j < nc_per_group; j++){
+                result_dists[i * this->nc_per_group + j] = query_sub_centroids_dists[j];
+                result_labels[i * this->nc_per_group + j] = CentroidDistributionMap[group_id] + j;
+            }
+        }
+
+        /*
+        for (size_t i = 0; i < n; i++){
             idx_t group_id = group_ids[i];
             query_sequence_set[group_id].push_back(i);
         }
@@ -334,6 +377,7 @@ namespace bslib{
                 }
             }
         }
+        */
     }
 
     /**
