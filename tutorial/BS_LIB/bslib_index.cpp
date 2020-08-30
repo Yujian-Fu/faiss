@@ -800,7 +800,7 @@ namespace bslib{
                     std::cout << "The type name is wrong with " << index_type[j] << "!" << std::endl;
                     exit(0);
                 }
-                search_space = group_size * keep_result_space;
+                search_space = keep_result_space * group_size;
                 keep_result_space = keep_result_space * keep_space[j];
 
                 if (analysis){time_consumption[i][j] = Trecorder.getTimeConsumption();Trecorder.reset();}

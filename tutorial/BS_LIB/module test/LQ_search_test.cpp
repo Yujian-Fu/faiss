@@ -25,8 +25,8 @@ int main(){
     vq_quantizer.search_all(train_size, 1, train_set.data(), train_ids.data());
 
     std::vector<float> upper_centroids(dimension * nc_1st);
-    std::vector<float> nn_centroids_dists(dimension * nc_2nd);
-    std::vector<idx_t> nn_centroids_idxs(dimension * nc_2nd);
+    std::vector<float> nn_centroids_dists(nc_1st * nc_2nd);
+    std::vector<idx_t> nn_centroids_idxs(nc_1st * nc_2nd);
     
     vq_quantizer.compute_nn_centroids(nc_2nd, upper_centroids.data(), nn_centroids_dists.data(), nn_centroids_idxs.data());
     LQ_quantizer lq_quantizer(dimension, nc_1st, nc_2nd, upper_centroids.data(), nn_centroids_idxs.data(), nn_centroids_dists.data());
@@ -83,6 +83,40 @@ int main(){
     }
 
     std::cout << "Finish searching for VQ-VQ with " << nb << " queries \n";
+    Trecorder.print_time_usage("Time usage: ");
+
+    for (size_t nb = 100; nb < 2000; nb += 100){
+        Trecorder.reset();
+#pragma omp parallel for
+        for (size_t i = 0; i < nb; i++){
+            std::vector<idx_t> query_id(1, 0);
+            std::vector<float> query_dist(1, 0);
+            std::vector<float> result_dist(nc_1st);
+            std::vector<idx_t> result_labels(nc_1st);
+            vq_quantizer.search_in_group(1, base_set.data()+i * dimension, query_id.data(), result_dist.data(), result_labels.data(), first_keep_space);
+
+            query_id.resize(first_keep_space);
+            query_dist.resize(first_keep_space);
+            keep_k_min(nc_1st, first_keep_space, result_dist.data(), result_labels.data(), query_dist.data(), query_id.data());
+
+            std::vector<idx_t> upper_result_labels(nc_1st);
+            std::vector<float> upper_result_dists(nc_1st);
+            memcpy(upper_result_labels.data(), result_labels.data(), nc_1st * sizeof(idx_t));
+            memcpy(upper_result_dists.data(), result_dist.data(), nc_1st * sizeof(float));
+
+            result_dist.resize(first_keep_space * nc_2nd);
+            result_labels.resize(first_keep_space * nc_2nd);
+            for (size_t j = 0; j < first_keep_space; j++){
+                lq_quantizer.search_in_group(1, base_set.data() + i * dimension, upper_result_labels.data(), upper_result_dists.data(), nc_1st, query_id.data() + j,   result_dist.data() + j * nc_2nd, result_labels.data() + j * nc_2nd);
+            }
+
+            query_id.resize(first_keep_space * second_keep_space);
+            query_dist.resize(first_keep_space * second_keep_space);
+            keep_k_min(first_keep_space * nc_2nd, first_keep_space * second_keep_space, result_dist.data(), result_labels.data(), query_dist.data(), query_id.data());
+        }
+    }
+
+    std::cout << "Finish searching for VQ-LQ with " << nb << " queries \n";
     Trecorder.print_time_usage("Time usage: ");
 }
 
