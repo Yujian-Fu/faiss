@@ -5,7 +5,7 @@
 #include "utils/utils.h"
 #include <unordered_set>
 #include <algorithm>
-#include <faiss/VectorTransform.h>
+#include "faiss/VectorTransform.h"
 #define VALIDATION_EPSILON 5
 
 namespace bslib{
@@ -48,7 +48,7 @@ struct Bslib_Index{
 
     faiss::ProductQuantizer pq; // Initialized in train_pq
     faiss::ProductQuantizer norm_pq; // Initialized in train_pq
-    faiss::LinearTransform opq_matrix;
+    //faiss::LinearTransform * opq_matrix;
 
     std::vector<float> base_norms;
     std::vector<uint8_t> base_norm_codes;
@@ -84,7 +84,7 @@ struct Bslib_Index{
     void compute_centroid_norm();
     void search(size_t n, size_t result_k, float * queries, float * query_dists, idx_t * query_ids, const size_t * keep_space, uint32_t * groundtruth, std::string path_base);
     size_t get_next_group_idx(size_t keep_result_space, idx_t * group_ids, float * query_group_dists, std::pair<idx_t, float> & result_idx_dist);
-    void keep_k_min(const size_t m, const size_t k, const float * all_dists, const idx_t * all_ids, float * sub_dists, idx_t * sub_ids);
+    
     float pq_L2sqr(const uint8_t *code, const float * precomputed_table);
 
     void read_quantizers(const std::string path_quantizers);
