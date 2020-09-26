@@ -58,6 +58,7 @@ int main(){
             if (OPQ_train_size < train_size){
                 std::vector<float> OPQ_train_set(OPQ_train_size * dimension);
                 RandomSubset(origin_train_set.data(), OPQ_train_set.data(), dimension, train_size, OPQ_train_size);
+                std::cout<< "Randomly select the train set for OPQ training" << std::endl;
                 index.opq_matrix->train(OPQ_train_size, OPQ_train_set.data());
             }
             else{
