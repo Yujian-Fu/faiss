@@ -1,4 +1,4 @@
-#include "utils/utils.h"
+#include "../utils/utils.h"
 #include <unordered_set>
 #include <faiss/Clustering.h>
 #include <faiss/IndexFlat.h>
@@ -53,7 +53,6 @@ Draw the figure with different centroid setting
     */
     
     
-
     const std::string path_learn = "/home/y/yujianfu/ivf-hnsw/data/" + dataset + "/" + dataset +"_learn.fvecs";
     const std::string path_base = "/home/y/yujianfu/ivf-hnsw/data/" + dataset + "/" + dataset +"_base.fvecs";
     const std::string path_gt = "/home/y/yujianfu/ivf-hnsw/data/" + dataset + "/" + dataset +"_groundtruth.ivecs";

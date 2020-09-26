@@ -5,7 +5,7 @@
 #include <string>
 
 #include "bslib_index.h"
-#include "parameters/parameters_millions_VQ.h"
+#include "parameters/parameters_PQ.h"
 
 using namespace bslib;
 
@@ -22,9 +22,11 @@ int main(){
 
     //For recording 
     std::ofstream record_file;
+    std::ofstream qps_record_file;
+    qps_record_file.open(path_speed_record, std::ios::binary);
+    qps_record_file << "The num of centroid is: " << std::to_string(ncentroids[0]) << std::endl;
     if (is_recording){
         record_file.open(path_record, std::ios::app);
-
         time_t now = time(0);
         char* dt = ctime(&now);
         record_file << std::endl << "The time now is " << dt << std::endl;
@@ -36,8 +38,39 @@ int main(){
     //Initialize the index
     PrintMessage("Initializing the index");
     Trecorder.reset();
-    Bslib_Index index = Bslib_Index(dimension, layers, index_type, use_HNSW_VQ, use_norm_quantization);
+    Bslib_Index index = Bslib_Index(dimension, layers, index_type, use_HNSW_VQ, use_norm_quantization, use_OPQ);
     index.train_size = train_size;
+    index.M = M_PQ;
+    index.nbits = nbits;
+
+    if (use_OPQ){
+        if (exists(path_OPQ)){
+            index.opq_matrix = dynamic_cast<faiss::LinearTransform *>(faiss::read_VectorTransform(path_OPQ.c_str()));
+        }
+        else{
+            PrintMessage("Training the OPQ matrix");
+            index.opq_matrix = new faiss::OPQMatrix(dimension, M_PQ);
+            index.opq_matrix->verbose = false;
+            std::ifstream learn_input(path_learn, std::ios::binary);
+            std::vector<float>  origin_train_set(train_size * dimension);
+            readXvecFvec<learn_data_type>(learn_input, origin_train_set.data(), dimension, train_size, true);
+            
+            if (OPQ_train_size < train_size){
+                std::vector<float> OPQ_train_set(OPQ_train_size * dimension);
+                RandomSubset(origin_train_set.data(), OPQ_train_set.data(), dimension, train_size, OPQ_train_size);
+                index.opq_matrix->train(OPQ_train_size, OPQ_train_set.data());
+            }
+            else{
+                index.opq_matrix->train(train_size, origin_train_set.data());
+            }
+            faiss::write_VectorTransform(index.opq_matrix, path_OPQ.c_str());
+        }
+        message = "Trained the OPQ matrix, ";
+        Mrecorder.print_memory_usage(message);
+        Mrecorder.record_memory_usage(record_file,  message);
+        Trecorder.print_time_usage(message);
+        Trecorder.record_time_usage(record_file, message);
+    }
 
     index.build_train_selector(path_learn, path_groups, path_labels, train_size, selector_train_size, selector_group_size);
     std::vector<HNSW_para> HNSW_paras;
@@ -72,15 +105,19 @@ int main(){
             std::ofstream base_output (path_ids, std::ios::binary);
             std::vector<idx_t> assigned_ids(nb);
 
-    #pragma omp parallel for 
+#pragma omp parallel for 
             for (size_t i = 0; i < nbatches; i++){
                 std::vector<float> batch(batch_size * dimension);
                 std::ifstream base_input(path_base, std::ios::binary);
                 base_input.seekg(i * batch_size * dimension * sizeof(base_data_type) + i * batch_size * sizeof(uint32_t), std::ios::beg);
                 readXvecFvec<base_data_type> (base_input, batch.data(), dimension, batch_size);
-                index.assign(batch_size, batch.data(), assigned_ids.data() + i * batch_size * sizeof(idx_t));
+                if (use_OPQ) {index.do_OPQ(batch_size, batch.data());}
+                index.assign(batch_size, batch.data(), assigned_ids.data() + i * batch_size);
                 base_input.close();
             }
+
+            message = "[Assigned the index ]";
+            Trecorder.print_time_usage(message);
 
             for (size_t i = 0; i < nbatches; i++){
                 base_output.write((char *) & batch_size, sizeof(uint32_t));
@@ -103,6 +140,7 @@ int main(){
 
             for (size_t i = 0; i < nbatches; i++){
                 readXvecFvec<base_data_type> (base_input, batch.data(), dimension, batch_size);
+                if (use_OPQ) {index.do_OPQ(batch_size, batch.data());}
                 index.assign(batch_size, batch.data(), assigned_ids.data());
                 base_output.write((char * ) & batch_size, sizeof(uint32_t));
                 base_output.write((char *) assigned_ids.data(), batch_size * sizeof(idx_t));
@@ -137,9 +175,7 @@ int main(){
     }
     else
     {
-        index.M = M_PQ;
         index.norm_M = M_norm_PQ;
-        index.nbits = nbits;
         
         std::cout << "Training PQ codebook" << std::endl;
         index.train_pq(path_pq, path_pq_norm, path_learn, PQ_train_size);
@@ -166,7 +202,7 @@ int main(){
     else{
         std::vector<idx_t> ids(nb); std::ifstream ids_input(path_ids, std::ios::binary);
         readXvec<idx_t> (ids_input, ids.data(), batch_size, nbatches); 
-        std::vector<idx_t> pre_hash_ids; if (use_hash) {pre_hash_ids.resize(nb, 0); memcpy(pre_hash_ids.data(), ids.data(), nb * sizeof(idx_t)); HashMapping(nb, pre_hash_ids.data(), ids.data(), index.final_group_num);}
+        //std::vector<idx_t> pre_hash_ids; if (use_hash) {pre_hash_ids.resize(nb, 0); memcpy(pre_hash_ids.data(), ids.data(), nb * sizeof(idx_t)); HashMapping(nb, pre_hash_ids.data(), ids.data(), index.final_group_num);}
         std::vector<size_t> groups_size(index.final_group_num, 0); std::vector<size_t> group_position(nb, 0);
         for (size_t i = 0; i < nb; i++){group_position[i] = groups_size[ids[i]]; groups_size[ids[i]] ++;}
 
@@ -174,34 +210,53 @@ int main(){
         index.base_codes.resize(index.final_group_num);
         index.base_sequence_ids.resize(index.final_group_num);
         if (use_norm_quantization){index.base_norm_codes.resize(nb);} else{index.base_norms.resize(nb);}
-        if (use_hash) index.base_pre_hash_ids.resize(index.final_group_num);
+        //if (use_hash) index.base_pre_hash_ids.resize(index.final_group_num);
         for (size_t i = 0; i < index.final_group_num; i++){
             index.base_codes[i].resize(groups_size[i] * index.code_size);
             index.base_sequence_ids[i].resize(groups_size[i]);
-            if(use_hash) index.base_pre_hash_ids[i].resize(groups_size[i]);
+            //if(use_hash) index.base_pre_hash_ids[i].resize(groups_size[i]);
         }
 
         Trecorder.reset();
-        std::ifstream base_input(path_base, std::ios::binary);
-        std::ifstream idx_input(path_ids, std::ios::binary);
 
-        std::vector<float> base_batch(batch_size * dimension);
-        std::vector<idx_t> batch_sequence_ids(batch_size);
+        if (use_parallel_indexing){
+        
+#pragma omp parallel for
+            for (size_t i = 0; i < nbatches; i++){
+                std::vector<float> base_batch(batch_size * dimension);
+                std::vector<idx_t> batch_sequence_ids(batch_size);
+                std::ifstream base_input(path_base, std::ios::binary);
+                base_input.seekg(i * batch_size * dimension * sizeof(base_data_type) + i * batch_size * sizeof(uint32_t), std::ios::beg);
+                readXvecFvec<base_data_type> (base_input, base_batch.data(), dimension, batch_size);
+                if (use_OPQ) {index.do_OPQ(batch_size, base_batch.data());}
 
-        for (size_t i = 0; i < nbatches; i++){
-            readXvecFvec<base_data_type> (base_input, base_batch.data(), dimension, batch_size);
-
-            for (size_t j = 0; j < batch_size; j++){batch_sequence_ids[j] = batch_size * i + j;}
-
-            index.add_batch(batch_size, base_batch.data(), batch_sequence_ids.data(), ids.data() + i * batch_size, group_position.data()+i*batch_size, pre_hash_ids.data()+i*batch_size);
-            if (i % 10 == 0){
-                std::cout << " adding batches [ " << i << " / " << nbatches << " ]";
-                Trecorder.print_time_usage("");
+                for (size_t j = 0; j < batch_size; j++){batch_sequence_ids[j] = batch_size * i + j;}
+                index.add_batch(batch_size, base_batch.data(), batch_sequence_ids.data(), ids.data() + i * batch_size, group_position.data()+i * batch_size);
             }
         }
+        else{
+            std::ifstream base_input(path_base, std::ios::binary);
+            std::vector<float> base_batch(batch_size * dimension);
+            std::vector<idx_t> batch_sequence_ids(batch_size);
+
+
+            for (size_t i = 0; i < nbatches; i++){
+                readXvecFvec<base_data_type> (base_input, base_batch.data(), dimension, batch_size);
+                if (use_OPQ) {index.do_OPQ(batch_size, base_batch.data());}
+                for (size_t j = 0; j < batch_size; j++){batch_sequence_ids[j] = batch_size * i + j;}
+
+                index.add_batch(batch_size, base_batch.data(), batch_sequence_ids.data(), ids.data() + i * batch_size, group_position.data()+i*batch_size);
+                if (i % 10 == 0){
+                    std::cout << " adding batches [ " << i << " / " << nbatches << " ]";
+                    Trecorder.print_time_usage("");
+                }
+            }
+        }
+        message = "[Added batches to the index] ";
+        Trecorder.print_time_usage(message);
+
         std::cout << "The base id distribution in all groups is " << std::endl;
         for (size_t i = 0; i < index.base_sequence_ids.size(); i++){std::cout << index.base_sequence_ids[i].size() << " ";}std::cout << std::endl;
-
 
         index.compute_centroid_norm();
 
@@ -245,8 +300,10 @@ int main(){
             message = "Finish Search";
             Trecorder.print_time_usage(message);
             Trecorder.record_time_usage(record_file, message);
+            Trecorder.record_time_usage(qps_record_file, message);
             Mrecorder.print_memory_usage(message);
             Mrecorder.record_memory_usage(record_file, message);
+            
 
             for (size_t i = 0; i < nq; i++){
                 std::unordered_set<idx_t> gt;
@@ -264,6 +321,8 @@ int main(){
             float recall = float(correct) / (recall_k * nq);
             Rrecorder.print_recall_performance(nq, recall, recall_k, search_mode, layers, keep_space + i * layers, max_vectors[i]);
             Rrecorder.record_recall_performance(record_file, nq, recall, recall_k, search_mode, layers, keep_space + i * layers, max_vectors[i]);
+            Rrecorder.record_recall_performance(qps_record_file, nq, recall, recall_k, search_mode, layers, keep_space + i * layers, max_vectors[i]);
+
             if (use_reranking){
                 std::cout << " with reranking parameter: " << index.reranking_space << std::endl;
             } 

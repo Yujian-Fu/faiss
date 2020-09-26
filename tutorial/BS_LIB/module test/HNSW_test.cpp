@@ -1,6 +1,8 @@
 #include "../HNSWlib/hnswalg.h"
 #include <faiss/IndexFlat.h>
 #include "../utils/utils.h"
+#include <faiss/utils/distances.h>
+#include <faiss/utils/utils.h>
 
 /**
  * 
@@ -9,14 +11,37 @@
 
 typedef faiss::Index::idx_t idx_t;
 using namespace bslib;
+
+void keep_k_min(const size_t m, const size_t k, const float * all_dists, const idx_t * all_labels, float * sub_dists, idx_t * sub_labels){
+    
+    if (k < m){
+        faiss::maxheap_heapify(k, sub_dists, sub_labels);
+        for (size_t i = 0; i < m; i++){
+            if (all_dists[i] < sub_dists[0]){
+                faiss::maxheap_pop(k, sub_dists, sub_labels);
+                faiss::maxheap_push(k, sub_dists, sub_labels, all_dists[i], all_labels[i]);
+            }
+        }
+    }
+    else if (k == m){
+        memcpy(sub_dists, all_dists, k * sizeof(float));
+        memcpy(sub_labels, all_labels, k * sizeof(idx_t));
+    }
+    else{
+        std::cout << "k should be at least as large as m in keep_k_min function " << std::endl;
+        exit(0);
+    }
+}
+
+
 int main(){
     size_t dimension = 128;
     size_t M_HNSW = 100;
     size_t efConstruction = 200;
-    size_t nb = 1000;
+    size_t nb = 100;
     size_t nq = 1000;
     size_t k_result = 10;
-    size_t efSearch = 20;
+    size_t efSearch = k_result;
     std::vector<float> xb(dimension * nb);
     std::vector<float> xq(dimension * nq);
     time_recorder Trecorder  = time_recorder();
@@ -32,15 +57,31 @@ int main(){
     }
 
 
-    faiss::IndexFlatL2 index_flat(dimension);
-    index_flat.add(nb, xb.data());
-
     Trecorder.reset();
     std::vector<idx_t> flat_ids(nq * k_result);
     std::vector<float> flat_dists(nq * k_result);
-    index_flat.search(nq, xq.data(), k_result, flat_dists.data(), flat_ids.data());
+    std::vector<float> each_result_dist(nb);
+    std::vector<idx_t> each_result_label(nb);
+
+    for (size_t i = 0; i < nq; i++){
+        float * query = xq.data() + i * dimension;
+        for (size_t j = 0; j < nb; j++){
+            float * target = xb.data() + j * dimension;
+            std::vector<float> query_centroid_vector(dimension);
+            each_result_dist[j] = faiss::fvec_L2sqr(target, query, dimension);
+            each_result_label[j] = j;
+        }
+        keep_k_min(nb, k_result, each_result_dist.data(), each_result_label.data(), flat_dists.data() + i * k_result, flat_ids.data() + i * k_result);
+    }
     Trecorder.print_time_usage("IndexFlat search finished: ");
 
+
+    //faiss::IndexFlatL2 index_flat(dimension);
+    //index_flat.add(nb, xb.data());
+    //for (size_t i = 0; i < nq; i++){
+    //    index_flat.search(1, xq.data() + i * dimension, k_result, flat_dists.data() + i * k_result, flat_ids.data() + i * k_result);
+    //}
+    
 
     std::vector<idx_t> HNSW_ids(nq * efSearch);
     std::vector<float> HNSW_dists(nq * efSearch);
@@ -50,7 +91,7 @@ int main(){
     }
 
     Trecorder.reset();
-#pragma omp parallel for
+//#pragma omp parallel for
     for (size_t i = 0; i < nq; i++){
         const float * query = xq.data() + i * dimension;
         auto result_queue = quantizer->searchBaseLayer(query, efSearch);

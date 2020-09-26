@@ -8,7 +8,6 @@
 #include <sys/stat.h>
 #include <dirent.h>
 
-typedef faiss::Index::idx_t idx_t;
 namespace bslib{
     struct time_recorder{
         std::chrono::steady_clock::time_point start_time;
@@ -176,37 +175,4 @@ namespace bslib{
     }
 
 
-    /**
-     * 
-     * This is the function for keeping k results in m result value
-     * 
-     * Input:
-     * m: the total number of result pairs
-     * k: the number of result pairs that to be kept
-     * all_dists: the origin results of dists         size: m 
-     * all_labels: the origin label results           size: m
-     * sub_dists: the kept result of dists            size: k
-     * sub_labels: the kept result of labels          size: k   
-     * 
-     **/
-    void keep_k_min(const size_t m, const size_t k, const float * all_dists, const idx_t * all_labels, float * sub_dists, idx_t * sub_labels){
-        
-        if (k < m){
-            faiss::maxheap_heapify(k, sub_dists, sub_labels);
-            for (size_t i = 0; i < m; i++){
-                if (all_dists[i] < sub_dists[0]){
-                    faiss::maxheap_pop(k, sub_dists, sub_labels);
-                    faiss::maxheap_push(k, sub_dists, sub_labels, all_dists[i], all_labels[i]);
-                }
-            }
-        }
-        else if (k == m){
-            memcpy(sub_dists, all_dists, k * sizeof(float));
-            memcpy(sub_labels, all_labels, k * sizeof(idx_t));
-        }
-        else{
-            std::cout << "k should be at least as large as m in keep_k_min function " << std::endl;
-            exit(0);
-        }
-    }
 }

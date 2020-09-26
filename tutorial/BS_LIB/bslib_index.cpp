@@ -5,8 +5,11 @@ namespace bslib{
 
     /**
      * The initialize function for BSLIB struct 
+     * 
+     * 
+     * 
      **/
-    Bslib_Index::Bslib_Index(const size_t dimension, const size_t layers, const std::string * index_type, const bool use_HNSW_VQ, const bool use_norm_quantization):
+    Bslib_Index::Bslib_Index(const size_t dimension, const size_t layers, const std::string * index_type, const bool use_HNSW_VQ, const bool use_norm_quantization, const bool use_OPQ):
         dimension(dimension), layers(layers){
             
             this->use_norm_quantization = use_norm_quantization;
@@ -21,7 +24,6 @@ namespace bslib{
                 this->index_type[i] = index_type[i];
             }
             this->train_size = 0;
-            this->use_hash = true ? index_type[layers - 1] == "PQ" : false;
         }
     
     /**
@@ -129,6 +131,19 @@ namespace bslib{
         }
     }
 
+    /**
+     * This is the function for doing OPQ for the training and searching part.
+     * Input:
+     * n: this is the number of vectors to be processed
+     * dataset: the vector set to be processed, the result data will be stored in the same place
+     * 
+     **/
+    void Bslib_Index::do_OPQ(idx_t n, float * dataset){
+        assert(opq_matrix != NULL);
+        std::vector<float> copy_dataset(n * dimension);
+        memcpy(copy_dataset.data(), dataset, n * dimension * sizeof(float));
+        opq_matrix->apply_noalloc(n, copy_dataset.data(), dataset);
+    }
 
     /**
      * 
@@ -162,19 +177,24 @@ namespace bslib{
         else{
             std::vector<float> origin_train_set(total_train_size * dimension);
             std::ifstream learn_input(path_learn, std::ios::binary);
+            std::cout << "Read train input from " << path_learn << std::endl;
             readXvecFvec<learn_data_type>(learn_input, origin_train_set.data(), dimension, total_train_size, true);
+            if (use_OPQ){
+                do_OPQ(total_train_size, origin_train_set.data());
+            }
+
             std::vector<float> train_set_centroids(group_size * dimension);
 
             if (sub_train_size < total_train_size){
                 std::vector<float> sub_train_set(sub_train_size * dimension);
                 RandomSubset(origin_train_set.data(), sub_train_set.data(), dimension, total_train_size, sub_train_size);
-                faiss::kmeans_clustering(dimension, sub_train_size, group_size, sub_train_set.data(), train_set_centroids.data());
+                faiss::kmeans_clustering(dimension, sub_train_size, group_size, sub_train_set.data(), train_set_centroids.data(), 50);
             }
             else{
-                faiss::kmeans_clustering(dimension, total_train_size, group_size, origin_train_set.data(), train_set_centroids.data());
+                faiss::kmeans_clustering(dimension, total_train_size, group_size, origin_train_set.data(), train_set_centroids.data(), 50);
             }
-
             
+
             faiss::IndexFlatL2 centroid_index(dimension);
             centroid_index.add(group_size, train_set_centroids.data());
 
@@ -216,6 +236,7 @@ namespace bslib{
     void Bslib_Index::read_train_set(const std::string path_learn, size_t total_size, size_t train_set_size){
         std::cout << "Reading " << train_set_size << " from " << total_size << " for training" << std::endl;
         this->train_data.resize(train_set_size * dimension);
+        //Train data ids is for locating the data vectors are used for which group training
         this->train_data_ids.resize(train_set_size, 0);
 
         if (total_size == train_set_size){
@@ -238,8 +259,10 @@ namespace bslib{
                 learn_input.read((char *) & dim, sizeof(uint32_t));
                 assert(dim == dimension);
                 learn_input.read((char *)this->train_data.data() + i * dimension * sizeof(float), dimension * sizeof(float));
-                
             }
+        }
+        if (use_OPQ){
+            do_OPQ(train_set_size, this->train_data.data());
         }
     }
 
@@ -265,7 +288,6 @@ namespace bslib{
             std::cout << "Checking the quantizers read from file " << std::endl;
             std::cout << "The number of quantizers: " << this->vq_quantizer_index.size() << " " << this->lq_quantizer_index.size() << " " << this->pq_quantizer_index.size() << std::endl;
         }
-
         else
         {
         PrintMessage("No preconstructed quantizers, constructing quantizers");
@@ -319,7 +341,7 @@ namespace bslib{
                 nn_centroids_dists.resize(nc_upper * nc_per_group);
                 
                 if (index_type[i-1] == "VQ"){
-                    PrintMessage("Adding VQ quantizer with VQ upper layer");
+                    PrintMessage("Adding LQ quantizer with VQ upper layer");
                     size_t last_vq = vq_quantizer_index.size() - 1;
                     PrintMessage("VQ computing nn centroids");
                     assert(vq_quantizer_index[last_vq].nc > nc_per_group);
@@ -355,7 +377,7 @@ namespace bslib{
             nc_upper  = nc_upper * nc_per_group;
         }
         write_quantizers(path_quantizer);
-        }  
+        }
     }
 
 
@@ -394,7 +416,6 @@ namespace bslib{
         this->pq.train(train_set_size, residuals.data());
         std::cout << "Writing PQ codebook to " << path_pq << std::endl;
         faiss::write_ProductQuantizer(& this->pq, path_pq.c_str());
-
     }
     
     /**
@@ -412,7 +433,7 @@ namespace bslib{
             this->final_group_num =  lq_quantizer_index[lq_quantizer_index.size() -1].nc;
         }
         else if (this->index_type[layers - 1] == "PQ"){
-            this->final_group_num = pq_quantizer_index[pq_quantizer_index.size() -1].hash_size;
+            this->final_group_num = pq_quantizer_index[pq_quantizer_index.size() -1].nc;
         }
     }
 
@@ -427,13 +448,12 @@ namespace bslib{
      * sequence_ids: the origin sequence id of data                                        size: n
      * group_ids: the group id of the data                                                 size: n
      * group_positions                                                                     size: n
-     * batch_pre_hash_ids: only provided in PQ layer, the origin group id without hashing. size: n
      * 
      **/
-    void Bslib_Index::add_batch(size_t n, const float * data, const idx_t * sequence_ids, const idx_t * group_ids, const size_t * group_positions, const idx_t * batch_pre_hash_ids = nullptr){
+    void Bslib_Index::add_batch(size_t n, const float * data, const idx_t * sequence_ids, const idx_t * group_ids, const size_t * group_positions){
         std::vector<float> residuals(n * dimension);
         //Compute residuals
-        if (use_hash) encode(n, data, batch_pre_hash_ids, residuals.data()); else encode(n, data, group_ids, residuals.data());
+        encode(n, data, group_ids, residuals.data());
 
         //Compute code for residuals
         std::vector<uint8_t> batch_codes(n * this->code_size);
@@ -445,14 +465,13 @@ namespace bslib{
             size_t group_position = group_positions[i];
             for (size_t j = 0; j < this->code_size; j++){this->base_codes[group_id][group_position * code_size + j] = batch_codes[i * this->code_size + j];}
             this->base_sequence_ids[group_id][group_position] = sequence_ids[i];
-            if (use_hash){this->base_pre_hash_ids[group_id][group_position] = batch_pre_hash_ids[i];}
         }
 
         std::vector<float> decoded_residuals(n * dimension);
         this->pq.decode(batch_codes.data(), decoded_residuals.data(), n);
         
         std::vector<float> reconstructed_x(n * dimension);
-        if (use_hash) decode(n, decoded_residuals.data(), batch_pre_hash_ids, reconstructed_x.data()); else decode(n, decoded_residuals.data(), group_ids, reconstructed_x.data());
+        decode(n, decoded_residuals.data(), group_ids, reconstructed_x.data());
 
        //This is the norm for reconstructed vectors
         std::vector<float> xnorms (n);
@@ -523,14 +542,16 @@ namespace bslib{
      * 
      **/
     void Bslib_Index::compute_centroid_norm(){
+        this->centroid_norms.resize(final_group_num);
         if (this->index_type[layers -1] == "VQ"){
-            this->centroid_norms.resize(final_group_num);
             size_t n_vq = vq_quantizer_index.size();
             size_t group_num = vq_quantizer_index[n_vq-1].nc_upper;
             size_t group_size = vq_quantizer_index[n_vq-1].nc_per_group;
             assert(final_group_num == group_num * group_size);
 
             std::cout << "Computing centroid norm for " << final_group_num << " centroids in VQ layer" << std::endl;
+
+#pragma omp parallel for
             for (size_t i = 0; i < group_num; i++){
                 for (size_t j = 0; j < group_size; j++){
                     std::vector<float> each_centroid(dimension);
@@ -540,13 +561,14 @@ namespace bslib{
             }
         }
         else if (this->index_type[layers -1] == "LQ"){
-            this->centroid_norms.resize(final_group_num);
             size_t n_lq = lq_quantizer_index.size();
             size_t group_num = lq_quantizer_index[n_lq - 1].nc_upper;
             size_t group_size = lq_quantizer_index[n_lq - 1].nc_per_group;
             assert(final_group_num == group_num * group_size);
 
             std::cout << "Computing centroid norm for " << final_group_num << " centroids in LQ layer" << std::endl;
+
+#pragma omp parallel for
             for (size_t i = 0; i < group_num; i++){
                 for (size_t j = 0; j < group_size; j++){
                     std::vector<float> each_centroid(dimension);
@@ -555,8 +577,24 @@ namespace bslib{
                 }
             }
         }
+        else if (this->index_type[layers - 1] == "PQ"){
+            size_t n_pq = pq_quantizer_index.size();
+            size_t group_num = pq_quantizer_index[n_pq - 1].nc_upper;
+            size_t group_size = pq_quantizer_index[n_pq - 1].nc_per_group;
+            assert(final_group_num == group_num * group_size);
+
+            std::cout << "Computing centroid norm for " << final_group_num << " centroids in PQ layer" << std::endl;
+
+#pragma omp parallel for
+            for (size_t i = 0; i < final_group_num; i++){
+                std::vector<float> each_centroid(dimension);
+                pq_quantizer_index[n_pq - 1].compute_final_centroid(i, each_centroid.data());
+                this->centroid_norms[i] = faiss::fvec_norm_L2sqr(each_centroid.data(), dimension);
+            }
+        }
         else{
-            PrintMessage("The centroid norms of PQ layer should be computed indirectedly");
+            PrintMessage("The layer type not found for centroid norm computation");
+            exit(0);
         }
     }
 
@@ -600,13 +638,8 @@ namespace bslib{
     float Bslib_Index::pq_L2sqr(const uint8_t *code, const float * precomputed_table)
     {
         float result = 0.;
-        const size_t dim = code_size >> 2;
-        size_t m = 0;
-        for (size_t i = 0; i < dim; i++) {
-            result += precomputed_table[this->pq.ksub * m + code[m]]; m++;
-            result += precomputed_table[this->pq.ksub * m + code[m]]; m++;
-            result += precomputed_table[this->pq.ksub * m + code[m]]; m++;
-            result += precomputed_table[this->pq.ksub * m + code[m]]; m++;
+        for (size_t i = 0; i < this->M; i++) {
+            result += precomputed_table[this->pq.ksub * i + code[i]];
         }
         return result;
     }
@@ -647,6 +680,40 @@ namespace bslib{
         return min_i;
     }
 
+    /**
+     * 
+     * This is the function for keeping k results in m result value
+     * 
+     * Input:
+     * m: the total number of result pairs
+     * k: the number of result pairs that to be kept
+     * all_dists: the origin results of dists         size: m 
+     * all_labels: the origin label results           size: m
+     * sub_dists: the kept result of dists            size: k
+     * sub_labels: the kept result of labels          size: k   
+     * 
+     **/
+    void Bslib_Index::keep_k_min(const size_t m, const size_t k, const float * all_dists, const idx_t * all_labels, float * sub_dists, idx_t * sub_labels){
+        
+        if (k < m){
+            faiss::maxheap_heapify(k, sub_dists, sub_labels);
+            for (size_t i = 0; i < m; i++){
+                if (all_dists[i] < sub_dists[0]){
+                    faiss::maxheap_pop(k, sub_dists, sub_labels);
+                    faiss::maxheap_push(k, sub_dists, sub_labels, all_dists[i], all_labels[i]);
+                }
+            }
+        }
+        else if (k == m){
+            memcpy(sub_dists, all_dists, k * sizeof(float));
+            memcpy(sub_labels, all_labels, k * sizeof(idx_t));
+        }
+        else{
+            std::cout << "k (" << k << ") should be smaller than m (" << m << ") in keep_k_min function " << std::endl;
+            exit(0);
+        }
+    }
+
      /**
       * d = || x - y_C - y_R ||^2
       * d = || x - y_C ||^2 - || y_C ||^2 + || y_C + y_R ||^2 - 2 * (x|y_R)
@@ -682,17 +749,18 @@ namespace bslib{
         // Notice: they should only be activated when parallel is not used
         const bool validation = false; 
         size_t validation_print_space = 50;
-        const bool analysis = false;
-        const bool showmessage = false;
+        const bool analysis = true; 
+        const bool showmessage = false; 
 
         std::vector<float>  visited_gt_proportion;
         std::vector<size_t> actual_visited_vectors;
+        std::vector<size_t> actual_visited_clusters;
         std::vector<std::vector<float>> time_consumption;
         std::vector<float> q_c_dists;
         std::vector<float> recall;
 
         if (analysis){
-            visited_gt_proportion.resize(n, 0); actual_visited_vectors.resize(n, 0);
+            visited_gt_proportion.resize(n, 0); actual_visited_vectors.resize(n, 0); actual_visited_clusters.resize(n, 0);
             time_consumption.resize(n); for (size_t i=0;i<n;i++){time_consumption[i].resize(layers+1, 0);}
             q_c_dists.resize(n, 0); recall.resize(n, 0);
         }
@@ -701,15 +769,15 @@ namespace bslib{
         if (validation){base_input = std::ifstream(path_base, std::ios::binary);}
 
 //Use parallel in real use
-#pragma omp parallel for
+//#pragma omp parallel for
         for (size_t i = 0; i < n; i++){
 
             //Variables for analysis
             time_recorder Trecorder = time_recorder();
-            std::unordered_set<uint32_t> grountruth_set;
+            std::unordered_set<idx_t> grountruth_set;
             if (analysis){for (size_t j = 0; j < result_k; j++){grountruth_set.insert(groundtruth[i * 100 + j]);}}
 
-            const float * query = queries + i * dimension;
+            const float * query = use_OPQ ? opq_matrix->apply(1, queries + i * dimension) : queries + i * dimension;
             size_t n_vq = 0;
             size_t n_lq = 0;
             size_t n_pq = 0;
@@ -747,7 +815,7 @@ namespace bslib{
                     group_size = vq_quantizer_index[n_vq].nc_per_group;
 //#pragma omp parallel for
                     for (size_t m = 0; m < keep_result_space; m++){
-                        vq_quantizer_index[n_vq].search_in_group(1, query, query_group_ids.data()+m, query_result_dists.data()+m*group_size, query_result_labels.data() + m*group_size, keep_space[j]);
+                        vq_quantizer_index[n_vq].search_in_group(query, query_group_ids[m], query_result_dists.data()+m*group_size, query_result_labels.data() + m*group_size, keep_space[j]);
                     }
                     if (use_HNSW_VQ){
                         for (size_t m = 0; m < keep_result_space; m++){
@@ -776,7 +844,7 @@ namespace bslib{
                     //for (size_t m = 0; m < search_space; m++){upper_result_labels[m] = result_labels[m]; upper_result_dists[m] = result_dists[m];}
 //#pragma omp parallel for
                     for (size_t m = 0; m < keep_result_space; m++){
-                        lq_quantizer_index[n_lq].search_in_group(1, query, upper_result_labels.data(), upper_result_dists.data(), search_space, query_group_ids.data()+m*1, query_result_dists.data()+m*group_size, query_result_labels.data()+m*group_size);
+                        lq_quantizer_index[n_lq].search_in_group(query, upper_result_labels.data(), upper_result_dists.data(), search_space, query_group_ids[m], query_result_dists.data()+m*group_size, query_result_labels.data()+m*group_size);
                     }
                     for (size_t m = 0; m < keep_result_space; m++){
                         keep_k_min(group_size, keep_space[j], query_result_dists.data()+m*group_size, query_result_labels.data()+m*group_size, query_group_dists.data()+m*keep_space[j], query_group_ids.data()+m*keep_space[j]);
@@ -789,7 +857,7 @@ namespace bslib{
                     assert(j == this->layers-1);
 //#pragma omp parallel for
                     for (size_t m = 0; m < keep_result_space; m++){
-                        pq_quantizer_index[n_pq].search_in_group(1, query, query_group_ids.data()+m, query_result_dists.data()+m*keep_space[j], query_result_labels.data()+m*keep_space[j], keep_space[j]);
+                        pq_quantizer_index[n_pq].search_in_group(query, query_group_ids[m], query_result_dists.data()+m*keep_space[j], query_result_labels.data()+m*keep_space[j], keep_space[j]);
                     }
                     assert(keep_result_space * keep_space[j] == final_keep_space);
                     memcpy(query_group_ids.data(), query_result_labels.data(), final_keep_space * sizeof(idx_t));
@@ -803,7 +871,7 @@ namespace bslib{
                 search_space = keep_result_space * group_size;
                 keep_result_space = keep_result_space * keep_space[j];
 
-                if (analysis){time_consumption[i][j] = Trecorder.getTimeConsumption();Trecorder.reset();}
+                if (analysis){time_consumption[i][j] = Trecorder.getTimeConsumption(); Trecorder.reset();}
             }
 
             assert((n_vq + n_lq + n_pq) == this->layers);
@@ -821,10 +889,6 @@ namespace bslib{
                 q_c_dists[i] = query_centroid_dists;
             }
 
-            std::vector<idx_t> query_pre_hash_ids; 
-            if (use_hash){
-                query_pre_hash_ids.resize(final_keep_space, 0); memcpy(query_pre_hash_ids.data(), query_group_ids.data(), final_keep_space * sizeof(idx_t)); 
-                HashMapping(final_keep_space, query_pre_hash_ids.data(), query_group_ids.data(), final_group_num);}
             size_t max_size = 0;for (size_t j = 0; j < final_keep_space; j++){if (base_sequence_ids[query_group_ids[j]].size() > max_size) max_size = base_sequence_ids[query_group_ids[j]].size();}
             
             std::vector<float> query_search_dists(max_visited_vectors + max_size, 0);std::vector<idx_t> query_search_labels(max_visited_vectors + max_size, 0);
@@ -832,7 +896,8 @@ namespace bslib{
             // The dists for actual distance validation
             std::vector<float> query_actual_dists; if (validation){(query_actual_dists.resize(max_visited_vectors + max_size));}
 
-            for (size_t j = 0; j < final_keep_space; j++){
+            size_t j = 0;
+            for (j = 0; j < final_keep_space; j++){
 
                 std::pair<idx_t, float> result_idx_dist;
                 size_t id_position = get_next_group_idx(final_keep_space, query_group_ids.data(), query_group_dists.data(), result_idx_dist);
@@ -845,11 +910,9 @@ namespace bslib{
                 assert(group_size == this->base_codes[group_id].size() / this->code_size);
 
                 float centroid_norm;
-                idx_t centroid_id = (use_hash) ? query_pre_hash_ids[id_position] : group_id;
-                if (use_hash)
-                    centroid_norm = this->pq_quantizer_index[0].get_centroid_norms(centroid_id);
-                else
-                    centroid_norm = centroid_norms[centroid_id];
+                idx_t centroid_id = group_id;
+
+                centroid_norm = centroid_norms[centroid_id];
                 
                 assert(centroid_norm > 0);
                 float term1 = q_c_dist - centroid_norm;
@@ -869,46 +932,44 @@ namespace bslib{
                 const uint8_t * code = base_codes[group_id].data();
 
                 for (size_t m = 0; m < group_size; m++){
-                    if (use_hash && base_pre_hash_ids[group_id][m] != centroid_id){
-                        continue;
-                    }
-                    else{
-                        idx_t sequence_id = base_sequence_ids[group_id][m];
-                        std::vector<float> base_reconstructed_norm(1);
-                        if (use_norm_quantization) norm_pq.decode(base_norm_codes.data() + sequence_id * norm_code_size, base_reconstructed_norm.data(), 1);
-                        float term2 = use_norm_quantization ? base_reconstructed_norm[0] : base_norms[sequence_id];
-                        float term3 = 2 * pq_L2sqr(code + m * code_size, precomputed_table.data());
-                        float dist = term1 + term2 - term3;
-                        query_search_dists[visited_vectors] = dist;
 
-                        //Compute the actual distance
-                        if (validation){
-                            std::vector<base_data_type> base_vector(dimension); uint32_t dim;
-                            base_input.seekg(base_sequence_ids[group_id][m] * dimension * sizeof(base_data_type) + base_sequence_ids[group_id][m] * sizeof(uint32_t), std::ios::beg);
-                            base_input.read((char *) & dim, sizeof(uint32_t)); assert(dim == this->dimension);
-                            base_input.read((char *) base_vector.data(), sizeof(base_data_type)*dimension);
-                            std::vector<float> base_vector_float(dimension);
-                            for (size_t temp = 0; temp < dimension; temp++){base_vector_float[temp] = base_vector[temp];}
-                            std::vector<float> distance_vector(dimension);
-                            faiss::fvec_madd(dimension, base_vector_float.data(), -1, query, distance_vector.data());
-                            float actual_dist =  faiss::fvec_norm_L2sqr(distance_vector.data(), dimension);
-                            std::vector<float> decoded_code(dimension);
-                            pq.decode(code + m * code_size, decoded_code.data(), 1);
-                            std::vector<float> decoded_base_vector(dimension);
-                            decode(1, decoded_code.data(), & group_id, decoded_base_vector.data());
-                            float actual_norm = faiss::fvec_norm_L2sqr(decoded_base_vector.data(), dimension);
-                            query_actual_dists[visited_vectors] = actual_dist;
-                            std::cout << "S: " << dist << " A: " << actual_dist << " LN: " << term2 << " AN: " << actual_norm << " "; // S for "Search" and A for "Actual"
-                        }
+                    idx_t sequence_id = base_sequence_ids[group_id][m];
+                    std::vector<float> base_reconstructed_norm(1);
+                    if (use_norm_quantization) norm_pq.decode(base_norm_codes.data() + sequence_id * norm_code_size, base_reconstructed_norm.data(), 1);
+                    float term2 = use_norm_quantization ? base_reconstructed_norm[0] : base_norms[sequence_id];
+                    float term3 = 2 * pq_L2sqr(code + m * code_size, precomputed_table.data());
+                    float dist = term1 + term2 - term3;
+                    query_search_dists[visited_vectors] = dist;
 
-                        query_search_labels[visited_vectors] = base_sequence_ids[group_id][m];
-                        visited_vectors ++;
-                        if (analysis){if (grountruth_set.count(base_sequence_ids[group_id][m]) != 0){visited_gt ++;}}
+                    //Compute the actual distance
+                    if (validation){
+                        std::vector<base_data_type> base_vector(dimension); uint32_t dim;
+                        base_input.seekg(base_sequence_ids[group_id][m] * dimension * sizeof(base_data_type) + base_sequence_ids[group_id][m] * sizeof(uint32_t), std::ios::beg);
+                        base_input.read((char *) & dim, sizeof(uint32_t)); assert(dim == this->dimension);
+                        base_input.read((char *) base_vector.data(), sizeof(base_data_type)*dimension);
+                        std::vector<float> base_vector_float(dimension);
+                        for (size_t temp = 0; temp < dimension; temp++){base_vector_float[temp] = base_vector[temp];}
+                        std::vector<float> distance_vector(dimension);
+                        faiss::fvec_madd(dimension, base_vector_float.data(), -1, query, distance_vector.data());
+                        float actual_dist =  faiss::fvec_norm_L2sqr(distance_vector.data(), dimension);
+                        std::vector<float> decoded_code(dimension);
+                        pq.decode(code + m * code_size, decoded_code.data(), 1);
+                        std::vector<float> decoded_base_vector(dimension);
+                        decode(1, decoded_code.data(), & group_id, decoded_base_vector.data());
+                        float actual_norm = faiss::fvec_norm_L2sqr(decoded_base_vector.data(), dimension);
+                        query_actual_dists[visited_vectors] = actual_dist;
+                        std::cout << "S: " << dist << " A: " << actual_dist << " LN: " << term2 << " AN: " << actual_norm << " "; // S for "Search" and A for "Actual"
                     }
+
+                    query_search_labels[visited_vectors] = base_sequence_ids[group_id][m];
+                    visited_vectors ++;
+                    if (analysis){if (grountruth_set.count(base_sequence_ids[group_id][m]) != 0){visited_gt ++;}}
+
                 }
                 if (visited_vectors >= this->max_visited_vectors)
                     break;
             }
+
 
             if (validation){
             //Compute the distance sort for computed distance
@@ -941,7 +1002,7 @@ namespace bslib{
                 std::vector<idx_t> reranking_labels(reranking_space, 0);
                 std::vector<float> reranking_actual_dists(reranking_space, 0);
                 keep_k_min(visited_vectors, reranking_space, query_search_dists.data(), query_search_labels.data(), reranking_dists.data(), reranking_labels.data());
-
+                
                 for (size_t j = 0; j < reranking_space; j++){
                     std::vector<base_data_type> base_vector(dimension); std::vector<float> base_vector_float(dimension); uint32_t dim;
                     reranking_input.seekg(reranking_labels[j] * dimension * sizeof(base_data_type) + reranking_labels[j] * sizeof(uint32_t), std::ios::beg);
@@ -960,19 +1021,22 @@ namespace bslib{
             else{keep_k_min(visited_vectors, result_k, query_search_dists.data(), query_search_labels.data(), query_dists + i * result_k, query_ids + i * result_k);}
 
             if (analysis){
-                size_t correct = 0; for (size_t temp=0;temp<result_k;temp++){if(grountruth_set.count(query_ids[temp])!=0) correct++;}
+
+                size_t correct = 0; for (size_t temp=0;temp<result_k;temp++){if(grountruth_set.count(query_ids[ i * result_k + temp])!=0) correct++;}
                 recall[i] = float(correct) / result_k;
                 time_consumption[i][layers]  = Trecorder.getTimeConsumption();
                 visited_gt_proportion[i] = float(visited_gt) / result_k;
                 actual_visited_vectors[i] = visited_vectors;
+                actual_visited_clusters[i] = j;
             }
         }
 
         if (analysis){
-            float avg_visited_vectors = 0, avg_q_c_dist = 0, avg_visited_gt_proportion = 0, avg_recall = 0;
+            float avg_visited_vectors = 0, avg_q_c_dist = 0, avg_visited_gt_proportion = 0, avg_recall = 0, avg_visited_clusters = 0;
             std::vector<float> avg_time_consumption(layers+1, 0);
             for (size_t i = 0; i < n; i++){
                 avg_visited_vectors += actual_visited_vectors[i];
+                avg_visited_clusters += actual_visited_clusters[i];
                 avg_q_c_dist += q_c_dists[i];
                 avg_visited_gt_proportion += visited_gt_proportion[i];
                 for (size_t j = 0; j < layers+1; j++){avg_time_consumption[j] += time_consumption[i][j];}
@@ -988,6 +1052,7 @@ namespace bslib{
 
             std::cout << "Time consumption in different parts: ";for(size_t i = 0; i < layers+1; i++){std::cout << avg_time_consumption[i] / n << " ";}std::cout << std::endl;
             std::cout << "The average visited vectors: " << avg_visited_vectors / n << std::endl;
+            std::cout << "The average visited clusters: " << avg_visited_clusters / n << std::endl;
             std::cout << "The average query centroid distance: " << avg_q_c_dist / n << std::endl;
             std::cout << "The avarage groundtruth proportion is: " << avg_visited_gt_proportion / n << std::endl;
             std::cout << "The avarage recall is: " << avg_recall / n << std::endl;
@@ -1216,18 +1281,6 @@ namespace bslib{
             output.write((char *)base_norms.data(), base_norms.size() * sizeof(float));
         }
 
-        if (use_hash){
-            output.write((char *) & this->final_group_num, sizeof(size_t));
-            assert(base_pre_hash_ids.size() == final_group_num);
-            for (size_t i = 0; i < final_group_num; i++){
-                assert(base_pre_hash_ids[i].size() == base_sequence_ids[i].size());
-                size_t group_size = base_pre_hash_ids[i].size();
-                output.write((char *) & group_size, sizeof(size_t));
-                output.write((char *) base_pre_hash_ids[i].data(), group_size * sizeof(idx_t));
-                
-            }
-        }
-
         output.write((char *) & this->final_group_num, sizeof(size_t));
         assert(base_codes.size() == final_group_num);
         for (size_t i = 0; i < this->final_group_num; i++){
@@ -1246,11 +1299,11 @@ namespace bslib{
             output.write((char *) base_sequence_ids[i].data(), group_size * sizeof(idx_t));
         }
 
-        if (index_type[index_type.size() - 1] != "PQ"){
-            output.write((char *) & this->final_group_num, sizeof(size_t));
-            assert(centroid_norms.size() == this->final_group_num);
-            output.write((char *) centroid_norms.data(), this->final_group_num * sizeof(float));
-        }
+        assert(centroid_norms.size() == final_group_num);
+        output.write((char *) & this->final_group_num, sizeof(size_t));
+        assert(centroid_norms.size() == this->final_group_num);
+        output.write((char *) centroid_norms.data(), this->final_group_num * sizeof(float));
+
         output.close();
     }
 
@@ -1262,6 +1315,7 @@ namespace bslib{
         this->base_codes.resize(this->final_group_num);
         
         this->base_sequence_ids.resize(this->final_group_num);
+        input.read((char *) & final_nc_input, sizeof(size_t));
 
         if (use_norm_quantization){
             size_t base_size;
@@ -1276,18 +1330,8 @@ namespace bslib{
             input.read((char *) base_norms.data(), base_size * sizeof(float));
         }
 
-        if (use_hash){
-            this->base_pre_hash_ids.resize(this->final_group_num);
-            input.read((char *) & final_nc_input, sizeof(size_t));
-            assert(final_nc_input == this->final_group_num);
-            for (size_t i = 0; i < this->final_group_num; i++){
-                input.read((char *) & group_size_input, sizeof(size_t));
-                this->base_pre_hash_ids[i].resize(group_size_input);
-                input.read((char *)base_pre_hash_ids[i].data(), group_size_input * sizeof(idx_t));
-            }
-        }
-
         input.read((char *) & final_nc_input, sizeof(size_t));
+        std::cout << final_nc_input << " " << final_group_num << std::endl;
         assert(final_nc_input == this->final_group_num);
         for (size_t i = 0; i < this->final_group_num; i++){
             input.read((char *) & group_size_input, sizeof(size_t));
@@ -1303,12 +1347,11 @@ namespace bslib{
             input.read((char *) base_sequence_ids[i].data(), group_size_input * sizeof(idx_t));
         }
 
-        if (index_type[index_type.size()-1] != "PQ"){
-            input.read((char *) & final_nc_input, sizeof(size_t));
-            assert(final_nc_input == this->final_group_num);
-            this->centroid_norms.resize(this->final_group_num);
-            input.read((char *) centroid_norms.data(), this->final_group_num * sizeof(float));
-        }
+
+        input.read((char *) & final_nc_input, sizeof(size_t));
+        assert(final_nc_input == this->final_group_num);
+        this->centroid_norms.resize(this->final_group_num);
+        input.read((char *) centroid_norms.data(), this->final_group_num * sizeof(float));
         input.close();
     }
 }

@@ -32,8 +32,6 @@ namespace bslib{
 
             this->ksub = new_pow(2, nbits);
             this->dsub = dimension / M;
-            // Tune this parameter to modify the size of Hash Table
-            this->hash_size = nc_upper * ksub;
         }
 
     /**
@@ -178,11 +176,9 @@ namespace bslib{
      * 
      **/
    void PQ_quantizer::multi_sequence_sort(const idx_t group_id, const float * dist_sequence, size_t keep_space, float * result_dists, idx_t * result_labels){
-       
        std::vector<std::vector<float>> dist_seqs(this->M, std::vector<float>(this->ksub));
        std::vector<std::vector<idx_t>> dist_index(this->M, std::vector<idx_t>(this->ksub));
 
-//#pragma omp parallel for
        for (size_t i = 0; i < this->M; i++){
            uint32_t x = 0;
            //From 0 to M-1
@@ -193,7 +189,7 @@ namespace bslib{
            }
             std::sort(dist_index[i].begin(), dist_index[i].end(), [&](int a,int b){return dist_seqs[i][a]<dist_seqs[i][b];} );
        }
-        
+    
        std::priority_queue<dist_pair, std::vector<dist_pair>, cmp> dist_queue;
        std::vector<dist_pair> result_sequence(keep_space);
        std::vector<idx_t> visited_index;
@@ -267,7 +263,7 @@ namespace bslib{
             result_sequence[i] = dist_queue.top();
         }
 
-#pragma omp parallel for
+//#pragma omp parallel for
         for (size_t i = 0; i < keep_space; i++){
             
             dist_pair new_pair = result_sequence[i];
@@ -297,14 +293,10 @@ namespace bslib{
      * 
      * 
      **/
-    void PQ_quantizer::search_in_group(size_t n, const float * queries, const idx_t * group_idxs, float * result_dists, idx_t * result_labels, size_t keep_space){
-//#pragma omp parallel for
-        for (size_t i = 0; i < n; i++){
-            idx_t group_id = group_idxs[i];
-            std::vector<float> distance_table(this->M * this->ksub);
-            this->PQs[group_id]->compute_distance_table(queries + i * dimension, distance_table.data());
-            multi_sequence_sort(group_id, distance_table.data(), keep_space, result_dists + i * keep_space, result_labels + i * keep_space);
-        }
+    void PQ_quantizer::search_in_group(const float * query, const idx_t group_id, float * result_dists, idx_t * result_labels, size_t keep_space){
+        std::vector<float> distance_table(this->M * this->ksub);
+        this->PQs[group_id]->compute_distance_table(query, distance_table.data());
+        multi_sequence_sort(group_id, distance_table.data(), keep_space, result_dists, result_labels);
     }
 
 
@@ -315,19 +307,21 @@ namespace bslib{
         std::vector<idx_t> query_group_labels(n  * nc_upper);
         std::vector<float> query_group_dists(n * nc_upper);
 #pragma omp parallel for
-        for (size_t i = 0; i < nc_upper; i++){
-            std::vector<idx_t> query_group_idxs(n, i);
-            search_in_group(n, query_data, query_group_idxs.data(), query_group_dists.data() + i * n, query_group_labels.data() + i * n, 1);
+        for (size_t i = 0; i < n; i++){
+            for (size_t j = 0; j < nc_upper; j++){
+                search_in_group(query_data + i * dimension, j, query_group_dists.data() + i * nc_upper + j, query_group_labels.data() + i * nc_upper + j, 1);
+            }
         }
 
+#pragma omp parallel for
         for (size_t i = 0; i < n; i++){
-            float min_dis = query_group_dists[i];
-            query_data_ids[i] = query_group_labels[i];
+            float min_dis = query_group_dists[i * nc_upper];
+            query_data_ids[i] = query_group_labels[i * nc_upper];
 
             for (size_t j = 1; j < nc_upper; j++){
-                if (query_group_dists[i * j] < min_dis){
-                    min_dis = query_group_dists[i * j];
-                    query_data_ids[i] = query_group_labels[i * j];
+                if (query_group_dists[i * nc_upper + j] < min_dis){
+                    min_dis = query_group_dists[i * nc_upper + j];
+                    query_data_ids[i] = query_group_labels[i *nc_upper + j];
                 }
             }
         }

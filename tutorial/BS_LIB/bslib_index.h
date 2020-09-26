@@ -11,8 +11,8 @@
 namespace bslib{
 
 // Change this type for different datasets
-typedef float learn_data_type;
-typedef float base_data_type;
+typedef uint8_t learn_data_type;
+typedef uint8_t base_data_type;
 
 typedef faiss::Index::idx_t idx_t;
 typedef std::pair<std::pair<size_t, size_t>, size_t> HNSW_para;
@@ -28,7 +28,6 @@ struct Bslib_Index{
     bool use_HNSW_VQ;
     bool use_HNSW_group;
     bool use_OPQ;
-    bool use_hash;
     bool use_norm_quantization;
     size_t reranking_space;
 
@@ -48,7 +47,7 @@ struct Bslib_Index{
 
     faiss::ProductQuantizer pq; // Initialized in train_pq
     faiss::ProductQuantizer norm_pq; // Initialized in train_pq
-    //faiss::LinearTransform * opq_matrix;
+    faiss::LinearTransform * opq_matrix;
 
     std::vector<float> base_norms;
     std::vector<uint8_t> base_norm_codes;
@@ -57,14 +56,15 @@ struct Bslib_Index{
 
     std::vector<std::vector<uint8_t>> base_codes;
     std::vector<std::vector<idx_t>> base_sequence_ids;
-    std::vector<std::vector<idx_t>> base_pre_hash_ids;
+    //std::vector<std::vector<idx_t>> base_pre_hash_ids;
 
     std::vector<std::vector<idx_t>> train_set_ids; // This is for train data selection 
     std::vector<float> train_data; // Initialized in build_quantizers (without reading)
     std::vector<idx_t> train_data_ids; // Initialized in build_quantizers (without reading)
 
-    explicit Bslib_Index(const size_t dimension, const size_t layers, const std::string * index_type, const bool use_HNSW_VQ, const bool use_norm_quantization);
+    explicit Bslib_Index(const size_t dimension, const size_t layers, const std::string * index_type, const bool use_HNSW_VQ, const bool use_norm_quantization, const bool use_OPQ);
 
+    void do_OPQ(idx_t n, float * dataset);
     void build_quantizers(const uint32_t * ncentroids, const std::string path_quantizer, const std::string path_learn, const size_t * num_train, const std::vector<HNSW_para> HNSW_paras, const std::vector<PQ_para> PQ_paras);
     
     void add_vq_quantizer(size_t nc_upper, size_t nc_per_group, size_t M, size_t efConstruction, size_t efSearch);
@@ -79,9 +79,10 @@ struct Bslib_Index{
     void encode(size_t n, const float * data, const idx_t * encoded_ids, float * encoded_data);
     void decode(size_t n, const float * encoded_data, const idx_t * encoded_ids, float * decoded_data);
     void assign(const size_t n, const float * assign_data, idx_t * assigned_ids);
-    void add_batch(size_t n, const float * data, const idx_t * sequence_ids, const idx_t * group_ids, const size_t * group_position, const idx_t * pre_hash_ids);
+    void add_batch(size_t n, const float * data, const idx_t * sequence_ids, const idx_t * group_ids, const size_t * group_positions);
     void get_final_group_num();
     void compute_centroid_norm();
+    void keep_k_min(const size_t m, const size_t k, const float * all_dists, const idx_t * all_labels, float * sub_dists, idx_t * sub_labels);
     void search(size_t n, size_t result_k, float * queries, float * query_dists, idx_t * query_ids, const size_t * keep_space, uint32_t * groundtruth, std::string path_base);
     size_t get_next_group_idx(size_t keep_result_space, idx_t * group_ids, float * query_group_dists, std::pair<idx_t, float> & result_idx_dist);
     

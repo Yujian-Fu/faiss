@@ -1,4 +1,4 @@
-#include "utils/utils.h"
+#include "../utils/utils.h"
 #include <unordered_set>
 #include <faiss/Clustering.h>
 #include <faiss/IndexFlat.h>

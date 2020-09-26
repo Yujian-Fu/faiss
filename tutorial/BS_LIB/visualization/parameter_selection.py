@@ -69,7 +69,7 @@ filepaths = ["/home/yujian/Desktop/Recording_Files/VQ/analysis/" + dataset + "_r
 # This is the figure for 
 
 
-size_list = [10000, 100000, 1000000]
+size_list = [1000000]
 
 for i in range(len(recall_performance)):
 

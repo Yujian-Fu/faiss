@@ -269,45 +269,58 @@ namespace bslib{
      * result_dists:         the search result dists                                            size: n * nc_per_group
      * 
      **/
-    void LQ_quantizer::search_in_group(size_t n, const float * queries, idx_t * upper_result_labels, const float * upper_result_dists, const size_t upper_search_space, const idx_t * group_ids, float * result_dists, idx_t * result_labels){        
-        for (size_t i = 0; i < n; i++){
-            const idx_t group_id = group_ids[i];
-            const float alpha = alphas[group_id];
-            
-            for (size_t j = 0; j < nc_per_group; j++){
-                result_labels[i * nc_per_group + j] = CentroidDistributionMap[group_id] + j;
-                idx_t nn_id = nn_centroid_ids[group_id][j];
-                float query_nn_dist = Not_Found;
-                float query_group_dist = Not_Found;
-                idx_t * nn_id_index = std::find(upper_result_labels + i * upper_search_space, upper_result_labels + i * upper_search_space + upper_search_space, nn_id);
-                idx_t nn_index = nn_id_index - upper_result_labels + i * upper_search_space;
+    void LQ_quantizer::search_in_group(const float * query, idx_t * upper_result_labels, const float * upper_result_dists, const size_t upper_search_space, const idx_t group_id, float * result_dists, idx_t * result_labels){        
 
-                if (nn_index > upper_search_space){
-                    query_nn_dist = upper_result_dists [i * upper_search_space + nn_index];
-                    idx_t * group_id_index = std::find(upper_result_labels + i * upper_search_space, upper_result_labels + i * upper_search_space + upper_search_space, group_id);
-                    idx_t group_index = group_id_index - upper_result_labels + i * upper_search_space;
-                    query_group_dist = upper_result_dists[i * upper_search_space + group_index];
+        const float alpha = alphas[group_id];
+        
+        for (size_t j = 0; j < nc_per_group; j++){
+            result_labels[j] = CentroidDistributionMap[group_id] + j;
+            idx_t nn_id = nn_centroid_ids[group_id][j];
+            float query_nn_dist = Not_Found;
+            float query_group_dist = Not_Found;
+            // There are many ways for finding whether the nn_id exists in the upper search result, try different ways
+            idx_t * nn_id_index = std::find(upper_result_labels, upper_result_labels+ upper_search_space, nn_id);
+            idx_t nn_index = nn_id_index - upper_result_labels;
 
-                    float group_nn_dist = nn_centroid_dists[group_id][j];
-                    result_dists[i * nc_per_group + j] = alpha*(alpha-1)*group_nn_dist + (1-alpha)*query_group_dist + alpha*query_nn_dist;
+            //idx_t nn_index = 0;
+            //for (nn_index = 0; nn_index < upper_search_space; nn_index++){
+            //    if (upper_result_labels[nn_index] == nn_id)
+            //        break;
+            //}
+
+            if (nn_index < upper_search_space){
+                query_nn_dist = upper_result_dists [nn_index];
+
+                //idx_t group_index = 0;
+                //for (group_index = 0; group_index < upper_search_space; group_index++){
+                //    if (upper_result_labels[group_index] == group_id){
+                //        break;
+                //    }
+                //}
+
+                idx_t * group_id_index = std::find(upper_result_labels, upper_result_labels + upper_search_space, group_id);
+                idx_t group_index = group_id_index - upper_result_labels;
+                query_group_dist = upper_result_dists[group_index];
+
+                float group_nn_dist = nn_centroid_dists[group_id][j];
+                result_dists[j] = alpha*(alpha-1)*group_nn_dist + (1-alpha)*query_group_dist + alpha*query_nn_dist;
+            }
+            else{
+                std::vector<float> query_sub_centroid_vector(dimension);
+                float * nn_centroid = upper_centroids.data() + nn_centroid_ids[group_id][j] * dimension;
+                float * group_centrod = upper_centroids.data() + group_id * dimension;
+                
+                //std::vector<float> sub_centroid(dimension);
+                //compute_final_centroid(group_id, j, sub_centroid.data());
+                //faiss::fvec_madd(dimension, sub_centroid.data(), -1.0, query, query_sub_centroid_vector.data());
+
+                for (size_t k = 0; k < dimension; k++){
+                    query_sub_centroid_vector[k] = alpha * nn_centroid[k] + (1-alpha)*group_centrod[k]-query[k];
                 }
-                else{
-                    const float * query = queries + i * dimension;
-                    std::vector<float> query_sub_centroid_vector(dimension);
-                    float * nn_centroid = upper_centroids.data() + nn_centroid_ids[group_id][j] * dimension;
-                    float * group_centrod = upper_centroids.data() + group_id * dimension;
-                    
-                    //std::vector<float> sub_centroid(dimension);
-                    //compute_final_centroid(group_id, j, sub_centroid.data());
-                    //faiss::fvec_madd(dimension, sub_centroid.data(), -1.0, query, query_sub_centroid_vector.data());
-
-                    for (size_t k = 0; k < dimension; k++){
-                        query_sub_centroid_vector[k] = alpha * nn_centroid[k] + (1-alpha)*group_centrod[k]-query[k];
-                    }
-                    result_dists[i * nc_per_group + j] = faiss::fvec_norm_L2sqr(query_sub_centroid_vector.data(), dimension);
-                }
+                result_dists[j] = faiss::fvec_norm_L2sqr(query_sub_centroid_vector.data(), dimension);
             }
         }
+
 
         /*
         for (size_t i = 0; i < n; i++){

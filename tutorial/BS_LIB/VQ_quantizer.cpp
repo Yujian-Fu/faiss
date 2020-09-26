@@ -61,7 +61,7 @@ namespace bslib{
             std::vector<float> centroids(dimension * nc_per_group);
             size_t nt_sub = train_set[i].size() / this->dimension;
             std::cout << "Clustering " << nt_sub << " train vectors into " << nc_per_group << " groups " << std::endl;
-            faiss::kmeans_clustering(dimension, nt_sub, nc_per_group, train_set[i].data(), centroids.data());
+            faiss::kmeans_clustering(dimension, nt_sub, nc_per_group, train_set[i].data(), centroids.data(), 40);
 
             //Adding centroids into quantizers
             if (use_HNSW){
@@ -128,41 +128,33 @@ namespace bslib{
      * result_dists in HNSW search:                                                 size: n * k (n * efSearch?)
      * The output result for HNSW search and L2 search is different
      **/
-    void VQ_quantizer::search_in_group(size_t n, const float * queries, const idx_t * group_ids, float * result_dists, idx_t * result_labels, size_t k){
+    void VQ_quantizer::search_in_group(const float * query, const idx_t group_id, float * result_dists, idx_t * result_labels, size_t k){
         if (use_HNSW){
 //#pragma omp parallel for
-            for (size_t i = 0; i < n; i++){
-                idx_t group_id = group_ids[i];
-                const float * query = queries + i * dimension;
-                //The distance result for search kNN is in reverse 
-                auto result_queue = this->HNSW_quantizers[group_id]->searchBaseLayer(query, efSearch > k ? efSearch : k);
-                size_t result_length = result_queue.size();
-                assert (result_length >= k && result_length <= nc_per_group);
-                for (size_t j = 0; j < this->nc_per_group; j++){
-                    if (j < result_length){
-                        result_dists[i * nc_per_group + result_length - j - 1] = result_queue.top().first;
-                        result_labels[i * nc_per_group + result_length - j -1] = CentroidDistributionMap[group_id] + result_queue.top().second;
-                        result_queue.pop();
-                    }
-                    else{
-                        result_dists[i * nc_per_group + j] = MAX_DIST;
-                        result_labels[i * nc_per_group + j] = INVALID_ID;
-                    }
+            //The distance result for search kNN is in reverse 
+            size_t search_para = efSearch > k ? efSearch : k;
+            auto result_queue = this->HNSW_quantizers[group_id]->searchBaseLayer(query, search_para);
+            size_t result_length = result_queue.size();
+            // The result of search result 
+            assert (result_length >= k && result_length <= nc_per_group);
+            for (size_t j = 0; j < this->nc_per_group; j++){
+                if (j < result_length){
+                    result_dists[result_length - j - 1] = result_queue.top().first;
+                    result_labels[result_length - j -1] = CentroidDistributionMap[group_id] + result_queue.top().second;
+                    result_queue.pop();
+                }
+                else{
+                    result_dists[j] = MAX_DIST;
+                    result_labels[j] = INVALID_ID;
                 }
             }
         }
         else{
 //#pragma omp parallel for
-            for (size_t i = 0; i < n; i++){
-                idx_t group_id = group_ids[i];
-                const float * query = queries + i * dimension;
-                for (size_t j = 0; j < this->nc_per_group; j++){
-                    std::vector<float> query_centroid_vector(dimension);
-                    const float * target_centroid = this->L2_quantizers[group_id]->xb.data() + j * this->dimension;
-                    faiss::fvec_madd(dimension, target_centroid, -1.0, query, query_centroid_vector.data());
-                    result_dists[i * this->nc_per_group + j] = faiss::fvec_norm_L2sqr(query_centroid_vector.data(), dimension);
-                    result_labels[i * this->nc_per_group + j] = CentroidDistributionMap[group_id] + j;
-                }
+            for (size_t j = 0; j < this->nc_per_group; j++){
+                const float * target_centroid = this->L2_quantizers[group_id]->xb.data() + j * this->dimension;
+                result_dists[j] = faiss::fvec_L2sqr(target_centroid, query, dimension);
+                result_labels[j] = CentroidDistributionMap[group_id] + j;
             }
         }
     }

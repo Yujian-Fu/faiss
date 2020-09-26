@@ -7,7 +7,6 @@ namespace bslib{
         size_t nbits;
         size_t ksub;
         size_t dsub;
-        size_t hash_size;
         std::vector<faiss::ProductQuantizer *> PQs;
         std::vector<std::vector<float>> centroid_norms;
 
@@ -21,7 +20,7 @@ namespace bslib{
         void compute_final_centroid(const idx_t group_idx, float * final_centroid);
         void compute_residual_group_id(size_t n, const idx_t * group_idxs, const float * x, float * residuals);
         void recover_residual_group_id(size_t n, const idx_t * group_idxs, const float * residuals, float * x);
-        void search_in_group(size_t n, const float * queries, const idx_t * group_idxs, float * result_dists,idx_t * result_labels, size_t keep_space);
+        void search_in_group(const float * query, const idx_t group_id, float * result_dists, idx_t * result_labels, size_t keep_space);
         void search_all(const size_t n, const float * queries, idx_t * result_labels);
         void multi_sequence_sort(const idx_t group_id, const float * dist_sequence, size_t keep_space, float * result_dists, idx_t * result_labels);
         float get_centroid_norms(const idx_t group_id);

@@ -247,12 +247,11 @@ void Clustering::train (idx_t nx, const float *x_in, Index & index) {
 
 }
 
-float kmeans_clustering (size_t d, size_t n, size_t k,
-                         const float *x,
-                         float *centroids)
+float kmeans_clustering (size_t d, size_t n, size_t k, const float *x, float *centroids, size_t niter)
 {
     Clustering clus (d, k);
     clus.verbose = false;
+    clus.niter = niter;
     //clus.verbose = d * n * k > (1L << 30);
     // display logs if > 1Gflop per iteration
     IndexFlatL2 index (d);
