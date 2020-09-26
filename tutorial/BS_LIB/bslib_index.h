@@ -29,6 +29,7 @@ struct Bslib_Index{
     bool use_HNSW_group;
     bool use_OPQ;
     bool use_norm_quantization;
+    bool use_train_selector;
     size_t reranking_space;
 
     size_t M; // Initialized by training pq

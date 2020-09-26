@@ -17,6 +17,7 @@ const bool use_norm_quantization = false;
 const bool use_dynamic_reranking = false;
 const bool use_OPQ = false;
 const bool use_parallel_indexing = false;
+const bool use_train_selector = false;
 
 //For train PQ
 const size_t M_PQ = 16;
@@ -34,11 +35,11 @@ const size_t efSearch[VQ_layers] = {};
 const size_t M_PQ_layer[PQ_layers] = {2};
 const size_t nbits_PQ_layer[PQ_layers] = {14};
 
-const size_t OPQ_train_size = 100000;
+const size_t OPQ_train_size = 1000000;
 const size_t selector_train_size = OPQ_train_size;
 const size_t selector_group_size = 10000;
 
-const size_t PQ_train_size = 100000;
+const size_t PQ_train_size = 1000000;
 
 const size_t num_train[layers] = {10000000};
 size_t nb = 1000000000;

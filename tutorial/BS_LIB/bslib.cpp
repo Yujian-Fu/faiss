@@ -5,7 +5,7 @@
 #include <string>
 
 #include "bslib_index.h"
-#include "parameters/parameters_PQ.h"
+#include "./parameters/parameters_PQ.h"
 
 using namespace bslib;
 
@@ -42,11 +42,11 @@ int main(){
     index.train_size = train_size;
     index.M = M_PQ;
     index.nbits = nbits;
+    index.use_train_selector = use_train_selector;
 
     if (use_OPQ){
         if (exists(path_OPQ)){
             index.opq_matrix = static_cast<faiss::OPQMatrix *>(faiss::read_VectorTransform(path_OPQ.c_str()));
-
         }
         else{
             PrintMessage("Training the OPQ matrix");
@@ -74,7 +74,10 @@ int main(){
         Trecorder.record_time_usage(record_file, message);
     }
 
-    index.build_train_selector(path_learn, path_groups, path_labels, train_size, selector_train_size, selector_group_size);
+    if (use_train_selector){
+        index.build_train_selector(path_learn, path_groups, path_labels, train_size, selector_train_size, selector_group_size);
+    }
+    
     std::vector<HNSW_para> HNSW_paras;
     if (use_HNSW_VQ){
         for (size_t i = 0; i < VQ_layers; i++){

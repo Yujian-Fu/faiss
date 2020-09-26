@@ -139,6 +139,7 @@ namespace bslib{
      * 
      **/
     void Bslib_Index::do_OPQ(idx_t n, float * dataset){
+        std::cout << "Doing OPQ for the input data" << std::endl;
         assert(opq_matrix != NULL);
         std::vector<float> copy_dataset(n * dimension);
         memcpy(copy_dataset.data(), dataset, n * dimension * sizeof(float));
@@ -235,7 +236,7 @@ namespace bslib{
      **/
     void Bslib_Index::read_train_set(const std::string path_learn, size_t total_size, size_t train_set_size){
         std::cout << "Reading " << train_set_size << " from " << total_size << " for training" << std::endl;
-        this->train_data.resize(train_set_size * dimension);
+        this->train_data.resize(train_set_size * dimension, 0);
         //Train data ids is for locating the data vectors are used for which group training
         this->train_data_ids.resize(train_set_size, 0);
 
@@ -243,7 +244,7 @@ namespace bslib{
             std::ifstream learn_input(path_learn, std::ios::binary);
             readXvecFvec<float>(learn_input, this->train_data.data(), dimension, train_set_size, true, false);
         }
-        else{
+        else if (use_train_selector){
             assert(this->train_set_ids.size() > 0);
             size_t group_size = train_set_ids.size();
             srand((unsigned)time(NULL));
@@ -261,6 +262,16 @@ namespace bslib{
                 learn_input.read((char *)this->train_data.data() + i * dimension * sizeof(float), dimension * sizeof(float));
             }
         }
+        else{
+            
+            std::ifstream learn_input(path_learn, std::ios::binary);
+            std::vector<float> sum_train_data (total_size * dimension, 0);
+            readXvecFvec<float>(learn_input, sum_train_data.data(), dimension, total_size, true, false);
+            std::cout << "Reading subset without selector" << std::endl;
+            RandomSubset(sum_train_data.data(), this->train_data.data(), dimension, total_size, train_set_size);
+            
+        }
+
         if (use_OPQ){
             do_OPQ(train_set_size, this->train_data.data());
         }
