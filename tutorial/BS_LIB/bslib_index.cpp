@@ -242,7 +242,7 @@ namespace bslib{
 
         if (total_size == train_set_size){
             std::ifstream learn_input(path_learn, std::ios::binary);
-            readXvecFvec<float>(learn_input, this->train_data.data(), dimension, train_set_size, true, false);
+            readXvecFvec<learn_data_type>(learn_input, this->train_data.data(), dimension, train_set_size, true, false);
         }
         else if (use_train_selector){
             assert(this->train_set_ids.size() > 0);
@@ -256,17 +256,17 @@ namespace bslib{
                 size_t inner_group_id = rand() % this->train_set_ids[group_id].size();
                 idx_t sequence_id = this->train_set_ids[group_id][inner_group_id];
 
-                learn_input.seekg(sequence_id * dimension * sizeof (float) + sequence_id * sizeof(uint32_t), std::ios::beg);
+                learn_input.seekg(sequence_id * dimension * sizeof (learn_data_type) + sequence_id * sizeof(uint32_t), std::ios::beg);
                 learn_input.read((char *) & dim, sizeof(uint32_t));
                 assert(dim == dimension);
-                learn_input.read((char *)this->train_data.data() + i * dimension * sizeof(float), dimension * sizeof(float));
+                learn_input.read((char *)this->train_data.data() + i * dimension * sizeof(learn_data_type), dimension * sizeof(float));
             }
         }
         else{
             
             std::ifstream learn_input(path_learn, std::ios::binary);
             std::vector<float> sum_train_data (total_size * dimension, 0);
-            readXvecFvec<float>(learn_input, sum_train_data.data(), dimension, total_size, true, false);
+            readXvecFvec<learn_data_type>(learn_input, sum_train_data.data(), dimension, total_size, true, false);
             std::cout << "Reading subset without selector" << std::endl;
             RandomSubset(sum_train_data.data(), this->train_data.data(), dimension, total_size, train_set_size);
             
