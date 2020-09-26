@@ -50,7 +50,7 @@ int main(){
         else{
             PrintMessage("Training the OPQ matrix");
             index.opq_matrix = new faiss::OPQMatrix(dimension, M_PQ);
-            index.opq_matrix->verbose = false;
+            index.opq_matrix->verbose = true;
             std::ifstream learn_input(path_learn, std::ios::binary);
             std::vector<float>  origin_train_set(train_size * dimension);
             readXvecFvec<learn_data_type>(learn_input, origin_train_set.data(), dimension, train_size, true);
