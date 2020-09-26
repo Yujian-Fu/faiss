@@ -47,7 +47,7 @@ struct Bslib_Index{
 
     faiss::ProductQuantizer pq; // Initialized in train_pq
     faiss::ProductQuantizer norm_pq; // Initialized in train_pq
-    faiss::LinearTransform * opq_matrix;
+    faiss::OPQMatrix * opq_matrix;
 
     std::vector<float> base_norms;
     std::vector<uint8_t> base_norm_codes;

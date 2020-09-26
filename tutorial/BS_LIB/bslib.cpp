@@ -45,7 +45,8 @@ int main(){
 
     if (use_OPQ){
         if (exists(path_OPQ)){
-            index.opq_matrix = dynamic_cast<faiss::LinearTransform *>(faiss::read_VectorTransform(path_OPQ.c_str()));
+            index.opq_matrix = static_cast<faiss::OPQMatrix *>(faiss::read_VectorTransform(path_OPQ.c_str()));
+
         }
         else{
             PrintMessage("Training the OPQ matrix");
