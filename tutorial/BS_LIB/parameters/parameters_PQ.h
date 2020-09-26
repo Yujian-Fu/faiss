@@ -15,7 +15,7 @@ const bool use_reranking = false;
 const bool use_HNSW_VQ = false;
 const bool use_norm_quantization = false;
 const bool use_dynamic_reranking = false;
-const bool use_OPQ = true;
+const bool use_OPQ = false;
 const bool use_parallel_indexing = false;
 
 //For train PQ
