@@ -263,7 +263,6 @@ namespace bslib{
             }
         }
         else{
-            
             std::ifstream learn_input(path_learn, std::ios::binary);
             std::vector<float> sum_train_data (total_size * dimension, 0);
             readXvecFvec<learn_data_type>(learn_input, sum_train_data.data(), dimension, total_size, true, false);
