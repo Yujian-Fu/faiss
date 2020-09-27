@@ -260,9 +260,6 @@ int main(){
         message = "[Added batches to the index] ";
         Trecorder.print_time_usage(message);
 
-        std::cout << "The base id distribution in all groups is " << std::endl;
-        for (size_t i = 0; i < index.base_sequence_ids.size(); i++){std::cout << index.base_sequence_ids[i].size() << " ";}std::cout << std::endl;
-
         index.compute_centroid_norm();
 
         index.write_index(path_index);
@@ -272,6 +269,30 @@ int main(){
         Trecorder.print_time_usage(message);
         Trecorder.record_time_usage(record_file, message);
     }
+
+        std::cout << "The base id distribution in all groups is " << std::endl;
+        int empty_clusters = 0;
+        float average_number = 0;
+        for (size_t i = 0; i < index.base_sequence_ids.size(); i++){
+            average_number += index.base_sequence_ids[i].size();
+        }
+        average_number /= index.base_sequence_ids.size();
+
+        float std = 0;
+        for (size_t i = 0; i < index.base_sequence_ids.size(); i++){
+            std::cout << index.base_sequence_ids[i].size() << " ";
+            if (index.base_sequence_ids[i].size() == 0){
+                empty_clusters ++;
+            }
+            float subtraction = index.base_sequence_ids[i].size() - average_number;
+            std += subtraction * subtraction;
+        }
+        std /= index.base_sequence_ids.size();
+
+        std::cout << std::endl << "The total number of empty clusters is: " << empty_clusters <<  std::endl;
+        std::cout << "The aaverage number of data point in each cluster is: " << average_number << std::endl;
+        std::cout << "The std of the data points distribution is: " << std << std::endl;
+
 
     PrintMessage("Loading groundtruth");
     std::vector<uint32_t> groundtruth(nq * ngt);

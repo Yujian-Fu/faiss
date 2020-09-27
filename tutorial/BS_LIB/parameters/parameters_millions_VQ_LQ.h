@@ -5,22 +5,22 @@
 /* Parameter setting: */
 //Exp parameters
 //For index initialization
-const size_t layers = 1;
+const size_t layers = 2;
 const size_t VQ_layers = 1;
 const size_t PQ_layers = 1;
-const std::string index_type[layers] = {"VQ"};
-const uint32_t ncentroids[layers] = {2000};
+const std::string index_type[layers] = {"VQ", "PQ"};
+const uint32_t ncentroids[layers] = {256};
 
 const bool use_reranking = false;
-const bool use_HNSW_VQ = false;
+const bool use_HNSW_VQ = true;
 const bool use_norm_quantization = false;
 const bool use_dynamic_reranking = false;
 const bool use_OPQ = false;
-const bool use_parallel_indexing = false;
+const bool use_parallel_indexing = true;
 const bool use_train_selector = false;
 
 //For train PQ
-const size_t M_PQ = 16;
+const size_t M_PQ = 8;
 const size_t M_norm_PQ = 1;
 const size_t nbits = 8; //Or 16
 const size_t dimension = 128;
@@ -33,7 +33,7 @@ const size_t efConstruction [VQ_layers] = {200};
 const size_t efSearch[VQ_layers] = {50};
 
 const size_t M_PQ_layer[PQ_layers] = {2};
-const size_t nbits_PQ_layer[PQ_layers] = {8};
+const size_t nbits_PQ_layer[PQ_layers] = {5};
 
 const size_t OPQ_train_size = 10000;
 const size_t selector_train_size = 100000;
@@ -41,7 +41,7 @@ const size_t selector_group_size = 2000;
 
 const size_t PQ_train_size = 10000;
 
-const size_t num_train[layers] = {100000};
+const size_t num_train[layers] = {100000, 100000};
 size_t nb = 1000000;
 const uint32_t batch_size = 10000;
 const size_t nbatches = nb / batch_size; //100
@@ -49,14 +49,14 @@ const size_t nbatches = nb / batch_size; //100
 //For searching
 const size_t ngt = 100;
 const size_t nq = 1000;
-const size_t num_search_paras = 2;
-const size_t num_recall = 2;
+const size_t num_search_paras = 12;
+const size_t num_recall = 1;
 
-const size_t result_k[num_recall] = {1, 10};
-const size_t max_vectors[num_search_paras] = {10000, 15000};
-const size_t keep_space[layers * num_search_paras] = { 50, 100};
-const size_t reranking_space[num_recall] = {10, 20};
-const std::string search_mode = "parallel";
+const size_t result_k[num_recall] = {10};
+const size_t max_vectors[num_search_paras] = {1000, 2000, 4000, 6000, 8000, 10000, 12000, 13000, 15000, 16000, 18000, 20000};
+const size_t keep_space[layers * num_search_paras] = {10, 10, 10, 20, 10, 30, 20, 20, 20, 30, 20, 40, 20, 50, 20, 60, 20, 70, 20, 80, 20, 100, 20, 120};
+const size_t reranking_space[num_recall] = {10};
+const std::string search_mode = "non parallel";
 
 bool is_recording = true;
 
