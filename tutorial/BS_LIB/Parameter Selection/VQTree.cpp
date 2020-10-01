@@ -5,15 +5,16 @@
 #include <string>
 
 #include "../bslib_index.h"
-#include "../parameters/parameter_tuning/VQTree/VQTree_GIST1M.h"
+#include "../parameters/parameter_tuning/VQTree/VQTree_SIFT1M.h"
 
 
 using namespace bslib;
 
 int main(int argc, char * argv[]){
-    assert(argc == 3);
+    assert(argc == 4);
     size_t centroid1 = atoi(argv[1]);
     size_t centroid2 = atoi(argv[2]);
+    size_t build_times = atoi(argv[3]);
 
     size_t max_centroid_space = nb / 5000; // 1000000 / 2000 = 200 
     size_t min_centroid_space = nb / 20000; //1000000 / 10000 = 50
@@ -27,7 +28,12 @@ int main(int argc, char * argv[]){
     PrepareFolder((char *) folder_model.c_str());
     PrepareFolder((char *) (std::string(folder_model)+"/" + dataset).c_str());
     path_record += "parameter_tuning_VQTree" + std::to_string(M_PQ) + ".txt";
-    record_file.open(path_record, std::ios::app);
+    if (build_times == 0){
+        record_file.open(path_record, std::ios::binary);
+    }
+    else{
+        record_file.open(path_record, std::ios::app);
+    }
 
     /*
     std::vector<std::vector<idx_t>> best_recall_index_1(num_recall);
@@ -192,7 +198,6 @@ int main(int argc, char * argv[]){
             }
 
 
-        index.max_visited_vectors = nb;
         for (size_t i = 0; i < num_recall; i++){
             size_t recall_k = result_k[i];
             std::vector<float> query_distances(nq * recall_k);
@@ -217,6 +222,7 @@ int main(int argc, char * argv[]){
                 std::vector<size_t> search_space(2);
                 search_space[0] = search_space1;
                 search_space[1] = search_space2;
+                index.max_visited_vectors = nb / index.final_group_num * (search_space1 * search_space2 * 1.5);
                 size_t correct = 0;
                 std::cout << search_space1 << " " << search_space2 << " ";
                 Trecorder.reset();

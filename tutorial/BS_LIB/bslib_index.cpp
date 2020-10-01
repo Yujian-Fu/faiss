@@ -179,7 +179,7 @@ namespace bslib{
             std::vector<float> origin_train_set(total_train_size * dimension);
             std::ifstream learn_input(path_learn, std::ios::binary);
             std::cout << "Read train input from " << path_learn << std::endl;
-            readXvecFvec<learn_data_type>(learn_input, origin_train_set.data(), dimension, total_train_size, true);
+            readXvecFvec<learn_data_type>(learn_input, origin_train_set.data(), dimension, total_train_size, false);
             if (use_OPQ){
                 do_OPQ(total_train_size, origin_train_set.data());
             }
@@ -242,7 +242,7 @@ namespace bslib{
 
         if (total_size == train_set_size){
             std::ifstream learn_input(path_learn, std::ios::binary);
-            readXvecFvec<learn_data_type>(learn_input, this->train_data.data(), dimension, train_set_size, true, false);
+            readXvecFvec<learn_data_type>(learn_input, this->train_data.data(), dimension, train_set_size, false, false);
         }
         else if (use_train_selector){
             assert(this->train_set_ids.size() > 0);
@@ -265,7 +265,7 @@ namespace bslib{
         else{
             std::ifstream learn_input(path_learn, std::ios::binary);
             std::vector<float> sum_train_data (total_size * dimension, 0);
-            readXvecFvec<learn_data_type>(learn_input, sum_train_data.data(), dimension, total_size, true, false);
+            readXvecFvec<learn_data_type>(learn_input, sum_train_data.data(), dimension, total_size, false, false);
             std::cout << "Reading subset without selector" << std::endl;
             RandomSubset(sum_train_data.data(), this->train_data.data(), dimension, total_size, train_set_size);
             
@@ -624,6 +624,8 @@ namespace bslib{
      * 
      **/
     void Bslib_Index::assign(const size_t n, const float * assign_data, idx_t * assigned_ids){
+
+        /*
         if (index_type[layers - 1] == "VQ"){
             size_t n_vq = vq_quantizer_index.size();
             vq_quantizer_index[n_vq - 1].search_all(n, 1, assign_data, assigned_ids);
@@ -635,6 +637,73 @@ namespace bslib{
         else if(index_type[layers - 1] == "PQ"){
             size_t n_pq = pq_quantizer_index.size();
             pq_quantizer_index[n_pq - 1].search_all(n, assign_data, assigned_ids);
+        }*/
+
+
+#pragma omp parallel for
+        for (size_t i = 0; i < n; i++){
+            size_t n_vq = 0, n_lq = 0, n_pq = 0; 
+            std::vector<idx_t> query_search_id(1 , 0);
+            std::vector<idx_t> query_result_ids;
+            std::vector<float> query_result_dists;
+
+            for (size_t j = 0; j < layers; j++){
+                assert(n_vq+ n_lq + n_pq == j);
+
+                if (index_type[j] == "VQ"){
+
+                    size_t group_size = vq_quantizer_index[n_vq].nc_per_group;
+                    query_result_dists.resize(group_size, 0);
+                    query_result_ids.resize(group_size, 0);
+                    
+                    const float * target_data = assign_data + i * dimension;
+                    vq_quantizer_index[n_vq].search_in_group(target_data, query_search_id[0], query_result_dists.data(), query_result_ids.data(), 1);
+                    if (use_HNSW_VQ){
+                        query_search_id[j] = query_result_ids[0];
+                    }
+                    else{
+                        std::vector<float> sub_dist(1);
+                        keep_k_min(group_size, 1, query_result_dists.data(), query_result_ids.data(), sub_dist.data(), query_search_id.data()); 
+                    }
+                    n_vq ++;
+                }
+
+                else if(index_type[j] == "LQ") {
+
+                    size_t group_size = lq_quantizer_index[n_lq].nc_per_group;
+                    // Copy the upper search result for LQ layer 
+                    size_t upper_group_size = query_result_ids.size();
+                    
+                    std::vector<idx_t> upper_result_ids(upper_group_size, 0);
+                    std::vector<float> upper_result_dists(upper_group_size, 0);
+                    memcpy(upper_result_ids.data(), query_result_ids.data(), upper_group_size * sizeof(idx_t));
+                    memcpy(upper_result_dists.data(), query_result_dists.data(), upper_group_size * sizeof(float));
+                    query_result_ids.resize(group_size, 0);
+                    query_result_dists.resize(group_size, 0);
+
+                    const float * target_data = assign_data + i * dimension;
+                    lq_quantizer_index[n_lq].search_in_group(target_data, upper_result_ids.data(), upper_result_dists.data(), 1, query_search_id[0], query_result_dists.data(), query_result_ids.data());
+                    std::vector<float> sub_dist(1);
+                    keep_k_min(group_size, 1, query_result_dists.data(), query_result_ids.data(), sub_dist.data(), query_search_id.data());
+                    n_lq ++;
+                }
+
+                else if(index_type[j] == "PQ"){
+                    assert(j == this->layers-1);
+                    const float * target_data = assign_data + i * dimension;
+                    query_result_dists.resize(1);
+                    query_result_ids.resize(1);
+
+                    pq_quantizer_index[n_pq].search_in_group(target_data, query_search_id[0], query_result_dists.data(), query_result_ids.data(), 1);
+                    query_search_id[0] = query_result_ids[0];
+                    n_pq ++;
+                }
+                else{
+                    std::cout << "The type name is wrong with " << index_type[j] << "!" << std::endl;
+                    exit(0);
+                }
+            }
+            assigned_ids[i] = query_search_id[0];
         }
     }
 

@@ -11,6 +11,6 @@ test: $(TEST)
 	$(CXX) $(CXXFLAGS) $(CPPFLAGS) -o $@ $^ $(LDFLAGS) -I../../../.. $(LIBS)
 
 clean:
-	rm -f $(CPU_TARGETS) $(GPU_TARGETS)
+	rm -f $(TEST)
 
-.PHONY: all cpu default gpu clean
+.PHONY: all TEST file clean

@@ -3,8 +3,9 @@
 
 for i in {4..8..1}
 do
-    #./IMI $i
-    echo $i 
+    count=0
+    ./IMI $i $count
+    count++
 done
 
 echo "Finished IMI experiments"

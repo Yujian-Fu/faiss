@@ -5,14 +5,16 @@
 #include <string>
 
 #include "../bslib_index.h"
-#include "../parameters/parameter_tuning/IVFADC/IVFADC_DEEP1M.h"
+#include "../parameters/parameter_tuning/IVFADC/IVFADC_SIFT1M.h"
 
 using namespace bslib;
 
 int main(int argc, char * argv[]){
-    assert(argc == 3);
+    assert(argc == 4);
     size_t centroid1 = atoi(argv[1]);
     size_t centroid2 = atoi(argv[2]);
+    size_t build_times = atoi(argv[3]);
+    std::cout << "Building index for centroids: " << centroid1 << " " << centroid2 << std::endl;
 
     size_t VQ_max_centroid_space = nb / 500; // 1000000 / 500 =  2000
     size_t VQ_min_centroid_space = nb / 10000; //1000000 / 20000 = 100
@@ -26,7 +28,12 @@ int main(int argc, char * argv[]){
     PrepareFolder((char *) folder_model.c_str());
     PrepareFolder((char *) (std::string(folder_model)+"/" + dataset).c_str());
     path_record += "parameter_tuning_" + std::to_string(M_PQ) + ".txt";
-    record_file.open(path_record, std::ios::app);
+    if (build_times == 0){
+        record_file.open(path_record, std::ios::binary);
+    }
+    else{
+        record_file.open(path_record, std::ios::app);
+    }
 
     /*
     std::vector<std::vector<idx_t>> best_recall_index_1(num_recall);
@@ -133,7 +140,7 @@ int main(int argc, char * argv[]){
                 base_input.close();
             }
 
-            message = "Assigned the index ";
+            message = "[Assigned the index ] ";
             Trecorder.print_time_usage(message);
 
             for (size_t i = 0; i < nbatches; i++){
@@ -191,8 +198,6 @@ int main(int argc, char * argv[]){
                 readXvecFvec<base_data_type>(query_input, queries.data(), dimension, nq, false, false);
             }
 
-
-        index.max_visited_vectors = nb;
         for (size_t i = 0; i < num_recall; i++){
             size_t recall_k = result_k[i];
             std::vector<float> query_distances(nq * recall_k);
@@ -213,8 +218,9 @@ int main(int argc, char * argv[]){
             size_t search_space1 = c1_start;
             size_t search_space2 = c2_start;
 
-            std::cout << "Searching with parameters: " << c1_start << " " << c1_end << " " << search_space1 << " " << c2_start << " " << c2_end << " " << search_space2 << std::endl;
+            //std::cout << "Searching with parameters: " << c1_start << " " << c1_end << " " << search_space1 << " " << c2_start << " " << c2_end << " " << search_space2 << std::endl;
             while(search_space1 < c1_end){
+                index.max_visited_vectors = nb / index.final_group_num * (search_space1 * search_space2 * 1.5);
                 std::vector<size_t> search_space(2);
                 search_space[0] = search_space1;
                 search_space[1] = search_space2;
@@ -240,7 +246,7 @@ int main(int argc, char * argv[]){
 
                 record_file << search_space1 << " " << search_space2 << " " << recall << " " << qps << std::endl;
                 std::cout << search_space1 << " " << search_space2 << " " << recall << " " << qps << std::endl;
-                std::cout << c1_previous_recall << " " << c1_second_previous_recall << " " << c2_previous_recall << " " << c2_second_previous_recall << std::endl;
+                //std::cout << c1_previous_recall << " " << c1_second_previous_recall << " " << c2_previous_recall << " " << c2_second_previous_recall << std::endl;
                 if (recall <= c2_previous_recall && recall <= c2_second_previous_recall){
                     if (recall <= c1_previous_recall && recall <= c1_second_previous_recall){
                         break;

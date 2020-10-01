@@ -5,13 +5,14 @@
 #include <string>
 
 #include "../bslib_index.h"
-#include "../parameters/parameter_tuning/IMI/IMI_DEEP1M.h"
+#include "../parameters/parameter_tuning/IMI/IMI_SIFT1M.h"
 
 using namespace bslib;
 
 int main(int argc, char * argv[]){
-    assert(argc == 2);
+    assert(argc == 3);
     size_t test_nbits = atoi(argv[1]);
+    size_t build_times = atoi(argv[2]);
 
     size_t max_nbits = 8;
     size_t min_nbits = 4;
@@ -25,7 +26,12 @@ int main(int argc, char * argv[]){
     //For recording 
     std::ofstream record_file;
     path_record += "parameter_tuning_IMI" + std::to_string(M_PQ) + ".txt";
-    record_file.open(path_record, std::ios::app);
+    if (build_times == 0){
+        record_file.open(path_record, std::ios::binary);
+    }
+    else{
+        record_file.open(path_record, std::ios::app);
+    }
 
     /*
     std::vector<std::vector<idx_t>> best_recall_index(num_recall);

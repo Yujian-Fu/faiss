@@ -119,7 +119,7 @@ namespace bslib{
         for (size_t i = 0; i < nc_upper; i++){
             faiss::ProductQuantizer * product_quantizer = new faiss::ProductQuantizer(dimension, M, nbits);
             size_t nt_sub = train_set[i].size() / this->dimension;
-            product_quantizer->verbose = true;
+            product_quantizer->verbose = false;
             product_quantizer->train(nt_sub, train_set[i].data());
             this->PQs[i] = product_quantizer;
         }

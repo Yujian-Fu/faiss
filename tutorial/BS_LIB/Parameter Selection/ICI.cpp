@@ -5,14 +5,15 @@
 #include <string>
 
 #include "../bslib_index.h"
-#include "../parameters/parameter_tuning/ICI/ICI_DEEP1M.h"
+#include "../parameters/parameter_tuning/ICI/ICI_SIFT1M.h"
 
 using namespace bslib;
 
 int main(int argc, char * argv[]){
-    assert(argc == 3);
+    assert(argc == 4);
     size_t centroid1 = atoi(argv[1]);
     size_t cons_nbits = atoi(argv[2]);
+    size_t build_times = atoi(argv[3]);
 
 
     size_t max_centroid_space = 64; // 1000000 / 5000 = 200 
@@ -30,7 +31,13 @@ int main(int argc, char * argv[]){
     PrepareFolder((char *) folder_model.c_str());
     PrepareFolder((char *) (std::string(folder_model)+"/" + dataset).c_str());
     path_record += "parameter_tuning_ICI" + std::to_string(M_PQ) + ".txt";
-    record_file.open(path_record, std::ios::app);
+    if (build_times == 0){
+        record_file.open(path_record, std::ios::binary);
+    }
+    else{
+        record_file.open(path_record, std::ios::app);
+    }
+    
 
     /*
     std::vector<std::vector<idx_t>> best_recall_index_1(num_recall);
@@ -198,7 +205,6 @@ int main(int argc, char * argv[]){
             }
 
 
-        index.max_visited_vectors = nb;
         for (size_t i = 0; i < num_recall; i++){
             size_t recall_k = result_k[i];
             std::vector<float> query_distances(nq * recall_k);
@@ -228,6 +234,7 @@ int main(int argc, char * argv[]){
                 std::vector<size_t> search_space(2);
                 search_space[0] = search_space1;
                 search_space[1] = search_space2;
+                index.max_visited_vectors = nb / index.final_group_num * (search_space[0] * search_space[1] * 1.5);
                 size_t correct = 0;
                 std::cout << search_space1 << " " << search_space2 << " ";
                 Trecorder.reset();
@@ -249,7 +256,7 @@ int main(int argc, char * argv[]){
                 float recall = float(correct) / (recall_k * nq);
 
                 record_file << search_space1 << " " << search_space2 << " " << recall << " " << qps << std::endl;
-                std::cout << recall << " " << qps << std::endl;
+                std::cout << "The Recall and QPS " << recall << " " << qps << std::endl;
                 if (recall <= c2_previous_recall && recall <= c2_second_previous_recall){
                     if (recall <= c1_previous_recall && recall <= c1_second_previous_recall){
                         break;

@@ -1,11 +1,13 @@
 #！/bin/bash
 #This is for running inverted index from 200 to 5000
-
+count=0
 for i in {4..64..2}
 do
+    
     for j in {4..8..1}
     do
-        ./inverted_index $i $j
+        ./ICI $i $j $count
+        count++
     done
 done
 

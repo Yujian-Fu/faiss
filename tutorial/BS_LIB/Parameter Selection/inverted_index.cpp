@@ -5,27 +5,34 @@
 #include <string>
 
 #include "../bslib_index.h"
-#include "../parameters/parameter_tuning/inverted_index/Inverted_Index_DEEP1M.h"
+#include "../parameters/parameter_tuning/inverted_index/Inverted_Index_SIFT1M.h"
 
 
 using namespace bslib;
 
 int main(int argc,char *argv[]){
-    assert(argc == 2);
+    assert(argc == 3);
+
     size_t centroid = atoi(argv[1]);
+    size_t build_times = atoi(argv[2]);
     std::cout <<"The input centroid is: " << centroid << std::endl;
 
     //Keep it to record the search space
-    size_t max_centroid_space = nb / 100; //1000000 / 100 = 10000
-    size_t min_centroid_space = nb / 2000; // 1000000 / 2000 = 500
-    size_t step_size = nb / 10000;
+    //size_t max_centroid_space = nb / 100; //1000000 / 100 = 10000
+    //size_t min_centroid_space = nb / 2000; // 1000000 / 2000 = 500
+    //size_t step_size = nb / 10000;
 
     std::string message;
     std::ofstream record_file;
     PrepareFolder((char *) folder_model.c_str());
     PrepareFolder((char *) (std::string(folder_model)+"/" + dataset).c_str());
     path_record += "parameter_tuning_inverter_index_" + std::to_string(M_PQ) + ".txt";
-    record_file.open(path_record, std::ios::app);
+    if (build_times == 0){
+        record_file.open(path_record, std::ios::binary);
+    }
+    else{
+        record_file.open(path_record, std::ios::app);
+    }
 
     /*
     std::vector<std::vector<idx_t>> best_recall_index(num_recall);
@@ -215,9 +222,11 @@ int main(int argc,char *argv[]){
                 }
                 float recall = float(correct) / (recall_k * nq);
 
-                record_file << j << " " << recall << " " << qps << std::endl;
+                record_file << search_space[0] << " " << recall << " " << qps << std::endl;
+                
+                std::cout << " The Recall and QPS: " << search_space[0] << " " << recall << " " << qps << std::endl;
+                
                 /*
-                std::cout << " The Recall and QPS: " << j << " " << recall << " " << qps << std::endl;
                 if (qps < best_recall_time[i][size_t(recall*1000)]){
                     best_recall_time[i][size_t(recall*1000)] = qps;
                     best_recall_index[i][size_t(recall*1000)] = j;
