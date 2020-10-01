@@ -41,7 +41,7 @@ const size_t selector_group_size = 10000;
 
 const size_t PQ_train_size = 1000000;
 
-const size_t num_train[layers] = {1000000};
+const size_t num_train[layers] = {10000000, 10000000};
 size_t nb = 1000000000;
 const uint32_t batch_size = 1000000;
 const size_t nbatches = nb / batch_size; //100
