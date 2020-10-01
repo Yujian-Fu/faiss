@@ -8,8 +8,8 @@
 const size_t layers = 2;
 const size_t VQ_layers = 1;
 const size_t PQ_layers = 1;
-const std::string index_type[layers] = {"VQ", "PQ"};
-const uint32_t ncentroids[layers] = {1000};
+const std::string index_type[layers] = {"VQ", "VQ"};
+const uint32_t ncentroids[layers] = {1000, 1000};
 
 const bool use_reranking = false;
 const bool use_HNSW_VQ = true;
@@ -41,9 +41,9 @@ const size_t selector_group_size = 10000;
 
 const size_t PQ_train_size = 1000000;
 
-const size_t num_train[layers] = {10000000, 10000000};
+const size_t num_train[layers] = {1000000, 100000000};
 size_t nb = 1000000000;
-const uint32_t batch_size = 1000000;
+const uint32_t batch_size = 100000;
 const size_t nbatches = nb / batch_size; //100
 
 //For searching
