@@ -322,7 +322,7 @@ namespace bslib{
             if (nc_per_group > this->max_group_size){this->max_group_size = nc_per_group;}
 
             if (index_type[i] == "VQ"){
-                
+
                 std::cout << "Adding VQ quantizer with parameters: " << nc_upper << " " << nc_per_group << std::endl;
                 if (use_HNSW_VQ){
                     size_t existed_VQ_layers = this->vq_quantizer_index.size();
@@ -386,7 +386,8 @@ namespace bslib{
             }
             nc_upper  = nc_upper * nc_per_group;
         }
-        write_quantizers(path_quantizer);
+        if(save_index)
+            write_quantizers(path_quantizer);
         }
     }
 
@@ -422,10 +423,13 @@ namespace bslib{
         encode(train_set_size, this->train_data.data(), train_data_ids.data(), residuals.data());
 
         std::cout << "Training the pq " << std::endl;
-        this->pq.verbose = true;
+        this->pq.verbose = false;
         this->pq.train(train_set_size, residuals.data());
-        std::cout << "Writing PQ codebook to " << path_pq << std::endl;
-        faiss::write_ProductQuantizer(& this->pq, path_pq.c_str());
+
+        if(save_index){
+            std::cout << "Writing PQ codebook to " << path_pq << std::endl;
+            faiss::write_ProductQuantizer(& this->pq, path_pq.c_str());           
+        }
     }
     
     /**
@@ -759,7 +763,7 @@ namespace bslib{
         // Notice: they should only be activated when parallel is not used
         const bool validation = false; 
         size_t validation_print_space = 50;
-        const bool analysis = true; 
+        const bool analysis = false; 
         const bool showmessage = false; 
 
         std::vector<float>  visited_gt_proportion;
@@ -884,6 +888,7 @@ namespace bslib{
                 if (analysis){time_consumption[i][j] = Trecorder.getTimeConsumption(); Trecorder.reset();}
             }
 
+            if (showmessage) std::cout << "Finished search in index centroids, show the results" << std::endl;
             assert((n_vq + n_lq + n_pq) == this->layers);
             
             std::vector<float> precomputed_table(pq.M * pq.ksub);
@@ -901,12 +906,14 @@ namespace bslib{
 
             size_t max_size = 0;for (size_t j = 0; j < final_keep_space; j++){if (base_sequence_ids[query_group_ids[j]].size() > max_size) max_size = base_sequence_ids[query_group_ids[j]].size();}
             
+            if(showmessage) std::cout << "Assigning the space for dists and labels with size " << max_visited_vectors << " + " << max_size <<  std::endl;
             std::vector<float> query_search_dists(max_visited_vectors + max_size, 0);std::vector<idx_t> query_search_labels(max_visited_vectors + max_size, 0);
             
             // The dists for actual distance validation
             std::vector<float> query_actual_dists; if (validation){(query_actual_dists.resize(max_visited_vectors + max_size));}
 
             size_t j = 0;
+            if (showmessage) std::cout << "Searching the base vectors " << std::endl;
             for (j = 0; j < final_keep_space; j++){
 
                 std::pair<idx_t, float> result_idx_dist;
@@ -968,7 +975,7 @@ namespace bslib{
                         decode(1, decoded_code.data(), & group_id, decoded_base_vector.data());
                         float actual_norm = faiss::fvec_norm_L2sqr(decoded_base_vector.data(), dimension);
                         query_actual_dists[visited_vectors] = actual_dist;
-                        std::cout << "S: " << dist << " A: " << actual_dist << " LN: " << term2 << " AN: " << actual_norm << " "; // S for "Search" and A for "Actual"
+                        std::cout << "S: " << dist << " A: " << actual_dist << " LN: " << term2 << " AN: " << actual_norm << " " << " Term1: " << q_c_dist << " " << centroid_norm << " Term3: " << term3; // S for "Search" and A for "Actual"
                     }
 
                     query_search_labels[visited_vectors] = base_sequence_ids[group_id][m];

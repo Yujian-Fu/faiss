@@ -5,7 +5,7 @@
 #include <string>
 
 #include "bslib_index.h"
-#include "./parameters/parameters_PQ.h"
+#include "./parameters/parameters_million/parameters_millions_VQ_LQ.h"
 
 using namespace bslib;
 
@@ -273,16 +273,25 @@ int main(){
         std::cout << "The base id distribution in all groups is " << std::endl;
         int empty_clusters = 0;
         float average_number = 0;
+        float total_number = 0;
         for (size_t i = 0; i < index.base_sequence_ids.size(); i++){
-            average_number += index.base_sequence_ids[i].size();
+            total_number += index.base_sequence_ids[i].size();
         }
-        average_number /= index.base_sequence_ids.size();
+        average_number = total_number / index.base_sequence_ids.size();
 
         float std = 0;
+        float smaller_10 = 0;
+        float smaller_1 = 0;
         for (size_t i = 0; i < index.base_sequence_ids.size(); i++){
-            std::cout << index.base_sequence_ids[i].size() << " ";
+            //std::cout << index.base_sequence_ids[i].size() << " ";
             if (index.base_sequence_ids[i].size() == 0){
                 empty_clusters ++;
+            }
+            if (index.base_sequence_ids[i].size() < 0.1 * average_number){
+                smaller_10 += 1;
+            }
+            if (index.base_sequence_ids[i].size() < 0.01 * average_number){
+                smaller_1 += 1;
             }
             float subtraction = index.base_sequence_ids[i].size() - average_number;
             std += subtraction * subtraction;
@@ -292,6 +301,9 @@ int main(){
         std::cout << std::endl << "The total number of empty clusters is: " << empty_clusters <<  std::endl;
         std::cout << "The aaverage number of data point in each cluster is: " << average_number << std::endl;
         std::cout << "The std of the data points distribution is: " << std << std::endl;
+        std::cout << "The skewness is: " << sqrt(std) / average_number << std::endl;
+        std::cout << "The 10 percent is: " << smaller_10 / index.base_sequence_ids.size() << std::endl;
+        std::cout << "The 1 percent is: " << smaller_1 / index.base_sequence_ids.size() << std::endl;
 
 
     PrintMessage("Loading groundtruth");

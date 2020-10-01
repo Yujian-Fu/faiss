@@ -51,8 +51,8 @@ namespace bslib{
         }
 
         std::cout << "Building group quantizers for vq_quantizer " << std::endl;
-        size_t min_train_size = train_set[0].size() / 128; 
-        for (size_t i = 0; i < nc_upper; i++){if (min_train_size > train_set[i].size() / 128) min_train_size = train_set[i].size() / 128; std::cout << train_set[i].size() / 128 << " ";}
+        size_t min_train_size = train_set[0].size() / dimension; 
+        for (size_t i = 0; i < nc_upper; i++){if (min_train_size > train_set[i].size() / dimension) min_train_size = train_set[i].size() / dimension;}
 
         std::cout <<  std::endl << "The min size for sub train set is: " << min_train_size << std::endl;
 
@@ -60,7 +60,7 @@ namespace bslib{
         for (size_t i = 0; i < nc_upper; i++){
             std::vector<float> centroids(dimension * nc_per_group);
             size_t nt_sub = train_set[i].size() / this->dimension;
-            std::cout << "Clustering " << nt_sub << " train vectors into " << nc_per_group << " groups " << std::endl;
+            //std::cout << "Clustering " << nt_sub << " train vectors into " << nc_per_group << " groups " << std::endl;
             faiss::kmeans_clustering(dimension, nt_sub, nc_per_group, train_set[i].data(), centroids.data(), 40);
 
             //Adding centroids into quantizers

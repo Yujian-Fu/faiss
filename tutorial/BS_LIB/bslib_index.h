@@ -11,8 +11,8 @@
 namespace bslib{
 
 // Change this type for different datasets
-typedef uint8_t learn_data_type;
-typedef uint8_t base_data_type;
+typedef float learn_data_type;
+typedef float base_data_type;
 
 typedef faiss::Index::idx_t idx_t;
 typedef std::pair<std::pair<size_t, size_t>, size_t> HNSW_para;
@@ -30,6 +30,7 @@ struct Bslib_Index{
     bool use_OPQ;
     bool use_norm_quantization;
     bool use_train_selector;
+    bool save_index;
     size_t reranking_space;
 
     size_t M; // Initialized by training pq

@@ -44,7 +44,7 @@ namespace bslib{
         void record_memory_usage(std::ofstream & output_record, std::string s){
             rusage r_usage;
             getrusage(RUSAGE_SELF, &r_usage);
-            output_record << s << " The memory usage: " <<  r_usage.ru_ixrss << " / " << r_usage.ru_isrss << " / " << r_usage.ru_idrss << " / " << r_usage.ru_maxrss << std::endl;
+            output_record << s << " The memory usage: " <<  r_usage.ru_ixrss << " KB / " << r_usage.ru_isrss << " KB / " << r_usage.ru_idrss << " KB / " << r_usage.ru_maxrss <<  " KB " << std::endl;
         }
 
         void print_memory_usage(std::string s){
