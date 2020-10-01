@@ -2,7 +2,7 @@
 #---------------
 #Run all other files
 #---------------
-echo 'Running all scripts for DEEP1M dataset with 32 bytes'
+echo 'Running all scripts for SIFT1M dataset with 8 bytes'
 
 echo 'Running Inverted Index'
 source inverted_index.sh
