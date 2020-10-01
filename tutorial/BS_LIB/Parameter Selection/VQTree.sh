@@ -6,7 +6,7 @@ do
     for j in {50..200..20}
     do
         ./VQTree $i $j $count
-        count++
+        count+=1
     done
 done
 

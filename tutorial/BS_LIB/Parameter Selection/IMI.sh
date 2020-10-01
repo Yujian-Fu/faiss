@@ -5,7 +5,7 @@ for i in {4..8..1}
 do
     count=0
     ./IMI $i $count
-    count++
+    count+=1
 done
 
 echo "Finished IMI experiments"
