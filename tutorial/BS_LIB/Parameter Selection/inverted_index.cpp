@@ -28,7 +28,7 @@ int main(int argc,char *argv[]){
     PrepareFolder((char *) (std::string(folder_model)+"/" + dataset).c_str());
     path_record += "parameter_tuning_inverter_index_" + std::to_string(M_PQ) + ".txt";
     if (build_times == 0){
-        record_file.open(path_record, std::ios::binary);
+        record_file.open(path_record, std::ios::trunc);
     }
     else{
         record_file.open(path_record, std::ios::app);
