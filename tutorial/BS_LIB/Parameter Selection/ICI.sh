@@ -7,7 +7,7 @@ do
     for j in {4..8..1}
     do
         ./ICI $i $j $count
-        count+=1
+        let count=$count+1
     done
 done
 

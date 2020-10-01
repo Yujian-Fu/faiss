@@ -10,7 +10,7 @@ do
     for ((second_centroid=$min_second_centroid; second_centroid<=$max_second_centroid; second_centroid+=$min_second_centroid))
     do
         ./IVFADC $first_centroid $second_centroid $count
-        count+=1
+        let count=$count+1
     done
 done
 

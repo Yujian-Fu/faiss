@@ -5,7 +5,7 @@ for i in {200..5000..100}
 do
     count=0
     ./inverted_index $i $count
-    count+=1
+    let count=$count+1
 done
 
 echo "Finished inverted index experiments"
