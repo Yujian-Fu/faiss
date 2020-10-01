@@ -16,9 +16,9 @@ int main(int argc, char * argv[]){
     size_t build_times = atoi(argv[3]);
     std::cout << "Building index for centroids: " << centroid1 << " " << centroid2 << std::endl;
 
-    size_t VQ_max_centroid_space = nb / 500; // 1000000 / 500 =  2000
-    size_t VQ_min_centroid_space = nb / 10000; //1000000 / 20000 = 100
-    size_t step_size = nb / 10000; // 1000000 / 10000 = 100
+    //size_t VQ_max_centroid_space = nb / 500; // 1000000 / 500 =  2000
+    //size_t VQ_min_centroid_space = nb / 10000; //1000000 / 20000 = 100
+    //size_t step_size = nb / 10000; // 1000000 / 10000 = 100
     // Keep the total centroids from 1000 to 10000
     // 100 - 500
     // 100 - 500

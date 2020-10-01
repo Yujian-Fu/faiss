@@ -16,12 +16,12 @@ int main(int argc, char * argv[]){
     size_t build_times = atoi(argv[3]);
 
 
-    size_t max_centroid_space = 64; // 1000000 / 5000 = 200 
-    size_t min_centroid_space = 4; //1000000 / 20000 = 50
-    size_t step_size = 2; // 1000000 / 20000 = 50
-    size_t max_nbits = 8;
-    size_t min_nbits = 4;
-    size_t step_nbits = 1;
+    //size_t max_centroid_space = 64; // 1000000 / 5000 = 200 
+    //size_t min_centroid_space = 4; //1000000 / 20000 = 50
+    //size_t step_size = 2; // 1000000 / 20000 = 50
+    //size_t max_nbits = 8;
+    //size_t min_nbits = 4;
+    //size_t step_nbits = 1;
     // Keep the total centroids from 1000 to 10000
     // 100 - 500
     // 100 - 500

@@ -16,9 +16,9 @@ int main(int argc, char * argv[]){
     size_t centroid2 = atoi(argv[2]);
     size_t build_times = atoi(argv[3]);
 
-    size_t max_centroid_space = nb / 5000; // 1000000 / 2000 = 200 
-    size_t min_centroid_space = nb / 20000; //1000000 / 10000 = 50
-    size_t step_size = nb / 20000; // 1000000 / 20000 = 50
+    //size_t max_centroid_space = nb / 5000; // 1000000 / 2000 = 200 
+    //size_t min_centroid_space = nb / 20000; //1000000 / 10000 = 50
+    //size_t step_size = nb / 20000; // 1000000 / 20000 = 50
     // Keep the total centroids from 1000 to 10000
     // 100 - 500
     // 100 - 500

@@ -14,9 +14,9 @@ int main(int argc, char * argv[]){
     size_t test_nbits = atoi(argv[1]);
     size_t build_times = atoi(argv[2]);
 
-    size_t max_nbits = 8;
-    size_t min_nbits = 4;
-    size_t step = 1;
+    //size_t max_nbits = 8;
+    //size_t min_nbits = 4;
+    //size_t step = 1;
 
 
 /*Prepare the work space*/
