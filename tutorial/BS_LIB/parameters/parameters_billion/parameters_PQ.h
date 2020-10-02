@@ -85,8 +85,8 @@ const std::string dataset = "SIFT1B";
 const std::string folder_model = base_path + model;
 
 //File paths
-const std::string path_learn =     data_path + dataset + "/" + dataset +"_learn.fvecs";
-const std::string path_base =      data_path + dataset + "/" + dataset +"_base.fvecs";
+const std::string path_learn =     data_path + dataset + "/bigann_learn.bvecs";
+const std::string path_base =      data_path + dataset + "/bigann_base.bvecs";
 const std::string path_gt =        data_path + dataset + "/" + dataset +"_groundtruth.ivecs";
 const std::string path_query =     data_path + dataset + "/" + dataset +"_query.fvecs";
 
