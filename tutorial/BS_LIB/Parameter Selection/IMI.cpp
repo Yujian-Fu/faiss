@@ -219,7 +219,7 @@ int main(int argc, char * argv[]){
             }
 
             for (size_t j = 0; j < keep_space.size(); j++){
-                keep_space[j] = (j + 1) * search_step / 2;
+                keep_space[j] = (j + 1) * search_step / 2 + 1;
             }
 
             record_file << "The result for recall = " << recall_k << std::endl;

@@ -199,11 +199,12 @@ int main(int argc,char *argv[]){
             float second_previous_recall = 0;
             float third_previous_recall = 0;
             size_t step = size_t(centroid / 1000) + 2;
-            for (size_t j = 0; j < centroid; j += step){
+            size_t search_space_start = 5;
+            for (size_t j = search_space_start; j < centroid; j += step){
                 std::vector<size_t> search_space(1);
                 search_space[0] = j + 1;
                 size_t correct = 0;
-                index.max_visited_vectors = size_t(nb / index.final_group_num * ((j + 1) * 1.5));
+                index.max_visited_vectors = size_t(nb / index.final_group_num * (search_space[0] * 1.5));
                 Trecorder.reset();
                 index.search(nq, recall_k, queries.data(), query_distances.data(), query_labels.data(), search_space.data(), groundtruth.data(), path_base);
                 float qps = Trecorder.getTimeConsumption() / (nq * 1000);
