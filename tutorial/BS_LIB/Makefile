@@ -5,24 +5,16 @@
 
 -include ../../makefile.inc
 
-CPU_TARGETS = 1-Flat 2-IVFFlat 3-IVFPQ
-GPU_TARGETS = 4-GPU 5-Multiple-GPUs
+
 TEST = bslib
 
-default: cpu
-
-all: cpu gpu
-
-cpu: $(CPU_TARGETS)
-
-gpu: $(GPU_TARGETS)
 
 test: $(TEST)
 
-%: %.cpp ../../libfaiss.a
+%: %.cpp ./bslib_index.cpp ./VQ_quantizer.cpp ./LQ_quantizer.cpp ./PQ_quantizer.cpp ./quantizer.cpp ./utils/utils.h ./HNSWlib/hnswalg.cpp ../../libfaiss.a 
 	$(CXX) $(CXXFLAGS) $(CPPFLAGS) -o $@ $^ $(LDFLAGS) -I../../.. $(LIBS)
 
 clean:
-	rm -f $(CPU_TARGETS) $(GPU_TARGETS)
+	rm -f $(TEST)
 
-.PHONY: all cpu default gpu clean
+.PHONY: all file clean
