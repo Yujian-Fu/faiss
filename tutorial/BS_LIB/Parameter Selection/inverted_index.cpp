@@ -5,7 +5,7 @@
 #include <string>
 
 #include "../bslib_index.h"
-#include "../parameters/parameter_tuning/inverted_index/Inverted_Index_SIFT1M.h"
+#include "../parameters/parameter_tuning/inverted_index/Inverted_Index.h"
 
 
 using namespace bslib;

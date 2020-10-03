@@ -5,7 +5,7 @@
 #include <string>
 
 #include "../bslib_index.h"
-#include "../parameters/parameter_tuning/VQTree/VQTree_SIFT1M.h"
+#include "../parameters/parameter_tuning/VQTree/VQTree.h"
 
 
 using namespace bslib;

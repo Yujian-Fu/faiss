@@ -5,7 +5,7 @@
 #include <string>
 
 #include "../bslib_index.h"
-#include "../parameters/parameter_tuning/ICI/ICI_SIFT1M.h"
+#include "../parameters/parameter_tuning/ICI/ICI.h"
 
 using namespace bslib;
 

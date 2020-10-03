@@ -5,7 +5,7 @@
 #include <string>
 
 #include "../bslib_index.h"
-#include "../parameters/parameter_tuning/IVFADC/IVFADC_SIFT1M.h"
+#include "../parameters/parameter_tuning/IVFADC/IVFADC.h"
 
 using namespace bslib;
 
