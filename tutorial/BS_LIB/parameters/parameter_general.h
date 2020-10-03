@@ -12,7 +12,7 @@ const size_t M_norm_PQ = 1;
 const size_t nbits = 8; //Or 16
 size_t nb = 10000;
 const size_t train_size = 25000; //This is the size of train set
-const size_t PQ_train_size = 25000;
+const size_t PQ_train_size = train_size;
 
 const size_t OPQ_train_size = 10000;
 const size_t selector_train_size = 100000;

@@ -423,7 +423,7 @@ namespace bslib{
         encode(train_set_size, this->train_data.data(), train_data_ids.data(), residuals.data());
 
         std::cout << "Training the pq " << std::endl;
-        this->pq.verbose = false;
+        this->pq.verbose = true;
         this->pq.train(train_set_size, residuals.data());
 
         if(save_index){
