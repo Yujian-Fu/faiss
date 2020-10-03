@@ -85,7 +85,7 @@ namespace hnswlib {
 
         void getNeighborsByHeuristic(std::priority_queue<std::pair<float, idx_t>> &topResults, size_t NN);
 
-        void mutuallyConnectNewElement(const float *x, idx_t id, std::priority_queue<std::pair<float, idx_t>> topResults);
+        void mutuallyConnectNewElement(idx_t id, std::priority_queue<std::pair<float, idx_t>> topResults);
 
         void addPoint(const float *point);
 

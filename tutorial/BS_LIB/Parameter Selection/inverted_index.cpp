@@ -104,10 +104,13 @@ int main(int argc,char *argv[]){
             }
         }
         std::vector<PQ_para> PQ_paras;
-        for (size_t i = 0; i < PQ_layers; i++){
-            PQ_para new_para; new_para.first = M_PQ_layer[i]; new_para.second = nbits_PQ_layer[i];
-            PQ_paras.push_back(new_para);
+        if (PQ_layers > 0){
+            for (size_t i = 0; i < PQ_layers; i++){
+                PQ_para new_para; new_para.first = M_PQ_layer[i]; new_para.second = nbits_PQ_layer[i];
+                PQ_paras.push_back(new_para);
+            }
         }
+
 
         ncentroids[0] = centroid;
         index.build_quantizers(ncentroids, path_quantizers, path_learn, num_train, HNSW_paras, PQ_paras);

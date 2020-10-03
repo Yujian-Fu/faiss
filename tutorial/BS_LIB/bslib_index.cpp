@@ -430,6 +430,11 @@ namespace bslib{
             std::cout << "Writing PQ codebook to " << path_pq << std::endl;
             faiss::write_ProductQuantizer(& this->pq, path_pq.c_str());           
         }
+
+        if (use_norm_quantization){
+            std::cout << path_norm_pq << "not implmented now" << std::endl; 
+
+        }
     }
     
     /**
@@ -986,7 +991,8 @@ namespace bslib{
             for (j = 0; j < final_keep_space; j++){
 
                 std::pair<idx_t, float> result_idx_dist;
-                size_t id_position = get_next_group_idx(final_keep_space, query_group_ids.data(), query_group_dists.data(), result_idx_dist);
+                get_next_group_idx(final_keep_space, query_group_ids.data(), query_group_dists.data(), result_idx_dist);
+                
                 
                 idx_t group_id = result_idx_dist.first;
                 float q_c_dist = result_idx_dist.second;
