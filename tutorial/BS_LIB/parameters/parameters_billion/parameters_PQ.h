@@ -6,8 +6,8 @@
 //Exp parameters
 //For index initialization
 const size_t layers = 2;
-const size_t VQ_layers = 2;
-const size_t PQ_layers = 0;
+const size_t VQ_layers = 1;
+const size_t PQ_layers = 1;
 const std::string index_type[layers] = {"VQ", "VQ"};
 const uint32_t ncentroids[layers] = {1000, 1000};
 
@@ -32,8 +32,8 @@ const size_t M_HNSW[VQ_layers] = {};
 const size_t efConstruction [VQ_layers] = {};
 const size_t efSearch[VQ_layers] = {};
 
-const size_t M_PQ_layer[PQ_layers] = {};
-const size_t nbits_PQ_layer[PQ_layers] = {};
+const size_t M_PQ_layer[PQ_layers] = {2};
+const size_t nbits_PQ_layer[PQ_layers] = {8};
 
 const size_t OPQ_train_size = 1000000;
 const size_t selector_train_size = OPQ_train_size;
