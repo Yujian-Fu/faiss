@@ -5,8 +5,7 @@ for i in {4..128..4}
 do
     for j in {4..8..1}
     do
-        #./ICI $i $j $count
-
+        ./ICI $i $j $count
         let count=$count+1
     done
 done
