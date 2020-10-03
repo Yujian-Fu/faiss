@@ -2,6 +2,7 @@
 #This is for running IVFADC
 count=0
 for first_centroid in {100..2000..100}
+
 do
     let min_second_centroid=first_centroid/50
     let max_second_centroid=first_centroid/10
