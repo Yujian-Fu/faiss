@@ -211,7 +211,7 @@ int main(int argc, char * argv[]){
             std::vector<faiss::Index::idx_t> query_labels(nq * recall_k);
             size_t c1_start = 2;
             size_t c1_end = centroid1;
-            size_t search_step1 = 1;
+            size_t search_step1 = 4;
 
             size_t nbits_search_space = 1;
             for (size_t temp = 0; temp < cons_nbits * 2; temp++){

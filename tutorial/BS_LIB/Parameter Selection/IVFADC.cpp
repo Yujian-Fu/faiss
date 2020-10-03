@@ -207,7 +207,7 @@ int main(int argc, char * argv[]){
             size_t search_step1 = centroid1 / 25;
             size_t c2_start = centroid2 / 2;
             size_t c2_end = centroid2;
-            size_t search_step2 = 2;
+            size_t search_step2 =  centroid2 < 20? 2 : 4;
             record_file << "The result for recall = " << recall_k << std::endl;
 
             float c1_previous_recall = 0;
