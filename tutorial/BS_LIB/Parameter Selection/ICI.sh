@@ -3,7 +3,6 @@
 count=0
 for i in {4..64..2}
 do
-    
     for j in {4..8..1}
     do
         ./ICI $i $j $count

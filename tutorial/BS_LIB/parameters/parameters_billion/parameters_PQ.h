@@ -8,7 +8,7 @@
 const size_t layers = 2;
 const size_t VQ_layers = 1;
 const size_t PQ_layers = 1;
-const std::string index_type[layers] = {"VQ", "VQ"};
+const std::string index_type[layers] = {"VQ", "PQ"};
 const uint32_t ncentroids[layers] = {1000, 1000};
 
 const bool use_reranking = false;
@@ -16,7 +16,7 @@ const bool use_HNSW_VQ = true;
 const bool use_norm_quantization = false;
 const bool use_dynamic_reranking = false;
 const bool use_OPQ = false;
-const bool use_parallel_indexing = true;
+const bool use_parallel_indexing = false;
 const bool use_train_selector = false;
 
 //For train PQ
