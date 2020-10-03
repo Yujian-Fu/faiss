@@ -144,7 +144,7 @@ int main(){
             std::vector<idx_t> assigned_ids(batch_size);
 
             for (size_t i = 0; i < nbatches; i++){
-                readXvecFvec<base_data_type> (base_input, batch.data(), dimension, batch_size);
+                readXvecFvec<base_data_type> (base_input, batch.data(), dimension, batch_size, false, true);
                 if (use_OPQ) {index.do_OPQ(batch_size, batch.data());}
                 index.assign(batch_size, batch.data(), assigned_ids.data());
                 base_output.write((char * ) & batch_size, sizeof(uint32_t));
