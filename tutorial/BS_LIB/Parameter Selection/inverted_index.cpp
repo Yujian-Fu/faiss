@@ -150,6 +150,8 @@ int main(int argc,char *argv[]){
         readXvec<idx_t> (ids_input, ids.data(), batch_size, nbatches);
         std::vector<size_t> groups_size(index.final_group_num, 0); std::vector<size_t> group_position(nb, 0);
         for (size_t i = 0; i < nb; i++){group_position[i] = groups_size[ids[i]]; groups_size[ids[i]] ++;}
+        message = "Loaded the computed ids with final group num: " + std::to_string(index.final_group_num);
+        Trecorder.print_time_usage(message);
 
         index.base_codes.resize(index.final_group_num);
         index.base_sequence_ids.resize(index.final_group_num);
@@ -158,6 +160,7 @@ int main(int argc,char *argv[]){
             index.base_codes[i].resize(groups_size[i] * index.code_size);
             index.base_sequence_ids[i].resize(groups_size[i]);
         }
+
 
 #pragma omp parallel for
         for (size_t i = 0; i < nbatches; i++){
@@ -171,6 +174,7 @@ int main(int argc,char *argv[]){
             for (size_t j = 0; j < batch_size; j++){batch_sequence_ids[j] = batch_size * i + j;}
             index.add_batch(batch_size, base_batch.data(), batch_sequence_ids.data(), ids.data() + i * batch_size, group_position.data()+i * batch_size);
         }
+
         index.compute_centroid_norm();
         message = "Finished Construction: ";
         Trecorder.print_time_usage(message);
