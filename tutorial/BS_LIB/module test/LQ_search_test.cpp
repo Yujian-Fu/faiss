@@ -27,7 +27,6 @@ int main(){
     std::vector<float> base_set(dimension * nb);
     std::vector<float> train_set(dimension * train_size);
     
-
     std::ifstream learn_file(path_learn, std::ios::binary);
     std::ifstream base_file(path_base, std::ios::binary);
 

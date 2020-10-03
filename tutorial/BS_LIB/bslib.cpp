@@ -54,7 +54,7 @@ int main(){
             index.opq_matrix->verbose = true;
             std::ifstream learn_input(path_learn, std::ios::binary);
             std::vector<float>  origin_train_set(train_size * dimension);
-            readXvecFvec<learn_data_type>(learn_input, origin_train_set.data(), dimension, train_size, true);
+            readXvecFvec<learn_data_type>(learn_input, origin_train_set.data(), dimension, train_size, false);
             
             if (OPQ_train_size < train_size){
                 std::vector<float> OPQ_train_set(OPQ_train_size * dimension);
@@ -310,14 +310,14 @@ int main(){
     std::vector<uint32_t> groundtruth(nq * ngt);
     {
         std::ifstream gt_input(path_gt, std::ios::binary);
-        readXvec<uint32_t>(gt_input, groundtruth.data(), ngt, nq, true, false);
+        readXvec<uint32_t>(gt_input, groundtruth.data(), ngt, nq, false, false);
     }
 
     PrintMessage("Loading queries");
     std::vector<float> queries(nq * dimension);
     {
         std::ifstream query_input(path_query, std::ios::binary);
-        readXvecFvec<base_data_type>(query_input, queries.data(), dimension, nq, true, false);
+        readXvecFvec<base_data_type>(query_input, queries.data(), dimension, nq, false, false);
     }
 
     // Evaluating the search performance with various search performance settings
