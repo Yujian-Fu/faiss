@@ -1,7 +1,7 @@
 #！/bin/bash
 #This is for running IVFADC
 count=0
-for first_centroid in {100..2000..100}
+for first_centroid in {100..2000..200}
 
 #for first_centroid in {100..500..10}
 do
