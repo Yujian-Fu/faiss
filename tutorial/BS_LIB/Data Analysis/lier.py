@@ -38,7 +38,7 @@ plt.title("Performance Figure")
 plt.xlabel("Time / ms")
 plt.ylabel("Recall@10")
 plt.show()
-'''
+
 
 
 #16 10
@@ -95,12 +95,12 @@ ICI_time_32_1 = [0.49,    1.2504, 1.807, 2.0736, 3.587, 3.784, 4.45, 5.01, 6.88,
 ICI_recall_32_1 = [0.439, 0.499, 0.532, 0.545, 0.654, 0.661, 0.665, 0.689, 0.693, 0.6934, 0.693]
 
 
-plt.plot(time_8_1, recall_8_1, label = "8 bytes IVFADC")
-plt.plot(ICI_time_8_1, ICI_recall_8_1, label = "8 bytes ICI")
-plt.plot(time_16_1, recall_16_1, label = "16 bytes IVFADC")
-plt.plot(ICI_time_16_1, ICI_recall_16_1, label = "16 bytes ICI")
-plt.plot(time_32_1, recall_32_1, label = "32 bytes IVFADC")
-plt.plot(ICI_time_32_1, ICI_recall_32_1, label = "32 bytes ICI")
+plt.plot(time_8_10, recall_8_10, label = "8 bytes IVFADC")
+plt.plot(ICI_time_8_10, ICI_recall_8_10, label = "8 bytes ICI")
+plt.plot(time_16_10, recall_16_10, label = "16 bytes IVFADC")
+plt.plot(ICI_time_16_10, ICI_recall_16_10, label = "16 bytes ICI")
+plt.plot(time_32_10, recall_32_10, label = "32 bytes IVFADC")
+plt.plot(ICI_time_32_10, ICI_recall_32_10, label = "32 bytes ICI")
 plt.plot()
 plt.legend()
 plt.title("SIFT1B Dataset")
@@ -110,4 +110,45 @@ plt.show()
 
 
 
+x_1 = [2.7, 3.0, 3.5, 3.8, 4.0, 4.2, 4.5, 5.0, 5.2, 5.5]
+y_1 = [0.54, 0.56, 0.572, 0.577, 0.579, 0.582, 0.590, 0.592, 0.593, 0.593]
 
+x_2 = [2.7, 3.0, 3.2, 3.5, 3.7, 4.0, 4.5, 4.7, 4.9]
+y_2 = [0.56, 0.582, 0.587, 0.591, 0.595, 0.598, 0.603, 0.604, 0.605]
+
+x_3 = [2.7, 3.0, 3.5, 3.7, 4.0, 4.2, 4.5, 5.0]
+y_3 = [0.548, 0.568, 0.576, 0.585, 0.587, 0.590, 0.595, 0.5955]
+
+
+x_1 = [0.36, 0.38, 0.408, 0.422, 0.428, 0.43]
+y_1 = [3.5, 4.2, 5.17, 6.67, 7.619, 12.0]
+
+x_2 = [0.328, 0.37, 0.4, 0.41, 0.419, 0.424, 0.425, 0.43, 0.434, 0.435]
+y_2 = [0.46, 1.2, 1.49, 2.45, 4.33, 5.5, 6.0, 7.7, 11.06, 12.5 ]
+
+x_3 = [0.326, 0.353, 0.377, 0.398, 0.402, 0.413, 0.418, 0.423, 0.427, 0.433, 0.442, 0.449, 0.45, 0.452, 0.456, 0.458, 0.462, 0.471, 0.472, 0.473, 0.476, 0.477, 0.477, 0.477, 0.4775]
+y_3 = [0.273, 0.274, 0.28, 0.29, 0.34, 0.38, 0.46, 0.52, 0.54, 0.58, 0.74, 0.81, 0.87, 0.94, 0.98, 1.10, 1.32, 1.32, 1.49, 2.2, 4, 5, 6, 7, 8]
+
+
+plt.plot(y_1, x_1, label = "M = 4")
+plt.plot(y_2, x_2, label = "M = 6")
+plt.plot(y_3, x_3, label = "M = 8")
+
+
+
+#plt.plot(x_4, y_4)
+plt.title("Inverted Multi-Index on SIFT1M")
+plt.xlabel("Time / ms")
+plt.ylabel("Recall@1")
+plt.legend()
+plt.show()
+'''
+
+
+
+IIG_R1 = 
+
+IMIS_R1 = [0.319, 0.349, 0.371, 0.389, 0.4,   0.413, 0.429, 0.434, 0.447, 0.45, 0.455, 0.458, 0.46, 0.469, 0.473, 0.48]
+IMIS_T1 = [0.1,   0.10,  0.127, 0.146, 0.162, 0.188, 0.208, 0.22,  0.248, 0.26, 0.278, 0.303, 0.33, 0.40,  0.43,  0.47]
+IMIS_R10 = []
+IMIS_T10 = []

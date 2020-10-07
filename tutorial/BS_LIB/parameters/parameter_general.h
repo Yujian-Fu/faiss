@@ -1,10 +1,10 @@
 #include <string>
 
-const std::string base_path = "/home/y/yujianfu/ivf-hnsw/";
-//const std::string base_path = "/home/yujian/Desktop/extra/Similarity Search/similarity_search_datasets/";
+//const std::string base_path = "/home/y/yujianfu/ivf-hnsw/";
+const std::string base_path = "/home/yujian/Desktop/extra/Similarity Search/similarity_search_datasets/";
 
-const std::string dataset = "DEEP1M";
-const size_t dimension = 256;
+const std::string dataset = "SIFT1M";
+const size_t dimension = 128;
 
 //For train PQ
 const size_t M_PQ = 16;
