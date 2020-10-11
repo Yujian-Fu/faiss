@@ -19,8 +19,8 @@ const size_t OPQ_train_size = 10000;
 const size_t selector_train_size = 100000;
 const size_t selector_group_size = 2000;
 
-const size_t nbatches = 100; //100
-const uint32_t batch_size = nb / nbatches;
+size_t nbatches = 20; //100
+uint32_t batch_size = nb / nbatches;
 //For searching
 const size_t ngt = 100;
 const size_t num_recall = 2;

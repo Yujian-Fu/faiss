@@ -11,10 +11,12 @@
 using namespace bslib;
 
 int main(int argc,char *argv[]){
-    assert(argc == 3);
+    assert(argc == 4);
 
     size_t centroid = atoi(argv[1]);
     size_t build_times = atoi(argv[2]);
+    size_t nbatches = atoi(argv[3]); //100
+    uint32_t batch_size = nb / nbatches;
     std::cout <<"The input centroid is: " << centroid << std::endl;
 
     //Keep it to record the search space
@@ -26,7 +28,7 @@ int main(int argc,char *argv[]){
     std::ofstream record_file;
     PrepareFolder((char *) folder_model.c_str());
     PrepareFolder((char *) (std::string(folder_model)+"/" + dataset).c_str());
-    path_record += "parameter_tuning_inverter_index_" + std::to_string(M_PQ) + ".txt";
+    path_record += "batch_size_parameter_tuning_inverter_index_" + std::to_string(M_PQ) + ".txt";
     if (build_times == 0){
         record_file.open(path_record, std::ios::trunc);
     }
@@ -47,6 +49,7 @@ int main(int argc,char *argv[]){
     */
 
     record_file << "This is the record for Inverted Index with record " << centroid << " centroids " << std::endl;
+    record_file << "The batch size and number of batches in this program is: " << batch_size << " " << nbatches << std::endl;
     
     //for (size_t centroid = min_centroid_space; centroid <= max_centroid_space; centroid+= step_size){
         memory_recorder Mrecorder = memory_recorder();
@@ -117,25 +120,34 @@ int main(int argc,char *argv[]){
         index.get_final_group_num();
         message = "Built index " + std::to_string(centroid) + " ";
         Trecorder.record_time_usage(record_file, message);
+        Mrecorder.print_memory_usage(message);
 
 
         //The parallel version of assigning points
+        std::ifstream base_input (path_base, std::ios::binary);
         std::ofstream base_output (path_ids, std::ios::binary);
-        std::vector<idx_t> assigned_ids(nb);
 
-#pragma omp parallel for 
+        std::vector <float> batch(batch_size * dimension);
+        std::vector<idx_t> assigned_ids(batch_size);
+        Mrecorder.print_memory_usage("Test memory usage1 ");
+
         for (size_t i = 0; i < nbatches; i++){
-            std::vector<float> batch(batch_size * dimension);
-            std::ifstream base_input(path_base, std::ios::binary);
-            base_input.seekg(i * batch_size * dimension * sizeof(base_data_type) + i * batch_size * sizeof(uint32_t), std::ios::beg);
-            readXvecFvec<base_data_type> (base_input, batch.data(), dimension, batch_size);
+            Mrecorder.print_memory_usage("Test memory usage " + std::to_string(i));
+            readXvecFvec<base_data_type> (base_input, batch.data(), dimension, batch_size, false, false);
             if (use_OPQ) {index.do_OPQ(batch_size, batch.data());}
-            index.assign(batch_size, batch.data(), assigned_ids.data() + i * batch_size);
-            base_input.close();
+            index.assign(batch_size, batch.data(), assigned_ids.data());
+            base_output.write((char * ) & batch_size, sizeof(uint32_t));
+            base_output.write((char *) assigned_ids.data(), batch_size * sizeof(idx_t));
+            if (i % 10 == 0){
+                std::cout << " assigned batches [ " << i << " / " << nbatches << " ]";
+                Trecorder.print_time_usage("");
+            }
         }
-
-        message = "[Assigned the index ]";
+        base_input.close();
+        base_output.close();
+        message = "Assigned the base vectors in sequential mode";
         Trecorder.print_time_usage(message);
+        Mrecorder.record_memory_usage(record_file, message);
 
         for (size_t i = 0; i < nbatches; i++){
             base_output.write((char *) & batch_size, sizeof(uint32_t));
@@ -148,6 +160,8 @@ int main(int argc,char *argv[]){
         index.train_pq(path_pq, path_pq_norm, path_learn, PQ_train_size);
         message = "Trained the PQ ";
         Trecorder.record_time_usage(record_file, message);
+        Mrecorder.record_memory_usage(record_file, message);
+
 
         std::vector<idx_t> ids(nb); std::ifstream ids_input(path_ids, std::ios::binary);
         readXvec<idx_t> (ids_input, ids.data(), batch_size, nbatches);
@@ -155,6 +169,7 @@ int main(int argc,char *argv[]){
         for (size_t i = 0; i < nb; i++){group_position[i] = groups_size[ids[i]]; groups_size[ids[i]] ++;}
         message = "Loaded the computed ids with final group num: " + std::to_string(index.final_group_num);
         Trecorder.print_time_usage(message);
+        Mrecorder.record_memory_usage(record_file, message);
 
         index.base_codes.resize(index.final_group_num);
         index.base_sequence_ids.resize(index.final_group_num);
@@ -165,21 +180,25 @@ int main(int argc,char *argv[]){
         }
 
 
-#pragma omp parallel for
+        base_input = std::ifstream(path_base, std::ios::binary);
+        std::vector<float> base_batch(batch_size * dimension);
+        std::vector<idx_t> batch_sequence_ids(batch_size);
+
+
         for (size_t i = 0; i < nbatches; i++){
-            std::vector<float> base_batch(batch_size * dimension);
-            std::vector<idx_t> batch_sequence_ids(batch_size);
-            std::ifstream base_input(path_base, std::ios::binary);
-            base_input.seekg(i * batch_size * dimension * sizeof(base_data_type) + i * batch_size * sizeof(uint32_t), std::ios::beg);
             readXvecFvec<base_data_type> (base_input, base_batch.data(), dimension, batch_size);
             if (use_OPQ) {index.do_OPQ(batch_size, base_batch.data());}
-
             for (size_t j = 0; j < batch_size; j++){batch_sequence_ids[j] = batch_size * i + j;}
-            index.add_batch(batch_size, base_batch.data(), batch_sequence_ids.data(), ids.data() + i * batch_size, group_position.data()+i * batch_size);
+
+            index.add_batch(batch_size, base_batch.data(), batch_sequence_ids.data(), ids.data() + i * batch_size, group_position.data()+i*batch_size);
+            if (i % 10 == 0){
+                std::cout << " adding batches [ " << i << " / " << nbatches << " ]";
+                Trecorder.print_time_usage("");
+            }
         }
 
         index.compute_centroid_norm();
-        message = "Finished Construction: ";
+        message = "Finished Construction with sequential mode: ";
         Trecorder.print_time_usage(message);
         Mrecorder.record_memory_usage(record_file, message);
         Trecorder.record_time_usage(record_file, message);
