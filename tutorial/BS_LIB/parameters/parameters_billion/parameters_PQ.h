@@ -6,9 +6,9 @@
 //Exp parameters
 //For index initialization
 const size_t layers = 2;
-const size_t VQ_layers = 1;
+const size_t VQ_layers = 2;
 const size_t PQ_layers = 1;
-const std::string index_type[layers] = {"VQ", "PQ"};
+const std::string index_type[layers] = {"VQ", "VQ"};
 const uint32_t ncentroids[layers] = {10000, 1000};
 
 const bool use_reranking = false;
