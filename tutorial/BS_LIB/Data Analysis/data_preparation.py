@@ -53,7 +53,7 @@ for dimension in range(500, 600, 300):
 
         sample_ID_file = dataset_path + "analysis/" + dataset + "_" + size + "_" + str(dimension) + "_gt.ivecs"
         index = faiss.IndexFlatL2(dimension)
-        index.add(sample_dataset)
+        index.add(sample_dataset.astype('float32'))
         dis, ID = index.search(query_dataset, 100)
         utils.ivecs_write(sample_ID_file, ID)
 
@@ -81,6 +81,6 @@ for dimension in range(500, 600, 300):
 
         sample_ID_file = dataset_path + "analysis/" + dataset + "_" + str(sample_size) + "K_" + str(dimension) + "_gt.ivecs"
         index = faiss.IndexFlatL2(dimension)
-        index.add(sample_dataset)
+        index.add(sample_dataset.astype('float32'))
         dis, ID = index.search(query_dataset, 100)
         utils.ivecs_write(sample_ID_file, ID)
