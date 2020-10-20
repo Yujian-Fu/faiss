@@ -38,6 +38,16 @@ def fvecs_write(fname, dataset):
             file.write(struct.pack('f', dataset[i][j]))
     file.close()
 
+def ivecs_write(fname, dataset):
+    dimenison = dataset.shape[1]
+    file = open(fname, "wb")
+    for i in range(dataset.shape[0]):
+        file.write(struct.pack('i', dimenison))
+        for j in range(dimenison):
+            file.write(struct.pack('i', dataset[i][j]))
+    file.close()
+    
+
 #use https://github.com/j-bac/scikit-dimension
 def compute_LID(dataset):
     return two_NN.twonn_dimension(dataset)
