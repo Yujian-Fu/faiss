@@ -61,10 +61,6 @@ for dimension in range(500, 600, 300):
 
 dataset = "Random"
 for dimension in range(500, 600, 300):
-    query_dataset_file = dataset_path + "analysis/" + dataset + "_"  + str(dimension) + "_query.fvecs"
-    sample_dataset = np.random.randint(0, 100, (1000, dimension))
-    print("Generating query dataset to ", query_dataset_file)
-    utils.fvecs_write(query_dataset_file, sample_dataset)
 
     for size in size_list:
         if "K" in size:
