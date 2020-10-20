@@ -41,17 +41,17 @@ for dimension in range(500, 600, 300):
         elif "M" in size:
             sample_size = int(size.split("M")[0]) * 1000000
 
-        sample_dataset_file = dataset_path + "analysis/" + dataset + "_" + size + str(dimension) + "_base.fvecs"
+        sample_dataset_file = dataset_path + "analysis/" + dataset + "_" + size + "_" + str(dimension) + "_base.fvecs"
         print("Generating dataset to ", sample_dataset_file)
         sample_dataset = np.random.normal(mu, sigma, (sample_size, dimension))
         utils.fvecs_write(sample_dataset_file, sample_dataset)
 
-        sample_query_file = dataset_path + "analysis/" + dataset + "_" + str(sample_size) + "K_" + str(dimension) + "_query.fvecs"
+        sample_query_file = dataset_path + "analysis/" + dataset + "_" + size + "_" + str(dimension) + "_query.fvecs"
         print("Generating query dataset to ", sample_query_file)
         query_dataset = np.random.normal(mu, sigma, (query_size, dimension))
         utils.fvecs_write(sample_query_file, query_dataset)
 
-        sample_ID_file = dataset_path + "analysis/" + dataset + "_" + str(sample_size) + "K_" + str(dimension) + "_gt.ivecs"
+        sample_ID_file = dataset_path + "analysis/" + dataset + "_" + size + "_" + str(dimension) + "_gt.ivecs"
         index = faiss.IndexFlatL2(dimension)
         index.add(sample_size, sample_dataset)
         dis, ID = index.search(query_dataset, 100)
