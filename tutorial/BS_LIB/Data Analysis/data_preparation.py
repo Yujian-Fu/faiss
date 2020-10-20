@@ -34,10 +34,6 @@ dataset = "Gaussian"
 mu = 10
 sigma = 0.1
 for dimension in range(500, 600, 300):
-    query_dataset_file = dataset_path + "analysis/" + dataset + "_"  + str(dimension) + "_query.fvecs"
-    sample_dataset = np.random.normal(mu, sigma, (1000, dimension))
-    print("Generating query dataset to ", query_dataset_file)
-    utils.fvecs_write(query_dataset_file, sample_dataset)
 
     for size in size_list:
         if "K" in size:
@@ -51,12 +47,13 @@ for dimension in range(500, 600, 300):
         utils.fvecs_write(sample_dataset_file, sample_dataset)
 
         sample_query_file = dataset_path + "analysis/" + dataset + "_" + str(sample_size) + "K_" + str(dimension) + "_query.fvecs"
+        print("Generating query dataset to ", sample_query_file)
         query_dataset = np.random.normal(mu, sigma, (query_size, dimension))
         utils.fvecs_write(sample_query_file, query_dataset)
 
         sample_ID_file = dataset_path + "analysis/" + dataset + "_" + str(sample_size) + "K_" + str(dimension) + "_gt.ivecs"
         index = faiss.IndexFlatL2(dimension)
-        index.add(sample_dataset)
+        index.add(sample_size, sample_dataset)
         dis, ID = index.search(query_dataset, 100)
         utils.ivecs_write(sample_ID_file, ID)
 
@@ -83,10 +80,11 @@ for dimension in range(500, 600, 300):
 
         sample_query_file = dataset_path + "analysis/" + dataset + "_" + str(sample_size) + "K_" + str(dimension) + "_query.fvecs"
         query_dataset = np.random.randint(0, 100, (query_size, dimension))
+        print("Generating query dataset to ", sample_query_file)
         utils.fvecs_write(sample_query_file, query_dataset)
 
         sample_ID_file = dataset_path + "analysis/" + dataset + "_" + str(sample_size) + "K_" + str(dimension) + "_gt.ivecs"
         index = faiss.IndexFlatL2(dimension)
-        index.add(sample_dataset)
+        index.add(sample_size, sample_dataset)
         dis, ID = index.search(query_dataset, 100)
         utils.ivecs_write(sample_ID_file, ID)
