@@ -33,7 +33,7 @@ size_list = ["10K", "100K", "1M", "10M"]
 dataset = "Gaussian"
 mu = 10
 sigma = 0.1
-for dimension in range(500, 500, 300):
+for dimension in range(500, 600, 300):
     query_dataset_file = dataset_path + "analysis/" + dataset + "_"  + str(dimension) + "_query.fvecs"
     sample_dataset = np.random.normal(mu, sigma, (1000, dimension))
     print("Generating query dataset to ", query_dataset_file)
@@ -63,7 +63,7 @@ for dimension in range(500, 500, 300):
 
 
 dataset = "Random"
-for dimension in range(500, 500, 300):
+for dimension in range(500, 600, 300):
     query_dataset_file = dataset_path + "analysis/" + dataset + "_"  + str(dimension) + "_query.fvecs"
     sample_dataset = np.random.randint(0, 100, (1000, dimension))
     print("Generating query dataset to ", query_dataset_file)
