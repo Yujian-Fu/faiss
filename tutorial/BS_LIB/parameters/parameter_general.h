@@ -1,9 +1,9 @@
 #include <string>
 
-const std::string base_path = "/home/y/yujianfu/ivf-hnsw/analysis";
+const std::string base_path = "/home/y/yujianfu/ivf-hnsw/";
 //const std::string base_path = "/home/yujian/Desktop/extra/Similarity Search/similarity_search_datasets/";
 
-const std::string dataset = "Random_1M_500";
+const std::string dataset = "Random1M_500";
 const size_t dimension = 500;
 
 //For train PQ
@@ -20,7 +20,7 @@ const size_t OPQ_train_size = 10000;
 const size_t selector_train_size = 100000;
 const size_t selector_group_size = 2000;
 
-size_t nbatches = 20; //100
+size_t nbatches = 100; //100
 uint32_t batch_size = nb / nbatches;
 //For searching
 const size_t ngt = 100;
