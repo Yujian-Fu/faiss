@@ -11,11 +11,10 @@
 using namespace bslib;
 
 int main(int argc,char *argv[]){
-    assert(argc == 4);
+    assert(argc == 3);
 
     size_t centroid = atoi(argv[1]);
     size_t build_times = atoi(argv[2]);
-    size_t nbatches = atoi(argv[3]); //100
     uint32_t batch_size = nb / nbatches;
     std::cout <<"The input centroid is: " << centroid << std::endl;
 
