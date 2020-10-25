@@ -28,7 +28,7 @@ fi
 
 
 count=0
-for first_centroid in {$nc_start..$nc_end..$nc_step}
+for ((first_centroid=$nc_start; first_centroid<=$nc_end; first_centroid=$first_centroid+$nc_step))
 do
     let min_second_centroid=first_centroid/50
     let max_second_centroid=first_centroid/10

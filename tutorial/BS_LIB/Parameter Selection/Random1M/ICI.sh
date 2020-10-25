@@ -42,9 +42,9 @@ then
 fi
 
 record_count=0
-for i in {$nc_start..$nc_end..$nc_step}
+for ((i=$nc_start; i<=$nc_end; i=$i+$nc_step))
 do
-    for j in {$nbits_start..$nbits_end..$nbits_step}
+    for ((j=$nbits_start; j<=$nbits_end; j=$j+$nbits_step))
     do
         echo "Running ICI index with parameter setting: $i $j" 
         ./ICI $i $j $count

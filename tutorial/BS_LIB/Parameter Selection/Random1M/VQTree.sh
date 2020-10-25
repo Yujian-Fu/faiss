@@ -42,9 +42,9 @@ then
 fi
 
 record_count=0
-for i in {$nc1_start..$nc1_end..$nc1_step}
+for ((i=$nc1_start; i<=$nc1_end; i=$i+$nc1_step))
 do
-    for j in {$nc2_start..$nc2_end..$nc2_step}
+    for ((j=$nc2_start; j<=$nc2_end; j=$j+$nc2_step))
     do
         echo "Running VQTree index with parameter setting: $i $j" 
         ./VQTree $i $j $record_count

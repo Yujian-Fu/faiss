@@ -29,7 +29,7 @@ fi
 
 
 record_count=0
-for i in {$nbits_start..$nbits_end..$nbits_step}
+for ((i=$nbits_start; i<=$nbits_end; i=$i+$nbits_step}
 do
     echo "Running IMI index with parameter setting: $i" 
     ./IMI $i $record_count
