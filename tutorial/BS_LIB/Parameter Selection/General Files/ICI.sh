@@ -3,10 +3,15 @@
 
 datasize=1000
 
-if [ $datasize == 10000]
+if [ $datasize == 10000 ]
 then
+    nc_start=0
+    nc_end=0
+    nc_step=0
 
-
+    nbits_start=0
+    nbits_end=0
+    nbits_step=0
 elif [ $datasize == 1000 ]
 then
     nc_start=4
@@ -18,10 +23,22 @@ then
     nbits_step=1
 elif [ $datasize == 100]
 then 
+    nc_start=0
+    nc_end=0
+    nc_step=0
 
+    nbits_start=0
+    nbits_end=0
+    nbits_step=0
 elif [ $datasize == 10]
 then
+    nc_start=0
+    nc_end=0
+    nc_step=0
 
+    nbits_start=0
+    nbits_end=0
+    nbits_step=0
 fi
 
 record_count=0
