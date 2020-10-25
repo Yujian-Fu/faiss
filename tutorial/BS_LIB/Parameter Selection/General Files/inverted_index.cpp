@@ -83,6 +83,7 @@ int main(int argc,char *argv[]){
                 std::ifstream learn_input(path_learn, std::ios::binary);
                 std::vector<float>  origin_train_set(train_size * dimension);
                 std::cout << "Load data from " << path_learn << std::endl;
+                
                 readXvecFvec<learn_data_type>(learn_input, origin_train_set.data(), dimension, train_size, false);
                 
                 if (OPQ_train_size < train_size){
