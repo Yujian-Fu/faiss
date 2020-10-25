@@ -248,6 +248,7 @@ void Clustering::train (idx_t nx, const float *x_in, Index & index) {
 
 float kmeans_clustering (size_t d, size_t n, size_t k, const float *x, float *centroids, size_t niter)
 {
+    
     Clustering clus (d, k);
     clus.verbose = true;
     clus.niter = niter;

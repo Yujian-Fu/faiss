@@ -5,13 +5,13 @@ datasize=1000
 
 if [ $datasize == 10000]
 then
-    nc1_start=0
-    nc1_end=0
-    nc1_step=0
+    nc1_start=160
+    nc1_end=20
+    nc1_step=20
 
-    nc2_start=0
-    nc2_end=0
-    nc2_step=0
+    nc2_start=160
+    nc2_end=20
+    nc2_step=20
 elif [ $datasize == 1000]
 then
     nc1_start=10
@@ -23,13 +23,13 @@ then
     nc2_step=10
 elif [ $datasize == 100]
 then 
-    nc1_start=0
-    nc1_end=0
-    nc1_step=0
+    nc1_start=10
+    nc1_end=40
+    nc1_step=10
 
-    nc2_start=0
-    nc2_end=0
-    nc2_step=0
+    nc2_start=10
+    nc2_end=40
+    nc2_step=10
 elif [ $datasize == 10]
 then
     nc1_start=10

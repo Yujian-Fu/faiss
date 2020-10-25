@@ -89,7 +89,7 @@ struct Clustering: ClusteringParameters {
  * @param centroids output centroids (size k * d)
  * @return final quantization error
  */
-float kmeans_clustering (size_t d, size_t n, size_t k, const float *x, float *centroids, size_t niter = 50);
+float kmeans_clustering (size_t d, size_t n, size_t k, const float *x, float *centroids, size_t niter = 30);
 
 
 

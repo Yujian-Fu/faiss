@@ -5,36 +5,36 @@ datasize=1000
 
 if [ $datasize == 10000 ]
 then
-    nc_start=
-    nc_end=0
-    nc_step=0
+    nc_start=50
+    nc_end=500
+    nc_step=10
 
     nbits_start=3
     nbits_end=6
     nbits_step=1
 elif [ $datasize == 1000 ]
 then
-    nc_start=4
-    nc_end=128
-    nc_step=4
+    nc_start=10
+    nc_end=100
+    nc_step=5
 
     nbits_start=3
     nbits_end=5
     nbits_step=1
 elif [ $datasize == 100]
 then 
-    nc_start=0
-    nc_end=0
-    nc_step=0
+    nc_start=5
+    nc_end=50
+    nc_step=5
 
-    nbits_start=0
-    nbits_end=0
-    nbits_step=0
+    nbits_start=3
+    nbits_end=5
+    nbits_step=1
 elif [ $datasize == 10]
 then
-    nc_start=4
-    nc_end=
-    nc_step=
+    nc_start=5
+    nc_end=20
+    nc_step=2
 
     nbits_start=3
     nbits_end=4

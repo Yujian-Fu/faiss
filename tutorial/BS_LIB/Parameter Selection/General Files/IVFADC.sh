@@ -6,9 +6,9 @@ datasize=1000
 
 if [ $datasize == 10000]
 then
-    nc_start=0
-    nc_end=0
-    nc_step=0
+    nc_start=1000
+    nc_end=10000
+    nc_step=500
 elif [ $datasize == 1000 ]
 then
     nc_start=100
@@ -16,9 +16,9 @@ then
     nc_step=200
 elif [ $datasize == 100 ]
 then 
-    nc_start=0
-    nc_end=0
-    nc_step=0
+    nc_start=100
+    nc_end=1000
+    nc_step=50
 elif [ $datasize == 10 ]
 then
     nc_start=100

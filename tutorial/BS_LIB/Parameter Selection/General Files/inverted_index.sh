@@ -5,25 +5,24 @@ datasize=1000
 
 if [ $datasize == 10000  ]
 then
-    nc_start=0
-    nc_end=0
-    nc_step=0
+    nc_start=5000
+    nc_end=50000
+    nc_step=1000
 elif [ $datasize == 1000 ]
 then 
     nc_start=200
-    nc_end=3000
-    nc_step=100
+    nc_end=5000
+    nc_step=200
 elif [ $datasize == 100 ]
 then 
-    nc_start=0
-    nc_end=0
-    nc_step=0
+    nc_start=100
+    nc_end=3000
+    nc_step=100
 elif [ $datasize == 10 ]
 then 
     nc_start=50
     nc_end=1000
     nc_step=50
-
 fi
 
 
