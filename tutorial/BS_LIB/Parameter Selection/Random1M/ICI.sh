@@ -1,7 +1,7 @@
 #！/bin/bash
 # This is for running ICI for datasets
 
-datasize = 1000
+datasize=1000
 
 if [ $datasize == 10000]
 then
@@ -9,13 +9,13 @@ then
 
 elif [ $datasize == 1000]
 then
-    nc_start = 4
-    nc_end = 128
-    nc_step = 4
+    nc_start=4
+    nc_end=128
+    nc_step=4
 
-    nbits_start = 3
-    nbits_end = 5
-    nbits_step = 1
+    nbits_start=3
+    nbits_end=5
+    nbits_step=1
 elif [ $datasize == 100]
 then 
 

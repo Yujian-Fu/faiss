@@ -2,7 +2,7 @@
 #This is for running IVFADC index
 
 
-datasize = 1000
+datasize=1000
 
 if [ $datasize == 10000]
 then
@@ -10,18 +10,18 @@ then
 
 elif [ $datasize == 1000]
 then
-    nc_start = 100
-    nc_end = 2000
-    nc_step = 200
+    nc_start=100
+    nc_end=2000
+    nc_step=200
 
 elif [ $datasize == 100]
 then 
 
 elif [ $datasize == 10]
 then
-    nc_start = 100
-    nc_end = 500
-    nc_step = 10
+    nc_start=100
+    nc_end=500
+    nc_step=10
 fi
 
 
