@@ -3,7 +3,7 @@
 const std::string base_path = "/home/y/yujianfu/ivf-hnsw/analysis";
 //const std::string base_path = "/home/yujian/Desktop/extra/Similarity Search/similarity_search_datasets/";
 
-const std::string dataset = "Random_1M";
+const std::string dataset = "Random_1M_500";
 const size_t dimension = 500;
 
 //For train PQ
