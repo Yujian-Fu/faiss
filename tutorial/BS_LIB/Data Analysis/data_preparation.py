@@ -41,6 +41,7 @@ for dimension in range(500, 600, 300):
         elif "M" in size:
             sample_size = int(size.split("M")[0]) * 1000000
 
+        '''
         sample_dataset_file = dataset_path + "analysis/" + dataset + "_" + size + "_" + str(dimension) + "_base.fvecs"
         print("Generating dataset to ", sample_dataset_file)
         sample_dataset = np.random.normal(mu, sigma, (sample_size, dimension)).astype('float32')
@@ -50,12 +51,20 @@ for dimension in range(500, 600, 300):
         print("Generating query dataset to ", sample_query_file)
         query_dataset = np.random.normal(mu, sigma, (query_size, dimension)).astype('float32')
         utils.fvecs_write(sample_query_file, query_dataset)
+        '''
 
+        sample_learn_file = dataset_path + "analysis/" + dataset + "_" + size + "_" + str(dimension) + "_learn.fvecs"
+        print("Generating train dataset to ", sample_learn_file)
+        learn_dataset = np.random.normal(mu, sigma, (int(sample_size / 10), dimension)).astype('float32')
+        utils.fvecs_write(sample_learn_file, learn_dataset)
+
+        '''
         sample_ID_file = dataset_path + "analysis/" + dataset + "_" + size + "_" + str(dimension) + "_gt.ivecs"
         index = faiss.IndexFlatL2(dimension)
         index.add(sample_dataset)
         dis, ID = index.search(query_dataset, 100)
         utils.ivecs_write(sample_ID_file, ID)
+        '''
 
 
 
@@ -68,19 +77,28 @@ for dimension in range(500, 600, 300):
         elif "M" in size:
             sample_size = int(size.split("M")[0]) * 1000000
 
-        sample_dataset_file = dataset_path + "analysis/" + dataset + "_" + str(sample_size) + "K_" + str(dimension) + "_base.fvecs"
+        '''
+        sample_dataset_file = dataset_path + "analysis/" + dataset + "_" + size + "_" + str(dimension) + "_base.fvecs"
         print("Generating dataset to ", sample_dataset_file)
         sample_dataset = np.random.randint(0, 100, (sample_size, dimension)).astype('float32')
         utils.fvecs_write(sample_dataset_file, sample_dataset)
 
 
-        sample_query_file = dataset_path + "analysis/" + dataset + "_" + str(sample_size) + "K_" + str(dimension) + "_query.fvecs"
+        sample_query_file = dataset_path + "analysis/" + dataset + "_" + size + "_" + str(dimension) + "_query.fvecs"
         query_dataset = np.random.randint(0, 100, (query_size, dimension)).astype('float32')
         print("Generating query dataset to ", sample_query_file)
         utils.fvecs_write(sample_query_file, query_dataset)
+        '''
 
-        sample_ID_file = dataset_path + "analysis/" + dataset + "_" + str(sample_size) + "K_" + str(dimension) + "_gt.ivecs"
+        sample_learn_file = dataset_path + "analysis/" + dataset + "_" + size + "_" + str(dimension) + "_learn.fvecs"
+        print("Generating train dataset to ", sample_learn_file)
+        learn_dataset = np.random.randint(0, 100, (int(sample_size / 10), dimension)).astype('float32')
+        utils.fvecs_write(sample_learn_file, learn_dataset)
+
+        '''
+        sample_ID_file = dataset_path + "analysis/" + dataset + "_" + size + "_" + str(dimension) + "_gt.ivecs"
         index = faiss.IndexFlatL2(dimension)
         index.add(sample_dataset)
         dis, ID = index.search(query_dataset, 100)
         utils.ivecs_write(sample_ID_file, ID)
+        '''
