@@ -4,8 +4,8 @@
 #include <sys/resource.h>
 #include <string>
 
-#include "../bslib_index.h"
-#include "../parameters/parameter_tuning/IVFADC/IVFADC.h"
+#include "../../bslib_index.h"
+#include "../../parameters/parameter_tuning/IVFADC/IVFADC.h"
 
 using namespace bslib;
 

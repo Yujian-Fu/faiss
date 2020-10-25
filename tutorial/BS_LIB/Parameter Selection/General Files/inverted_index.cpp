@@ -4,8 +4,8 @@
 #include <sys/resource.h>
 #include <string>
 
-#include "../bslib_index.h"
-#include "../parameters/parameter_tuning/inverted_index/Inverted_Index.h"
+#include "../../bslib_index.h"
+#include "../../parameters/parameter_tuning/inverted_index/Inverted_Index.h"
 
 
 using namespace bslib;

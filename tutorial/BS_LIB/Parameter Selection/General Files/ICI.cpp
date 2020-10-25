@@ -4,8 +4,8 @@
 #include <sys/resource.h>
 #include <string>
 
-#include "../bslib_index.h"
-#include "../parameters/parameter_tuning/ICI/ICI.h"
+#include "../../bslib_index.h"
+#include "../../parameters/parameter_tuning/ICI/ICI.h"
 
 using namespace bslib;
 

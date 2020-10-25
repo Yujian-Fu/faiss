@@ -4,8 +4,8 @@
 #include <sys/resource.h>
 #include <string>
 
-#include "../bslib_index.h"
-#include "../parameters/parameter_tuning/VQTree/VQTree.h"
+#include "../../bslib_index.h"
+#include "../../parameters/parameter_tuning/VQTree/VQTree.h"
 
 
 using namespace bslib;
