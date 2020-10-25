@@ -1,0 +1,38 @@
+#！/bin/bash
+# This is for running ICI for datasets
+
+datasize = 1000
+
+if [ $datasize == 10000]
+then
+
+
+elif [ $datasize == 1000]
+then
+    nc_start = 4
+    nc_end = 128
+    nc_step = 4
+
+    nbits_start = 3
+    nbits_end = 5
+    nbits_step = 1
+elif [ $datasize == 100]
+then 
+
+elif [ $datasize == 10]
+then
+
+fi
+
+record_count=0
+for i in {$nc_start..$nc_end..$nc_step}
+do
+    for j in {$nbits_start..$nbits_end..$nbits_step}
+    do
+        echo "Running ICI index with parameter setting: $i $j" 
+        ./ICI $i $j $count
+        let record_count=$record_count+1
+    done
+done
+
+echo "Finished ICI experiments"
