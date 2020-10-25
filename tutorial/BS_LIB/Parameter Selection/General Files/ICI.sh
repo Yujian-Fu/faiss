@@ -5,13 +5,13 @@ datasize=1000
 
 if [ $datasize == 10000 ]
 then
-    nc_start=0
+    nc_start=
     nc_end=0
     nc_step=0
 
-    nbits_start=0
-    nbits_end=0
-    nbits_step=0
+    nbits_start=3
+    nbits_end=6
+    nbits_step=1
 elif [ $datasize == 1000 ]
 then
     nc_start=4
@@ -32,13 +32,13 @@ then
     nbits_step=0
 elif [ $datasize == 10]
 then
-    nc_start=0
-    nc_end=0
-    nc_step=0
+    nc_start=4
+    nc_end=
+    nc_step=
 
-    nbits_start=0
-    nbits_end=0
-    nbits_step=0
+    nbits_start=3
+    nbits_end=4
+    nbits_step=1
 fi
 
 record_count=0
