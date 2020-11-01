@@ -11,10 +11,11 @@
 using namespace bslib;
 
 int main(int argc, char * argv[]){
-    assert(argc == 4);
+    assert(argc == 5);
     size_t centroid1 = atoi(argv[1]);
     size_t centroid2 = atoi(argv[2]);
     size_t build_times = atoi(argv[3]);
+    std::string time_now = std::string(argv[4]);
 
     //size_t max_centroid_space = nb / 5000; // 1000000 / 2000 = 200 
     //size_t min_centroid_space = nb / 20000; //1000000 / 10000 = 50
@@ -32,13 +33,16 @@ int main(int argc, char * argv[]){
    
    // 把 now 转换为字符串形式
     char* dt = ctime(&now);
-    path_record += "parameter_tuning_VQTree_" + std::to_string(M_PQ) + "_" + std::string(dt) + ".txt";
+    path_record += "parameter_tuning_VQTree_" + std::to_string(M_PQ) + "_" + time_now + ".txt";
     if (build_times == 0){
         record_file.open(path_record, std::ios::binary);
     }
     else{
         record_file.open(path_record, std::ios::app);
     }
+
+    std::cout << "Saving record to " << path_record << std::endl;
+    record_file << "The time now is " << std::string(dt) << std::endl;
 
     /*
     std::vector<std::vector<idx_t>> best_recall_index_1(num_recall);
@@ -56,7 +60,8 @@ int main(int argc, char * argv[]){
     }*/
 
     record_file << "This is the record for VQTree with centroids: " << centroid1 << " and " << centroid2 << std::endl;
-
+    record_file << "The batch size and number of batches in this program is: " << batch_size << " " << nbatches << std::endl;
+    
     //for (size_t centroid1 = min_centroid_space; centroid1 <= max_centroid_space; centroid1 += step_size){
         //for (size_t centroid2 = min_centroid_space; centroid2 <= max_centroid_space; centroid2 += step_size){
 
@@ -248,8 +253,8 @@ int main(int argc, char * argv[]){
                 }
                 float recall = float(correct) / (recall_k * nq);
 
-                record_file << search_space1 << " " << search_space2 << " " << recall << " " << qps << std::endl;
-                std::cout << recall << " " << qps << std::endl;
+                record_file << " The Search Space, Recall and QPS " << search_space1 << " " << search_space2 << " " << recall << " " << qps << std::endl;
+                std::cout << " The Search Space, Recall and QPS " <<  search_space1 << " " << search_space2 << " " << recall << " " << qps << std::endl;
                 if (recall <= c2_previous_recall && recall <= c2_second_previous_recall){
                     if (recall <= c1_previous_recall && recall <= c1_second_previous_recall){
                         break;
@@ -301,5 +306,6 @@ int main(int argc, char * argv[]){
         }*/
     //}
     //}
+    record_file << "Record end, the time now is: " << std::string (dt) << std::endl;
     record_file.close();
 }

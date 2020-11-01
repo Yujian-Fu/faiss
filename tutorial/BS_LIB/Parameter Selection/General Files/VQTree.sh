@@ -1,7 +1,7 @@
 #！/bin/bash
 #This is for running VQTree index
 
-datasize=10
+datasize=10000
 
 nc1_start=0
 nc1_end=0
@@ -12,12 +12,12 @@ nc2_step=0
 
 if [ $datasize == 10000 ]
 then
-    nc1_start=160
-    nc1_end=20
-    nc1_step=20
-    nc2_start=160
-    nc2_end=20
-    nc2_step=20
+    nc1_start=50
+    nc1_end=300
+    nc1_step=50
+    nc2_start=50
+    nc2_end=300
+    nc2_step=50
 elif [ $datasize == 1000 ]
 then
     nc1_start=10
