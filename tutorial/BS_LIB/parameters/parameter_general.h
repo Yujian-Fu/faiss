@@ -1,14 +1,14 @@
 #include <string>
 
-//const std::string base_path = "/home/y/yujianfu/ivf-hnsw/";
-const std::string base_path = "/home/yujian/Desktop/extra/Similarity Search/similarity_search_datasets/";
+const std::string base_path = "/home/y/yujianfu/ivf-hnsw/";
+//const std::string base_path = "/home/yujian/Desktop/extra/Similarity Search/similarity_search_datasets/";
 
-const std::string dataset = "SIFT100K";
+const std::string dataset = "SIFT1M";
 const size_t dimension = 128;
 
 
-size_t nb = 100000;
-const size_t train_size = 10000; //This is the size of train set
+size_t nb = 1000000;
+const size_t train_size = 100000; //This is the size of train set
 
 const size_t nq = 1000;
 
