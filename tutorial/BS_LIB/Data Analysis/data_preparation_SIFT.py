@@ -12,9 +12,9 @@ size_list = ["2M", "3M", "4M", "5M", "6M", "7M", "8M", "9M"]
 #billion_dataset_learn = dataset_path + "SIFT1B/" + "bigann_learn.bvecs" 
 #billion_dataset_query = dataset_path + "SIFT1B/" + "bigann_query.bvecs"
 
-source_dataset_base = dataset_path + "SIFT1B/SIFT10M_base.fvecs"
-source_dataset_query = dataset_path + "SIFT1B/SIFT10M_query.fvecs"
-source_dataset_learn = dataset_path + "SIFT1B/SIFT10M_learn.fvecs"
+source_dataset_base = dataset_path + "SIFT10M/SIFT10M_base.fvecs"
+source_dataset_query = dataset_path + "SIFT10M/SIFT10M_query.fvecs"
+source_dataset_learn = dataset_path + "SIFT10M/SIFT10M_learn.fvecs"
 
 ngt = 100
 nq = 1000
