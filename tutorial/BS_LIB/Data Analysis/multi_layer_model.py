@@ -102,7 +102,7 @@ for dataset in datasets:
                         recall_result = 0
 
             plt.xlim()
-            plt.title(dataset + " " + model)
+            plt.title("Random1M" + " " + model)
             plt.ylabel("Recall@" + str(recall_test))
             plt.xlabel("Time / ms")
             plt.legend(prop={'size':5})

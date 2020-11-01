@@ -141,7 +141,6 @@ int main(int argc,char *argv[]){
         Mrecorder.print_memory_usage("Test memory usage1 ");
 
         for (size_t i = 0; i < nbatches; i++){
-            Mrecorder.print_memory_usage("Test memory usage " + std::to_string(i));
             readXvecFvec<base_data_type> (base_input, batch.data(), dimension, batch_size, false, false);
             if (use_OPQ) {index.do_OPQ(batch_size, batch.data());}
             index.assign(batch_size, batch.data(), assigned_ids.data());
