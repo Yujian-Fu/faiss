@@ -1,7 +1,7 @@
 #！/bin/bash
 #This is for running inverted index
 
-datasize=100
+datasize=10
 
 nc_start=0
 nc_end=0
