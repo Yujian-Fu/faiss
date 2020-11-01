@@ -242,18 +242,18 @@ int main(int argc,char *argv[]){
                     std::unordered_set<idx_t> gt;
                     for (size_t temp2 = 0; temp2 < recall_k; temp2 ++){
                         gt.insert(groundtruth[ngt * temp1 + temp2]);
-                        //std::cout << groundtruth[ngt * temp1 + temp2] << " ";
+                        std::cout << groundtruth[ngt * temp1 + temp2] << " ";
                     }
-                    //std::cout << std::endl;
+                    std::cout << std::endl;
 
                     assert(gt.size() == recall_k);
                     for (size_t temp2 = 0; temp2 < recall_k; temp2 ++){
-                        //std::cout << query_labels[temp1 * recall_k + temp2] << " ";
+                        std::cout << query_labels[temp1 * recall_k + temp2] << " ";
                         if (gt.count(query_labels[temp1 * recall_k + temp2]) != 0){
                             correct ++;
                         }
                     }
-                    //std::cout << std::endl;
+                    std::cout << std::endl;
                 }
                 float recall = float(correct) / (recall_k * nq);
 
