@@ -10,7 +10,7 @@ nc2_start=0
 nc2_end=0
 nc2_step=0
 
-if [ $datasize == 10000]
+if [ $datasize == 10000 ]
 then
     nc1_start=160
     nc1_end=20
@@ -18,7 +18,7 @@ then
     nc2_start=160
     nc2_end=20
     nc2_step=20
-elif [ $datasize == 1000]
+elif [ $datasize == 1000 ]
 then
     nc1_start=10
     nc1_end=50
@@ -26,7 +26,7 @@ then
     nc2_start=10
     nc2_end=50
     nc2_step=10
-elif [ $datasize == 100]
+elif [ $datasize == 100 ]
 then 
     nc1_start=10
     nc1_end=40
@@ -35,7 +35,7 @@ then
     nc2_start=10
     nc2_end=40
     nc2_step=10
-elif [ $datasize == 10]
+elif [ $datasize == 10 ]
 then
     nc1_start=10
     nc1_end=30
