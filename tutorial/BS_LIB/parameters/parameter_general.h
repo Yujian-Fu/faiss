@@ -3,7 +3,7 @@
 const std::string base_path = "/home/y/yujianfu/ivf-hnsw/";
 //const std::string base_path = "/home/yujian/Desktop/extra/Similarity Search/similarity_search_datasets/";
 
-const std::string dataset = "SIFT2M";
+const std::string dataset = "SIFT3M";
 const size_t dimension = 128;
 
 

@@ -26,7 +26,7 @@ def create_dir_not_exist(path):
         os.mkdir(path)
 
 print("read dataset from ", source_dataset_base)
-real_base_dataset = utils.fvecs_read(source_dataset_base)
+#real_base_dataset = utils.fvecs_read(source_dataset_base)
 
 for size in size_list:
     folder_path = dataset_path + "SIFT" + size
@@ -39,6 +39,7 @@ for size in size_list:
         sample_size = int(size.split("M")[0]) * 1000000
     print("The file size is: ", sample_size)
     
+    '''
     index = random.sample(range(real_base_dataset.shape[0]), sample_size)
     base_dataset = real_base_dataset[index, :]
     base_dataset_file = folder_path + "/SIFT" + size +"_base" + ".fvecs"
@@ -58,12 +59,19 @@ for size in size_list:
     query_dataset_file = folder_path + "/SIFT" + size + "_query" + ".fvecs"
     utils.fvecs_write(query_dataset_file, query_dataset)
     print("Write query file")
+    '''
+
+    base_dataset_file = folder_path + "/SIFT" + size +"_base" + ".fvecs"
+    base_dataset = utils.fvecs_read(base_dataset_file)
+
+    query_dataset_file = folder_path + "/SIFT" + size + "_query" + ".fvecs"
+    query_dataset = utils.fvecs_read(query_dataset_file)
     
     assert(base_dataset.shape[1] == dimension)
     index = faiss.IndexFlatL2(dimension)
     index.add(base_dataset)
     D, I = index.search(query_dataset, 100)
-    groundtruth_file = folder_path + "/SIFT" + size + "_groundtruth" + ".fvecs"
+    groundtruth_file = folder_path + "/SIFT" + size + "_groundtruth" + ".ivecs"
     utils.fvecs_write(groundtruth_file, I)
     print("Write GT file")
 
