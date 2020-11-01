@@ -3,8 +3,8 @@
 //const std::string base_path = "/home/y/yujianfu/ivf-hnsw/";
 const std::string base_path = "/home/yujian/Desktop/extra/Similarity Search/similarity_search_datasets/";
 
-const std::string dataset = "Random10K_500";
-const size_t dimension = 500;
+const std::string dataset = "SIFT10K";
+const size_t dimension = 128;
 
 
 size_t nb = 10000;
@@ -13,7 +13,7 @@ const size_t train_size = 1000; //This is the size of train set
 const size_t nq = 100;
 
 //For train PQ
-const size_t M_PQ = 25;
+const size_t M_PQ = 16;
 const size_t M_norm_PQ = 1;
 const size_t nbits = 8; //Or 16
 

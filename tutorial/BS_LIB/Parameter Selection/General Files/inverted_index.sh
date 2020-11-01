@@ -9,9 +9,49 @@ nc_step=0
 
 if [ $datasize == 10000  ]
 then
-    nc_start=5000
+    nc_start=2000
     nc_end=50000
+    nc_step=2000
+elif [ $datasize == 9000  ]
+then
+    nc_start=1800
+    nc_end=45000
+    nc_step=1800
+elif [ $datasize == 8000  ]
+then
+    nc_start=1600
+    nc_end=40000
+    nc_step=1600
+elif [ $datasize == 7000  ]
+then
+    nc_start=1400
+    nc_end=35000
+    nc_step=1400
+elif [ $datasize == 6000  ]
+then
+    nc_start=1200
+    nc_end=30000
+    nc_step=1200
+elif [ $datasize == 5000 ]
+then 
+    nc_start=1000
+    nc_end=25000
     nc_step=1000
+elif [ $datasize == 4000 ]
+then 
+    nc_start=800
+    nc_end=20000
+    nc_step=800
+elif [ $datasize == 3000 ]
+then 
+    nc_start=600
+    nc_end=150000
+    nc_step=600
+elif [ $datasize == 2000 ]
+then 
+    nc_start=400
+    nc_end=10000
+    nc_step=400
 elif [ $datasize == 1000 ]
 then 
     nc_start=200
@@ -33,7 +73,43 @@ record_count=0
 for ((i=$nc_start; i<=nc_end; i=$i+$nc_step))
 do
     echo "Running II index with parameter setting: " $i 
-    ./inverted_index $i $record_count
+    if [ $datasize == 10000  ]
+    then
+        ./inverted_index_10000 $i $record_count
+    elif [ $datasize == 9000  ]
+    then
+        ./inverted_index_9000 $i $record_count
+    elif [ $datasize == 8000  ]
+    then
+        ./inverted_index_8000 $i $record_count
+    elif [ $datasize == 7000  ]
+    then
+        ./inverted_index_7000 $i $record_count
+    elif [ $datasize == 6000  ]
+    then
+        ./inverted_index_6000 $i $record_count
+    elif [ $datasize == 5000 ]
+    then 
+        ./inverted_index_5000 $i $record_count
+    elif [ $datasize == 4000 ]
+    then 
+        ./inverted_index_4000 $i $record_count
+    elif [ $datasize == 3000 ]
+    then 
+        ./inverted_index_3000 $i $record_count
+    elif [ $datasize == 2000 ]
+    then 
+        ./inverted_index_2000 $i $record_count
+    elif [ $datasize == 1000 ]
+    then 
+        ./inverted_index_1000 $i $record_count
+    elif [ $datasize == 100 ]
+    then 
+        ./inverted_index_100 $i $record_count
+    elif [ $datasize == 10 ]
+    then 
+        ./inverted_index_10 $i $record_count
+    fi
     let record_count=$record_count+1
 done
 

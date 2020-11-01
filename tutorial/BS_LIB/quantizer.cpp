@@ -12,5 +12,4 @@ namespace bslib{
             num_centroids += group_size;
         }
     }
-
 }

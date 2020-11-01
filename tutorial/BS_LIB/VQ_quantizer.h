@@ -16,6 +16,7 @@ namespace bslib{
         size_t efSearch;
         bool use_HNSW;
         std::vector<hnswlib::HierarchicalNSW *> HNSW_quantizers;
+        std::vector<size_t> nc_num;
         std::vector<faiss::IndexFlatL2 *> L2_quantizers; //Resized with nc_upper in read quantizer
 
          // The size should be train_set_size, the max size is nc_upper

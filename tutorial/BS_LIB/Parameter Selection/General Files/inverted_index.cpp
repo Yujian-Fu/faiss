@@ -42,18 +42,6 @@ int main(int argc,char *argv[]){
         record_file.open(path_record, std::ios::app);
     }
 
-    /*
-    std::vector<std::vector<idx_t>> best_recall_index(num_recall);
-    std::vector<std::vector<size_t>> best_recall_para(num_recall);
-    std::vector<std::vector<float>> best_recall_time(num_recall);
-
-    for (size_t i = 0; i < num_recall; i++){
-        best_recall_time[i].resize(1000, 100);
-        best_recall_index[i].resize(1000);
-        best_recall_para[i].resize(1000);
-    }
-    */
-
     record_file << "This is the record for Inverted Index with record " << centroid << " centroids " << std::endl;
     record_file << "The batch size and number of batches in this program is: " << batch_size << " " << nbatches << std::endl;
     
@@ -270,15 +258,8 @@ int main(int argc,char *argv[]){
                 
                 std::cout << " The Recall and QPS: " << search_space[0] << " " << recall << " " << qps << std::endl;
                 
-                /*
-                if (qps < best_recall_time[i][size_t(recall*1000)]){
-                    best_recall_time[i][size_t(recall*1000)] = qps;
-                    best_recall_index[i][size_t(recall*1000)] = j;
-                    best_recall_para[i][size_t(recall*1000)] = search_space[0];
-                }*/
-                
                 if (recall <= previous_recall && recall <= second_previous_recall && recall <= third_previous_recall){
-                    //break;
+                    break;
                 }
                 third_previous_recall = second_previous_recall;
                 second_previous_recall = previous_recall;

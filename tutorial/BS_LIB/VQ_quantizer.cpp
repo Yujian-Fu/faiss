@@ -21,6 +21,7 @@ namespace bslib{
                 this->efConstruction = efConstruction;
                 this->efSearch = efSearch;
                 this->HNSW_quantizers.resize(nc_upper);
+                this->nc_num.resize(nc_upper);
             }
             else{
                 this->L2_quantizers.resize(nc_upper);
@@ -40,6 +41,7 @@ namespace bslib{
      * 
      **/
     void VQ_quantizer::build_centroids(const float * train_data, size_t train_set_size, idx_t * train_data_ids){
+        bool use_dynamic_nc = false;
         std::cout << "Adding " << train_set_size << " train set data into " << nc_upper << " groups " << std::endl;
         std::vector<std::vector<float>> train_set(this->nc_upper);
 
@@ -53,6 +55,7 @@ namespace bslib{
         std::cout << "Building group quantizers for vq_quantizer " << std::endl;
         size_t min_train_size = train_set[0].size() / dimension; 
         for (size_t i = 0; i < nc_upper; i++){if (min_train_size > train_set[i].size() / dimension) min_train_size = train_set[i].size() / dimension;std::cout << train_set[i].size() / dimension <<" ";}
+        
 
         std::cout <<  std::endl << "The min size for sub train set is: " << min_train_size << std::endl;
 
