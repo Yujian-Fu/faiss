@@ -52,7 +52,7 @@ namespace bslib{
 
         std::cout << "Building group quantizers for vq_quantizer " << std::endl;
         size_t min_train_size = train_set[0].size() / dimension; 
-        for (size_t i = 0; i < nc_upper; i++){if (min_train_size > train_set[i].size() / dimension) min_train_size = train_set[i].size() / dimension;std::cout << train_set[i].size()<<" ";}
+        for (size_t i = 0; i < nc_upper; i++){if (min_train_size > train_set[i].size() / dimension) min_train_size = train_set[i].size() / dimension;std::cout << train_set[i].size() / dimension <<" ";}
 
         std::cout <<  std::endl << "The min size for sub train set is: " << min_train_size << std::endl;
 

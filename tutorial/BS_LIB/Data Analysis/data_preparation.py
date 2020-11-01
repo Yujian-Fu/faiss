@@ -34,7 +34,7 @@ dataset = "Gaussian"
 mu = 10
 sigma = 0.1
 
-for dimension in range(500, 600, 300):
+for dimension in range(128, 129, 300):
 
     for size in size_list:
         if "K" in size:
@@ -57,7 +57,7 @@ for dimension in range(500, 600, 300):
         learn_dataset = np.random.normal(mu, sigma, (int(sample_size / 10), dimension)).astype('float32')
         utils.fvecs_write(sample_learn_file, learn_dataset)
 
-        sample_ID_file = dataset_path + "analysis/" + dataset + "_" + size + "_" + str(dimension) + "_gt.ivecs"
+        sample_ID_file = dataset_path + "analysis/" + dataset + "_" + size + "_" + str(dimension) + "_groundtruth.ivecs"
         index = faiss.IndexFlatL2(dimension)
         index.add(sample_dataset)
         dis, ID = index.search(query_dataset, 100)
@@ -65,7 +65,7 @@ for dimension in range(500, 600, 300):
         
 
 dataset = "Random"
-for dimension in range(500, 600, 300):
+for dimension in range(128, 129, 300):
 
     for size in size_list:
         if "K" in size:
@@ -88,7 +88,7 @@ for dimension in range(500, 600, 300):
         learn_dataset = np.random.randint(0, 100, (int(sample_size / 10), dimension)).astype('float32')
         utils.fvecs_write(sample_learn_file, learn_dataset)
 
-        sample_ID_file = dataset_path + "analysis/" + dataset + "_" + size + "_" + str(dimension) + "_gt.ivecs"
+        sample_ID_file = dataset_path + "analysis/" + dataset + "_" + size + "_" + str(dimension) + "_groundtruth.ivecs"
         index = faiss.IndexFlatL2(dimension)
         index.add(sample_dataset)
         dis, ID = index.search(query_dataset, 100)
