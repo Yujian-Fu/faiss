@@ -11,10 +11,11 @@
 using namespace bslib;
 
 int main(int argc,char *argv[]){
-    assert(argc == 3);
+    assert(argc == 4);
 
     size_t centroid = atoi(argv[1]);
     size_t build_times = atoi(argv[2]);
+    std::string time_now = std::string(argv[3]);
     uint32_t batch_size = nb / nbatches;
     std::cout <<"The input centroid is: " << centroid << std::endl;
 
@@ -34,13 +35,15 @@ int main(int argc,char *argv[]){
    // 把 now 转换为字符串形式
     char* dt = ctime(&now);
 
-    path_record += "parameter_tuning_inverter_index_" + std::to_string(M_PQ) + "_" + std::string(dt) + ".txt";
+    path_record += "parameter_tuning_inverter_index_" + std::to_string(M_PQ) + "_" + time_now + ".txt";
     if (build_times == 0){
         record_file.open(path_record, std::ios::trunc);
     }
     else{
         record_file.open(path_record, std::ios::app);
     }
+    std::cout << "Saving record to " << path_record << std::endl;
+    record_file << "The time now is " << std::string(dt) << std::endl;
 
     record_file << "This is the record for Inverted Index with record " << centroid << " centroids " << std::endl;
     record_file << "The batch size and number of batches in this program is: " << batch_size << " " << nbatches << std::endl;
@@ -280,5 +283,6 @@ int main(int argc,char *argv[]){
             }
         }*/
     //}
+    record_file << "Record end, the time now is: " << std::string (dt) << std::endl;
     record_file.close();
 }

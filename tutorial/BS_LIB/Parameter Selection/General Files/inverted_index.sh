@@ -70,45 +70,46 @@ then
 fi
 
 record_count=0
+time=$(date "+%Y%m%d-%H%M%S")
 for ((i=$nc_start; i<=nc_end; i=$i+$nc_step))
 do
     echo "Running II index with parameter setting: " $i 
     if [ $datasize == 10000  ]
     then
-        ./inverted_index_10000 $i $record_count
+        ./inverted_index_10000 $i $record_count $time
     elif [ $datasize == 9000  ]
     then
-        ./inverted_index_9000 $i $record_count
+        ./inverted_index_9000 $i $record_count $time
     elif [ $datasize == 8000  ]
     then
-        ./inverted_index_8000 $i $record_count
+        ./inverted_index_8000 $i $record_count $time
     elif [ $datasize == 7000  ]
     then
-        ./inverted_index_7000 $i $record_count
+        ./inverted_index_7000 $i $record_count $time
     elif [ $datasize == 6000  ]
     then
-        ./inverted_index_6000 $i $record_count
+        ./inverted_index_6000 $i $record_count $time
     elif [ $datasize == 5000 ]
     then 
-        ./inverted_index_5000 $i $record_count
+        ./inverted_index_5000 $i $record_count $time
     elif [ $datasize == 4000 ]
     then 
-        ./inverted_index_4000 $i $record_count
+        ./inverted_index_4000 $i $record_count $time
     elif [ $datasize == 3000 ]
     then 
-        ./inverted_index_3000 $i $record_count
+        ./inverted_index_3000 $i $record_count $time
     elif [ $datasize == 2000 ]
     then 
-        ./inverted_index_2000 $i $record_count
+        ./inverted_index_2000 $i $record_count $time
     elif [ $datasize == 1000 ]
     then 
-        ./inverted_index_1000 $i $record_count
+        ./inverted_index_1000 $i $record_count $time
     elif [ $datasize == 100 ]
     then 
-        ./inverted_index_100 $i $record_count
+        ./inverted_index_100 $i $record_count $time
     elif [ $datasize == 10 ]
     then 
-        ./inverted_index_10 $i $record_count
+        ./inverted_index_10 $i $record_count $time
     fi
     let record_count=$record_count+1
 done
