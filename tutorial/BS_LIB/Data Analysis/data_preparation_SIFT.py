@@ -4,7 +4,8 @@ import utils
 import faiss
 import os
 
-dataset_path = "/home/y/yujianfu/ivf-hnsw/data/"
+#dataset_path = "/home/y/yujianfu/ivf-hnsw/data/"
+dataset_path = "/home/yujian/Desktop/extra/Similarity Search/similarity_search_datasets/data/"
 
 size_list = ["100K", "2M", "3M", "4M", "5M", "6M", "7M", "8M", "9M", "10M"]
 
@@ -71,13 +72,12 @@ for size in size_list:
     query_dataset = utils.fvecs_read(query_dataset_file)
 
     
-    
     assert(base_dataset.shape[1] == dimension)
     index = faiss.IndexFlatL2(dimension)
     index.add(base_dataset)
     D, I = index.search(query_dataset, 100)
     groundtruth_file = folder_path + "/SIFT" + size + "_groundtruth" + ".ivecs"
-    utils.fvecs_write(groundtruth_file, I)
+    utils.ivecs_write(groundtruth_file, I)
     print("Write GT file")
 
 
