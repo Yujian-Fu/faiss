@@ -3,6 +3,10 @@
 
 datasize=10
 
+nc_start=0
+nc_end=0
+nc_step=0
+
 if [ $datasize == 10000  ]
 then
     nc_start=5000

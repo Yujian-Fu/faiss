@@ -3,12 +3,18 @@
 
 datasize=10
 
+nc1_start=0
+nc1_end=0
+nc1_step=0
+nc2_start=0
+nc2_end=0
+nc2_step=0
+
 if [ $datasize == 10000]
 then
     nc1_start=160
     nc1_end=20
     nc1_step=20
-
     nc2_start=160
     nc2_end=20
     nc2_step=20
@@ -17,7 +23,6 @@ then
     nc1_start=10
     nc1_end=50
     nc1_step=10
-
     nc2_start=10
     nc2_end=50
     nc2_step=10
@@ -35,11 +40,11 @@ then
     nc1_start=10
     nc1_end=30
     nc1_step=5
-
     nc2_start=10
     nc2_end=30
     nc2_step=5
 fi
+
 
 record_count=0
 for ((i=$nc1_start; i<=$nc1_end; i=$i+$nc1_step))
