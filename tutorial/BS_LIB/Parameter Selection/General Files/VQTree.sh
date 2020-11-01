@@ -53,7 +53,20 @@ do
     for ((j=$nc2_start; j<=$nc2_end; j=$j+$nc2_step))
     do
         echo "Running VQTree index with parameter setting: $i $j" 
-        ./VQTree $i $j $record_count $time
+        if [ $datasize == 10000 ]
+        then
+            ./VQTree_10000 $i $j $record_count $time
+        elif [ $datasize == 1000 ]
+        then
+            ./VQTree_1000 $i $j $record_count $time
+        elif [ $datasize == 100 ]
+        then 
+            ./VQTree_100 $i $j $record_count $time
+        elif [ $datasize == 10 ]
+        then
+            ./VQTree_10 $i $j $record_count $time
+        fi
+
         let record_count=$record_count+1
     done
 done
