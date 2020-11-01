@@ -6,7 +6,7 @@ import os
 
 dataset_path = "/home/y/yujianfu/ivf-hnsw/data/"
 
-size_list = ["100K"]
+size_list = ["10M"]
 
 billion_dataset_base = dataset_path + "SIFT1B/" + "bigann_base.bvecs" 
 billion_dataset_learn = dataset_path + "SIFT1B/" + "bigann_learn.bvecs" 
@@ -37,12 +37,10 @@ for size in size_list:
     '''
     index = random.sample(range(real_base_dataset.shape[0]), sample_size)
     base_dataset = real_base_dataset[index, :]
+    base_dataset_file = folder_path + "/SIFT" + size +"_base" + ".fvecs"
     utils.fvecs_write(base_dataset_file, base_dataset)
     print("Write base file")
-    '''
 
-    base_dataset_file = folder_path + "/SIFT" + size +"_base" + ".fvecs"
-    base_dataset = utils.fvecs_read(base_dataset_file)
 
     real_learn_dataset = utils.bvecs_read(billion_dataset_learn)
     index = random.sample(range(real_learn_dataset.shape[0]), int(sample_size / 10))
@@ -57,11 +55,20 @@ for size in size_list:
     query_dataset_file = folder_path + "/SIFT" + size + "_query" + ".fvecs"
     utils.fvecs_write(query_dataset_file, query_dataset)
     print("Write query file")
+    '''
+
+
+    base_dataset_file = folder_path + "/SIFT" + size +"_base" + ".fvecs"
+    base_dataset = utils.fvecs_read(base_dataset_file)
+
+    query_dataset_file = folder_path + "/SIFT" + size + "_query" + ".fvecs"
+    query_dataset = utils.fvecs_read(query_dataset_file)
+
 
     assert(base_dataset.shape[1] == dimension)
     index = faiss.IndexFlatL2(dimension)
     index.add(base_dataset)
-    D, I = index.search(query_dataset, ngt)
+    D, I = index.search(query_dataset, 100)
     groundtruth_file = folder_path + "/SIFT" + size + "_groundtruth" + ".fvecs"
     utils.fvecs_write(groundtruth_file, I)
     print("Write GT file")
