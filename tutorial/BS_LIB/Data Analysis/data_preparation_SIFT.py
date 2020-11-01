@@ -39,7 +39,7 @@ for size in size_list:
     print("Write base file")
 
     real_learn_dataset = utils.bvecs_read(billion_dataset_learn)
-    index = random.sample(range(real_base_dataset.shape[0]), int(sample_size / 10))
+    index = random.sample(range(real_learn_dataset.shape[0]), int(sample_size / 10))
     learn_dataset = real_learn_dataset[index, :]
     learn_dataset_file = folder_path + "/SIFT" + size +"_learn" + ".fvecs"
     utils.fvecs_write(learn_dataset, learn_dataset_file)
