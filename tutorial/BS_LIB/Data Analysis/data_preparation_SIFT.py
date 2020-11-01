@@ -6,7 +6,7 @@ import os
 
 dataset_path = "/home/y/yujianfu/ivf-hnsw/data/"
 
-size_list = ["100K", "10M"]
+size_list = ["10M"]
 
 billion_dataset_base = dataset_path + "SIFT1B/" + "bigann_base.bvecs" 
 billion_dataset_learn = dataset_path + "SIFT1B/" + "bigann_learn.bvecs" 
