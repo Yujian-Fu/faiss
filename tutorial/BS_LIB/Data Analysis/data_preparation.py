@@ -62,7 +62,7 @@ for dimension in range(128, 129, 300):
         index.add(sample_dataset)
         dis, ID = index.search(query_dataset, 100)
         utils.ivecs_write(sample_ID_file, ID)
-        
+
 
 dataset = "Random"
 for dimension in range(128, 129, 300):
