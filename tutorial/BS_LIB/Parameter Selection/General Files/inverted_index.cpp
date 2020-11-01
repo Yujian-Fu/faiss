@@ -234,26 +234,35 @@ int main(int argc,char *argv[]){
             float third_previous_recall = 0;
             size_t step = size_t(centroid / 1000) + 2;
             size_t search_space_start = 5;
+
             for (size_t j = search_space_start; j < centroid; j += step){
                 std::vector<size_t> search_space(1);
                 search_space[0] = j + 1;
                 size_t correct = 0;
+
                 index.max_visited_vectors = size_t(nb / index.final_group_num * (search_space[0] * 1.5));
                 Trecorder.reset();
+
                 index.search(nq, recall_k, queries.data(), query_distances.data(), query_labels.data(), search_space.data(), groundtruth.data(), path_base);
+
                 float qps = Trecorder.getTimeConsumption() / (nq * 1000);
 
                 for (size_t temp1 = 0; temp1 < nq; temp1++){
                     std::unordered_set<idx_t> gt;
                     for (size_t temp2 = 0; temp2 < recall_k; temp2 ++){
                         gt.insert(groundtruth[ngt * temp1 + temp2]);
+                        //std::cout << groundtruth[ngt * temp1 + temp2] << " ";
                     }
+                    //std::cout << std::endl;
 
                     assert(gt.size() == recall_k);
                     for (size_t temp2 = 0; temp2 < recall_k; temp2 ++){
-                        if (gt.count(query_labels[temp1 * recall_k + temp2]) != 0)
+                        //std::cout << query_labels[temp1 * recall_k + temp2] << " ";
+                        if (gt.count(query_labels[temp1 * recall_k + temp2]) != 0){
                             correct ++;
+                        }
                     }
+                    //std::cout << std::endl;
                 }
                 float recall = float(correct) / (recall_k * nq);
 
@@ -269,7 +278,7 @@ int main(int argc,char *argv[]){
                 }*/
                 
                 if (recall <= previous_recall && recall <= second_previous_recall && recall <= third_previous_recall){
-                    break;
+                    //break;
                 }
                 third_previous_recall = second_previous_recall;
                 second_previous_recall = previous_recall;

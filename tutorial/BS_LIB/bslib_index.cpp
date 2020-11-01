@@ -1041,16 +1041,29 @@ namespace bslib{
                         base_input.read((char *) base_vector.data(), sizeof(base_data_type)*dimension);
                         std::vector<float> base_vector_float(dimension);
                         for (size_t temp = 0; temp < dimension; temp++){base_vector_float[temp] = base_vector[temp];}
-                        std::vector<float> distance_vector(dimension);
-                        faiss::fvec_madd(dimension, base_vector_float.data(), -1, query, distance_vector.data());
-                        float actual_dist =  faiss::fvec_norm_L2sqr(distance_vector.data(), dimension);
+                        float actual_dist =  faiss::fvec_L2sqr(base_vector_float.data(), query, dimension);
                         std::vector<float> decoded_code(dimension);
                         pq.decode(code + m * code_size, decoded_code.data(), 1);
                         std::vector<float> decoded_base_vector(dimension);
                         decode(1, decoded_code.data(), & group_id, decoded_base_vector.data());
                         float actual_norm = faiss::fvec_norm_L2sqr(decoded_base_vector.data(), dimension);
+                        
                         query_actual_dists[visited_vectors] = actual_dist;
-                        std::cout << "S: " << dist << " A: " << actual_dist << " LN: " << term2 << " AN: " << actual_norm << " " << " Term1: " << q_c_dist << " " << centroid_norm << " Term3: " << term3; // S for "Search" and A for "Actual"
+                        float product_term3 = 2 * faiss::fvec_inner_product(query, decoded_code.data(), dimension);
+                        
+                        std::vector<float> b_c_residual(dimension);
+                        std::vector<float> centroid(dimension);
+                        get_final_centroid(centroid_id, centroid.data());
+                        faiss::fvec_madd(dimension, base_vector_float.data(), -1.0, centroid.data(), b_c_residual.data());
+                        float actual_term3 = 2 * faiss::fvec_inner_product(query, b_c_residual.data(), dimension);
+                        std::vector<uint8_t> base_code(this->code_size);
+                        pq.compute_code(b_c_residual.data(), base_code.data());
+                        std::vector<float> reconstructed_residual(dimension);
+                        pq.decode(base_code.data(), reconstructed_residual.data(), 1);
+                        float test_term3 = 2 * faiss::fvec_inner_product(query, reconstructed_residual.data(), dimension);
+                        
+
+                        std::cout << " S: " << dist << " A: " << actual_dist << " LN: " << term2 << " AN: " << actual_norm << " " << " Term1: " << q_c_dist << " " << centroid_norm << " Term3: " << term3 << " " << "Term3 inner: " << product_term3 <<  " Term3 Test: " << test_term3 << " Actual term3: " << actual_term3 << std::endl; // S for "Search" and A for "Actual"
                     }
 
                     query_search_labels[visited_vectors] = base_sequence_ids[group_id][m];

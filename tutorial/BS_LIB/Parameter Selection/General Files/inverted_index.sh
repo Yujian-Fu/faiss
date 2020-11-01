@@ -29,12 +29,11 @@ then
     nc_step=50
 fi
 
-
 record_count=0
 for ((i=$nc_start; i<=nc_end; i=$i+$nc_step))
 do
     echo "Running II index with parameter setting: " $i 
-    #./inverted_index $i $record_count
+    ./inverted_index $i $record_count
     let record_count=$record_count+1
 done
 
