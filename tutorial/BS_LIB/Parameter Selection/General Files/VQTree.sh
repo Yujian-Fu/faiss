@@ -1,7 +1,7 @@
 #！/bin/bash
 #This is for running VQTree index
 
-datasize=1000
+datasize=10
 
 if [ $datasize == 10000]
 then

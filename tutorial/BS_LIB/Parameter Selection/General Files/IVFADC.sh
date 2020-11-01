@@ -2,7 +2,7 @@
 #This is for running IVFADC index
 
 
-datasize=1000
+datasize=10
 
 if [ $datasize == 10000]
 then
