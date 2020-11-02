@@ -1,11 +1,13 @@
 import numpy as np 
 import matplotlib.pyplot as plt 
 
-base_path = "/home/yujian/Desktop/exp_record/QE_multi_layer/"
 
-models = ["inverted_index", "ICI", "IMI", "IVFADC", "VQTree"]
 
-datasets = ["SIFT10K", "SIFT1M", "DEEP1M", "GIST1M"]
+base_path = "/home/yujian/Desktop/extra/Similarity_Search/similarity_search_datasets/models_VQ/"
+
+models = ["inverted_index"]
+
+datasets = ["SIFT10K"]
 recall = []
 time = []
 index_conf = ""
@@ -40,7 +42,7 @@ all_colors = [
 
 all_types = [
 '-',
-'--',
+#'--',
 '-.',
 ':' 
 ]
@@ -53,19 +55,32 @@ all_nodes = [
 '^'
 ]
 
+convergence_gap = 0.01
+
+def get_best_point(sorted_time, sorted_recall):
+    best_recall = 0
+    for i in range(len(sorted_recall)):
+        if (sorted_recall[-1] - best_recall < convergence_gap):
+            return (sorted_time[i], sorted_recall[i])
+        else:
+            best_recall = sorted_recall[i]
+
+    return (sorted_time[-1], sorted_recall[-1])
+
 
 color_length = len(all_colors)
+type_length = len(all_types)
 
 for dataset in datasets:
     for model in models:
         for recall_test in [1, 10]:
+            fig,ax=plt.subplots(1,2)
 
-            folder_path = base_path + model + "/"
-            file_path = folder_path + dataset + "_parameter_tuning_" + model + "_16.txt"
+            folder_path = base_path + dataset + "/"
+            file_path = folder_path + "parameter_tuning_" + model + "_16_20201102-184457.txt"
             print(file_path)
             file = open(file_path, "r")
             f1 = file.readlines()
-            plt.figure()
             time = []
             recall = []
             recall_result = 0
@@ -88,9 +103,13 @@ for dataset in datasets:
                     inds_recall = (-np.array(recall)).argsort()
                     sorted_recall = np.array(recall)[inds_recall]
 
-                    plt.plot(list(sorted_time), list(sorted_recall), label = index_conf, color = all_colors[color_index % color_length], linestyle = all_types[int(color_index / color_length)%4], marker = all_nodes[int(color_index / (color_length * 4))%4])
+                    ax[0].plot(list(sorted_time), list(sorted_recall), label = index_conf, color = all_colors[color_index % color_length], linestyle = all_types[int(color_index / color_length)%type_length] , marker = all_nodes[int(color_index / (color_length * type_length))%4])
                     color_index += 1
-                    print(color_index, color_length)
+                    print(color_index, color_index % color_length , int(color_index / color_length)%type_length, int(color_index / (color_length * type_length))%4)
+                    best_point = get_best_point(list(sorted_time), list(sorted_recall))
+                    ax[1].plot(best_point[0], best_point[1])
+                    ax[1].text(best_point[0], best_point[1], index_conf, fontsize=8)
+
                     time = []
                     recall = []
                     recall_result = 0
@@ -101,11 +120,11 @@ for dataset in datasets:
                     else:
                         recall_result = 0
 
-            plt.xlim()
-            plt.title("Random1M" + " " + model)
-            plt.ylabel("Recall@" + str(recall_test))
-            plt.xlabel("Time / ms")
-            plt.legend(prop={'size':5})
+            #ax[0][0].xlim()
+            ax[0].set_title(dataset + " " + model)
+            ax[0].set_ylabel("Recall@" + str(recall_test))
+            ax[0].set_xlabel("Time / ms")
+            ax[0].legend(prop={'size':7}, ncol = 3)
             plt.show()
 
 

@@ -35,7 +35,7 @@ int main(int argc,char *argv[]){
    // 把 now 转换为字符串形式
     char* dt = ctime(&now);
 
-    path_record += "parameter_tuning_inverter_index_" + std::to_string(M_PQ) + "_" + time_now + ".txt";
+    path_record += "parameter_tuning_inverted_index_" + std::to_string(M_PQ) + "_" + time_now + ".txt";
     if (build_times == 0){
         record_file.open(path_record, std::ios::trunc);
     }

@@ -61,12 +61,12 @@ elif [ $datasize == 100 ]
 then 
     nc_start=100
     nc_end=3000
-    nc_step=100
+    nc_step=50
 elif [ $datasize == 10 ]
 then 
     nc_start=50
     nc_end=1000
-    nc_step=50
+    nc_step=10
 fi
 
 record_count=0
