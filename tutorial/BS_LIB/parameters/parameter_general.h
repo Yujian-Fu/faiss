@@ -1,7 +1,7 @@
 #include <string>
 
-//const std::string base_path = "/home/y/yujianfu/ivf-hnsw/";
-const std::string base_path = "/home/yujian/Desktop/extra/Similarity_Search/similarity_search_datasets/";
+const std::string base_path = "/home/y/yujianfu/ivf-hnsw/";
+//const std::string base_path = "/home/yujian/Desktop/extra/Similarity_Search/similarity_search_datasets/";
 
 const std::string dataset = "SIFT5M";
 const size_t dimension = 128;
