@@ -22,10 +22,10 @@ elif [ $datasize == 1000 ]
 then
     nc1_start=10
     nc1_end=100
-    nc1_step=10
+    nc1_step=5
     nc2_start=10
     nc2_end=100
-    nc2_step=10
+    nc2_step=5
 elif [ $datasize == 100 ]
 then 
     nc1_start=10
