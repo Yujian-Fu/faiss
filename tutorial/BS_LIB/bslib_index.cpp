@@ -161,6 +161,7 @@ namespace bslib{
      * 
      **/
     void Bslib_Index::build_train_selector(const std::string path_learn, const std::string path_groups, const std::string path_labels, size_t total_train_size, size_t sub_train_size, size_t group_size){
+        time_recorder Trecorder = time_recorder();
         PrintMessage("Building train dataset selector for further train tasks");
         if (exists(path_labels)){
             PrintMessage("Selector already constructed, load it");
@@ -185,6 +186,7 @@ namespace bslib{
             }
 
             std::vector<float> train_set_centroids(group_size * dimension);
+            PrintMessage("Running Kmeans to generate the centroids");
 
             if (sub_train_size < total_train_size){
                 std::vector<float> sub_train_set(sub_train_size * dimension);
@@ -194,8 +196,9 @@ namespace bslib{
             else{
                 faiss::kmeans_clustering(dimension, total_train_size, group_size, origin_train_set.data(), train_set_centroids.data(), 50);
             }
-            
+            Trecorder.print_time_usage("Run Kmeans to generate the centroids");
 
+            PrintMessage("Computing the total train set distance to the closest centroids");
             faiss::IndexFlatL2 centroid_index(dimension);
             centroid_index.add(group_size, train_set_centroids.data());
 
@@ -203,6 +206,7 @@ namespace bslib{
             std::vector<float> result_dists(total_train_size);
             centroid_index.search(total_train_size, origin_train_set.data(), 1, result_dists.data(), result_ids.data());
 
+            Trecorder.print_time_usage("Computed the total train set distance to the closest centroids");
             this->train_set_ids.resize(group_size);
             for (size_t i = 0; i < total_train_size; i++){this->train_set_ids[result_ids[i]].push_back(i);}
 
@@ -811,7 +815,8 @@ namespace bslib{
      * distance = ||query - (centroids + residual_PQ)||^2
      *            ||query - centroids||^2 + ||residual_PQ|| ^2 - 2 * (query - centroids) * residual_PQ
      *            ||query - centroids||^2 + ||residual_PQ|| ^2 - 2 * query * residual_PQ + 2 * centroids * residual_PQ
-     *            ||query - centroids||^2 + ||residual_PQ + centroids||^2 - ||centroids||^2 - 2 * query * residual_PQ 
+     *            ||query - centroids||^2 + - ||centroids||^2 + ||residual_PQ + centroids||^2 - 2 * query * residual_PQ 
+     *             accurate                                      error                          error
      * 
       * Term1 can be computed in assigning the queries
       * Term2 is the norm of base vectors
@@ -833,10 +838,16 @@ namespace bslib{
 
     void Bslib_Index::search(size_t n, size_t result_k, float * queries, float * query_dists, idx_t * query_ids, const size_t * keep_space, uint32_t * groundtruth, std::string path_base){
         
+        /*
+        std::ofstream dist_file;
+        dist_file.open(path_dist, std::ios::app);
+        dist_file << "The search analysis for recall @ " << result_k << std::endl;
+        */
+
         // Variables for testing and validation and printing
         // Notice: they should only be activated when parallel is not used
         const bool validation = false; 
-        size_t validation_print_space = 50;
+        size_t validation_print_space = 50; 
         const bool analysis = false; 
         const bool showmessage = false; 
 
@@ -859,6 +870,8 @@ namespace bslib{
 //Use parallel in real use
 //#pragma omp parallel for
         for (size_t i = 0; i < n; i++){
+
+            //dist_file << "QUery " << i << std::endl;
 
             //Variables for analysis
             time_recorder Trecorder = time_recorder();
@@ -978,10 +991,13 @@ namespace bslib{
                 q_c_dists[i] = query_centroid_dists;
             }
 
+
             size_t max_size = 0;for (size_t j = 0; j < final_keep_space; j++){if (base_sequence_ids[query_group_ids[j]].size() > max_size) max_size = base_sequence_ids[query_group_ids[j]].size();}
             
             if(showmessage) std::cout << "Assigning the space for dists and labels with size " << max_visited_vectors << " + " << max_size <<  std::endl;
-            std::vector<float> query_search_dists(max_visited_vectors + max_size, 0);std::vector<idx_t> query_search_labels(max_visited_vectors + max_size, 0);
+            std::vector<float> query_search_dists(max_visited_vectors + max_size, 0);
+            std::vector<idx_t> query_search_labels(max_visited_vectors + max_size, 0);
+            
             
             // The dists for actual distance validation
             std::vector<float> query_actual_dists; if (validation){(query_actual_dists.resize(max_visited_vectors + max_size));}
@@ -1075,6 +1091,56 @@ namespace bslib{
                     break;
             }
 
+            /*
+            std::vector<float> temp_search_dist(100);
+            std::vector<idx_t> temp_search_ids(100);
+            std::vector<float> actual_search_dist(100);
+
+            keep_k_min(visited_vectors, 100, query_search_dists.data(), query_search_labels.data(), temp_search_dist.data(), temp_search_ids.data());
+            std::ifstream reranking_input(path_base, std::ios::binary);
+            std::vector<float> reranking_dists(100, 0);
+            std::vector<idx_t> reranking_labels(100, 0);
+            std::vector<float> reranking_actual_dists(100, 0);
+
+            for (size_t temp = 0; temp < 100; temp++){
+                std::vector<base_data_type> base_vector(dimension);
+                uint32_t dim;
+                reranking_input.seekg(temp_search_ids[temp] * dimension * sizeof(base_data_type) + temp_search_ids[temp] * sizeof(uint32_t), std::ios::beg);
+                reranking_input.read((char *)& dim, sizeof(uint32_t));
+                reranking_input.read((char *) base_vector.data(), sizeof(base_data_type) * dimension);
+                assert(dim == dimension);
+                actual_search_dist[temp] = faiss::fvec_L2sqr(base_vector.data(), query, dimension);
+            }
+            std::vector<idx_t> search_dist_index(100);
+            uint32_t x = 0;
+            std::iota(search_dist_index.begin(), search_dist_index.end(), x++);
+            std::sort(search_dist_index.begin(), search_dist_index.end(), [&](int i, int j){return temp_search_dist[i] < temp_search_dist[j];});
+
+            
+            for (size_t temp = 0; temp < 100; temp++){
+                if (temp == 9){
+                    dist_file << std::endl;
+                }
+                dist_file << temp_search_ids[search_dist_index[temp]] << " " << temp_search_dist[search_dist_index[temp]] << " " << actual_search_dist[search_dist_index[temp]] << " ";
+            }
+            dist_file << std::endl;
+
+            for (size_t temp = 0; temp < 100; temp++){
+                std::vector<base_data_type> base_vector(dimension);
+                uint32_t dim;
+                reranking_input.seekg(groundtruth[i* 100 + temp] * dimension * sizeof(base_data_type) + groundtruth[i* 100 + temp] * sizeof(uint32_t), std::ios::beg);
+                reranking_input.read((char *)& dim, sizeof(uint32_t));
+                reranking_input.read((char *) base_vector.data(), sizeof(base_data_type) * dimension);
+                actual_search_dist[temp] = faiss::fvec_L2sqr(base_vector.data(), query, dimension);
+            }
+            for (size_t temp = 0; temp < 100; temp++){
+                if (temp == 9){
+                    dist_file << std::endl;
+                }
+                dist_file << groundtruth[i * 100 + temp] <<  " " << actual_search_dist[temp] << " ";
+            }
+            dist_file << std::endl;
+            */
 
             if (validation){
             //Compute the distance sort for computed distance

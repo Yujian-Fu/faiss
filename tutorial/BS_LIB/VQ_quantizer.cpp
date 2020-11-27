@@ -41,7 +41,6 @@ namespace bslib{
      * 
      **/
     void VQ_quantizer::build_centroids(const float * train_data, size_t train_set_size, idx_t * train_data_ids){
-        bool use_dynamic_nc = false;
         std::cout << "Adding " << train_set_size << " train set data into " << nc_upper << " groups " << std::endl;
         std::vector<std::vector<float>> train_set(this->nc_upper);
 

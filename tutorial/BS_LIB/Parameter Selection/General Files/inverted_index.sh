@@ -1,7 +1,7 @@
 #！/bin/bash
 #This is for running inverted index
 
-datasize=1000
+datasize=10
 
 nc_start=0
 nc_end=0
@@ -54,19 +54,28 @@ then
     nc_step=200
 elif [ $datasize == 1000 ]
 then 
-    nc_start=200
-    nc_end=5000
-    nc_step=200
+    #nc_start=200
+    #nc_end=5000
+    #nc_step=200
+    nc_start=100
+    nc_end=1100
+    nc_step=100
 elif [ $datasize == 100 ]
 then 
+    #nc_start=100
+    #nc_end=3000
+    #nc_step=50
     nc_start=100
-    nc_end=3000
-    nc_step=50
+    nc_end=1000
+    nc_step=100
 elif [ $datasize == 10 ]
 then 
-    nc_start=50
-    nc_end=1000
-    nc_step=10
+    #nc_start=50
+    #nc_end=1000
+    #nc_step=10
+    nc_start=10
+    nc_end=11
+    nc_step=1
 fi
 
 record_count=0
@@ -113,6 +122,7 @@ do
     fi
     let record_count=$record_count+1
 done
+
 
 echo "Finished inverted index experiments"
 

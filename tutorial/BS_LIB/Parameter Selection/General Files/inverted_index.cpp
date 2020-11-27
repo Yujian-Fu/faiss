@@ -26,6 +26,7 @@ int main(int argc,char *argv[]){
 
     std::string message;
     std::ofstream record_file;
+    std::ofstream distance_NN_file;
     PrepareFolder((char *) folder_model.c_str());
     PrepareFolder((char *) (std::string(folder_model)+"/" + dataset).c_str());
 
@@ -34,13 +35,18 @@ int main(int argc,char *argv[]){
    
    // 把 now 转换为字符串形式
     char* dt = ctime(&now);
+    std::string path_dis_NN = path_record + "dist_NN_record_" + time_now + ".txt"; 
+    std::string path_centroids = path_record + "centroids_" + std::to_string(centroid) + ".fvecs";
+    std::string path_dis = path_record + "dist_analysis_" + time_now + ".txt";
 
     path_record += "parameter_tuning_inverted_index_" + std::to_string(M_PQ) + "_" + time_now + ".txt";
     if (build_times == 0){
         record_file.open(path_record, std::ios::trunc);
+        distance_NN_file.open(path_dis_NN, std::ios::trunc);
     }
     else{
         record_file.open(path_record, std::ios::app);
+        distance_NN_file.open(path_dis_NN, std::ios::app);
     }
     std::cout << "Saving record to " << path_record << std::endl;
     record_file << "The time now is " << std::string(dt) << std::endl;
@@ -121,7 +127,10 @@ int main(int argc,char *argv[]){
         message = "Built index " + std::to_string(centroid) + " ";
         Trecorder.record_time_usage(record_file, message);
         Mrecorder.print_memory_usage(message);
-
+        std::ofstream centroid_file;
+        centroid_file.open(path_centroids, std::ios::binary);
+        writeXvec<float>(centroid_file, index.vq_quantizer_index[0].L2_quantizers[0]->xb.data(), dimension, centroid);
+        centroid_file.close();
 
         //The parallel version of assigning points
         std::ifstream base_input (path_base, std::ios::binary);
@@ -178,7 +187,6 @@ int main(int argc,char *argv[]){
             index.base_sequence_ids[i].resize(groups_size[i]);
         }
 
-
         base_input = std::ifstream(path_base, std::ios::binary);
         std::vector<float> base_batch(batch_size * dimension);
         std::vector<idx_t> batch_sequence_ids(batch_size);
@@ -195,6 +203,85 @@ int main(int argc,char *argv[]){
                 Trecorder.print_time_usage("");
             }
         }
+
+        // Analysis
+        base_input.seekg(0, std::ios::beg);
+        std::vector<float> residual(nb * dimension);
+        std::vector<float> base_vectors(nb * dimension);
+        readXvecFvec<base_data_type> (base_input, base_vectors.data(), dimension, nb, true, true);
+        index.encode(nb, base_vectors.data(), ids.data(), residual.data());
+
+
+        std::vector<float> b_c_distance(nb);
+        faiss::fvec_norms_L2(b_c_distance.data(), residual.data(), dimension, nb);
+        float subtotal = 0;
+        distance_NN_file << "The record for index with centroid: " << centroid << std::endl;
+        distance_NN_file << "The b_c_dis of each base vector: " << std::endl;
+        for (size_t i = 0; i < nb; i++){
+            distance_NN_file << b_c_distance[i] << " ";
+            subtotal += b_c_distance[i];
+        }
+        float average = subtotal / nb;
+        distance_NN_file << std::endl << "The average distance between base vectors and centroids: " << average << std::endl;
+        
+        distance_NN_file << "The b_res_prod for each base vector: " << std::endl;
+        std::vector<float> final_centroid(dimension);
+        float subtotal_1 = 0;
+        float subtotal_2 = 0;
+
+        for (size_t i = 0; i < nb; i++){
+
+            float b_res_prod = faiss::fvec_inner_product(base_vectors.data() + i * dimension, residual.data()+ i * dimension, dimension);
+            subtotal_1 += abs(b_res_prod);
+            distance_NN_file << b_res_prod << " ";
+        }
+        distance_NN_file << std::endl << "The avg b_res_prod: " << subtotal_1 / nb << " " << std::endl;
+
+        distance_NN_file << "The c_res_prod: for each base vector: " << std::endl;
+        for (size_t i = 0; i< nb; i++){
+            index.get_final_centroid(ids[i], final_centroid.data());
+            float c_res_prod = faiss::fvec_inner_product(final_centroid.data(), residual.data() + i * dimension, dimension);
+            subtotal_2 += abs(c_res_prod);
+            
+            distance_NN_file <<c_res_prod  << " " ;
+        }
+        distance_NN_file << std::endl << "The avg c_res_prod: " << subtotal_2 / nb << std::endl;
+
+        std::vector<uint8_t> base_vector_codes(nb * index.code_size);
+        index.pq.compute_codes(residual.data(), base_vector_codes.data(), nb);
+        std::vector<float> decoded_residuals(nb * dimension);
+        index.pq.decode(base_vector_codes.data(), decoded_residuals.data(), nb);
+        std::vector<float> diff_residuals(nb * dimension);
+        faiss::fvec_madd(nb * dimension, decoded_residuals.data(), -1.0, residual.data(), diff_residuals.data());
+
+        distance_NN_file << "The com_diff_norm for each base vector: " << std::endl;
+        subtotal = 0;
+        for (size_t i = 0; i < nb; i++){
+            float com_diff_norm = faiss::fvec_norm_L2sqr(diff_residuals.data() + i * dimension, dimension);
+            distance_NN_file << com_diff_norm << " ";
+            subtotal += com_diff_norm;
+        }
+        distance_NN_file << std::endl << "The avg com_diff_norm " << subtotal / nb << std::endl;
+
+        distance_NN_file << "The b_com_diff_prod: " << std::endl;
+        subtotal = 0;
+        for (size_t i = 0; i < nb; i++){
+            float b_com_diff_prod = faiss::fvec_inner_product(base_vectors.data() + i * dimension, diff_residuals.data() + i * dimension, dimension);
+            distance_NN_file << b_com_diff_prod << " ";
+            subtotal += abs(b_com_diff_prod);
+        }
+        distance_NN_file << std::endl << "The avg b_com_diff_prod: " << subtotal / nb << std::endl;
+
+        distance_NN_file << "The c_com_diff_prod: " << std::endl;
+        subtotal = 0;
+        for (size_t i = 0; i < nb; i++){
+            index.get_final_centroid(ids[i], final_centroid.data());
+            float c_com_diff_prod = faiss::fvec_inner_product(final_centroid.data(), diff_residuals.data() + i * dimension, dimension);
+            distance_NN_file << c_com_diff_prod << " ";
+            subtotal += abs(c_com_diff_prod);
+        }
+        distance_NN_file << std::endl << "The avg c_com_diff_prod: " << subtotal / nb << std::endl;
+
 
         index.compute_centroid_norm();
         message = "Finished Construction with sequential mode: ";
@@ -217,24 +304,29 @@ int main(int argc,char *argv[]){
         for (size_t i = 0; i < num_recall; i++){
             size_t recall_k = result_k[i];
             std::vector<float> query_distances(nq * recall_k);
-            std::vector<faiss::Index::idx_t> query_labels(nq * recall_k);
+            std::vector<idx_t> query_labels(nq * recall_k);
             record_file << "The result for recall = " << recall_k << std::endl;
 
             float previous_recall = 0;
             float second_previous_recall = 0;
             float third_previous_recall = 0;
-            size_t step = size_t(centroid / 1000) + 2;
+            size_t step = 1;
+            //size_t(centroid / 1000) + 5;
             size_t search_space_start = 5;
+            float highest_recall = 0;
+            std::vector<idx_t> label_record(nq * recall_k);
+            std::vector<float> dis_record(nq * recall_k);
 
-            for (size_t j = search_space_start; j < centroid; j += step){
+            for (size_t j = centroid; j <= centroid; j += step){
                 std::vector<size_t> search_space(1);
-                search_space[0] = j + 1;
+                search_space[0] = j;
                 size_t correct = 0;
 
-                index.max_visited_vectors = size_t(nb / index.final_group_num * (search_space[0] * 1.5));
+                index.max_visited_vectors = nb;
+                //size_t(nb / index.final_group_num * (search_space[0] * 1.5));
                 Trecorder.reset();
 
-                index.search(nq, recall_k, queries.data(), query_distances.data(), query_labels.data(), search_space.data(), groundtruth.data(), path_base);
+                index.search(nq, recall_k, queries.data(), query_distances.data(), query_labels.data(), search_space.data(), groundtruth.data(), path_base, path_dis);
 
                 float qps = Trecorder.getTimeConsumption() / (nq * 1000);
 
@@ -262,13 +354,41 @@ int main(int argc,char *argv[]){
                 std::cout << " The Recall and QPS: " << search_space[0] << " " << recall << " " << qps << std::endl;
                 
                 if (recall <= previous_recall && recall <= second_previous_recall && recall <= third_previous_recall){
-                    break;
+                    //break;
+                }
+
+                
+                if (recall > highest_recall){
+                    for (size_t temp = 0; temp < nq * recall_k; temp++){
+                        label_record[temp] = query_labels[temp];
+                        dis_record[temp] = query_distances[temp];
+                    }
+                    highest_recall = recall;
                 }
                 third_previous_recall = second_previous_recall;
                 second_previous_recall = previous_recall;
                 previous_recall = recall;
-
             }
+            
+            distance_NN_file << "The gt record for recall =  " << recall_k << std::endl;
+            for (size_t temp1 = 0; temp1 < nq; temp1++){
+                distance_NN_file << "GT: ";
+                for (size_t temp2 = 0; temp2 < recall_k; temp2++){
+                    float q_res_prod = faiss::fvec_inner_product(queries.data()+temp1 * dimension, residual.data() +  groundtruth[temp1 * ngt + temp2] * dimension, dimension);
+                    float q_res_diff_prod = faiss::fvec_inner_product(queries.data()+temp1 * dimension, diff_residuals.data()+groundtruth[temp1 * ngt + temp2] * dimension, dimension);
+                    float q_b_dis = faiss::fvec_L2sqr(queries.data() + temp1 * dimension, base_vectors.data() + groundtruth[temp1 * ngt + temp2] * dimension, dimension);
+                    distance_NN_file << groundtruth[temp1 * ngt + temp2] << " " << q_b_dis << " " << q_res_prod << " " << q_res_diff_prod << " ";
+                }
+                distance_NN_file << std::endl << "Search: ";
+                for (size_t temp2 = 0; temp2 < recall_k; temp2++){
+                    float q_res_prod = faiss::fvec_inner_product(queries.data()+temp1 * dimension, residual.data() +  label_record[temp1 * recall_k + temp2] * dimension, dimension);
+                    float q_res_diff_prod = faiss::fvec_inner_product(queries.data()+temp1 * dimension, diff_residuals.data()+label_record[temp1 * recall_k + temp2] * dimension, dimension);
+                    float q_b_dis = dis_record[temp1 * recall_k + temp2];
+                    distance_NN_file << label_record[temp1 * recall_k + temp2] << " " << q_b_dis << " " << q_res_prod << " " << q_res_diff_prod << " ";
+                }
+                distance_NN_file << std::endl;
+            }
+            
             record_file << std::endl;
         }
         /*
@@ -285,4 +405,5 @@ int main(int argc,char *argv[]){
     //}
     record_file << "Record end, the time now is: " << std::string (dt) << std::endl;
     record_file.close();
+    distance_NN_file.close();
 }

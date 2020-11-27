@@ -5,9 +5,10 @@ import matplotlib.pyplot as plt
 
 base_path = "/home/yujian/Desktop/extra/Similarity_Search/similarity_search_datasets/models_VQ/"
 
+#base_path = "/home/yujian/Desktop/exp_record/models_VQ/"
 models = ["inverted_index"]
 
-datasets = ["SIFT10K"]
+datasets = ["Random100K_128"]
 recall = []
 time = []
 index_conf = ""
@@ -64,6 +65,8 @@ def get_best_point(sorted_time, sorted_recall):
             return (sorted_time[i], sorted_recall[i])
         else:
             best_recall = sorted_recall[i]
+    print(sorted_time)
+    print(sorted_recall)
 
     return (sorted_time[-1], sorted_recall[-1])
 
@@ -77,7 +80,7 @@ for dataset in datasets:
             fig,ax=plt.subplots(1,2)
 
             folder_path = base_path + dataset + "/"
-            file_path = folder_path + "parameter_tuning_" + model + "_16_20201102-184457.txt"
+            file_path = folder_path + "parameter_tuning_" + model + "_16_20201115-211523.txt"
             print(file_path)
             file = open(file_path, "r")
             f1 = file.readlines()
@@ -93,22 +96,26 @@ for dataset in datasets:
                 if "This is the record for IMI with nbits =  " in x:
                     index_conf = x.split("This is the record for IMI with nbits =  ")[1]
 
-                if recall_result > 0 and len(x.split(" ")) > 1 and len(x.split(" ")) < 6:
+                if recall_result > 0 and len(x.split(" ")) > 1 and (len(x.split(" ")) < 6 or "Recall" in x):
                     recall.append(float(x.split(" ")[-2]))
                     time.append(float(x.split(" ")[-1].split("\n")[0]))
                 
                 if recall_result > 0 and len(x.split(" ")) <= 1:
-                    inds_time = (-np.array(time)).argsort()
-                    sorted_time = np.array(time)[inds_time]
-                    inds_recall = (-np.array(recall)).argsort()
-                    sorted_recall = np.array(recall)[inds_recall]
+                    if (len(recall) > 0):
+                        inds_time = (-np.array(time)).argsort()
+                        sorted_time = np.array(time)[inds_time]
+                        inds_recall = (-np.array(recall)).argsort()
+                        sorted_recall = np.array(recall)[inds_recall]
 
-                    ax[0].plot(list(sorted_time), list(sorted_recall), label = index_conf, color = all_colors[color_index % color_length], linestyle = all_types[int(color_index / color_length)%type_length] , marker = all_nodes[int(color_index / (color_length * type_length))%4])
-                    color_index += 1
-                    print(color_index, color_index % color_length , int(color_index / color_length)%type_length, int(color_index / (color_length * type_length))%4)
-                    best_point = get_best_point(list(sorted_time), list(sorted_recall))
-                    ax[1].plot(best_point[0], best_point[1])
-                    ax[1].text(best_point[0], best_point[1], index_conf, fontsize=8)
+                        
+                        ax[0].plot(list(sorted_time), list(sorted_recall), label = index_conf, color = all_colors[color_index % color_length], linestyle = all_types[int(color_index / color_length)%type_length] , marker = all_nodes[int(color_index / (color_length * type_length))%4])
+                        best_point = get_best_point(list(sorted_time), list(sorted_recall))
+                        target = ""
+                        if (str(target)+" " in index_conf or " "+ str(target) in index_conf):
+                            ax[1].plot(best_point[0], best_point[1])
+                            ax[1].text(best_point[0], best_point[1], index_conf, fontsize=8)
+                            color_index += 1
+                            print(color_index, color_index % color_length , int(color_index / color_length)%type_length, int(color_index / (color_length * type_length))%4)
 
                     time = []
                     recall = []
@@ -120,11 +127,14 @@ for dataset in datasets:
                     else:
                         recall_result = 0
 
-            #ax[0][0].xlim()
             ax[0].set_title(dataset + " " + model)
             ax[0].set_ylabel("Recall@" + str(recall_test))
             ax[0].set_xlabel("Time / ms")
             ax[0].legend(prop={'size':7}, ncol = 3)
+            #plt.title(dataset + " " + model)
+            #plt.ylabel("Recall@" + str(recall_test))
+            #plt.xlabel("Time / ms")
+            #plt.legend(prop={'size':7}, ncol = 3)
             plt.show()
 
 

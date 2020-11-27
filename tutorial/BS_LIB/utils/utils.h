@@ -142,6 +142,20 @@ namespace bslib{
             CheckResult<float>(data, dimension, n);
     }
 
+    template<typename T>
+    void writeXvec(std::ofstream & out, T * data, const size_t dimension, const size_t n = 1,
+    bool CheckFlag = false, bool ShowProcess = false){
+        std::cout << "Write data with " << n << " vectors in " << dimension << " dimension" << std::endl;
+        uint32_t dim = dimension;
+        size_t print_every = 100;
+        for (size_t i = 0; i< n; i++){
+            out.write((char *) & dim, sizeof(uint32_t));
+            out.write((char *) (data + i * dim), dim * sizeof(T));
+            if ( ShowProcess && print_every != 0 && i % print_every == 0)
+                std::cout << "[Finished writing " << i << " / " << n << "]"  << std::endl; 
+        } 
+    }
+
 
     inline bool exists(const std::string FilePath){
         std::ifstream f (FilePath);
