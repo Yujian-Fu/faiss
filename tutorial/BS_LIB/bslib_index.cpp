@@ -255,6 +255,7 @@ namespace bslib{
             std::ifstream learn_input(path_learn, std::ios::binary);
             uint32_t dim;
 
+            learn_data_type origin_data[dimension];
             for (size_t i = 0; i < train_set_size; i++){
                 size_t group_id = i % group_size;
                 size_t inner_group_id = rand() % this->train_set_ids[group_id].size();
@@ -263,7 +264,10 @@ namespace bslib{
                 learn_input.seekg(sequence_id * dimension * sizeof (learn_data_type) + sequence_id * sizeof(uint32_t), std::ios::beg);
                 learn_input.read((char *) & dim, sizeof(uint32_t));
                 assert(dim == dimension);
-                learn_input.read((char *)this->train_data.data() + i * dimension * sizeof(learn_data_type), dimension * sizeof(float));
+                learn_input.read((char *) & origin_data, dimension * sizeof(learn_data_type));
+                for (size_t j = 0; j < dimension; j++){
+                    this->train_data[i * dimension + j] = 1.0 * origin_data[j];
+                }
             }
         }
         else{
@@ -272,7 +276,6 @@ namespace bslib{
             readXvecFvec<learn_data_type>(learn_input, sum_train_data.data(), dimension, total_size, true, true);
             std::cout << "Reading subset without selector" << std::endl;
             RandomSubset(sum_train_data.data(), this->train_data.data(), dimension, total_size, train_set_size);
-            
         }
 
         if (use_OPQ){
