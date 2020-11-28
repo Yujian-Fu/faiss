@@ -21,6 +21,7 @@ void assign_residual(const float * residuals, const float * centroid, size_t dim
         faiss::IndexFlatL2 index_sub(dimension_sub);
         index_sub.add(nc_PQ, centroid + PQ_index * nc_PQ * dimension_sub);
         std::vector<float> distance(nb);
+#pragma omp parallel for
         for (size_t i = 0; i < nb; i++){
             index_sub.search(1, residuals + i * dimension + PQ_index * dimension_sub, 1, distance.data()+i, PQ_ids + PQ_index * nb + i);
         }
