@@ -11,6 +11,7 @@ void assign_residual(const float * residuals, const float * centroid, size_t dim
     size_t dimension_sub = dimension / M;
     
     for (size_t PQ_index = 0; PQ_index < M; PQ_index++){
+        std::cout << "Now the PQ index is: " << PQ_index << std::endl;
         faiss::IndexFlatL2 index_sub(dimension_sub);
         index_sub.add(nc_PQ, centroid + PQ_index * nc_PQ * dimension_sub);
         std::vector<float> distance(nb);
