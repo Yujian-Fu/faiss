@@ -20,8 +20,8 @@ const size_t M = 16;
 const size_t nc_PQ = 256;
 const float alpha = 0.1;
 
-const size_t index_iter = 5;
-const size_t PQ_iter = 5;
+const size_t index_iter = 10;
+const size_t PQ_iter = 10;
 const size_t total_iter = 10;
 std::vector<size_t> recall_k_list = {1, 10, 100};
 
