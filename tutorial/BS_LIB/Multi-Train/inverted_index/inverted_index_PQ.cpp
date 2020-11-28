@@ -9,7 +9,7 @@
 void assign_residual(const float * residuals, const float * centroid, size_t dimension, idx_t * PQ_ids, size_t nc_PQ, size_t nb){
     std::cout << "Entering the assign residual function " << std::endl;
     size_t dimension_sub = dimension / M;
-    
+    std::cout << "Entering the assign residual function for loop " << std::endl;
     for (size_t PQ_index = 0; PQ_index < M; PQ_index++){
         std::cout << "Now the PQ index is: " << PQ_index << std::endl;
         faiss::IndexFlatL2 index_sub(dimension_sub);
