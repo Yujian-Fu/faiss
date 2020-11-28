@@ -7,6 +7,7 @@
 
 // ids: sizeof(idx) * nb * M
 void assign_residual(const float * residuals, const float * centroid, size_t dimension, idx_t * PQ_ids, size_t nc_PQ, size_t nb){
+    std::cout << "Entering the assign residual function " << std::endl;
     size_t dimension_sub = dimension / M;
     
     for (size_t PQ_index = 0; PQ_index < M; PQ_index++){
