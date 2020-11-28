@@ -1,0 +1,4 @@
+Kmeans with centroids: 100
+Distance computation
+62114.1 11354.8
+61285.9 10694.6

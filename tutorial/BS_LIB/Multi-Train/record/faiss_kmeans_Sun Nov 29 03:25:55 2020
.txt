@@ -1,0 +1,11 @@
+Kmeans with centroids: 10
+result for recall@ 1
+476 10000 
+0.04 0.73 
+result for recall@ 10
+952 20000 
+0.049 0.808 
+result for recall@ 100
+1428 30000 
+0.0479 0.8822 
+Kmeans with centroids: 11

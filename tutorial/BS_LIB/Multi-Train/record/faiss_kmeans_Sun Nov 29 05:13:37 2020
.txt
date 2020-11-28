@@ -1,0 +1,2 @@
+Kmeans with centroids: 10
+Index distance: 214609

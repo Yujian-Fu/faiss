@@ -1,0 +1,252 @@
+Kmeans with centroids: 10
+Index distance: 214609
+PQ distance: 10747.6
+result for recall@ 1
+476 10000 
+0.04 0.73 
+result for recall@ 10
+952 20000 
+0.049 0.808 
+result for recall@ 100
+1428 30000 
+0.0479 0.8822 
+Kmeans with centroids: 11
+Index distance: 92783.8
+PQ distance: 10935
+result for recall@ 1
+475 10000 
+0.03 0.68 
+result for recall@ 10
+950 20000 
+0.047 0.783 
+result for recall@ 100
+1425 30000 
+0.0472 0.8755 
+Kmeans with centroids: 12
+Index distance: 87280.7
+PQ distance: 10939.5
+result for recall@ 1
+479 10000 
+0.03 0.71 
+result for recall@ 10
+958 20000 
+0.049 0.807 
+result for recall@ 100
+1437 30000 
+0.0481 0.884 
+Kmeans with centroids: 13
+Index distance: 83991.1
+PQ distance: 10944.7
+result for recall@ 1
+389 10000 
+0.05 0.69 
+result for recall@ 10
+778 20000 
+0.051 0.797 
+result for recall@ 100
+1167 30000 
+0.0441 0.8812 
+Kmeans with centroids: 14
+Index distance: 81009.3
+PQ distance: 10965.5
+result for recall@ 1
+379 10000 
+0.04 0.71 
+result for recall@ 10
+758 20000 
+0.049 0.794 
+result for recall@ 100
+1137 30000 
+0.0429 0.8838 
+Kmeans with centroids: 15
+Index distance: 86746.9
+PQ distance: 10982.9
+result for recall@ 1
+387 10000 
+0.04 0.7 
+result for recall@ 10
+774 20000 
+0.048 0.795 
+result for recall@ 100
+1161 30000 
+0.0432 0.8827 
+Kmeans with centroids: 16
+Index distance: 79016.6
+PQ distance: 11017.8
+result for recall@ 1
+387 10000 
+0.04 0.65 
+result for recall@ 10
+774 20000 
+0.048 0.812 
+result for recall@ 100
+1161 30000 
+0.0432 0.8822 
+Kmeans with centroids: 17
+Index distance: 82210.5
+PQ distance: 10996.8
+result for recall@ 1
+380 10000 
+0.04 0.7 
+result for recall@ 10
+760 20000 
+0.048 0.805 
+result for recall@ 100
+1140 30000 
+0.0426 0.8837 
+Kmeans with centroids: 18
+Index distance: 76770.9
+PQ distance: 10985.2
+result for recall@ 1
+392 10000 
+0.03 0.69 
+result for recall@ 10
+784 20000 
+0.044 0.797 
+result for recall@ 100
+1176 30000 
+0.043 0.8784 
+Kmeans with centroids: 19
+Index distance: 75417.5
+PQ distance: 10972.4
+result for recall@ 1
+366 10000 
+0.03 0.63 
+result for recall@ 10
+732 20000 
+0.044 0.801 
+result for recall@ 100
+1098 30000 
+0.0399 0.881 
+Kmeans with centroids: 20
+Index distance: 74748.2
+PQ distance: 10961.1
+result for recall@ 1
+356 4948 10000 
+0.04 0.35 0.65 
+result for recall@ 10
+712 9896 20000 
+0.047 0.414 0.8 
+result for recall@ 100
+1068 14844 30000 
+0.0407 0.442 0.8818 
+Kmeans with centroids: 21
+Index distance: 74412.9
+PQ distance: 10951.8
+result for recall@ 1
+345 4770 10000 
+0.04 0.36 0.63 
+result for recall@ 10
+690 9540 20000 
+0.041 0.399 0.8 
+result for recall@ 100
+1035 14310 30000 
+0.0399 0.4356 0.879 
+Kmeans with centroids: 22
+Index distance: 74257
+PQ distance: 10941.9
+result for recall@ 1
+363 4598 10000 
+0.03 0.35 0.69 
+result for recall@ 10
+726 9196 20000 
+0.043 0.415 0.815 
+result for recall@ 100
+1089 13794 30000 
+0.0402 0.4386 0.8867 
+Kmeans with centroids: 23
+Index distance: 79867.4
+PQ distance: 10946.3
+result for recall@ 1
+363 4489 10000 
+0.03 0.3 0.71 
+result for recall@ 10
+726 8978 20000 
+0.042 0.373 0.816 
+result for recall@ 100
+1089 13467 30000 
+0.0396 0.3862 0.8852 
+Kmeans with centroids: 24
+Index distance: 77795.1
+PQ distance: 10917.6
+result for recall@ 1
+361 4211 10000 
+0.03 0.28 0.73 
+result for recall@ 10
+722 8422 20000 
+0.041 0.316 0.82 
+result for recall@ 100
+1083 12633 30000 
+0.0392 0.3333 0.8892 
+Kmeans with centroids: 25
+Index distance: 74097
+PQ distance: 10909.6
+result for recall@ 1
+363 4253 10000 
+0.03 0.26 0.67 
+result for recall@ 10
+726 8506 20000 
+0.041 0.313 0.802 
+result for recall@ 100
+1089 12759 30000 
+0.0399 0.3315 0.8845 
+Kmeans with centroids: 26
+Index distance: 76771.3
+PQ distance: 10888.9
+result for recall@ 1
+357 3988 10000 
+0.03 0.25 0.69 
+result for recall@ 10
+714 7976 20000 
+0.04 0.307 0.825 
+result for recall@ 100
+1071 11964 30000 
+0.0393 0.3172 0.8851 
+Kmeans with centroids: 27
+Index distance: 71857.1
+PQ distance: 10908.7
+result for recall@ 1
+260 3726 10000 
+0.04 0.24 0.59 
+result for recall@ 10
+520 7452 20000 
+0.046 0.307 0.816 
+result for recall@ 100
+780 11178 30000 
+0.0392 0.3061 0.8851 
+Kmeans with centroids: 28
+Index distance: 76125.1
+PQ distance: 10886.1
+result for recall@ 1
+261 3684 10000 
+0.04 0.3 0.65 
+result for recall@ 10
+522 7368 20000 
+0.044 0.306 0.815 
+result for recall@ 100
+783 11052 30000 
+0.0386 0.3029 0.8839 
+Kmeans with centroids: 29
+Index distance: 72552
+PQ distance: 10907.8
+result for recall@ 1
+260 3799 10000 
+0.04 0.23 0.64 
+result for recall@ 10
+520 7598 20000 
+0.045 0.294 0.805 
+result for recall@ 100
+780 11397 30000 
+0.0392 0.3037 0.884 
+Kmeans with centroids: 30
+Index distance: 70551.9
+PQ distance: 10870.7
+result for recall@ 1
+261 3708 7168 10000 
+0.03 0.28 0.54 0.73 
+result for recall@ 10
+522 7416 14336 20000 
+0.044 0.291 0.614 0.817 
+result for recall@ 100
+783 11124 21504 30000 
+0.039 0.2975 0.6658 0.8843 

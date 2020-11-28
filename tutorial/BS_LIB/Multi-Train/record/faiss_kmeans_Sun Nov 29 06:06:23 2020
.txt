@@ -1,0 +1,60 @@
+Kmeans with centroids: 11
+Index distance: 214568
+PQ distance: 10935
+result for recall@ 1
+475 10000 
+0.03 0.68 
+result for recall@ 10
+950 20000 
+0.047 0.783 
+result for recall@ 100
+1425 30000 
+0.0472 0.8755 
+Kmeans with centroids: 12
+Index distance: 87280.7
+PQ distance: 10939.5
+result for recall@ 1
+479 10000 
+0.03 0.71 
+result for recall@ 10
+958 20000 
+0.049 0.807 
+result for recall@ 100
+1437 30000 
+0.0481 0.884 
+Kmeans with centroids: 13
+Index distance: 83991.1
+PQ distance: 10944.7
+result for recall@ 1
+389 10000 
+0.05 0.69 
+result for recall@ 10
+778 20000 
+0.051 0.797 
+result for recall@ 100
+1167 30000 
+0.0441 0.8812 
+Kmeans with centroids: 14
+Index distance: 81009.3
+PQ distance: 10965.5
+result for recall@ 1
+379 10000 
+0.04 0.71 
+result for recall@ 10
+758 20000 
+0.049 0.794 
+result for recall@ 100
+1137 30000 
+0.0429 0.8838 
+Kmeans with centroids: 15
+Index distance: 86746.9
+PQ distance: 10982.9
+result for recall@ 1
+387 10000 
+0.04 0.7 
+result for recall@ 10
+774 20000 
+0.048 0.795 
+result for recall@ 100
+1161 30000 
+0.0432 0.8827 
