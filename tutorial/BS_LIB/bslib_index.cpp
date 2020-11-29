@@ -994,7 +994,6 @@ namespace bslib{
                 q_c_dists[i] = query_centroid_dists;
             }
 
-
             size_t max_size = 0;for (size_t j = 0; j < final_keep_space; j++){if (base_sequence_ids[query_group_ids[j]].size() > max_size) max_size = base_sequence_ids[query_group_ids[j]].size();}
             
             if(showmessage) std::cout << "Assigning the space for dists and labels with size " << max_visited_vectors << " + " << max_size <<  std::endl;
@@ -1011,7 +1010,6 @@ namespace bslib{
 
                 std::pair<idx_t, float> result_idx_dist;
                 get_next_group_idx(final_keep_space, query_group_ids.data(), query_group_dists.data(), result_idx_dist);
-                
                 
                 idx_t group_id = result_idx_dist.first;
                 float q_c_dist = result_idx_dist.second;
