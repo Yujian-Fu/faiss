@@ -111,24 +111,53 @@ int main(){
     std::vector<float> compressed_vectors(nb * dimension);
     get_base_vectors(base_ids.data(), PQ_ids.data(), index_centroids.data(), PQ_centroids.data(), compressed_vectors.data(), dimension, nb, nc_PQ);
 
-    for (size_t recall_index = 0; recall_index < recall_k_list.size(); recall_index++){
-        size_t recall_k = recall_k_list[recall_index];
-        std::vector<std::vector<float>> correct_num(nq);
+
+
+
+        std::vector<std::vector<float>> correct_num1(nq);
+        std::vector<std::vector<float>> correct_num10(nq);
+        std::vector<std::vector<float>> correct_num100(nq);
         std::vector<std::vector<float>> visited_num(nq);
 
 #pragma omp parallel for
     for (size_t i = 0; i < nq; i++){
-        correct_num[i].resize(nc, 0);
+        correct_num1[i].resize(nc, 0);
+        correct_num10[i].resize(nc, 0);
+        correct_num100[i].resize(nc, 0);
         visited_num[i].resize(nc, 0);
 
         size_t visited_vectors = 0;
-        std::unordered_set<idx_t> gt;
-        for (size_t j = 0; j < recall_k; j++){
-            gt.insert(groundtruth[i * ngt + j]);
+
+        std::unordered_set<idx_t> gt1;
+        for (size_t j = 0; j < 1; j++){
+            gt1.insert(groundtruth[i * ngt + j]);
         }
-        std::vector<float> result_dists(recall_k);
-        std::vector<idx_t> result_labels(recall_k);
-        faiss::maxheap_heapify(recall_k, result_dists.data(), result_labels.data());
+
+        std::unordered_set<idx_t> gt10;
+        for (size_t j = 0; j < 10; j++){
+            gt10.insert(groundtruth[i * ngt + j]);
+        }
+
+        std::unordered_set<idx_t> gt100;
+        for (size_t j = 0; j < 100; j++){
+            gt100.insert(groundtruth[i * ngt + j]);
+        }
+
+
+        std::vector<float> result_dists1(1);
+        std::vector<idx_t> result_labels1(1);
+
+        std::vector<float> result_dists10(10);
+        std::vector<idx_t> result_labels10(10);
+
+        std::vector<float> result_dists100(100);
+        std::vector<idx_t> result_labels100(100);
+
+
+        faiss::maxheap_heapify(1, result_dists1.data(), result_labels1.data());
+        faiss::maxheap_heapify(10, result_dists10.data(), result_labels10.data());
+        faiss::maxheap_heapify(100, result_dists100.data(), result_labels100.data());
+
 
         std::vector<float> distance(nc);
         std::vector<idx_t> query_ids(nc);
@@ -141,28 +170,70 @@ int main(){
             visited_num[i][j] += visited_vectors;
             for (size_t k = 0; k < cluster_size; k++){
                 float dist = faiss::fvec_L2sqr(query_vectors.data() + i * dimension, compressed_vectors.data() + clusters[centroid_id][k] * dimension, dimension);
-                if (dist < result_dists[0]){
-                    faiss::maxheap_pop(recall_k, result_dists.data(), result_labels.data());
-                    faiss::maxheap_push(recall_k, result_dists.data(), result_labels.data(), dist, clusters[centroid_id][k]);
+                
+                if (dist < result_dists1[0]){
+                    faiss::maxheap_pop(1, result_dists1.data(), result_labels1.data());
+                    faiss::maxheap_push(1, result_dists1.data(), result_labels1.data(), dist, clusters[centroid_id][k]);
+                }
+
+                if (dist < result_dists10[0]){
+                    faiss::maxheap_pop(10, result_dists10.data(), result_labels10.data());
+                    faiss::maxheap_push(10, result_dists10.data(), result_labels10.data(), dist, clusters[centroid_id][k]);
+                }
+
+                if (dist < result_dists100[0]){
+                    faiss::maxheap_pop(100, result_dists100.data(), result_labels100.data());
+                    faiss::maxheap_push(100, result_dists100.data(), result_labels100.data(), dist, clusters[centroid_id][k]);
                 }
             }
-            for (size_t k = 0; k < recall_k; k++){
-                if (gt.count(result_labels[k]) != 0){
-                    correct_num[i][j] += 1;
+
+            for (size_t k = 0; k < 1; k++){
+                if (gt1.count(result_labels1[k]) != 0){
+                    correct_num1[i][j] += 1;
+                }
+            }
+
+            for (size_t k = 0; k < 10; k++){
+                if (gt10.count(result_labels10[k]) != 0){
+                    correct_num10[i][j] += 1;
+                }
+            }
+            for (size_t k = 0; k < 100; k++){
+                if (gt100.count(result_labels100[k]) != 0){
+                    correct_num100[i][j] += 1;
                 }
             }
         }
     }
 
+
+for (size_t recall_index = 0; recall_index < recall_k_list.size(); recall_index++){
+    size_t recall_k = recall_k_list[recall_index];
     std::vector<float> sum_visited_num(nc, 0);
     std::vector<float> sum_correct_num(nc, 0);
 
+    if (recall_k ==1)
     for (size_t i = 0; i < nc; i++){
         for (size_t j = 0; j < nq; j++){
-            sum_correct_num[i] += correct_num[j][i];
+            sum_correct_num[i] += correct_num1[j][i];
             sum_visited_num[i] += visited_num[j][i];
         }
     }
+    else if (recall_k == 10)
+    for (size_t i = 0; i < nc; i++){
+        for (size_t j = 0; j < nq; j++){
+            sum_correct_num[i] += correct_num10[j][i];
+            sum_visited_num[i] += visited_num[j][i];
+        }
+    }
+    else if (recall_k == 100)
+    for (size_t i = 0; i < nc; i++){
+        for (size_t j = 0; j < nq; j++){
+            sum_correct_num[i] += correct_num100[j][i];
+            sum_visited_num[i] += visited_num[j][i];
+        }
+    }
+
     record_file << "result for recall@ " << recall_k << std::endl;
     for (size_t i = 0; i < nc / 10; i++){
         std::cout << size_t(sum_visited_num[i * 10] / nq) << " ";

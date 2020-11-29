@@ -23,8 +23,8 @@ const size_t N_random = 999;
 const bool use_kmeansplusplus = false;
 
 const size_t index_iter = 1;
-const size_t PQ_iter = 3;
-const size_t total_iter = 20;
+const size_t PQ_iter = 1;
+const size_t total_iter = 40;
 std::vector<size_t> recall_k_list = {1, 10, 100};
 
 
@@ -89,6 +89,7 @@ void assign_vector(const float * centroid, const float * vectors, size_t dimensi
 
 
 void compute_index_residual(const float * base_vectors, const float * centroids, const idx_t * base_ids, float * residual, size_t nb, size_t dimension){
+#pragma omp parallel for
     for (size_t i = 0; i < nb; i++){
         faiss::fvec_madd(dimension, base_vectors + i * dimension, -1.0, centroids + base_ids[i] * dimension, residual+ i * dimension);
     }
@@ -146,6 +147,7 @@ void residual_PQ_dist(const float * residuals, const float * centroid, const idx
 
 void compute_PQ_residual(const float * base_vectors, const float * PQ_centroids, const idx_t * PQ_ids, float * PQ_residual, size_t nb, size_t dimension, size_t nc_PQ){
     size_t dimension_sub = dimension / M;
+#pragma omp parallel for
     for (size_t i = 0; i < nb; i++){
         for (size_t PQ_index = 0; PQ_index < M; PQ_index++){
             idx_t PQ_id = PQ_ids[PQ_index * nb + i];
