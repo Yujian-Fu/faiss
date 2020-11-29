@@ -13,8 +13,8 @@
 typedef faiss::Index::idx_t idx_t;
 
 //const size_t nc = 12;
-const size_t nc_low = 2000;
-const size_t nc_up = 3000;
+const size_t nc_low = 3000;
+const size_t nc_up = 4000;
 const size_t nc_step = 50;
 const size_t M = 16;
 const size_t nc_PQ = 256;
