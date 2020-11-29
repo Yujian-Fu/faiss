@@ -113,7 +113,7 @@ int main(){
 
     std::vector<float> compressed_vectors(nb * dimension);
     get_base_vectors(base_ids.data(), PQ_ids.data(), index_centroids.data(), PQ_centroids.data(), compressed_vectors.data(), dimension, nb, nc_PQ);
-
+    
     
     for (size_t recall_index = 0; recall_index < recall_k_list.size(); recall_index++){
         size_t recall_k = recall_k_list[recall_index];

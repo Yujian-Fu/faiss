@@ -23,8 +23,8 @@ const size_t N_random = 999;
 const bool use_kmeansplusplus = false;
 
 const size_t index_iter = 1;
-const size_t PQ_iter = 3;
-const size_t total_iter = 25;
+const size_t PQ_iter = 1;
+const size_t total_iter = 40;
 std::vector<size_t> recall_k_list = {1, 10, 100};
 
 
@@ -251,6 +251,7 @@ void metric_computation(const float * base_vector, const float * index_centroids
 
 void get_base_vectors(const idx_t * base_ids, const idx_t * PQ_ids, const float * index_centroids, const float * PQ_centroids, float * compressed_vectors, size_t dimension, size_t nb, size_t nc_PQ){
     size_t dimension_sub = dimension / M;
+#pragma omp parallel for
     for (size_t i = 0; i < nb; i++){
         idx_t base_id = base_ids[i];
         for (size_t j = 0; j < dimension; j++){

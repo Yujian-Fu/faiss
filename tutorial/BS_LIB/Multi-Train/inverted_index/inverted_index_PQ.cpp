@@ -102,7 +102,7 @@ int main(){
     std::vector<uint32_t> groundtruth(nq * ngt);
     {
         std::ifstream gt_input(path_gt, std::ios::binary);
-        readXvec<uint32_t>(gt_input, groundtruth.data(), ngt, nq, false, false);
+        readXvec<uint32_t>(gt_input, groundtruth.data(), ngt, nq, true, true);
     }
 
     faiss::IndexFlatL2 centroid_index(dimension);
