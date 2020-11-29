@@ -34,7 +34,7 @@ int main(){
     std::vector<float> base_residual(dimension * nb);
     std::ifstream base_input(path_base, std::ios::binary);
     readXvecFvec<float>(base_input, base_vectors.data(), dimension, nb, true);
-    std::string path_record = "./record/inverted_index_PQ_" + std::string(dt) + " _" + std::to_string(alpha) + "_" + std::to_string(index_iter) + 
+    std::string path_record = "./record/inverted_index_PQ_time_" + std::string(dt) + " _" + std::to_string(alpha) + "_" + std::to_string(index_iter) + 
                                 "_" + std::to_string(PQ_iter) + "_" + std::to_string(total_iter) + ".txt";
     std::ofstream record_file(path_record);
 
@@ -113,21 +113,21 @@ int main(){
     get_base_vectors(base_ids.data(), PQ_ids.data(), index_centroids.data(), PQ_centroids.data(), compressed_vectors.data(), dimension, nb, nc_PQ);
 
 
-
-
+        size_t nc_to_visit = nc / 10;
         std::vector<std::vector<float>> correct_num1(nq);
         std::vector<std::vector<float>> correct_num10(nq);
         std::vector<std::vector<float>> correct_num100(nq);
         std::vector<std::vector<float>> visited_num(nq);
 
-#pragma omp parallel for
+//#pragma omp parallel for
     for (size_t i = 0; i < nq; i++){
-        correct_num1[i].resize(nc, 0);
-        correct_num10[i].resize(nc, 0);
-        correct_num100[i].resize(nc, 0);
-        visited_num[i].resize(nc, 0);
+        time_recorder Trecorder = time_recorder();
+        correct_num1[i].resize(nc_to_visit, 0);
+        correct_num10[i].resize(nc_to_visit, 0);
+        correct_num100[i].resize(nc_to_visit, 0);
+        visited_num[i].resize(nc_to_visit, 0);
 
-        size_t visited_vectors = 0;
+        //size_t visited_vectors = 0;
 
         std::unordered_set<idx_t> gt1;
         for (size_t j = 0; j < 1; j++){
@@ -163,15 +163,15 @@ int main(){
         std::vector<float> distance(nc);
         std::vector<idx_t> query_ids(nc);
         centroid_index.search(1, query_vectors.data()+i * dimension, nc, distance.data(), query_ids.data());
-        for (size_t j = 0; j < nc; j++){
+        for (size_t j = 0; j < nc_to_visit; j++){
             idx_t centroid_id = query_ids[j];
 
             size_t cluster_size = clusters[centroid_id].size();
-            visited_vectors += cluster_size;
-            visited_num[i][j] += visited_vectors;
+            //visited_vectors += cluster_size;
+            
             for (size_t k = 0; k < cluster_size; k++){
                 float dist = faiss::fvec_L2sqr(query_vectors.data() + i * dimension, compressed_vectors.data() + clusters[centroid_id][k] * dimension, dimension);
-                
+
                 if (dist < result_dists1[0]){
                     faiss::maxheap_pop(1, result_dists1.data(), result_labels1.data());
                     faiss::maxheap_push(1, result_dists1.data(), result_labels1.data(), dist, clusters[centroid_id][k]);
@@ -187,6 +187,7 @@ int main(){
                     faiss::maxheap_push(100, result_dists100.data(), result_labels100.data(), dist, clusters[centroid_id][k]);
                 }
             }
+            visited_num[i][j] += Trecorder.get_time_usage();
 
             for (size_t k = 0; k < 1; k++){
                 if (gt1.count(result_labels1[k]) != 0){
@@ -210,25 +211,25 @@ int main(){
 
 for (size_t recall_index = 0; recall_index < recall_k_list.size(); recall_index++){
     size_t recall_k = recall_k_list[recall_index];
-    std::vector<float> sum_visited_num(nc, 0);
-    std::vector<float> sum_correct_num(nc, 0);
+    std::vector<float> sum_visited_num(nc_to_visit, 0);
+    std::vector<float> sum_correct_num(nc_to_visit, 0);
 
     if (recall_k ==1)
-    for (size_t i = 0; i < nc; i++){
+    for (size_t i = 0; i < nc_to_visit; i++){
         for (size_t j = 0; j < nq; j++){
             sum_correct_num[i] += correct_num1[j][i];
             sum_visited_num[i] += visited_num[j][i];
         }
     }
     else if (recall_k == 10)
-    for (size_t i = 0; i < nc; i++){
+    for (size_t i = 0; i < nc_to_visit; i++){
         for (size_t j = 0; j < nq; j++){
             sum_correct_num[i] += correct_num10[j][i];
             sum_visited_num[i] += visited_num[j][i];
         }
     }
     else if (recall_k == 100)
-    for (size_t i = 0; i < nc; i++){
+    for (size_t i = 0; i < nc_to_visit; i++){
         for (size_t j = 0; j < nq; j++){
             sum_correct_num[i] += correct_num100[j][i];
             sum_visited_num[i] += visited_num[j][i];
@@ -236,19 +237,24 @@ for (size_t recall_index = 0; recall_index < recall_k_list.size(); recall_index+
     }
 
     record_file << "result for recall@ " << recall_k << std::endl;
-    for (size_t i = 0; i < nc / 10; i++){
-        std::cout << size_t(sum_visited_num[i * 10] / nq) << " ";
-        record_file << size_t(sum_visited_num[i * 10] / nq) << " ";
+    for (size_t i = 0; i < nc_to_visit; i++){
+        std::cout << (sum_visited_num[i] / nq) * 1000 << " ";
+        record_file << (sum_visited_num[i] / nq) * 1000 << " ";
     }
-    std::cout << sum_visited_num[nc-1] / nq << " " << std::endl;
-    record_file << sum_visited_num[nc-1] / nq << " " << std::endl;
+    std::cout << std::endl;
+    record_file << std::endl;
+    //std::cout << sum_visited_num[nc-1] / nq << " " << std::endl;
+    //record_file << sum_visited_num[nc-1] / nq << " " << std::endl;
 
-    for (size_t i = 0; i < nc / 10; i++){
-        std::cout << sum_correct_num[i * 10] / recall_k / nq << " ";
-        record_file << sum_correct_num[i * 10] / recall_k / nq<< " ";
+    for (size_t i = 0; i < nc_to_visit; i++){
+        std::cout << sum_correct_num[i] / recall_k / nq << " ";
+        record_file << sum_correct_num[i] / recall_k / nq<< " ";
     }
-    std::cout << sum_correct_num[nc-1] / recall_k / nq << " " << std::endl;
-    record_file << sum_correct_num[nc-1] / recall_k / nq << " " << std::endl;
+    std::cout << std::endl;
+    record_file << std::endl;
+
+    //std::cout << sum_correct_num[nc-1] / recall_k / nq << " " << std::endl;
+    //record_file << sum_correct_num[nc-1] / recall_k / nq << " " << std::endl;
 
 }
 }
