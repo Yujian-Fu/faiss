@@ -23,8 +23,8 @@ const size_t N_random = 999;
 const bool use_kmeansplusplus = false;
 
 const size_t index_iter = 1;
-const size_t PQ_iter = 4;
-const size_t total_iter = 24;
+const size_t PQ_iter = 5;
+const size_t total_iter = 20;
 std::vector<size_t> recall_k_list = {1, 10, 100};
 
 
