@@ -18,7 +18,7 @@ const size_t nc_up = 1000;
 const size_t nc_step = 50;
 const size_t M = 16;
 const size_t nc_PQ = 256;
-const float alpha = 0.1;
+const float alpha = 0.2;
 const size_t N_random = 999;
 const bool use_kmeansplusplus = false;
 
