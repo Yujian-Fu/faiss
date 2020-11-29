@@ -24,7 +24,7 @@ const bool use_kmeansplusplus = true;
 
 const size_t index_iter = 1;
 const size_t PQ_iter = 1;
-const size_t total_iter = 40;
+const size_t total_iter = 60;
 std::vector<size_t> recall_k_list = {1, 10, 100};
 
 

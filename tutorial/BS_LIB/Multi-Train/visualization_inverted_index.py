@@ -18,9 +18,10 @@ recall_100 = 0
 recall1_result = []
 recall10_result = []
 recall100_result = []
-record_file = get_newest_folder("./inverted_index/record", "inverted_index_PQSun")
+record_file = "./inverted_index/record/inverted_index_PQSun Nov 29 13%3A18%3A36 2020.txt"
+#get_newest_folder("./inverted_index/record", "inverted_index_PQSun")
 
-
+print(record_file)
 with open(record_file , 'r') as f:
     lines = f.readlines()
     for line in lines:
@@ -66,8 +67,8 @@ with open(record_file , 'r') as f:
     plt.figure()
     print(centroid_result)
     plt.xticks(centroid_result)
-    plt.plot(centroid_result, recall1_result, label = "recall@1")
-    plt.plot(centroid_result, recall10_result, label = "recall@10")
+    #plt.plot(centroid_result, recall1_result, label = "recall@1")
+    #plt.plot(centroid_result, recall10_result, label = "recall@10")
     plt.plot(centroid_result, recall100_result, label = "recall@100")
     plt.legend()
     plt.show()

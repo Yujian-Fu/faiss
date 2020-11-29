@@ -4,7 +4,7 @@
 #include <iostream>
 #include "../utils/utils.h"
 #include "../parameters/parameter_tuning/inverted_index/Inverted_Index.h"
-#include "inverted_index_PQ.h"
+#include "parameter_multi.h"
 #include <unordered_set>
 
 

@@ -36,7 +36,7 @@ int main(){
     std::vector<float> base_residual(dimension * nb);
     std::ifstream base_input(path_base, std::ios::binary);
     readXvecFvec<float>(base_input, base_vectors.data(), dimension, nb, true);
-    std::string path_record = "./record/kmeans_PQ" + std::string(dt) + ".txt";
+    std::string path_record = "./record/kmeans_PQ_" + std::string(dt) + ".txt";
 
     std::ofstream record_file(path_record);
 
