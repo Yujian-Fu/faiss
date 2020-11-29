@@ -114,14 +114,18 @@ int main(){
     std::vector<float> compressed_vectors(nb * dimension);
     get_base_vectors(base_ids.data(), PQ_ids.data(), index_centroids.data(), PQ_centroids.data(), compressed_vectors.data(), dimension, nb, nc_PQ);
     
-    
+
     for (size_t recall_index = 0; recall_index < recall_k_list.size(); recall_index++){
         size_t recall_k = recall_k_list[recall_index];
-    
-        std::vector<float> correct_num(nc, 0);
-        std::vector<float> visited_num(nc, 0);
 
+        std::vector<std::vector<float>> correct_num(nq);
+        std::vector<std::vector<float>> visited_num(nq);
+
+#pragma omp parallel for
     for (size_t i = 0; i < nq; i++){
+        correct_num[i].resize(nc, 0);
+        visited_num[i].resize(nc, 0);
+        
         size_t visited_vectors = 0;
         std::unordered_set<idx_t> gt;
         for (size_t j = 0; j < recall_k; j++){
@@ -138,7 +142,7 @@ int main(){
             idx_t centroid_id = query_ids[j];
             size_t cluster_size = clusters[centroid_id].size();
             visited_vectors += cluster_size;
-            visited_num[j] += visited_vectors;
+            visited_num[i][j] += visited_vectors;
             for (size_t k = 0; k < cluster_size; k++){
                 float dist = faiss::fvec_L2sqr(query_vectors.data() + i * dimension, compressed_vectors.data() + clusters[centroid_id][k] * dimension, dimension);
                 if (dist < result_dists[0]){
@@ -148,26 +152,35 @@ int main(){
             }
             for (size_t k = 0; k < recall_k; k++){
                 if (gt.count(result_labels[k]) != 0){
-                    correct_num[j] += 1;
+                    correct_num[i][j] += 1;
                 }
             }
         }
     }
 
+    std::vector<float> sum_visited_num(nc, 0);
+    std::vector<float> sum_correct_num(nc, 0);
+
+    for (size_t i = 0; i < nc; i++){
+        for (size_t j = 0; j < nq; j++){
+            sum_correct_num[i] += correct_num[j][i];
+            sum_visited_num[i] += visited_num[j][i];
+        }
+    }
     record_file << "result for recall@ " << recall_k << std::endl;
     for (size_t i = 0; i < nc / 10; i++){
-        std::cout << size_t(visited_num[i * 10] / nq) << " ";
-        record_file << size_t(visited_num[i * 10] / nq) << " ";
+        std::cout << size_t(sum_visited_num[i * 10] / nq) << " ";
+        record_file << size_t(sum_visited_num[i * 10] / nq) << " ";
     }
-    std::cout << visited_num[nc-1] / nq << " " << std::endl;
-    record_file << visited_num[nc-1] / nq << " " << std::endl;
+    std::cout << sum_visited_num[nc-1] / nq << " " << std::endl;
+    record_file << sum_visited_num[nc-1] / nq << " " << std::endl;
 
     for (size_t i = 0; i < nc / 10; i++){
-        std::cout << correct_num[i * 10] / recall_k / nq << " ";
-        record_file << correct_num[i * 10] / recall_k / nq<< " ";
+        std::cout << sum_correct_num[i * 10] / recall_k / nq << " ";
+        record_file << sum_correct_num[i * 10] / recall_k / nq<< " ";
     }
-    std::cout << correct_num[nc-1] / recall_k / nq << " " << std::endl;
-    record_file << correct_num[nc-1] / recall_k / nq << " " << std::endl;
+    std::cout << sum_correct_num[nc-1] / recall_k / nq << " " << std::endl;
+    record_file << sum_correct_num[nc-1] / recall_k / nq << " " << std::endl;
 
     }
 }
