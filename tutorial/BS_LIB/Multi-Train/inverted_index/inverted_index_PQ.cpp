@@ -34,7 +34,8 @@ int main(){
     std::vector<float> base_residual(dimension * nb);
     std::ifstream base_input(path_base, std::ios::binary);
     readXvecFvec<float>(base_input, base_vectors.data(), dimension, nb, true);
-    std::string path_record = "./record/inverted_index_PQ_" + std::string(dt) + ".txt";
+    std::string path_record = "./record/inverted_index_PQ_" + std::string(dt) + " _" + std::to_string(alpha) + "_" + std::to_string(index_iter) + 
+                                "_" + std::to_string(PQ_iter) + "_" + std::to_string(total_iter) + ".txt";
     std::ofstream record_file(path_record);
 
     if (dimension % M != 0){
@@ -67,7 +68,7 @@ int main(){
     std::vector<float> PQ_residual(nb * dimension); // This is the residual between base vector and the PQ centroids
 
     record_file << "Distance computation" << std::endl;
-    std::cout << "Start the training process " << std::endl;
+    std::cout << "Start the training process with " << std::endl;
     for (size_t iter = 0; iter < total_iter; iter++){
         compute_PQ_residual(base_vectors.data(), PQ_centroids.data(), PQ_ids.data(), PQ_residual.data(), nb, dimension, nc_PQ);
         for (size_t iter1 = 0; iter1 < index_iter; iter1++){
