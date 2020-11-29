@@ -18,13 +18,13 @@ const size_t nc_up = 1000;
 const size_t nc_step = 50;
 const size_t M = 16;
 const size_t nc_PQ = 256;
-const float alpha = 0.1;
+const float alpha = 0.2;
 const size_t N_random = 999;
 const bool use_kmeansplusplus = false;
 
 const size_t index_iter = 1;
-const size_t PQ_iter = 3;
-const size_t total_iter = 20;
+const size_t PQ_iter = 1;
+const size_t total_iter = 50;
 std::vector<size_t> recall_k_list = {1, 10, 100};
 
 
