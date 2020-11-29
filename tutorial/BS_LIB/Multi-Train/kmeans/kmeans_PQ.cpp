@@ -4,7 +4,7 @@
 #include <iostream>
 #include "../../utils/utils.h"
 #include "../../parameters/parameter_tuning/inverted_index/Inverted_Index.h"
-#include "Kmeans_PQ.h"
+#include "../parameter_multi.h"
 #include <unordered_set>
 #include <time.h>
 
@@ -13,11 +13,8 @@ using namespace bslib;
 
 // ids: sizeof(idx) * nb * M
 void assign_residual(const float * residuals, const float * centroid, size_t dimension, idx_t * PQ_ids, size_t nc_PQ, size_t nb){
-    std::cout << "Entering the assign residual function " << std::endl;
     size_t dimension_sub = dimension / M;
-    std::cout << "Entering the assign residual function for loop " << std::endl;
     for (size_t PQ_index = 0; PQ_index < M; PQ_index++){
-        std::cout << "Now the PQ index is: " << PQ_index << std::endl;
         faiss::IndexFlatL2 index_sub(dimension_sub);
         index_sub.add(nc_PQ, centroid + PQ_index * nc_PQ * dimension_sub);
         std::vector<float> distance(nb);
@@ -99,8 +96,6 @@ int main(){
         clusters[base_ids[i]].push_back(i);
     }
 
-    std::vector<float> correct_num(nc, 0);
-    std::vector<float> visited_num(nc, 0);
 
     std::ifstream query_input(path_query, std::ios::binary);
     std::vector<float> query_vectors(nq * dimension);
@@ -123,6 +118,9 @@ int main(){
     for (size_t recall_index = 0; recall_index < recall_k_list.size(); recall_index++){
         size_t recall_k = recall_k_list[recall_index];
     
+        std::vector<float> correct_num(nc, 0);
+        std::vector<float> visited_num(nc, 0);
+
     for (size_t i = 0; i < nq; i++){
         size_t visited_vectors = 0;
         std::unordered_set<idx_t> gt;
@@ -137,15 +135,15 @@ int main(){
         std::vector<idx_t> query_ids(nc);
         centroid_index.search(1, query_vectors.data()+i * dimension, nc, distance.data(), query_ids.data());
         for (size_t j = 0; j < nc; j++){
-            
-            size_t cluster_size = clusters[j].size();
+            idx_t centroid_id = query_ids[j];
+            size_t cluster_size = clusters[centroid_id].size();
             visited_vectors += cluster_size;
             visited_num[j] += visited_vectors;
             for (size_t k = 0; k < cluster_size; k++){
-                float dist = faiss::fvec_L2sqr(query_vectors.data() + i * dimension, compressed_vectors.data() + clusters[j][k] * dimension, dimension);
+                float dist = faiss::fvec_L2sqr(query_vectors.data() + i * dimension, compressed_vectors.data() + clusters[centroid_id][k] * dimension, dimension);
                 if (dist < result_dists[0]){
                     faiss::maxheap_pop(recall_k, result_dists.data(), result_labels.data());
-                    faiss::maxheap_push(recall_k, result_dists.data(), result_labels.data(), dist, clusters[j][k]);
+                    faiss::maxheap_push(recall_k, result_dists.data(), result_labels.data(), dist, clusters[centroid_id][k]);
                 }
             }
             for (size_t k = 0; k < recall_k; k++){
@@ -158,8 +156,8 @@ int main(){
 
     record_file << "result for recall@ " << recall_k << std::endl;
     for (size_t i = 0; i < nc / 10; i++){
-        std::cout << visited_num[i * 10] / nq << " ";
-        record_file << visited_num[i * 10] / nq << " ";
+        std::cout << size_t(visited_num[i * 10] / nq) << " ";
+        record_file << size_t(visited_num[i * 10] / nq) << " ";
     }
     std::cout << visited_num[nc-1] / nq << " " << std::endl;
     record_file << visited_num[nc-1] / nq << " " << std::endl;

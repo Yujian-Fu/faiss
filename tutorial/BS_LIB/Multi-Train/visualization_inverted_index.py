@@ -18,7 +18,7 @@ recall_100 = 0
 recall1_result = []
 recall10_result = []
 recall100_result = []
-record_file = get_newest_folder("./record", "inverted_index_PQSun")
+record_file = get_newest_folder("./inverted_index/record", "inverted_index_PQSun")
 
 
 with open(record_file , 'r') as f:

@@ -20,9 +20,9 @@ const size_t M = 16;
 const size_t nc_PQ = 256;
 const float alpha = 0.1;
 
-const size_t index_iter = 10;
-const size_t PQ_iter = 10;
-const size_t total_iter = 10;
+const size_t index_iter = 1;
+const size_t PQ_iter = 1;
+const size_t total_iter = 50;
 std::vector<size_t> recall_k_list = {1, 10, 100};
 
 void initialize_centroid(const float * vectors, float * centroids, size_t nb, size_t dimension, size_t nc){

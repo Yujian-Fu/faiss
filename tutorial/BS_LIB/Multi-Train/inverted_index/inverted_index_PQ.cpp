@@ -1,20 +1,18 @@
 #include <iostream>
 #include "../../utils/utils.h"
 #include "../../parameters/parameter_tuning/inverted_index/Inverted_Index.h"
-#include "inverted_index_PQ.h"
+#include "../parameter_multi.h"
 #include <unordered_set>
 
 
 // ids: sizeof(idx) * nb * M
 void assign_residual(const float * residuals, const float * centroid, size_t dimension, idx_t * PQ_ids, size_t nc_PQ, size_t nb){
-    std::cout << "Entering the assign residual function " << std::endl;
     size_t dimension_sub = dimension / M;
-    std::cout << "Entering the assign residual function for loop " << std::endl;
     for (size_t PQ_index = 0; PQ_index < M; PQ_index++){
-        std::cout << "Now the PQ index is: " << PQ_index << std::endl;
         faiss::IndexFlatL2 index_sub(dimension_sub);
         index_sub.add(nc_PQ, centroid + PQ_index * nc_PQ * dimension_sub);
         std::vector<float> distance(nb);
+#pragma omp parallel for
         for (size_t i = 0; i < nb; i++){
             index_sub.search(1, residuals + i * dimension + PQ_index * dimension_sub, 1, distance.data()+i, PQ_ids + PQ_index * nb + i);
         }
@@ -95,8 +93,6 @@ int main(){
         clusters[base_ids[i]].push_back(i);
     }
 
-    std::vector<float> correct_num(nc, 0);
-    std::vector<float> visited_num(nc, 0);
 
     std::ifstream query_input(path_query, std::ios::binary);
     std::vector<float> query_vectors(nq * dimension);
@@ -117,6 +113,9 @@ int main(){
 
     for (size_t recall_index = 0; recall_index < recall_k_list.size(); recall_index++){
         size_t recall_k = recall_k_list[recall_index];
+        std::vector<float> correct_num(nc, 0);
+        std::vector<float> visited_num(nc, 0);
+
     for (size_t i = 0; i < nq; i++){
         size_t visited_vectors = 0;
         std::unordered_set<idx_t> gt;
@@ -153,8 +152,8 @@ int main(){
 
     record_file << "result for recall@ " << recall_k << std::endl;
     for (size_t i = 0; i < nc / 10; i++){
-        std::cout << visited_num[i * 10] / nq << " ";
-        record_file << visited_num[i * 10] / nq << " ";
+        std::cout << size_t(visited_num[i * 10] / nq) << " ";
+        record_file << size_t(visited_num[i * 10] / nq) << " ";
     }
     std::cout << visited_num[nc-1] / nq << " " << std::endl;
     record_file << visited_num[nc-1] / nq << " " << std::endl;

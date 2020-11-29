@@ -1,8 +1,6 @@
 import matplotlib.pyplot as plt 
 from visualization import *
-
 record_file = ""
-
 
 pq_distance_line = False
 index_distance_line = False
@@ -19,7 +17,7 @@ recall_100 = 0
 recall1_result = []
 recall10_result = []
 recall100_result = []
-record_file = get_newest_folder("./record", "kmeans_PQSun")
+record_file = get_newest_folder("./kmeans/record", "kmeans_PQSun")
 
 print(record_file)
 with open(record_file , 'r') as f:
