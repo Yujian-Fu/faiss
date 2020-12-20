@@ -66,7 +66,8 @@ int main(){
     faiss::ProductQuantizer pq = faiss::ProductQuantizer(dimension, M, nbits);
 
     pq.verbose = true;
-    pq.train(nb, train_residual.data());
+    pq.train(nt, train_residual.data());
+
     std::string message = "Time for kmeans training: ";
     Trecorder.record_time_usage(record_file, message);
     Trecorder.print_time_usage(message);
