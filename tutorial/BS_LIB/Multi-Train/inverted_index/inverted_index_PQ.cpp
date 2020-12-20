@@ -3,7 +3,8 @@
 #include "../../parameters/parameter_tuning/inverted_index/Inverted_Index.h"
 #include "../parameter_multi.h"
 #include <unordered_set>
-
+#include <sstream>
+#include <iomanip>
 
 // ids: sizeof(idx) * nb * M
 void assign_residual(const float * residuals, const float * centroid, size_t dimension, idx_t * PQ_ids, size_t nc_PQ, size_t nb){
@@ -40,7 +41,10 @@ int main(){
     readXvecFvec<float>(base_input, base_vectors.data(), dimension, nb, true);
     readXvecFvec<float>(train_input, train_vectors.data(), dimension, num_train[0], true);
 
-    std::string path_record = "./record/inverted_index_PQ_time_" + dt + " _" + std::to_string(alpha) + "_" + std::to_string(index_iter) + 
+    std::stringstream ss;
+    ss << std::setprecision(2) << std::to_string(alpha);
+
+    std::string path_record = "./record/inverted_index_PQ_time_" + dt + " _" + ss.str() + "_" + std::to_string(index_iter) + 
                                 "_" + std::to_string(PQ_iter) + "_" + std::to_string(total_iter) + ".txt";
     std::cout << "Save path to " << path_record << std::endl;
     std::ofstream record_file(path_record);
@@ -137,7 +141,7 @@ int main(){
         std::vector<std::vector<float>> correct_num100(nq);
         std::vector<std::vector<float>> visited_num(nq);
 
-#pragma omp parallel for
+//#pragma omp parallel for
     for (size_t i = 0; i < nq; i++){
         time_recorder Trecorder = time_recorder();
         correct_num1[i].resize(nc_to_visit, 0);
@@ -145,7 +149,7 @@ int main(){
         correct_num100[i].resize(nc_to_visit, 0);
         visited_num[i].resize(nc_to_visit, 0);
 
-        //size_t visited_vectors = 0;
+        size_t visited_vectors = 0;
 
         std::unordered_set<idx_t> gt1;
         for (size_t j = 0; j < 1; j++){
@@ -185,7 +189,7 @@ int main(){
             idx_t centroid_id = query_ids[j];
 
             size_t cluster_size = clusters[centroid_id].size();
-            //visited_vectors += cluster_size;
+            visited_vectors += cluster_size;
             
             for (size_t k = 0; k < cluster_size; k++){
                 float dist = faiss::fvec_L2sqr(query_vectors.data() + i * dimension, compressed_vectors.data() + clusters[centroid_id][k] * dimension, dimension);
@@ -205,7 +209,7 @@ int main(){
                     faiss::maxheap_push(100, result_dists100.data(), result_labels100.data(), dist, clusters[centroid_id][k]);
                 }
             }
-            visited_num[i][j] += Trecorder.get_time_usage();
+            visited_num[i][j] += visited_vectors;
 
             for (size_t k = 0; k < 1; k++){
                 if (gt1.count(result_labels1[k]) != 0){
