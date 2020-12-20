@@ -264,8 +264,6 @@ for (size_t recall_index = 0; recall_index < recall_k_list.size(); recall_index+
     }
     std::cout << std::endl;
     record_file << std::endl;
-    //std::cout << sum_visited_num[nc-1] / nq << " " << std::endl;
-    //record_file << sum_visited_num[nc-1] / nq << " " << std::endl;
 
     for (size_t i = 0; i < nc_to_visit; i++){
         std::cout << sum_correct_num[i] / recall_k / nq << " ";
@@ -274,8 +272,6 @@ for (size_t recall_index = 0; recall_index < recall_k_list.size(); recall_index+
     std::cout << std::endl;
     record_file << std::endl;
 
-    //std::cout << sum_correct_num[nc-1] / recall_k / nq << " " << std::endl;
-    //record_file << sum_correct_num[nc-1] / recall_k / nq << " " << std::endl;
 
 }
 }

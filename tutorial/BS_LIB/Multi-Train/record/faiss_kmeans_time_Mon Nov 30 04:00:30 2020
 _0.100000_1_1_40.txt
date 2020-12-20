@@ -1,0 +1,3 @@
+Kmeans with centroids: 100
+Index distance: 61092.2
+PQ distance: 10395.9
