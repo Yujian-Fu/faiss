@@ -142,7 +142,6 @@ int main(){
 
 #pragma omp parallel for
     for (size_t i = 0; i < nq; i++){
-        time_recorder Trecorder = time_recorder();
         correct_num1[i].resize(nc_to_visit, 0);
         correct_num10[i].resize(nc_to_visit, 0);
         correct_num100[i].resize(nc_to_visit, 0);
