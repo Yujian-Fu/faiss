@@ -20,7 +20,6 @@ void assign_residual(const float * residuals, const float * centroid, size_t dim
     }
 }
 
-
 using namespace bslib;
 
 
@@ -261,8 +260,8 @@ for (size_t recall_index = 0; recall_index < recall_k_list.size(); recall_index+
     record_file << "result for recall@ " << recall_k << std::endl;
     std::cout << "result for recall@ " << recall_k << std::endl;
     for (size_t i = 0; i < nc_to_visit; i++){
-        std::cout << (sum_visited_num[i] / nq) * 1000 << " ";
-        record_file << (sum_visited_num[i] / nq) * 1000 << " ";
+        std::cout << (sum_visited_num[i] / nq) << " ";
+        record_file << (sum_visited_num[i] / nq) << " ";
     }
     std::cout << std::endl;
     record_file << std::endl;
