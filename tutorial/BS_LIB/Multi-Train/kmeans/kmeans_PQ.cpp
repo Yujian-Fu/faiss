@@ -99,6 +99,7 @@ int main(){
 
     std::string message = "Time for kmeans training: ";
     Trecorder.record_time_usage(record_file, message);
+    Trecorder.print_time_usage(message);
 
     std::vector<idx_t> PQ_ids(nb * M);
     std::cout << "Assigning the vectors " << std::endl;

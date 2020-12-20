@@ -97,6 +97,7 @@ int main(){
     }
     std::string message = "Time for kmeans training: ";
     Trecorder.record_time_usage(record_file, message);
+    Trecorder.print_time_usage(message);
 
     std::vector<idx_t> PQ_ids(nb * M);
     std::cout << "Assigning the vectors " << std::endl;
@@ -253,6 +254,7 @@ for (size_t recall_index = 0; recall_index < recall_k_list.size(); recall_index+
     }
 
     record_file << "result for recall@ " << recall_k << std::endl;
+    std::cout << "result for recall@ " << recall_k << std::endl;
     for (size_t i = 0; i < nc_to_visit; i++){
         std::cout << (sum_visited_num[i] / nq) * 1000 << " ";
         record_file << (sum_visited_num[i] / nq) * 1000 << " ";
