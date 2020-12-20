@@ -157,6 +157,7 @@ namespace bslib{
     }
 
 
+
     inline bool exists(const std::string FilePath){
         std::ifstream f (FilePath);
         return f.good();
@@ -186,6 +187,23 @@ namespace bslib{
 #pragma omp parallel for
         for (size_t i = 0; i < n; i++)
             hash_ids[i] = group_ids[i] % hash_size;
+    }
+
+
+    inline std::string GetNowTime() {
+        time_t setTime;
+        time(&setTime);
+        tm* ptm = localtime(&setTime);
+        std::string time = std::to_string(ptm->tm_year + 1900)
+                        + "/"
+                        + std::to_string(ptm->tm_mon + 1)
+                        + "/"
+                        + std::to_string(ptm->tm_mday)
+                        + " "
+                        + std::to_string(ptm->tm_hour) + ":"
+                        + std::to_string(ptm->tm_min) + ":"
+                        + std::to_string(ptm->tm_sec);		
+        return time;	
     }
 
 

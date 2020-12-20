@@ -19,22 +19,28 @@ void assign_residual(const float * residuals, const float * centroid, size_t dim
     }
 }
 
+
 using namespace bslib;
 
 
 int main(){
-
-    time_t now = time(0);
-   
-   // 把 now 转换为字符串形式
-    char* dt = ctime(&now);
+    std::string dt = GetNowTime();
 
     std::vector<float> base_vectors(dimension * nb);
     std::vector<idx_t> base_ids(nb);
     std::vector<float> base_residual(dimension * nb);
+    size_t nt = num_train[0];
+    std::vector<float> train_vectors(dimension * nt);
+    std::vector<idx_t> train_ids(nt);
+    std::vector<float> train_residual(dimension * nt);
+
     std::ifstream base_input(path_base, std::ios::binary);
+    std::ifstream train_input(path_learn, std::ios::binary);
+
     readXvecFvec<float>(base_input, base_vectors.data(), dimension, nb, true);
-    std::string path_record = "./record/inverted_index_PQ_time_" + std::string(dt) + " _" + std::to_string(alpha) + "_" + std::to_string(index_iter) + 
+    readXvecFvec<float>(train_input, train_vectors.data(), dimension, num_train[0], true);
+
+    std::string path_record = "./record/inverted_index_PQ_time_" + dt + " _" + std::to_string(alpha) + "_" + std::to_string(index_iter) + 
                                 "_" + std::to_string(PQ_iter) + "_" + std::to_string(total_iter) + ".txt";
     std::ofstream record_file(path_record);
 
@@ -45,55 +51,65 @@ int main(){
 
     for (size_t nc = nc_low; nc <= nc_up; nc += nc_step){
         record_file << "Kmeans with centroids: " << nc << std::endl;
+    
+    time_recorder Trecorder = time_recorder();
 
     std::vector<float> PQ_centroids(dimension * nc_PQ);
-    std::vector<idx_t> PQ_ids(nb * M);
+    std::vector<idx_t> PQ_train_ids(nt * M);
 
     std::vector<float> index_centroids(dimension * nc);
     std::cout << "Initializing the index centroids " << std::endl;
-    initialize_centroid(base_vectors.data(), index_centroids.data(), nb, dimension, nc);
+    initialize_centroid(train_vectors.data(), index_centroids.data(), nt, dimension, nc);
 
     std::cout << "Assigning the vectors " << std::endl;
-    assign_vector(index_centroids.data(), base_vectors.data(), dimension, base_ids.data(), nc, nb);
+    assign_vector(index_centroids.data(), train_vectors.data(), dimension, train_ids.data(), nc, nt);
 
     std::cout << "Computing the residual " << std::endl;
-    compute_index_residual(base_vectors.data(), index_centroids.data(), base_ids.data(), base_residual.data(), nb, dimension);
+    compute_index_residual(train_vectors.data(), index_centroids.data(), train_ids.data(), train_residual.data(), nt, dimension);
 
     std::cout << "Initializing the PQ centroids " << std::endl;
-    initialize_PQ_centroid(base_residual.data(), PQ_centroids.data(), nb, dimension, nc_PQ);
+    initialize_PQ_centroid(train_residual.data(), PQ_centroids.data(), nt, dimension, nc_PQ);
 
     std::cout << "Assinging the residuals to the PQ centroids " << std::endl;
-    assign_residual(base_residual.data(), PQ_centroids.data(), dimension, PQ_ids.data(), nc_PQ, nb);
+    assign_residual(train_residual.data(), PQ_centroids.data(), dimension, PQ_train_ids.data(), nc_PQ, nt);
 
-    std::vector<float> PQ_residual(nb * dimension); // This is the residual between base vector and the PQ centroids
+    std::vector<float> PQ_residual(nt * dimension); // This is the residual between base vector and the PQ centroids
 
     record_file << "Distance computation" << std::endl;
     std::cout << "Start the training process with " << std::endl;
     for (size_t iter = 0; iter < total_iter; iter++){
-        compute_PQ_residual(base_vectors.data(), PQ_centroids.data(), PQ_ids.data(), PQ_residual.data(), nb, dimension, nc_PQ);
+        compute_PQ_residual(train_residual.data(), PQ_centroids.data(), PQ_train_ids.data(), PQ_residual.data(), nt, dimension, nc_PQ);
         for (size_t iter1 = 0; iter1 < index_iter; iter1++){
-            update_index_centroids(base_vectors.data(), PQ_residual.data(), index_centroids.data(), base_ids.data(), nb, nc, dimension);
-            assign_vector(index_centroids.data(), base_vectors.data(), dimension, base_ids.data(), nc, nb);
+            update_index_centroids(train_vectors.data(), PQ_residual.data(), index_centroids.data(), train_ids.data(), nt, nc, dimension);
+            assign_vector(index_centroids.data(), train_vectors.data(), dimension, train_ids.data(), nc, nt);
         }
 
-        compute_index_residual(base_vectors.data(), index_centroids.data(), base_ids.data(), base_residual.data(), nb, dimension);
+        compute_index_residual(train_vectors.data(), index_centroids.data(), train_ids.data(), train_residual.data(), nt, dimension);
         for (size_t iter2 = 0; iter2 < PQ_iter; iter2++){
-            update_PQ_centroids(base_residual.data(), PQ_centroids.data(), PQ_ids.data(), nb, nc_PQ, dimension);
-            assign_residual(base_residual.data(), PQ_centroids.data(), dimension, PQ_ids.data(), nc_PQ, nb);
+            update_PQ_centroids(train_residual.data(), PQ_centroids.data(), PQ_train_ids.data(), nt, nc_PQ, dimension);
+            assign_residual(train_residual.data(), PQ_centroids.data(), dimension, PQ_train_ids.data(), nc_PQ, nt);
         }
 
         std::cout << "Start evaluation " << std::endl;
         std::vector<float> distance_metric(2,0);
-        metric_computation(base_vectors.data(), index_centroids.data(), base_ids.data(), PQ_centroids.data(), PQ_ids.data(), nb, nc_PQ, dimension, distance_metric.data());
+        metric_computation(train_vectors.data(), index_centroids.data(), train_ids.data(), PQ_centroids.data(), PQ_train_ids.data(), nt, nc_PQ, dimension, distance_metric.data());
         record_file << distance_metric[0] << " " << distance_metric[1] << std::endl;
     }
+    std::string message = "Time for kmeans training: ";
+    Trecorder.record_time_usage(record_file, message);
 
+    std::vector<idx_t> PQ_ids(nb * M);
+    std::cout << "Assigning the vectors " << std::endl;
+    assign_vector(index_centroids.data(), base_vectors.data(), dimension, base_ids.data(), nc, nb);
+    std::cout << "Computing the residual " << std::endl;
+    compute_index_residual(base_vectors.data(), index_centroids.data(), base_ids.data(), base_residual.data(), nb, dimension);
+    std::cout << "Assinging the residuals to the PQ centroids " << std::endl;
+    assign_residual(base_residual.data(), PQ_centroids.data(), dimension, PQ_ids.data(), nc_PQ, nb);
 
     std::vector<std::vector<size_t>> clusters(nc);
     for (size_t i = 0; i < nb; i++){
         clusters[base_ids[i]].push_back(i);
     }
-
 
     std::ifstream query_input(path_query, std::ios::binary);
     std::vector<float> query_vectors(nq * dimension);
@@ -119,7 +135,7 @@ int main(){
         std::vector<std::vector<float>> correct_num100(nq);
         std::vector<std::vector<float>> visited_num(nq);
 
-//#pragma omp parallel for
+#pragma omp parallel for
     for (size_t i = 0; i < nq; i++){
         time_recorder Trecorder = time_recorder();
         correct_num1[i].resize(nc_to_visit, 0);

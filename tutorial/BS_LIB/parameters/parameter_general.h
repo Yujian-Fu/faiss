@@ -8,7 +8,7 @@ const size_t dimension = 128;
 
 
 size_t nb = 1000000;
-const size_t train_size = 10000; //This is the size of train set
+const size_t train_size = 100000; //This is the size of train set
 const size_t PQ_train_size = train_size;
 
 const size_t nq = 10000;

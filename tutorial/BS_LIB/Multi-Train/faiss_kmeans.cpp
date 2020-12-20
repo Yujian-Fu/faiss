@@ -10,17 +10,22 @@
 
 using namespace bslib;
 int main(){
-    time_t now = time(0);
-
-   // 把 now 转换为字符串形式
-    char* dt = ctime(&now);
+    std::string dt = GetNowTime();
 
     std::vector<float> base_vectors(dimension * nb);
     std::vector<idx_t> base_ids(nb);
-    std::vector<float> base_residual(dimension * nb);
+    std::vector<float> base_residual(dimension * nb);    
+    size_t nt = num_train[0];
+    std::vector<float> train_vectors(dimension * nt);
+    std::vector<idx_t> train_ids(nt);
+    std::vector<float> train_residual(dimension * nt);
+
     std::ifstream base_input(path_base, std::ios::binary);
+    std::ifstream train_input(path_learn, std::ios::binary);
+
     readXvecFvec<float>(base_input, base_vectors.data(), dimension, nb, true);
-    std::string path_record = "./record/faiss_kmeans_" + std::string(dt) + " _" + std::to_string(alpha) + "_" + std::to_string(index_iter) + 
+    readXvecFvec<float>(train_input, train_vectors.data(), dimension, num_train[0], true);
+    std::string path_record = "./record/faiss_kmeans_" + dt + " _" + std::to_string(alpha) + "_" + std::to_string(index_iter) + 
                                 "_" + std::to_string(PQ_iter) + "_" + std::to_string(total_iter) + ".txt";
     std::ofstream record_file(path_record);
 
@@ -32,29 +37,38 @@ int main(){
     for (size_t nc = nc_low; nc <= nc_up; nc += nc_step){
         record_file << "Kmeans with centroids: " << nc << std::endl;
 
+    time_recorder Trecorder = time_recorder();
     std::vector<float> index_centroids(dimension * nc);
-    faiss::kmeans_clustering(dimension, nb, nc, base_vectors.data(), index_centroids.data(), index_iter * total_iter);
+    faiss::kmeans_clustering(dimension, nt, nc, train_vectors.data(), index_centroids.data(), index_iter * total_iter);
 
 
     std::cout << "Assigning the vectors " << std::endl;
-    assign_vector(index_centroids.data(), base_vectors.data(), dimension, base_ids.data(), nc, nb);
+    assign_vector(index_centroids.data(), train_vectors.data(), dimension, train_ids.data(), nc, nt);
+
 
     float b_c_distance = 0;
-    for (size_t i = 0; i < nb; i++){
-        idx_t base_id = base_ids[i];
-        b_c_distance += faiss::fvec_L2sqr(base_vectors.data() + i * dimension, index_centroids.data() + base_id * dimension, dimension);
+    for (size_t i = 0; i < nt; i++){
+        idx_t train_id = train_ids[i];
+        b_c_distance += faiss::fvec_L2sqr(train_vectors.data() + i * dimension, index_centroids.data() + train_id * dimension, dimension);
     }
     
-    std::cout << "Now the avergae b_c_dist is: " << b_c_distance / nb << std::endl;
-    record_file << "Index distance: " << b_c_distance / nb << std::endl;
+    std::cout << "Now the avergae b_c_dist is: " << b_c_distance / nt << std::endl;
+    record_file << "Index distance: " << b_c_distance / nt << std::endl;
     
     std::cout << "Computing the residual " << std::endl;
-    compute_index_residual(base_vectors.data(), index_centroids.data(), base_ids.data(), base_residual.data(), nb, dimension);
+    compute_index_residual(train_vectors.data(), index_centroids.data(), train_ids.data(), train_residual.data(), nt, dimension);
 
     faiss::ProductQuantizer pq = faiss::ProductQuantizer(dimension, M, nbits);
 
     pq.verbose = true;
-    pq.train(nb, base_residual.data());
+    pq.train(nb, train_residual.data());
+
+
+    std::cout << "Assigning the vectors " << std::endl;
+    assign_vector(index_centroids.data(), base_vectors.data(), dimension, base_ids.data(), nc, nb);
+    std::cout << "Computing the residual " << std::endl;
+    compute_index_residual(base_vectors.data(), index_centroids.data(), base_ids.data(), base_residual.data(), nb, dimension);
+    std::cout << "Assinging the residuals to the PQ centroids " << std::endl;
 
     size_t code_size = pq.code_size;
     std::vector<uint8_t> base_codes(code_size * nb);
@@ -159,7 +173,7 @@ int main(){
             visited_num[i][j] += visited_vectors;
             for (size_t k = 0; k < cluster_size; k++){
                 float dist = faiss::fvec_L2sqr(query_vectors.data() + i * dimension, compressed_vectors.data() + clusters[centroid_id][k] * dimension, dimension);
-                
+
                 if (dist < result_dists1[0]){
                     faiss::maxheap_pop(1, result_dists1.data(), result_labels1.data());
                     faiss::maxheap_push(1, result_dists1.data(), result_labels1.data(), dist, clusters[centroid_id][k]);
