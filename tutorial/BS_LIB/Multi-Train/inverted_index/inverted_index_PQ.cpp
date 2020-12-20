@@ -42,7 +42,7 @@ int main(){
     readXvecFvec<float>(train_input, train_vectors.data(), dimension, num_train[0], true);
 
     std::stringstream ss;
-    ss << std::setprecision(2) << std::to_string(alpha);
+    ss << std::setprecision(2) << alpha;
 
     std::string path_record = "./record/inverted_index_PQ_time_" + dt + " _" + ss.str() + "_" + std::to_string(index_iter) + 
                                 "_" + std::to_string(PQ_iter) + "_" + std::to_string(total_iter) + ".txt";
@@ -141,7 +141,7 @@ int main(){
         std::vector<std::vector<float>> correct_num100(nq);
         std::vector<std::vector<float>> visited_num(nq);
 
-//#pragma omp parallel for
+#pragma omp parallel for
     for (size_t i = 0; i < nq; i++){
         time_recorder Trecorder = time_recorder();
         correct_num1[i].resize(nc_to_visit, 0);

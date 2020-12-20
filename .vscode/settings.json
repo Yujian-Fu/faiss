@@ -56,7 +56,8 @@
         "thread": "cpp",
         "cinttypes": "cpp",
         "typeinfo": "cpp",
-        "queue": "cpp"
+        "queue": "cpp",
+        "iomanip": "cpp"
     },
     "C_Cpp.errorSquiggles": "Enabled"
 }
