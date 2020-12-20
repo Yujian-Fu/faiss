@@ -47,7 +47,7 @@ int main(){
 
     std::string path_record = "./record/inverted_index_PQ_time_" + dt + " _" + ss.str() + "_" + std::to_string(index_iter) + 
                                 "_" + std::to_string(PQ_iter) + "_" + std::to_string(total_iter) + ".txt";
-
+    std::cout << "Save path to " << path_record << std::endl;
     std::ofstream record_file(path_record);
 
     if (dimension % M != 0){
