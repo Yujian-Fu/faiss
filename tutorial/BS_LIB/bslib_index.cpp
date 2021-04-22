@@ -635,6 +635,7 @@ namespace bslib{
      * assigned_ids: the result id result for assigned vectors  size: n
      * 
      **/
+
     void Bslib_Index::assign(const size_t n, const float * assign_data, idx_t * assigned_ids){
 
         /*
@@ -1479,6 +1480,15 @@ namespace bslib{
         output.close();
     }
 
+    /*
+        Read the index file to get the whole constructed index
+        Input: 
+            path_index:    str, the path to get the index
+        
+        Output:
+            None (The index is updated)
+
+    */
     void Bslib_Index::read_index(const std::string path_index){
         std::ifstream input(path_index, std::ios::binary);
         size_t final_nc_input;
@@ -1519,12 +1529,87 @@ namespace bslib{
             input.read((char *) base_sequence_ids[i].data(), group_size_input * sizeof(idx_t));
         }
 
-
         input.read((char *) & final_nc_input, sizeof(size_t));
         assert(final_nc_input == this->final_group_num);
         this->centroid_norms.resize(this->final_group_num);
         input.read((char *) centroid_norms.data(), this->final_group_num * sizeof(float));
         input.close();
     }
+
+    /*
+        Construct the index with the train set
+        Input:
+            path_learn:    str, the path to read the dataset
+            
+
+        Output: 
+            None  (The index is updated)
+
+    */
+    void Bslib_Index::build_index(Bslib_Index index, const size_t M_PQ, std::string path_learn){
+        if (use_OPQ){
+            index.opq_matrix = new faiss::OPQMatrix(dimension, M_PQ);
+            index.opq_matrix->verbose = true;
+            std::ifstream learn_input(path_learn, std::ios::binary);
+            std::vector<float> origin_train_set(train_size * dimension);
+            readXvecFvec<learn_data_type>(learn_input, origin_train_set.data(), dimension, train_size, false);
+        }
+
+        std::vector<HNSW_para> HNSW_paras;
+        if (use_HNSW_VQ){
+            for (size_t i = 0; i < VQ_layers; i++){
+                HNSW_para new_para; new_para.first.first = M_HNSW[i]; new_para.first.second = efConstruction[i]; new_para.second = efSearch[i];
+                HNSW_paras.push_back(new_para);
+            }
+        }
+        std::vector<PQ_para> PQ_paras;
+        for (size_t i = 0; i < PQ_layers; i++){
+            PQ_para new_para; new_para.first = M_PQ_layer[i]; new_para.second = nbits_PQ_layer[i];
+            PQ_paras.push_back(new_para);
+        }
+
+        index.build_quantizers(ncentroids, path_quantizers, path_learn, num_train, HNSW_paras, PQ_paras);
+        index.get_final_group_num();
+    }
+
+    /*
+        Assign the whole dataset to the index
+        Input: 
+            path:            str, the path to read the dataset
+            batch_size:      int, number of vectors in each batch
+            nbatches:        int, number of batches to be partitioned
+
+        Output:
+            None    (The index is updated)
+    */
+    void Bslib_Index::assign_vectors(){
+        if (!exists(path_ids)){
+                        std::ifstream base_input (path_base, std::ios::binary);
+            std::ofstream base_output (path_ids, std::ios::binary);
+
+            std::vector <float> batch(batch_size * dimension);
+            std::vector<idx_t> assigned_ids(batch_size);
+
+            for (size_t i = 0; i < nbatches; i++){
+                readXvecFvec<base_data_type> (base_input, batch.data(), dimension, batch_size, false, true);
+                if (use_OPQ) {index.do_OPQ(batch_size, batch.data());}
+                index.assign(batch_size, batch.data(), assigned_ids.data());
+                base_output.write((char * ) & batch_size, sizeof(uint32_t));
+                base_output.write((char *) assigned_ids.data(), batch_size * sizeof(idx_t));
+                if (i % 10 == 0){
+                    std::cout << " assigned batches [ " << i << " / " << nbatches << " ]";
+                    Trecorder.print_time_usage("");
+                }
+            }
+            base_input.close();
+            base_output.close();
+        }
+    }
+
+    void Bslib_Index::train_pq_quantizer(){
+        
+    }
+
+
 }
 

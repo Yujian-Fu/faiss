@@ -97,10 +97,21 @@ struct Bslib_Index{
 
     void get_final_centroid(const size_t group_id, float * final_centroid);
 
+    void build_index();
+
+    void assign_vectors();
+
+    void train_pq_quantizer();
+
+    void query_test();
+
 
     /**
      ** This is the function for dynamically get the reranking space for 
+     ** For future work
      **/
     size_t get_reranking_space(size_t k, size_t group_label, size_t group_id);
+
+
 };
 }
