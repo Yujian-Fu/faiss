@@ -1821,7 +1821,7 @@ namespace bslib{
                     gt.insert(groundtruth[ngt * i + j]);
                 }
 
-                assert (gt.size() == recall_k);
+                //assert (gt.size() == recall_k);
                 
                 for (size_t j = 0; j < recall_k; j++){
                     if (gt.count(query_labels[i * recall_k + j]) != 0)
