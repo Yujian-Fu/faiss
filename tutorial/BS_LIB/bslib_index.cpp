@@ -1568,7 +1568,7 @@ namespace bslib{
             if (exists(path_OPQ)){
             this->opq_matrix = static_cast<faiss::OPQMatrix *>(faiss::read_VectorTransform(path_OPQ.c_str()));
             }
-        else{
+            else{
             PrintMessage("Training the OPQ matrix");
             this->opq_matrix = new faiss::OPQMatrix(dimension, M_PQ);
             this->opq_matrix->verbose = true;
