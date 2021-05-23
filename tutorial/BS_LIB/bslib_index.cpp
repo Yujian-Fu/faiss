@@ -1807,7 +1807,7 @@ namespace bslib{
             Trecorder.reset();
             search(nq, recall_k, queries.data(), query_distances.data(), query_labels.data(), keep_space+ i * layers, groundtruth.data(), path_base);
             std::cout << "The qps for searching is: " << Trecorder.getTimeConsumption() / nq << " us " << std::endl;
-            std::string message = "Finish Search";
+            std::string message = "Finish Search ";
             Trecorder.print_time_usage(message);
             Trecorder.record_time_usage(record_file, message);
             Trecorder.record_time_usage(qps_record_file, message);
@@ -1816,17 +1816,20 @@ namespace bslib{
             for (size_t i = 0; i < nq; i++){
                 std::unordered_set<idx_t> gt;
 
-                for (size_t j = 0; j < recall_k; j++){
+                //for (size_t j = 0; j < recall_k; j++){
+                for (size_t j = 0; j < 1; j++){
                     gt.insert(groundtruth[ngt * i + j]);
                 }
 
                 assert (gt.size() == recall_k);
+                
                 for (size_t j = 0; j < recall_k; j++){
                     if (gt.count(query_labels[i * recall_k + j]) != 0)
                         correct ++;
                 }
             }
-            float recall = float(correct) / (recall_k * nq);
+            //float recall = float(correct) / (recall_k * nq);
+            float recall = float(correct) / (nq);
             Rrecorder.print_recall_performance(nq, recall, recall_k, search_mode, layers, keep_space + i * layers, max_vectors[i]);
             Rrecorder.record_recall_performance(record_file, nq, recall, recall_k, search_mode, layers, keep_space + i * layers, max_vectors[i]);
             Rrecorder.record_recall_performance(qps_record_file, nq, recall, recall_k, search_mode, layers, keep_space + i * layers, max_vectors[i]);
