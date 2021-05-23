@@ -34,14 +34,14 @@ struct Bslib_Index{
     bool use_OPQ;
     bool use_norm_quantization;
     bool use_train_selector;
-    bool save_index;
+    bool saving_index;
     bool is_recording;
 
     memory_recorder Mrecorder = memory_recorder();
     recall_recorder Rrecorder = recall_recorder();
     time_recorder Trecorder = time_recorder();
 
-    size_t reranking_space;
+    
 
     size_t M; // Initialized by training pq
     size_t norm_M;
@@ -50,7 +50,7 @@ struct Bslib_Index{
     size_t norm_code_size; // Initialized by reading PQ
     size_t final_group_num; // Initialized by compute final nc
     size_t max_visited_vectors; //
-    
+    size_t reranking_space;
     
     std::vector<size_t> ncentroids;
     std::vector<VQ_quantizer > vq_quantizer_index; // Initialized in read_quantizer
@@ -130,7 +130,6 @@ struct Bslib_Index{
         const size_t * max_vectors, const size_t * result_k, const size_t * keep_space, const size_t * reranking_space,
         std::ofstream & record_file, std::ofstream & qps_record_file, 
         std::string search_mode, std::string path_base, std::string path_gt, std::string path_query);
-
 
     /**
      ** This is the function for dynamically get the reranking space for 

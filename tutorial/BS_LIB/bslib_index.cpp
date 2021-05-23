@@ -10,21 +10,22 @@ namespace bslib{
      * 
      **/
     Bslib_Index::Bslib_Index(const size_t dimension, const size_t layers, const std::string * index_type, 
-    const bool use_reranking, const bool save_index, const bool use_norm_quantization, const bool is_recording,
+    const bool use_reranking, const bool saving_index, const bool use_norm_quantization, const bool is_recording,
     const bool use_HNSW_VQ, const bool use_HNSW_group, const bool use_OPQ, const bool use_train_selector,
     const size_t train_size, const size_t M_PQ, const size_t nbits){
             
             this->dimension = dimension;
             this->layers = layers;
 
-            this->is_recording = is_recording;
             this->use_reranking = use_reranking;
-            this->save_index = save_index;
-            this->use_norm_quantization = use_norm_quantization;
             this->use_HNSW_VQ = use_HNSW_VQ;
-            this->use_HNSW_group = use_HNSW_group;
+            this->use_norm_quantization = use_norm_quantization;
             this->use_OPQ = use_OPQ;
-            this->use_train_selector;
+            this->use_train_selector = use_train_selector;
+            this->use_HNSW_group = use_HNSW_group;
+
+            this->is_recording = is_recording;
+            this->saving_index = saving_index;
 
             this->index_type.resize(layers);
             this->ncentroids.resize(layers);
@@ -32,6 +33,7 @@ namespace bslib{
             for (size_t i = 0; i < layers; i++){
                 this->index_type[i] = index_type[i];
             }
+
             this->train_size = train_size;
             this->M = M_PQ;
             this->nbits = nbits;
@@ -404,7 +406,7 @@ namespace bslib{
             }
             nc_upper  = nc_upper * nc_per_group;
         }
-        if(save_index)
+        if(saving_index)
             write_quantizers(path_quantizer);
         }
     }
@@ -444,14 +446,13 @@ namespace bslib{
         this->pq.verbose = true;
         this->pq.train(train_set_size, residuals.data());
 
-        if(save_index){
+        if(saving_index){
             std::cout << "Writing PQ codebook to " << path_pq << std::endl;
             faiss::write_ProductQuantizer(& this->pq, path_pq.c_str());           
         }
 
         if (use_norm_quantization){
-            std::cout << path_norm_pq << "not implmented now" << std::endl; 
-
+            std::cout << path_norm_pq << "norm PQ not implmented now" << std::endl; 
         }
     }
     
@@ -662,7 +663,6 @@ namespace bslib{
             size_t n_pq = pq_quantizer_index.size();
             pq_quantizer_index[n_pq - 1].search_all(n, assign_data, assigned_ids);
         }*/
-
 
 #pragma omp parallel for
         for (size_t i = 0; i < n; i++){
@@ -1563,35 +1563,39 @@ namespace bslib{
     const size_t * efSearch, const size_t * M_PQ_layer, const size_t * nbits_PQ_layer, const size_t * num_train,
     size_t OPQ_train_size, size_t selector_train_size, size_t selector_group_size, std::ofstream & record_file){
 
+        PrintMessage("Initializing the index");
         Trecorder.reset();
         if (use_OPQ){        
             if (exists(path_OPQ)){
-            this->opq_matrix = static_cast<faiss::OPQMatrix *>(faiss::read_VectorTransform(path_OPQ.c_str()));
+                this->opq_matrix = static_cast<faiss::OPQMatrix *>(faiss::read_VectorTransform(path_OPQ.c_str()));
             }
             else{
-            PrintMessage("Training the OPQ matrix");
-            this->opq_matrix = new faiss::OPQMatrix(dimension, M_PQ);
-            this->opq_matrix->verbose = true;
-            std::ifstream learn_input(path_learn, std::ios::binary);
-            std::vector<float>  origin_train_set(train_size * dimension);
-            readXvecFvec<learn_data_type>(learn_input, origin_train_set.data(), dimension, train_size, false);
-            
-            if (OPQ_train_size < train_size){
-                std::vector<float> OPQ_train_set(OPQ_train_size * dimension);
-                RandomSubset(origin_train_set.data(), OPQ_train_set.data(), dimension, train_size, OPQ_train_size);
-                std::cout<< "Randomly select the train set for OPQ training" << std::endl;
-                this->opq_matrix->train(OPQ_train_size, OPQ_train_set.data());
+                PrintMessage("Training the OPQ matrix");
+                this->opq_matrix = new faiss::OPQMatrix(dimension, M_PQ);
+                this->opq_matrix->verbose = true;
+                std::ifstream learn_input(path_learn, std::ios::binary);
+                std::vector<float>  origin_train_set(train_size * dimension);
+                readXvecFvec<learn_data_type>(learn_input, origin_train_set.data(), dimension, train_size, false);
+                
+                if (OPQ_train_size < train_size){
+                    std::vector<float> OPQ_train_set(OPQ_train_size * dimension);
+                    RandomSubset(origin_train_set.data(), OPQ_train_set.data(), dimension, train_size, OPQ_train_size);
+                    std::cout<< "Randomly select the train set for OPQ training" << std::endl;
+                    this->opq_matrix->train(OPQ_train_size, OPQ_train_set.data());
+                }
+                else{
+                    this->opq_matrix->train(train_size, origin_train_set.data());
+                }
+                faiss::write_VectorTransform(this->opq_matrix, path_OPQ.c_str());
             }
-            else{
-                this->opq_matrix->train(train_size, origin_train_set.data());
+            if (is_recording)
+            {
+                std::string message = "Trained the OPQ matrix";
+                Mrecorder.print_memory_usage(message);
+                Mrecorder.record_memory_usage(record_file,  message);
+                Trecorder.print_time_usage(message);
+                Trecorder.record_time_usage(record_file, message);
             }
-            faiss::write_VectorTransform(this->opq_matrix, path_OPQ.c_str());
-        }        
-        std::string message = "Trained the OPQ matrix";
-        Mrecorder.print_memory_usage(message);
-        Mrecorder.record_memory_usage(record_file,  message);
-        Trecorder.print_time_usage(message);
-        Trecorder.record_time_usage(record_file, message);
         }
 
         if (use_train_selector){
@@ -1611,14 +1615,17 @@ namespace bslib{
             PQ_paras.push_back(new_para);
         }
 
+        PrintMessage("Constructing the quantizers");
         this->build_quantizers(ncentroids, path_quantizers, path_learn, num_train, HNSW_paras, PQ_paras);
         this->get_final_group_num();
 
-        std::string message = "Initialized the index, ";
-        Mrecorder.print_memory_usage(message);
-        Mrecorder.record_memory_usage(record_file,  message);
-        Trecorder.print_time_usage(message);
-        Trecorder.record_time_usage(record_file, message);
+        if (is_recording){
+            std::string message = "Constructed the index, ";
+            Mrecorder.print_memory_usage(message);
+            Mrecorder.record_memory_usage(record_file,  message);
+            Trecorder.print_time_usage(message);
+            Trecorder.record_time_usage(record_file, message);
+        }
     }
 
     /*
@@ -1633,6 +1640,7 @@ namespace bslib{
     */
     void Bslib_Index::assign_vectors(std::string path_ids, std::string path_base, 
         uint32_t batch_size, size_t nbatches, std::ofstream & record_file){
+        
         PrintMessage("Assigning the points");
         Trecorder.reset();
         if (!exists(path_ids)){
@@ -1655,11 +1663,13 @@ namespace bslib{
             }
             base_input.close();
             base_output.close();
-            std::string message = "Assigned the base vectors in sequential mode";
-            Mrecorder.print_memory_usage(message);
-            Mrecorder.record_memory_usage(record_file,  message);
-            Trecorder.print_time_usage(message);
-            Trecorder.record_time_usage(record_file, message);
+            if (is_recording){
+                std::string message = "Assigned the base vectors in sequential mode";
+                Mrecorder.print_memory_usage(message);
+                Mrecorder.record_memory_usage(record_file,  message);
+                Trecorder.print_time_usage(message);
+                Trecorder.record_time_usage(record_file, message);
+            }
         }
     }
 
@@ -1670,17 +1680,18 @@ namespace bslib{
     */
     void Bslib_Index::train_pq_quantizer(std::string path_pq, std::string path_pq_norm,
         size_t M_norm_PQ, std::string path_learn, size_t PQ_train_size,  std::ofstream & record_file){
-        PrintMessage("Constructing the PQ");
+        
+        PrintMessage("Constructing the PQ compressor");
         Trecorder.reset();
         if (exists(path_pq)){
-        std::cout << "Loading PQ codebook from " << path_pq << std::endl;
-        this->pq = * faiss::read_ProductQuantizer(path_pq.c_str());
-        this->code_size = this->pq.code_size;
+            std::cout << "Loading PQ codebook from " << path_pq << std::endl;
+            this->pq = * faiss::read_ProductQuantizer(path_pq.c_str());
+            this->code_size = this->pq.code_size;
 
-        if(use_norm_quantization){
-            std::cout << "Loading norm PQ codebook from " << path_pq_norm << std::endl;
-            this->norm_pq = * faiss::read_ProductQuantizer(path_pq_norm.c_str());
-            this->norm_code_size = this->norm_pq.code_size;
+            if(use_norm_quantization){
+                std::cout << "Loading norm PQ codebook from " << path_pq_norm << std::endl;
+                this->norm_pq = * faiss::read_ProductQuantizer(path_pq_norm.c_str());
+                this->norm_code_size = this->norm_pq.code_size;
             }
         }
         else
@@ -1690,30 +1701,35 @@ namespace bslib{
             std::cout << "Training PQ codebook" << std::endl;
             this->train_pq(path_pq, path_pq_norm, path_learn, PQ_train_size);
         }
-        std::cout << "Checking the PQ " << this->pq.code_size << std::endl;
+        std::cout << "Checking the PQ with its code size:" << this->pq.code_size << std::endl;
 
-        std::string message = "Trained the PQ, ";
-        Mrecorder.print_memory_usage(message);
-        Mrecorder.record_memory_usage(record_file,  message);
-        Trecorder.print_time_usage(message);
-        Trecorder.record_time_usage(record_file, message);
+        if (is_recording){
+            std::string message = "Trained the PQ, ";
+            Mrecorder.print_memory_usage(message);
+            Mrecorder.record_memory_usage(record_file,  message);
+            Trecorder.print_time_usage(message);
+            Trecorder.record_time_usage(record_file, message);
+        }
     }
     
     void Bslib_Index::load_index(std::string path_index, std::string path_ids, std::string path_base,
         size_t batch_size, size_t nbatches, size_t nb, std::ofstream & record_file){
         Trecorder.reset();
         if (exists(path_index)){
-            PrintMessage("Loading index");
+            PrintMessage("Loading pre-constructed index");
             
             read_index(path_index);
-            std::string message = "Loaded index ";
-            Mrecorder.print_memory_usage(message);
-            Mrecorder.record_memory_usage(record_file,  message);
-            Trecorder.print_time_usage(message);
-            Trecorder.record_time_usage(record_file, message);
+            if (is_recording){
+                std::string message = "Loaded pre-constructed index ";
+                Mrecorder.print_memory_usage(message);
+                Mrecorder.record_memory_usage(record_file,  message);
+                Trecorder.print_time_usage(message);
+                Trecorder.record_time_usage(record_file, message);
+            }
         }
         else{
-            std::vector<idx_t> ids(nb); std::ifstream ids_input(path_ids, std::ios::binary);
+            std::vector<idx_t> ids(nb); 
+            std::ifstream ids_input(path_ids, std::ios::binary);
             readXvec<idx_t> (ids_input, ids.data(), batch_size, nbatches); 
             //std::vector<idx_t> pre_hash_ids; if (use_hash) {pre_hash_ids.resize(nb, 0); memcpy(pre_hash_ids.data(), ids.data(), nb * sizeof(idx_t)); HashMapping(nb, pre_hash_ids.data(), ids.data(), index.final_group_num);}
             std::vector<size_t> groups_size(this->final_group_num, 0); std::vector<size_t> group_position(nb, 0);
@@ -1723,38 +1739,37 @@ namespace bslib{
             this->base_codes.resize(this->final_group_num);
             this->base_sequence_ids.resize(this->final_group_num);
             if (use_norm_quantization){this->base_norm_codes.resize(nb);} else{this->base_norms.resize(nb);}
-            //if (use_hash) index.base_pre_hash_ids.resize(index.final_group_num);
             for (size_t i = 0; i < this->final_group_num; i++){
                 this->base_codes[i].resize(groups_size[i] * this->code_size);
                 this->base_sequence_ids[i].resize(groups_size[i]);
-                //if(use_hash) index.base_pre_hash_ids[i].resize(groups_size[i]);
             }
-        }
+        
 
-        std::ifstream base_input(path_base, std::ios::binary);
-        std::vector<float> base_batch(batch_size * dimension);
-        std::vector<idx_t> batch_sequence_ids(batch_size);
+            std::ifstream base_input(path_base, std::ios::binary);
+            std::vector<float> base_batch(batch_size * dimension);
+            std::vector<idx_t> batch_sequence_ids(batch_size);
 
+            for (size_t i = 0; i < nbatches; i++){
+                readXvecFvec<base_data_type> (base_input, base_batch.data(), dimension, batch_size);
+                if (use_OPQ) {this->do_OPQ(batch_size, base_batch.data());}
+                for (size_t j = 0; j < batch_size; j++){batch_sequence_ids[j] = batch_size * i + j;}
 
-        for (size_t i = 0; i < nbatches; i++){
-            readXvecFvec<base_data_type> (base_input, base_batch.data(), dimension, batch_size);
-            if (use_OPQ) {this->do_OPQ(batch_size, base_batch.data());}
-            for (size_t j = 0; j < batch_size; j++){batch_sequence_ids[j] = batch_size * i + j;}
-
-            this->add_batch(batch_size, base_batch.data(), batch_sequence_ids.data(), ids.data() + i * batch_size, group_position.data()+i*batch_size);
-            if (i % 10 == 0){
-                std::cout << " adding batches [ " << i << " / " << nbatches << " ]";
-                Trecorder.print_time_usage("");
+                this->add_batch(batch_size, base_batch.data(), batch_sequence_ids.data(), ids.data() + i * batch_size, group_position.data()+i*batch_size);
+                if (i % 10 == 0){
+                    std::cout << " adding batches [ " << i << " / " << nbatches << " ]";
+                    Trecorder.print_time_usage("");
+                }
             }
-        }
 
-        this->compute_centroid_norm();
-        this->write_index(path_index);
-        std::string message = "Constructed and wrote the index ";
-        Mrecorder.print_memory_usage(message);
-        Mrecorder.record_memory_usage(record_file,  message);
-        Trecorder.print_time_usage(message);
-        Trecorder.record_time_usage(record_file, message);
+            this->compute_centroid_norm();
+            this->write_index(path_index);
+
+            std::string message = "Constructed and wrote the index ";
+            Mrecorder.print_memory_usage(message);
+            Mrecorder.record_memory_usage(record_file,  message);
+            Trecorder.print_time_usage(message);
+            Trecorder.record_time_usage(record_file, message);
+        }
     }
 
     void Bslib_Index::index_statistic(){}
@@ -1780,11 +1795,10 @@ namespace bslib{
         }
 
         for (size_t i = 0; i < num_search_paras; i++){
-        this->use_reranking = use_reranking;
 
         this->max_visited_vectors = max_vectors[i];
         for (size_t j = 0; j < num_recall; j++){
-            if (use_reranking) this->reranking_space = reranking_space[j];
+            if (this->use_reranking) this->reranking_space = reranking_space[j];
             size_t recall_k = result_k[j];
             std::vector<float> query_distances(nq * recall_k);
             std::vector<faiss::Index::idx_t> query_labels(nq * recall_k);

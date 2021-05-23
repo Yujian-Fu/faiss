@@ -128,7 +128,6 @@ void Clustering::train (idx_t nx, const float *x_in, Index & index) {
         return;
     }
 
-
     if (verbose)
         printf("Clustering %d points in %ldD to %ld clusters, "
                "redo %d times, %d iterations\n",

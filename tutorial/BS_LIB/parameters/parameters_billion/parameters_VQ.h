@@ -1,6 +1,4 @@
-#include <cstdio>
-#include <iostream>
-#include <string>
+#include "./parameters_billions.h"
 
 /* Parameter setting: */
 //Exp parameters
@@ -11,60 +9,17 @@ const size_t PQ_layers = 0;
 const std::string index_type[layers] = {"VQ", "VQ"};
 const uint32_t ncentroids[layers] = {10, 100000};
 
-const bool use_reranking = false;
-const bool use_HNSW_VQ = false;
-const bool use_norm_quantization = false;
-const bool use_dynamic_reranking = false;
-const bool use_OPQ = false;
-const bool use_parallel_indexing = false;
-const bool use_train_selector = false;
-const bool use_HNSW_group = false;
-
-const bool is_recording = true;
-const bool save_index = true;
-
-//For train PQ
-const size_t M_PQ = 16;
-const size_t M_norm_PQ = 1;
-const size_t nbits = 8; //Or 16
-const size_t dimension = 128;
-//For assigning ID
 
 //For building index
-const size_t train_size = 100000000; //This is the size of train set
 const size_t M_HNSW[VQ_layers] = {};
 const size_t efConstruction [VQ_layers] = {};
 const size_t efSearch[VQ_layers] = {};
 
 const size_t M_PQ_layer[PQ_layers] = {};
 const size_t nbits_PQ_layer[PQ_layers] = {};
-
-const size_t OPQ_train_size = 1000000;
-const size_t selector_train_size = OPQ_train_size;
-const size_t selector_group_size = 10000;
-
-const size_t PQ_train_size = 10000000;
-
 const size_t num_train[layers] = {10000000, 100000000};
-size_t nb = 1000000000;
-const uint32_t batch_size = 1000000;
-const size_t nbatches = nb / batch_size; //100
 
-//For searching
-const size_t ngt = 1000;
-const size_t nq = 10000;
-const size_t num_search_paras = 2;
-const size_t num_recall = 2;
-
-const size_t result_k[num_recall] = {1, 10};
-const size_t max_vectors[num_search_paras] = {10000, 15000};
 const size_t keep_space[layers * num_search_paras] = { 50, 100};
-const size_t reranking_space[num_recall] = {10, 20};
-const std::string search_mode = "non parallel";
-const size_t efConstruction[0];
-const size_t efsearch[0];
-
-bool is_recording = true;
 
 std::string conf_combination(){
     std::string result = "";
@@ -106,15 +61,14 @@ const std::string path_pq_norm =        base_path + model + "/" + dataset + "/PQ
 const std::string path_index =          base_path + model + "/" + dataset + "/PQ" + std::to_string(M_PQ) + ncentroid_conf + "_" + std::to_string(M_PQ) + "_" + std::to_string(nbits) + ".index";
 
 
-
 /**
  **This is the centroids for assigining origin train vectors  size: n_group * dimension
  **/
-std::string use_OPQ_label = use_OPQ ? "OPQ" : "";
-const std::string path_groups = base_path + model + "/" + dataset + "/selector_centroids_" + std::to_string(selector_group_size) + "_" + use_OPQ_label + ".fvecs";
+//std::string use_OPQ_label = use_OPQ ? "OPQ" : "";
+const std::string path_groups = base_path + model + "/" + dataset + "/selector_centroids_" + std::to_string(selector_group_size) + ".fvecs";
 //This is for recording the labels based on the generated centroids
 
 /**
  ** This is the labels for all assigned vectors, n_group * group_size 
  **/
-const std::string path_labels = base_path + model + "/" + dataset + "/selector_ids_" + std::to_string(train_size) + "_" + use_OPQ_label;
+const std::string path_labels = base_path + model + "/" + dataset + "/selector_ids_" + std::to_string(selector_group_size);

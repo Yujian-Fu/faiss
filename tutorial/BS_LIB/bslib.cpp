@@ -261,8 +261,8 @@ int main(){
         Trecorder.print_time_usage(message);
 
         index.compute_centroid_norm();
-
         index.write_index(path_index);
+        
         message = "Constructed and wrote the index ";
         Mrecorder.print_memory_usage(message);
         Mrecorder.record_memory_usage(record_file,  message);
