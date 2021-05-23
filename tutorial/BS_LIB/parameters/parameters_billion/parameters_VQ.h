@@ -106,6 +106,7 @@ const std::string path_pq_norm =        base_path + model + "/" + dataset + "/PQ
 const std::string path_index =          base_path + model + "/" + dataset + "/PQ" + std::to_string(M_PQ) + ncentroid_conf + "_" + std::to_string(M_PQ) + "_" + std::to_string(nbits) + ".index";
 
 
+
 /**
  **This is the centroids for assigining origin train vectors  size: n_group * dimension
  **/
