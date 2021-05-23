@@ -663,7 +663,7 @@ t_1_V_V_L_OP_PO = [1.13, 1.25, 1.341, 1.481, 1.591, 1.93, 3.52]
 r_10_V_V_L_OP_PO = [0.338, 0.416, 0.458, 0.5650, 0.5705, 0.578, 0.582]
 t_10_V_V_L_OP_PO = [1.13, 1.25, 1.341, 1.481, 1.591, 1.93, 3.52]
 
-
+'''
 plt.plot(t_10_V_L, r_10_V_L, label = "IVFADC", color = "black", marker = '.', linestyle = ':')
 plt.plot(t_10_V_P, r_10_V_P, label = "IMI", color = "black", marker = ',', linestyle = '--')
 plt.plot(t_10_V_V_L_OP, r_10_V_V_L_OP, label = "VQ VQ LQ_OP", color = "black", marker = 'o', linestyle = '-.')
@@ -671,5 +671,126 @@ plt.plot(t_10_V_V_L_OP_PO, r_10_V_V_L_OP_PO, label = "VQ VQ LQ_OP PO", color = '
 plt.title("DEEP1B Dataset")
 plt.xlabel("Search Time / ms")
 plt.ylabel("Recall")
+plt.legend()
+plt.show()
+'''
+
+#SIFT1B dataset 16 bytes
+'''
+r_1_IVFADC = 
+r_10_IVFADC = [0.45, 0.55, 0.59, 0.62, 0.65, 0.661, 0.661]
+t_1_IVFADC = [2.42, 2.59, 2.67, 2.84, 3.54, 3.83, 5.03]
+
+r_1_IMI = 
+r_10_IMI = [0.37, 0.48, 0.51, 0.537, 0.540, 0.578, 0.582]
+t_1_IMI = [2.33, 2.45, 2.591, 2.6981, 3.31, 3.73, 4.52]
+
+r_1_VV = 
+r_10_VV = [0.42, 0.57, 0.63, 0.67, 0.68, 0.693, 0.703]
+t_1_VV = [2.4, 2.41, 2.59, 2.970, 3.51, 4.86, 5.9]
+
+r_1_VP = 
+r_10_VP = [0.45, 0.54, 0.58, 0.652, 0.671, 0.681, 0.694]
+t_1_VP = [2.56, 2.73, 2.84, 3.95, 4.32, 4.98, 5.72]
+
+r_1_VVL = 
+r_10_VVL = [0.47, 0.59, 0.63, 0.642, 0.672, 0.683, 0.691]
+t_1_VVL = [2.2, 2.3, 2.4, 2.5, 2.9, 4.5, 5.42]
+
+r_1_VVP = 
+r_10_VVP = [0.41, 0.49, 0.56, 0.58, 0.64, 0.651, 0.66]
+t_1_VVP = [2.35, 2.48, 2.57, 2.61, 3.31, 3.69, 4.92]
+'''
+
+#Deep1B dataset
+
+r_1_IVFADC = [0.19, 0.27, 0.34, 0.374, 0.4, 0.42, 0.43]
+r_10_IVFADC = [0.38, 0.45, 0.57, 0.68, 0.76, 0.77, 0.779]
+t_1_IVFADC = [2.42, 2.59, 2.67, 2.84, 3.54, 3.83, 5.03]
+
+r_1_IMI = [0.19, 0.225, 0.30, 0.342, 0.372, 0.392, 0.404]
+r_10_IMI = [0.22, 0.41, 0.52, 0.59, 0.62, 0.64, 0.65]
+t_1_IMI = [2.33, 2.45, 2.591, 2.6981, 3.31, 3.73, 4.52]
+
+r_1_VV = [0.27, 0.34, 0.443, 0.463, 0.474, 0.487, 0.489]
+r_10_VV = [0.31, 0.44, 0.59, 0.74, 0.78, 0.83, 0.84]
+t_1_VV = [2.4, 2.41, 2.59, 2.970, 3.51, 4.86, 5.9]
+
+r_1_VP = [0.22, 0.29, 0.383, 0.433, 0.444, 0.455, 0.455]
+r_10_VP = [0.32, 0.39, 0.48, 0.59, 0.64, 0.71, 0.75]
+t_1_VP = [2.56, 2.73, 2.84, 3.95, 4.32, 4.98, 5.72]
+
+r_1_VVL = [0.23, 0.296, 0.378, 0.426, 0.443, 0.452, 0.458]
+r_10_VVL = [0.37, 0.51, 0.64, 0.70, 0.78, 0.81, 0.83]
+t_1_VVL = [2.2, 2.3, 2.4, 2.5, 2.9, 4.5, 5.42]
+
+r_1_VVP = [0.18, 0.246, 0.338, 0.40, 0.404, 0.44, 0.448]
+r_10_VVP = [0.28, 0.38, 0.51, 0.64, 0.73, 0.76, 0.79]
+t_1_VVP = [2.35, 2.78, 2.87, 3.1, 3.61, 3.99, 4.92]
+
+'''
+plt.plot(t_1_IVFADC, r_1_IVFADC, label = 'IVFADCPQ', color = "black", marker = '.', linestyle = ':')
+plt.plot(t_1_IMI, r_1_IMI, label = 'IMI', color = "black", marker = ',', linestyle = ':')
+plt.plot(t_1_VV, r_1_VV, label = 'VQ VQ', color = "black", marker = 'o', linestyle = '-')
+plt.plot(t_1_VP, r_1_VP, label = 'VQ PQ', color = "black", marker = 'o', linestyle = '-.')
+plt.plot(t_1_VVL, r_1_VVL, label = 'VQ VQ LQ', color = "black", marker = 'v', linestyle = '-')
+plt.plot(t_1_VVP, r_1_VVP, label = 'VQ VQ PQ', color = "black", marker = 'v', linestyle = '-.')
+plt.title("DEEP1B Dataset")
+plt.xlabel("Search Time / ms")
+plt.ylabel("Recall@1")
+plt.legend()
+plt.show()
+'''
+
+VQ_no_samp_t = [2.42, 2.59, 2.67, 2.84, 3.54, 3.83, 5.03]
+VQ_no_samp_r = [0.41, 0.48, 0.60, 0.69, 0.77, 0.81, 0.839]
+
+VQ_samp_64_t = [2.42, 2.59, 2.67, 2.84, 3.54, 3.83, 5.03]
+VQ_samp_64_r = [0.35, 0.38, 0.46, 0.60, 0.71, 0.744, 0.749]
+
+VQ_samp_32_t = [2.42, 2.59, 2.67, 2.84, 3.54, 3.83, 5.03]
+VQ_samp_32_r = [0.11, 0.28, 0.39, 0.49, 0.57, 0.66, 0.73]
+
+VV_no_samp_t = [2.4, 2.41, 2.59, 2.970, 3.51, 4.86, 5.9]
+VV_no_samp_r = [0.31, 0.44, 0.59, 0.74, 0.78, 0.83, 0.84]
+
+VV_samp_128_t = [2.13, 2.51, 2.79, 2.970, 3.71, 4.96, 6.2]
+VV_samp_128_r = [0.276, 0.41, 0.542, 0.68, 0.73, 0.78, 0.82]
+
+VV_samp_64_t = [2.49, 2.58, 2.73, 3.170, 3.81, 4.96, 6.1]
+VV_samp_64_r = [0.235, 0.379, 0.497, 0.576, 0.671, 0.682, 0.703]
+
+VV_samp_32_t = [1.9, 2.61, 2.88, 2.970, 3.81, 5.06, 5.76]
+VV_samp_32_r = [0.16, 0.25, 0.36, 0.47, 0.59, 0.64, 0.66]
+
+VVV_no_samp_t = [2.2, 2.3, 2.4, 2.5, 2.9, 4.5, 5.42]
+VVV_no_samp_r = [0.37, 0.51, 0.64, 0.70, 0.78, 0.81, 0.83]
+
+VVV_samp_128_t = [2.98, 3.1, 3.25, 3.78, 3.9, 4.8, 5.72]
+VVV_samp_128_r = [0.245, 0.39, 0.56, 0.64, 0.73, 0.77, 0.79]
+
+VVV_samp_64_t = [1.89, 2.05, 2.3, 2.9, 3.4, 4.04, 5.97]
+VVV_samp_64_r = [0.21, 0.38, 0.47, 0.54, 0.62, 0.69, 0.74]
+
+VVV_samp_32_t= [2.2, 2.37, 2.57, 2.96, 3.67, 4.34, 5.97]
+VVV_samp_32_r = [0.14, 0.27, 0.39, 0.51, 0.62, 0.66, 0.71]
+
+plt.plot(VQ_no_samp_t, VQ_no_samp_r, label = 'VQ no sampling', color = "black", marker = '.', linestyle = '-')
+plt.plot(VQ_samp_64_t, VQ_samp_64_r, label = 'VQ sampling 64', color = "black", marker = '.', linestyle = '-.')
+plt.plot(VQ_samp_32_t, VQ_samp_32_r, label = 'VQ sampling 32', color = "black", marker = '.', linestyle = ':')
+
+plt.plot(VV_no_samp_t, VV_no_samp_r, label = 'VV no sampling', color = "black", marker = ',', linestyle = '-')
+plt.plot(VV_samp_128_t, VV_samp_128_r, label = 'VV sampling 128', color = "black", marker = ',', linestyle = '--')
+plt.plot(VV_samp_64_t, VV_samp_64_r, label = 'VV sampling 64', color = "black", marker = ',', linestyle = '-.')
+plt.plot(VV_samp_32_t, VV_samp_32_r, label = 'VV sampling 32', color = "black", marker = ',', linestyle = ':')
+
+plt.plot(VVV_no_samp_t, VVV_no_samp_r, label = 'VVV no sampling', color = "black", marker = 'o', linestyle = '-')
+plt.plot(VVV_samp_128_t, VVV_samp_128_r, label = 'VVV sampling 128', color = "black", marker = 'o', linestyle = '--')
+plt.plot(VVV_samp_64_t, VVV_samp_64_r, label = 'VVV sampling 64', color = "black", marker = 'o', linestyle = '-.')
+plt.plot(VVV_samp_32_t, VVV_samp_32_r, label = 'VVV sampling 32', color = "black", marker = 'o', linestyle = ':')
+
+plt.title("SIFT1B Dataset")
+plt.xlabel("Search Time / ms")
+plt.ylabel("Recall@10")
 plt.legend()
 plt.show()

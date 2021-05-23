@@ -17,7 +17,11 @@ const bool use_norm_quantization = false;
 const bool use_dynamic_reranking = false;
 const bool use_OPQ = false;
 const bool use_parallel_indexing = false;
-const bool use_train_selector = true;
+const bool use_train_selector = false;
+const bool use_HNSW_group = false;
+
+const bool is_recording = true;
+const bool save_index = true;
 
 //For train PQ
 const size_t M_PQ = 16;
@@ -57,6 +61,8 @@ const size_t max_vectors[num_search_paras] = {10000, 15000};
 const size_t keep_space[layers * num_search_paras] = { 50, 100};
 const size_t reranking_space[num_recall] = {10, 20};
 const std::string search_mode = "non parallel";
+const size_t efConstruction[0];
+const size_t efsearch[0];
 
 bool is_recording = true;
 

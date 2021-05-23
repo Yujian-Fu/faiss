@@ -14,6 +14,9 @@ namespace bslib{
 typedef uint8_t learn_data_type;
 typedef uint8_t base_data_type;
 
+//typedef float learn_data_type;
+//typedef float base_data_type;
+
 typedef faiss::Index::idx_t idx_t;
 typedef std::pair<std::pair<size_t, size_t>, size_t> HNSW_para;
 typedef std::pair<size_t, size_t> PQ_para;
@@ -24,6 +27,7 @@ struct Bslib_Index{
     std::vector<std::string> index_type; // Initialized in constructer
     size_t train_size; //Initialized in constructer by 0, assigned in main
     size_t max_group_size;
+
     bool use_reranking;
     bool use_HNSW_VQ;
     bool use_HNSW_group;
@@ -31,6 +35,12 @@ struct Bslib_Index{
     bool use_norm_quantization;
     bool use_train_selector;
     bool save_index;
+    bool is_recording;
+
+    memory_recorder Mrecorder = memory_recorder();
+    recall_recorder Rrecorder = recall_recorder();
+    time_recorder Trecorder = time_recorder();
+
     size_t reranking_space;
 
     size_t M; // Initialized by training pq
@@ -64,7 +74,10 @@ struct Bslib_Index{
     std::vector<float> train_data; // Initialized in build_quantizers (without reading)
     std::vector<idx_t> train_data_ids; // Initialized in build_quantizers (without reading)
 
-    explicit Bslib_Index(const size_t dimension, const size_t layers, const std::string * index_type, const bool use_HNSW_VQ, const bool use_norm_quantization, const bool use_OPQ);
+    explicit Bslib_Index(const size_t dimension, const size_t layers, const std::string * index_type, 
+    const bool use_reranking, const bool save_index, const bool use_norm_quantization,
+    const bool use_HNSW_VQ, const bool use_HNSW_group, const bool use_OPQ, const bool use_train_selector,
+    const size_t train_size, const size_t M_PQ, const size_t nbits);
 
     void do_OPQ(idx_t n, float * dataset);
     void build_quantizers(const uint32_t * ncentroids, const std::string path_quantizer, const std::string path_learn, const size_t * num_train, const std::vector<HNSW_para> HNSW_paras, const std::vector<PQ_para> PQ_paras);
@@ -97,13 +110,26 @@ struct Bslib_Index{
 
     void get_final_centroid(const size_t group_id, float * final_centroid);
 
-    void build_index();
+    void build_index(const size_t M_PQ, std::string path_learn, std::string path_groups, std::string path_labels,
+    std::string path_quantizers, uint32_t VQ_layers, uint32_t PQ_layers, std::string path_OPQ, 
+    const uint32_t * ncentroids, const size_t * M_HNSW, const size_t * efConstruction, 
+    const size_t * efSearch, const size_t * M_PQ_layer, const size_t * nbits_PQ_layer, const size_t * num_train,
+    size_t OPQ_train_size, size_t selector_train_size, size_t selector_group_size, std::ofstream & record_file);
 
-    void assign_vectors();
+    void assign_vectors(std::string path_ids, std::string path_base, uint32_t batch_size, size_t nbatches, std::ofstream & record_file);
 
-    void train_pq_quantizer();
+    void train_pq_quantizer(std::string path_pq, std::string path_pq_norm,
+        size_t M_norm_PQ, std::string path_learn, size_t PQ_train_size, std::ofstream & record_file);
 
-    void query_test();
+    void load_index(std::string path_index, std::string path_ids, std::string path_base,
+        size_t batch_size, size_t nbatches, size_t nb, std::ofstream & record_file);
+    
+    void index_statistic();
+
+    void query_test(size_t num_search_paras, size_t num_recall, size_t nq, size_t ngt,
+        const size_t * max_vectors, const size_t * result_k, const size_t * keep_space, const size_t * reranking_space,
+        std::ofstream & record_file, std::ofstream & qps_record_file, 
+        std::string search_mode, std::string path_base, std::string path_gt, std::string path_query);
 
 
     /**
