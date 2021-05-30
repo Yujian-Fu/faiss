@@ -1752,6 +1752,7 @@ namespace bslib{
             }
         }
         else{
+            PrintMessage("Loading the index");
             std::vector<idx_t> ids(nb); 
             std::ifstream ids_input(path_ids, std::ios::binary);
             readXvec<idx_t> (ids_input, ids.data(), batch_size, nbatches); 
@@ -1759,7 +1760,7 @@ namespace bslib{
             std::vector<size_t> groups_size(this->final_group_num, 0); std::vector<size_t> group_position(nb, 0);
             for (size_t i = 0; i < nb; i++){group_position[i] = groups_size[ids[i]]; groups_size[ids[i]] ++;}
 
-            PrintMessage("Loading the index");
+            
             this->base_codes.resize(this->final_group_num);
             this->base_sequence_ids.resize(this->final_group_num);
             if (use_norm_quantization){this->base_norm_codes.resize(nb);} else{this->base_norms.resize(nb);}
