@@ -87,8 +87,6 @@ namespace bslib{
         return group_id;
     }
 
-
-
     /**
      * Function for constructing PQ layer
      * 

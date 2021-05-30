@@ -94,9 +94,9 @@ struct Bslib_Index{
     void encode(size_t n, const float * data, const idx_t * encoded_ids, float * encoded_data);
     void decode(size_t n, const float * encoded_data, const idx_t * encoded_ids, float * decoded_data);
     void assign(const size_t n, const float * assign_data, idx_t * assigned_ids);
-    void add_batch(size_t n, const float * data, const idx_t * sequence_ids, const idx_t * group_ids, const size_t * group_positions);
+    void add_batch(size_t n, const float * data, const idx_t * sequence_ids, const idx_t * group_ids, const size_t * group_positions, float * base_norms, const bool base_norm_flag);
     void get_final_group_num();
-    void compute_centroid_norm();
+    void compute_centroid_norm(std::string path_centroid_norm);
     void keep_k_min(const size_t m, const size_t k, const float * all_dists, const idx_t * all_labels, float * sub_dists, idx_t * sub_labels);
     void search(size_t n, size_t result_k, float * queries, float * query_dists, idx_t * query_ids, const size_t * keep_space, uint32_t * groundtruth, std::string path_base);
     size_t get_next_group_idx(size_t keep_result_space, idx_t * group_ids, float * query_group_dists, std::pair<idx_t, float> & result_idx_dist);
@@ -122,7 +122,7 @@ struct Bslib_Index{
         size_t M_norm_PQ, std::string path_learn, size_t PQ_train_size, std::ofstream & record_file);
 
     void load_index(std::string path_index, std::string path_ids, std::string path_base,
-        size_t batch_size, size_t nbatches, size_t nb, std::ofstream & record_file);
+        std::string path_base_norm, std::string path_centroid_norm, size_t batch_size, size_t nbatches, size_t nb, std::ofstream & record_file);
     
     void index_statistic();
 

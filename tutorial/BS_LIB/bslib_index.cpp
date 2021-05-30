@@ -488,7 +488,8 @@ namespace bslib{
      * group_positions                                                                     size: n
      * 
      **/
-    void Bslib_Index::add_batch(size_t n, const float * data, const idx_t * sequence_ids, const idx_t * group_ids, const size_t * group_positions){
+    void Bslib_Index::add_batch(size_t n, const float * data, const idx_t * sequence_ids, const idx_t * group_ids, 
+    const size_t * group_positions, float * base_norms, const bool base_norm_flag){
         std::vector<float> residuals(n * dimension);
         //Compute residuals
         encode(n, data, group_ids, residuals.data());
@@ -507,18 +508,19 @@ namespace bslib{
 
         std::vector<float> decoded_residuals(n * dimension);
         this->pq.decode(batch_codes.data(), decoded_residuals.data(), n);
-        
+
         std::vector<float> reconstructed_x(n * dimension);
         decode(n, decoded_residuals.data(), group_ids, reconstructed_x.data());
 
        //This is the norm for reconstructed vectors
-        std::vector<float> xnorms (n);
-        for (size_t i = 0; i < n; i++){xnorms[i] =  faiss::fvec_norm_L2sqr(reconstructed_x.data() + i * dimension, dimension);}
+        if (!base_norm_flag){
+            for (size_t i = 0; i < n; i++){base_norms[i] =  faiss::fvec_norm_L2sqr(reconstructed_x.data() + i * dimension, dimension);}
+        }
 
         //The size of base_norm_code or base_norm should be initialized in main function
         if (use_norm_quantization){
             std::vector<uint8_t> xnorm_codes (n * norm_code_size);
-            this->norm_pq.compute_codes(xnorms.data(), xnorm_codes.data(), n);
+            this->norm_pq.compute_codes(base_norms, xnorm_codes.data(), n);
             for (size_t i = 0 ; i < n; i++){
                 idx_t sequence_id = sequence_ids[i];
                 for (size_t j =0; j < this->norm_code_size; j++){
@@ -529,7 +531,7 @@ namespace bslib{
         else{
             for (size_t i = 0; i < n; i++){
                 idx_t sequence_id = sequence_ids[i];
-                this->base_norms[sequence_id] = xnorms[i];
+                this->base_norms[sequence_id] = base_norms[i];
             }
         }
     }
@@ -579,8 +581,16 @@ namespace bslib{
      * The size of centroid norm is 0 for PQ layer
      * 
      **/
-    void Bslib_Index::compute_centroid_norm(){
+    void Bslib_Index::compute_centroid_norm(std::string path_centroid_norm){
         this->centroid_norms.resize(final_group_num);
+        
+        if (exists(path_centroid_norm)){
+            std::ifstream centroid_norm_input (path_centroid_norm, std::ios::binary);
+            readXvecFvec<float> (centroid_norm_input, this->centroid_norms.data(), final_group_num, 1);
+            centroid_norm_input.close();
+        }
+
+        else{
         if (this->index_type[layers -1] == "VQ"){
             size_t n_vq = vq_quantizer_index.size();
             size_t group_num = vq_quantizer_index[n_vq-1].nc_upper;
@@ -633,6 +643,12 @@ namespace bslib{
         else{
             PrintMessage("The layer type not found for centroid norm computation");
             exit(0);
+        }
+
+        std::ofstream centroid_norm_output(path_centroid_norm, std::ios::binary);
+        centroid_norm_output.write((char * ) & final_group_num, final_group_num);
+        centroid_norm_output.write((char *) this->centroid_norms.data(), sizeof(float) * centroid_norms.size());
+        centroid_norm_output.close();
         }
     }
 
@@ -1713,7 +1729,7 @@ namespace bslib{
     }
     
     void Bslib_Index::load_index(std::string path_index, std::string path_ids, std::string path_base,
-        size_t batch_size, size_t nbatches, size_t nb, std::ofstream & record_file){
+        std::string path_base_norm, std::string path_centroid_norm, size_t batch_size, size_t nbatches, size_t nb, std::ofstream & record_file){
         Trecorder.reset();
         if (exists(path_index)){
             PrintMessage("Loading pre-constructed index");
@@ -1743,27 +1759,48 @@ namespace bslib{
                 this->base_codes[i].resize(groups_size[i] * this->code_size);
                 this->base_sequence_ids[i].resize(groups_size[i]);
             }
-        
 
+            
             std::ifstream base_input(path_base, std::ios::binary);
             std::vector<float> base_batch(batch_size * dimension);
             std::vector<idx_t> batch_sequence_ids(batch_size);
+
+
+            std::vector<float> xnorms(nb);
+            bool base_norm_flag = false;
+            if (exists(path_base_norm)){
+                base_norm_flag = true;
+                std::ifstream base_norm_input(path_base_norm, std::ios::binary);
+                readXvecFvec<float>(base_norm_input, xnorms.data(), nb, 1);
+                base_norm_input.close();
+            }
 
             for (size_t i = 0; i < nbatches; i++){
                 readXvecFvec<base_data_type> (base_input, base_batch.data(), dimension, batch_size);
                 if (use_OPQ) {this->do_OPQ(batch_size, base_batch.data());}
                 for (size_t j = 0; j < batch_size; j++){batch_sequence_ids[j] = batch_size * i + j;}
 
-                this->add_batch(batch_size, base_batch.data(), batch_sequence_ids.data(), ids.data() + i * batch_size, group_position.data()+i*batch_size);
+                this->add_batch(batch_size, base_batch.data(), batch_sequence_ids.data(), ids.data() + i * batch_size, group_position.data()+i*batch_size, xnorms.data() + i * batch_size, base_norm_flag);
                 if (i % 10 == 0){
                     std::cout << " adding batches [ " << i << " / " << nbatches << " ]";
                     Trecorder.print_time_usage("");
                 }
             }
 
-            this->compute_centroid_norm();
-            this->write_index(path_index);
+            if (!base_norm_flag){
+                std::ofstream base_norm_output(path_base_norm, std::ios::binary);
+                base_norm_output.write((char * )& nb, sizeof(size_t));
+                base_norm_output.write((char *)xnorms.data(), xnorms.size() * sizeof(float));
+                base_norm_output.close();
+            }
 
+            this->compute_centroid_norm(path_centroid_norm);
+
+
+            if (this->saving_index){
+                //this->write_index(path_index);
+            }
+            
             std::string message = "Constructed and wrote the index ";
             Mrecorder.print_memory_usage(message);
             Mrecorder.record_memory_usage(record_file,  message);

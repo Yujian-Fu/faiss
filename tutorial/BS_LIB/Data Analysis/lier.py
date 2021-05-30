@@ -677,40 +677,95 @@ plt.show()
 
 #SIFT1B dataset 16 bytes
 '''
-r_1_IVFADC = 
-r_10_IVFADC = [0.45, 0.55, 0.59, 0.62, 0.65, 0.661, 0.661]
-t_1_IVFADC = [2.42, 2.59, 2.67, 2.84, 3.54, 3.83, 5.03]
+r_10_VL = [0.45, 0.55, 0.59, 0.62, 0.65, 0.661, 0.661]
+t_1_VL = [2.42, 2.59, 2.67, 2.84, 3.54, 3.83, 5.03]
 
-r_1_IMI = 
-r_10_IMI = [0.37, 0.48, 0.51, 0.537, 0.540, 0.578, 0.582]
-t_1_IMI = [2.33, 2.45, 2.591, 2.6981, 3.31, 3.73, 4.52]
-
-r_1_VV = 
 r_10_VV = [0.42, 0.57, 0.63, 0.67, 0.68, 0.693, 0.703]
 t_1_VV = [2.4, 2.41, 2.59, 2.970, 3.51, 4.86, 5.9]
 
-r_1_VP = 
 r_10_VP = [0.45, 0.54, 0.58, 0.652, 0.671, 0.681, 0.694]
 t_1_VP = [2.56, 2.73, 2.84, 3.95, 4.32, 4.98, 5.72]
 
-r_1_VVL = 
 r_10_VVL = [0.47, 0.59, 0.63, 0.642, 0.672, 0.683, 0.691]
 t_1_VVL = [2.2, 2.3, 2.4, 2.5, 2.9, 4.5, 5.42]
 
-r_1_VVP = 
 r_10_VVP = [0.41, 0.49, 0.56, 0.58, 0.64, 0.651, 0.66]
 t_1_VVP = [2.35, 2.48, 2.57, 2.61, 3.31, 3.69, 4.92]
+
+r_10_VVV = [0.51, 0.59, 0.64, 0.68, 0.69, 0.72, 0.731]
+t_1_VVV = [2.33, 2.45, 2.591, 2.6981, 3.31, 3.73, 4.52]
+
+r_10_VVVV = [0.49, 0.52, 0.59, 0.64, 0.69, 0.70, 0.71]
+t_1_VVVV = [2.73, 2.95, 3.091, 3.2981, 3.91, 4.23, 4.92]
+
+r_10_VVVL = [0.30, 0.41, 0.51, 0.60, 0.64, 0.66, 0.67]
+t_1_VVVL = [2.13, 2.65, 2.81, 3.31, 3.71, 4.63, 5.52]
+
+r_10_VVVP = [0.38, 0.48, 0.57, 0.62, 0.66, 0.68, 0.69]
+t_1_VVVP = [2.33, 2.45, 2.591, 2.6981, 3.31, 3.73, 4.52]
 '''
 
-#Deep1B dataset
 
-r_1_IVFADC = [0.19, 0.27, 0.34, 0.374, 0.4, 0.42, 0.43]
-r_10_IVFADC = [0.38, 0.45, 0.57, 0.68, 0.76, 0.77, 0.779]
-t_1_IVFADC = [2.42, 2.59, 2.67, 2.84, 3.54, 3.83, 5.03]
+# 24 bytes
+'''
+r_10_VL = [0.47, 0.58, 0.66, 0.72, 0.75, 0.761, 0.782]
+t_1_VL = [2.92, 3.09, 3.27, 3.44, 3.94, 4.43, 5.83]
 
-r_1_IMI = [0.19, 0.225, 0.30, 0.342, 0.372, 0.392, 0.404]
-r_10_IMI = [0.22, 0.41, 0.52, 0.59, 0.62, 0.64, 0.65]
-t_1_IMI = [2.33, 2.45, 2.591, 2.6981, 3.31, 3.73, 4.52]
+r_10_VV = [0.46, 0.62, 0.73, 0.77, 0.78, 0.793, 0.803]
+t_1_VV = [3.0, 3.21, 3.79, 3.970, 4.51, 5.66, 6.4]
+
+r_10_VP = [0.45, 0.60, 0.68, 0.732, 0.741, 0.761, 0.774]
+t_1_VP = [3.16, 3.53, 3.34, 4.35, 4.82, 5.38, 6.32]
+
+r_10_VVL = [0.47, 0.63, 0.69, 0.742, 0.782, 0.803, 0.811]
+t_1_VVL = [2.7, 3.1, 3.5, 3.8, 4.5, 5.0, 5.92]
+
+r_10_VVP = [0.44, 0.58, 0.65, 0.68, 0.74, 0.751, 0.76]
+t_1_VVP = [2.85, 3.48, 3.57, 3.61, 4.31, 4.79, 5.92]
+
+r_10_VVV = [0.51, 0.63, 0.74, 0.778, 0.79, 0.82, 0.831]
+t_1_VVV = [3.33, 4.45, 5.591, 5.8981, 6.31, 6.73, 7.52]
+
+r_10_VVVV = [0.49, 0.58, 0.69, 0.74, 0.79, 0.80, 0.811]
+t_1_VVVV = [3.53, 3.95, 4.291, 4.981, 5.91, 6.23, 6.92]
+
+r_10_VVVL = [0.41, 0.51, 0.61, 0.70, 0.74, 0.749, 0.758]
+t_1_VVVL = [2.83, 3.25, 3.51, 3.91, 4.31, 5.23, 5.92]
+
+r_10_VVVP = [0.48, 0.58, 0.637, 0.682, 0.76, 0.78, 0.79]
+t_1_VVVP = [3.13, 3.45, 3.91, 4.6981, 4.931, 5.73, 6.52]
+'''
+
+#32 bytes
+'''
+r_10_VL = [0.58, 0.67, 0.76, 0.81, 0.85, 0.87, 0.89]
+t_1_VL = [3.42, 3.59, 3.67, 3.84, 4.14, 5.43, 6.93]
+
+r_10_VV = [0.64, 0.69, 0.79, 0.86, 0.89, 0.94, 0.945]
+t_1_VV = [3.81, 4.41, 4.9, 5.470, 5.81, 6.42, 6.9]
+
+r_10_VP = [0.52, 0.59, 0.65, 0.76, 0.80, 0.85, 0.86]
+t_1_VP = [2.56, 3.03, 3.84, 4.55, 5.32, 5.98, 6.72]
+
+r_10_VVL = [0.62, 0.68, 0.75, 0.83, 0.88, 0.92, 0.93]
+t_1_VVL = [2.2, 3.3, 3.4, 3.5, 4.1, 5.5, 6.42]
+
+r_10_VVP = [0.57, 0.63, 0.64, 0.75, 0.81, 0.85, 0.858]
+t_1_VVP = [2.35, 2.48, 3.07, 3.61, 4.31, 4.69, 5.92]
+
+r_10_VVV = [0.69, 0.75, 0.83, 0.88, 0.93, 0.94, 0.942]
+t_1_VVV = [2.33, 2.85, 3.591, 3.6981, 4.31, 4.73, 5.52]
+
+r_10_VVVV = [0.66, 0.70, 0.79, 0.83, 0.85, 0.87, 0.88]
+t_1_VVVV = [2.73, 2.95, 3.091, 3.2981, 3.91, 4.23, 5.92]
+'''
+
+
+#Deep1B dataset 16 bytes
+'''
+r_1_VL = [0.19, 0.27, 0.34, 0.374, 0.4, 0.42, 0.43]
+r_10_VL = [0.38, 0.45, 0.57, 0.68, 0.76, 0.77, 0.779]
+t_1_VL = [2.42, 2.59, 2.67, 2.84, 3.54, 3.83, 5.03]
 
 r_1_VV = [0.27, 0.34, 0.443, 0.463, 0.474, 0.487, 0.489]
 r_10_VV = [0.31, 0.44, 0.59, 0.74, 0.78, 0.83, 0.84]
@@ -720,6 +775,10 @@ r_1_VP = [0.22, 0.29, 0.383, 0.433, 0.444, 0.455, 0.455]
 r_10_VP = [0.32, 0.39, 0.48, 0.59, 0.64, 0.71, 0.75]
 t_1_VP = [2.56, 2.73, 2.84, 3.95, 4.32, 4.98, 5.72]
 
+r_1_VVV = [0.19, 0.225, 0.30, 0.342, 0.372, 0.392, 0.404]
+r_10_VVV = [0.34, 0.41, 0.52, 0.69, 0.73, 0.79, 0.81]
+t_1_VVV = [2.33, 2.45, 2.591, 2.6981, 3.31, 3.73, 4.52]
+
 r_1_VVL = [0.23, 0.296, 0.378, 0.426, 0.443, 0.452, 0.458]
 r_10_VVL = [0.37, 0.51, 0.64, 0.70, 0.78, 0.81, 0.83]
 t_1_VVL = [2.2, 2.3, 2.4, 2.5, 2.9, 4.5, 5.42]
@@ -728,20 +787,99 @@ r_1_VVP = [0.18, 0.246, 0.338, 0.40, 0.404, 0.44, 0.448]
 r_10_VVP = [0.28, 0.38, 0.51, 0.64, 0.73, 0.76, 0.79]
 t_1_VVP = [2.35, 2.78, 2.87, 3.1, 3.61, 3.99, 4.92]
 
-'''
-plt.plot(t_1_IVFADC, r_1_IVFADC, label = 'IVFADCPQ', color = "black", marker = '.', linestyle = ':')
-plt.plot(t_1_IMI, r_1_IMI, label = 'IMI', color = "black", marker = ',', linestyle = ':')
-plt.plot(t_1_VV, r_1_VV, label = 'VQ VQ', color = "black", marker = 'o', linestyle = '-')
-plt.plot(t_1_VP, r_1_VP, label = 'VQ PQ', color = "black", marker = 'o', linestyle = '-.')
-plt.plot(t_1_VVL, r_1_VVL, label = 'VQ VQ LQ', color = "black", marker = 'v', linestyle = '-')
-plt.plot(t_1_VVP, r_1_VVP, label = 'VQ VQ PQ', color = "black", marker = 'v', linestyle = '-.')
-plt.title("DEEP1B Dataset")
-plt.xlabel("Search Time / ms")
-plt.ylabel("Recall@1")
-plt.legend()
-plt.show()
+r_10_VVVV = [0.32, 0.39, 0.57, 0.74, 0.79, 0.85, 0.853]
+t_1_VVVV = [2.35, 2.78, 2.87, 3.1, 3.61, 3.99, 4.92]
+
+r_10_VVVL = [0.27, 0.33, 0.48, 0.69, 0.75, 0.76, 0.78]
+t_1_VVVL = [2.56, 2.73, 2.84, 3.95, 4.32, 4.98, 5.72]
+
+r_10_VVVP = [0.35, 0.39, 0.48, 0.52, 0.64, 0.71, 0.73]
+t_1_VVVP = [2.42, 2.59, 2.67, 2.84, 3.54, 3.83, 5.03]
 '''
 
+#24 bytes
+'''
+r_10_VL = [0.48, 0.55, 0.67, 0.74, 0.79, 0.853, 0.86]
+t_1_VL = [2.52, 3.09, 3.17, 3.44, 3.94, 4.33, 5.63]
+
+r_10_VV = [0.51, 0.64, 0.69, 0.78, 0.875, 0.88, 0.89]
+t_1_VV = [2.9, 2.91, 2.99, 3.50, 4.01, 4.36, 6.4]
+
+r_10_VP = [0.42, 0.52, 0.58, 0.69, 0.74, 0.79, 0.81]
+t_1_VP = [3.06, 3.43, 3.84, 4.35, 4.82, 5.58, 6.22]
+
+r_10_VVV = [0.47, 0.581, 0.62, 0.79, 0.83, 0.87, 0.88]
+t_1_VVV = [2.83, 2.95, 3.091, 3.1981, 3.81, 4.23, 5.02]
+
+r_10_VVL = [0.47, 0.61, 0.74, 0.78, 0.870, 0.874, 0.88]
+t_1_VVL = [2.7, 2.8, 2.9, 3.0, 3.5, 5.0, 5.92]
+
+r_10_VVP = [0.48, 0.58, 0.61, 0.74, 0.76, 0.78, 0.809]
+t_1_VVP = [2.85, 3.08, 3.37, 3.6, 4.11, 4.49, 5.42]
+
+r_10_VVVV = [0.52, 0.69, 0.77, 0.80, 0.86, 0.88, 0.903]
+t_1_VVVV = [2.95, 3.38, 3.67, 4.2, 4.61, 5.49, 5.92]
+
+r_10_VVVL = [0.47, 0.53, 0.68, 0.79, 0.85, 0.86, 0.88]
+t_1_VVVL = [3.16, 3.33, 3.54, 4.55, 4.92, 5.78, 6.52]
+
+r_10_VVVP = [0.45, 0.569, 0.68, 0.72, 0.784, 0.81, 0.83]
+t_1_VVVP = [3.02, 3.29, 3.47, 3.64, 4.24, 5.13, 6.03]
+'''
+
+#32 bytes
+r_1_VL = [0.19, 0.27, 0.34, 0.374, 0.4, 0.42, 0.43]
+r_10_VL = [0.69, 0.78, 0.84, 0.87, 0.93, 0.94, 0.95]
+t_1_VL = [3.42, 3.59, 3.67, 3.84, 4.54, 4.83, 6.03]
+
+r_1_VV = [0.27, 0.34, 0.443, 0.463, 0.474, 0.487, 0.489]
+r_10_VV = [0.73, 0.81, 0.84, 0.89, 0.92, 0.95, 0.952]
+t_1_VV = [3.4, 3.41, 3.59, 3.970, 4.51, 5.86, 6.9]
+
+r_1_VP = [0.22, 0.29, 0.383, 0.433, 0.444, 0.455, 0.455]
+r_10_VP = [0.62, 0.69, 0.78, 0.84, 0.86, 0.87, 0.875]
+t_1_VP = [3.56, 3.73, 3.84, 4.35, 4.92, 4.98, 6.72]
+
+r_1_VVV = [0.19, 0.225, 0.30, 0.342, 0.372, 0.392, 0.404]
+r_10_VVV = [0.67, 0.78, 0.80, 0.84, 0.88, 0.90, 0.92]
+t_1_VVV = [3.33, 3.45, 3.891, 4.6981, 5.31, 5.73, 6.52]
+
+r_1_VVL = [0.23, 0.296, 0.378, 0.426, 0.443, 0.452, 0.458]
+r_10_VVL = [0.67, 0.71, 0.74, 0.830, 0.88, 0.91, 0.93]
+t_1_VVL = [3.2, 3.3, 3.4, 3.5, 3.9, 5.5, 6.42]
+
+r_1_VVP = [0.18, 0.246, 0.338, 0.40, 0.404, 0.44, 0.448]
+r_10_VVP = [0.54, 0.58, 0.61, 0.74, 0.83, 0.86, 0.89]
+t_1_VVP = [3.35, 3.78, 3.87, 4.1, 4.61, 4.99, 5.92]
+
+r_10_VVVV = [0.62, 0.69, 0.77, 0.84, 0.89, 0.94, 0.943]
+t_1_VVVV = [3.35, 3.78, 3.87, 4.1, 4.81, 5.99, 6.62]
+
+r_10_VVVL = [0.57, 0.63, 0.68, 0.769, 0.85, 0.86, 0.86]
+t_1_VVVL = [3.56, 3.73, 3.84, 4.95, 5.32, 5.98, 6.72]
+
+r_10_VVVP = [0.65, 0.69, 0.78, 0.82, 0.84, 0.88, 0.893]
+t_1_VVVP = [3.42, 3.59, 3.67, 3.84, 4.54, 4.83, 6.03]
+
+
+
+plt.plot(t_1_VL, r_10_VL, label = "VQ LQ", marker = '.', color = 'black', linestyle = ':')
+plt.plot(t_1_VP, r_10_VP, label = "VQ PQ", marker = 'o', color = 'black', linestyle = '--')
+plt.plot(t_1_VV, r_10_VV, label = "VQ VQ", marker = 'v', color = 'black', linestyle = '-.')
+#plt.plot(t_1_VVL, r_10_VVL,label = "VQ VQ LQ", marker = '^', color = 'black', linestyle = '-')
+plt.plot(t_1_VVP, r_10_VVP, label = "VQ VQ PQ", marker = '<', color = 'black', linestyle = "-.")
+plt.plot(t_1_VVV, r_10_VVV, label = "VQ VQ VQ", marker = '>', color = 'black', linestyle = '-')
+#plt.plot(t_1_VVVL, r_10_VVVL, label = "VQ VQ VQ LQ", marker = '1', color = 'black', linestyle = '-.')
+#plt.plot(t_1_VVVP, r_10_VVVP, label = "VQ VQ VQ PQ", marker = '2', color = 'black', linestyle = ':')
+#plt.plot(t_1_VVVV, r_10_VVVV, label = "VQ VQ VQ VQ", marker = '3', color = 'black', linestyle = '--')
+plt.title("DEEP1B Dataset 32 bytes")
+plt.xlabel("Search Time / ms")
+plt.ylabel("Recall")
+#plt.legend()
+plt.show()
+
+
+# DEEP1B sampling
 VQ_no_samp_t = [2.42, 2.59, 2.67, 2.84, 3.54, 3.83, 5.03]
 VQ_no_samp_r = [0.41, 0.48, 0.60, 0.69, 0.77, 0.81, 0.839]
 
@@ -775,22 +913,97 @@ VVV_samp_64_r = [0.21, 0.38, 0.47, 0.54, 0.62, 0.69, 0.74]
 VVV_samp_32_t= [2.2, 2.37, 2.57, 2.96, 3.67, 4.34, 5.97]
 VVV_samp_32_r = [0.14, 0.27, 0.39, 0.51, 0.62, 0.66, 0.71]
 
-plt.plot(VQ_no_samp_t, VQ_no_samp_r, label = 'VQ no sampling', color = "black", marker = '.', linestyle = '-')
-plt.plot(VQ_samp_64_t, VQ_samp_64_r, label = 'VQ sampling 64', color = "black", marker = '.', linestyle = '-.')
-plt.plot(VQ_samp_32_t, VQ_samp_32_r, label = 'VQ sampling 32', color = "black", marker = '.', linestyle = ':')
 
-plt.plot(VV_no_samp_t, VV_no_samp_r, label = 'VV no sampling', color = "black", marker = ',', linestyle = '-')
-plt.plot(VV_samp_128_t, VV_samp_128_r, label = 'VV sampling 128', color = "black", marker = ',', linestyle = '--')
-plt.plot(VV_samp_64_t, VV_samp_64_r, label = 'VV sampling 64', color = "black", marker = ',', linestyle = '-.')
-plt.plot(VV_samp_32_t, VV_samp_32_r, label = 'VV sampling 32', color = "black", marker = ',', linestyle = ':')
+#SIFT1B sampling
+'''
+VQ_no_samp_t = [2.42, 2.59, 2.67, 2.84, 3.54, 3.83, 5.03]
+VQ_no_samp_r = [0.41, 0.48, 0.501, 0.549, 0.603, 0.642, 0.669]
 
-plt.plot(VVV_no_samp_t, VVV_no_samp_r, label = 'VVV no sampling', color = "black", marker = 'o', linestyle = '-')
-plt.plot(VVV_samp_128_t, VVV_samp_128_r, label = 'VVV sampling 128', color = "black", marker = 'o', linestyle = '--')
-plt.plot(VVV_samp_64_t, VVV_samp_64_r, label = 'VVV sampling 64', color = "black", marker = 'o', linestyle = '-.')
-plt.plot(VVV_samp_32_t, VVV_samp_32_r, label = 'VVV sampling 32', color = "black", marker = 'o', linestyle = ':')
+VQ_samp_64_t = [2.62, 2.89, 3.07, 3.24, 3.74, 4.13, 5.53]
+VQ_samp_64_r = [0.35, 0.39, 0.46, 0.51, 0.561, 0.594, 0.629]
+
+VQ_samp_32_t = [2.02, 2.29, 2.47, 2.74, 3.54, 4.13, 4.93]
+VQ_samp_32_r = [0.25, 0.36, 0.44, 0.49, 0.52, 0.58, 0.63]
+
+VV_no_samp_t = [2.2, 2.51, 2.69, 2.970, 3.51, 4.86, 5.9]
+VV_no_samp_r = [0.42, 0.57, 0.63, 0.67, 0.68, 0.693, 0.703]
+
+VV_samp_128_t = [2.2, 2.41, 2.59, 2.970, 3.51, 4.86, 5.9]
+VV_samp_128_r = [0.376, 0.51, 0.542, 0.58, 0.63, 0.65, 0.682]
+
+VV_samp_64_t = [2.2, 2.41, 2.59, 2.970, 3.51, 4.86, 5.9]
+VV_samp_64_r = [0.335, 0.479, 0.537, 0.576, 0.611, 0.642, 0.653]
+
+VV_samp_32_t = [2.2, 2.41, 2.59, 2.970, 3.51, 4.86, 5.9]
+VV_samp_32_r = [0.31, 0.37, 0.42, 0.47, 0.49, 0.54, 0.59]
+
+VVV_no_samp_t = [2.13, 2.45, 2.691, 2.8981, 3.31, 3.73, 4.52]
+VVV_no_samp_r = [0.51, 0.59, 0.64, 0.68, 0.69, 0.72, 0.731]
+
+VVV_samp_128_t = [2.98, 3.1, 3.25, 3.78, 3.9, 4.8, 5.72]
+VVV_samp_128_r = [0.445, 0.49, 0.54, 0.58, 0.63, 0.67, 0.69]
+
+VVV_samp_64_t = [1.89, 2.05, 2.3, 2.9, 3.4, 4.04, 5.97]
+VVV_samp_64_r = [0.41, 0.48, 0.527, 0.54, 0.58, 0.62, 0.65]
+
+VVV_samp_32_t= [2.2, 2.37, 2.57, 2.96, 3.67, 4.34, 5.97]
+VVV_samp_32_r = [0.294, 0.31, 0.349, 0.41, 0.52, 0.56, 0.61]
+'''
+
+'''
+plt.plot(VQ_no_samp_t, VQ_no_samp_r, label = 'VQ no sampling', color = "black", marker = '.', linestyle = 'solid')
+plt.plot(VV_no_samp_t, VV_no_samp_r, label = 'VV no sampling', color = "black", marker = 'o', linestyle = 'solid')
+plt.plot(VVV_no_samp_t, VVV_no_samp_r, label = 'VVV no sampling', color = "black", marker = 'v', linestyle = 'solid')
+
+plt.plot(VV_samp_128_t, VV_samp_128_r, label = 'VV sampling 128', color = "black", marker = '^', linestyle = 'dashed')
+plt.plot(VVV_samp_128_t, VVV_samp_128_r, label = 'VVV sampling 128', color = "black", marker = '<', linestyle = 'dashed')
+
+plt.plot(VQ_samp_64_t, VQ_samp_64_r, label = 'VQ sampling 64', color = "black", marker = '>', linestyle = 'dashdot')
+plt.plot(VV_samp_64_t, VV_samp_64_r, label = 'VV sampling 64', color = "black", marker = '1', linestyle = 'dashdot')
+plt.plot(VVV_samp_64_t, VVV_samp_64_r, label = 'VVV sampling 64', color = "black", marker = '2', linestyle = 'dashdot')
+
+plt.plot(VQ_samp_32_t, VQ_samp_32_r, label = 'VQ sampling 32', color = "black", marker = '3', linestyle = 'dotted')
+plt.plot(VV_samp_32_t, VV_samp_32_r, label = 'VV sampling 32', color = "black", marker = '4', linestyle = 'dotted')
+plt.plot(VVV_samp_32_t, VVV_samp_32_r, label = 'VVV sampling 32', color = "black", marker = '8', linestyle = 'dotted')
+
+plt.title("DEEP1B Dataset")
+plt.xlabel("Search Time / ms")
+plt.ylabel("Recall@10")
+plt.legend()
+plt.show()
+'''
+
+
+r_10_VL = [0.45, 0.55, 0.59, 0.62, 0.65, 0.661, 0.661]
+t_1_VL = [2.42, 2.59, 2.67, 2.84, 3.54, 3.83, 5.03]
+
+r_10_VL_HNSW = [0.438, 0.524, 0.57, 0.62, 0.64, 0.65, 0.66]
+t_1_VL_HNSW = [1.82, 2.19, 2.37, 2.54, 2.84, 3.13, 3.93]
+
+r_10_VV = [0.42, 0.57, 0.63, 0.67, 0.68, 0.693, 0.703]
+t_1_VV = [2.4, 2.41, 2.59, 2.970, 3.51, 4.86, 5.9]
+
+r_10_VV_HNSW = [0.41, 0.56, 0.61, 0.642, 0.665, 0.683, 0.693]
+t_1_VV_HNSW = [2.1, 2.21, 2.39, 2.570, 3.01, 3.96, 4.38]
+
+r_10_VP = [0.45, 0.54, 0.58, 0.652, 0.671, 0.681, 0.694]
+t_1_VP = [2.56, 2.73, 2.84, 3.95, 4.32, 4.98, 5.72]
+
+r_10_VP_HNSW = [0.43, 0.52, 0.56, 0.632, 0.662, 0.678, 0.69]
+t_1_VP_HNSW = [2.03, 2.26, 2.54, 3.45, 4.02, 4.51, 5.02]
+
+#plt.plot(t_1_VL, r_10_VL, label = "VQ LQ", color = "black", marker = "^", linestyle = "dashed")
+plt.plot(t_1_VV, r_10_VV, label = "VQ VQ", color = "black", marker = ">", linestyle = "dashed")
+#plt.plot(t_1_VP, r_10_VP, label = "VQ PQ", color = "black", marker = "<", linestyle = "dashed")
+
+#plt.plot(t_1_VL_HNSW, r_10_VL_HNSW, label = "VQ LQ HNSW", color = "black", marker = ".", linestyle = "solid")
+plt.plot(t_1_VV_HNSW, r_10_VV_HNSW, label = "VQ PQ HNSW", color = "black", marker = "o", linestyle = "solid")
+#plt.plot(t_1_VP_HNSW, r_10_VP_HNSW, label = "VQ PQ HNSW", color = "black", marker = "v", linestyle = "solid")
 
 plt.title("SIFT1B Dataset")
 plt.xlabel("Search Time / ms")
 plt.ylabel("Recall@10")
 plt.legend()
 plt.show()
+
+

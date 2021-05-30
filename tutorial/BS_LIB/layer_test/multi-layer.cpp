@@ -39,7 +39,7 @@ int main(){
 
     index.train_pq_quantizer(path_pq, path_pq_norm, M_norm_PQ, path_learn, PQ_train_size, record_file);
 
-    index.load_index(path_index, path_ids, path_base, batch_size, nbatches, nb, record_file);
+    index.load_index(path_index, path_ids, path_base, path_base_norm, path_centroid_norm, batch_size, nbatches, nb, record_file);
 
     index.index_statistic();
 
