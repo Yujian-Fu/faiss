@@ -16,7 +16,7 @@ const size_t efConstruction [VQ_layers] = {};
 const size_t efSearch[VQ_layers] = {};
 
 const size_t M_PQ_layer[PQ_layers] = {2};
-const size_t nbits_PQ_layer[PQ_layers] = {9};
+const size_t nbits_PQ_layer[PQ_layers] = {8};
 const size_t num_train[layers] = {100000};
 
 //For searching
