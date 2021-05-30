@@ -646,7 +646,7 @@ namespace bslib{
         }
 
         std::ofstream centroid_norm_output(path_centroid_norm, std::ios::binary);
-        centroid_norm_output.write((char * ) & final_group_num, final_group_num);
+        centroid_norm_output.write((char * ) & final_group_num, sizeof(size_t));
         centroid_norm_output.write((char *) this->centroid_norms.data(), sizeof(float) * this->centroid_norms.size());
         centroid_norm_output.close();
         }
