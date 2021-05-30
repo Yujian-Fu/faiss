@@ -496,12 +496,12 @@ namespace bslib{
         std::vector<float> residuals(n * dimension);
         //Compute residuals
         encode(n, data, group_ids, residuals.data());
-        if (show_batch_time) batch_recorder.print_time_usage("compute residuals");
+        if (show_batch_time) batch_recorder.print_time_usage("compute residuals                 ");
 
         //Compute code for residuals
         std::vector<uint8_t> batch_codes(n * this->code_size);
         this->pq.compute_codes(residuals.data(), batch_codes.data(), n);
-        if (show_batch_time) batch_recorder.print_time_usage("encode data residuals");
+        if (show_batch_time) batch_recorder.print_time_usage("encode data residuals             ");
 
         //Add codes into index
         for (size_t i = 0; i < n; i++){
@@ -510,14 +510,14 @@ namespace bslib{
             for (size_t j = 0; j < this->code_size; j++){this->base_codes[group_id][group_position * code_size + j] = batch_codes[i * this->code_size + j];}
             this->base_sequence_ids[group_id][group_position] = sequence_ids[i];
         }
-        if (show_batch_time) batch_recorder.print_time_usage("add codes to index");
+        if (show_batch_time) batch_recorder.print_time_usage("add codes to index                ");
 
         std::vector<float> decoded_residuals(n * dimension);
         this->pq.decode(batch_codes.data(), decoded_residuals.data(), n);
 
         std::vector<float> reconstructed_x(n * dimension);
         decode(n, decoded_residuals.data(), group_ids, reconstructed_x.data());
-        if (show_batch_time) batch_recorder.print_time_usage("compute reconstructed base vectors");
+        if (show_batch_time) batch_recorder.print_time_usage("compute reconstructed base vectors ");
 
        //This is the norm for reconstructed vectors
         if (!base_norm_flag){
@@ -541,7 +541,7 @@ namespace bslib{
                 this->base_norms[sequence_id] = base_norms[i];
             }
         }
-        if (show_batch_time) batch_recorder.print_time_usage("add base norms");
+        if (show_batch_time) batch_recorder.print_time_usage("add base norms                     ");
     }
 
     /**
@@ -594,7 +594,7 @@ namespace bslib{
         
         if (exists(path_centroid_norm)){
             std::ifstream centroid_norm_input (path_centroid_norm, std::ios::binary);
-            readXvecFvec<float> (centroid_norm_input, this->centroid_norms.data(), final_group_num, 1, true, true);
+            readXvecFvec<float> (centroid_norm_input, this->centroid_norms.data(), final_group_num, 1, false, false);
             centroid_norm_input.close();
         }
 

@@ -3,7 +3,7 @@
 #include "../bslib_index.h"
 
 //Change the base_data_type for billion and million scale datasets
-#include "../parameters/parameters_million/parameters_VQ.h"
+#include "../parameters/parameters_million/parameters_PQ.h"
 
 using namespace bslib;
 
