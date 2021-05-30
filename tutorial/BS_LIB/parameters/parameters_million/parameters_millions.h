@@ -20,7 +20,7 @@ const std::string dataset = "SIFT1M";
 const std::string path_folder = "/home/y/yujianfu/ivf-hnsw/";
 
 //For train PQ
-const size_t M_PQ = 16;
+const size_t M_PQ = 8;
 const size_t M_norm_PQ = 1;
 const size_t nbits = 8; //Or 16
 const size_t dimension = 128;
@@ -38,10 +38,10 @@ const size_t nbatches = nb / batch_size; //100
 const size_t ngt = 100;
 const size_t nq = 10000;
 const size_t num_search_paras = 10;
-const size_t num_recall = 3;
+const size_t num_recall = 1;
 
-const size_t result_k[num_recall] = {1, 10, 100};
+const size_t result_k[num_recall] = {10};
 const size_t max_vectors[num_search_paras] = {2000, 5000, 6000, 8000, 10000, 12000, 14000, 16000, 18000, 20000};
-const size_t reranking_space[num_recall] = {10, 20, 150};
+const size_t reranking_space[num_recall] = {150};
 const std::string search_mode = "non parallel";
 
