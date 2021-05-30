@@ -646,7 +646,7 @@ namespace bslib{
         }
 
         std::ofstream centroid_norm_output(path_centroid_norm, std::ios::binary);
-        centroid_norm_output.write((char * ) & final_group_num, sizeof(size_t));
+        centroid_norm_output.write((char * ) & final_group_num, sizeof(uint32_t));
         centroid_norm_output.write((char *) this->centroid_norms.data(), sizeof(float) * this->centroid_norms.size());
         centroid_norm_output.close();
         }
@@ -1789,7 +1789,7 @@ namespace bslib{
 
             if (!base_norm_flag){
                 std::ofstream base_norm_output(path_base_norm, std::ios::binary);
-                base_norm_output.write((char * )& nb, sizeof(size_t));
+                base_norm_output.write((char * )& nb, sizeof(uint32_t));
                 base_norm_output.write((char *)xnorms.data(), xnorms.size() * sizeof(float));
                 base_norm_output.close();
             }
