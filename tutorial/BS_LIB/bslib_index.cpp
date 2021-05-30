@@ -594,7 +594,7 @@ namespace bslib{
         
         if (exists(path_centroid_norm)){
             std::ifstream centroid_norm_input (path_centroid_norm, std::ios::binary);
-            readXvecFvec<float> (centroid_norm_input, this->centroid_norms.data(), final_group_num, 1, true, false);
+            readXvecFvec<float> (centroid_norm_input, this->centroid_norms.data(), final_group_num, 1, false, false);
             centroid_norm_input.close();
         }
 
@@ -654,7 +654,7 @@ namespace bslib{
         }
 
         std::ofstream centroid_norm_output(path_centroid_norm, std::ios::binary);
-        centroid_norm_output.write((char * ) & final_group_num, sizeof(uint32_t));
+        centroid_norm_output.write((char * )& final_group_num, sizeof(uint32_t));
         centroid_norm_output.write((char *) this->centroid_norms.data(), sizeof(float) * this->centroid_norms.size());
         centroid_norm_output.close();
         }
