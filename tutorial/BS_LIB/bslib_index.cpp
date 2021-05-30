@@ -490,13 +490,18 @@ namespace bslib{
      **/
     void Bslib_Index::add_batch(size_t n, const float * data, const idx_t * sequence_ids, const idx_t * group_ids, 
     const size_t * group_positions, float * base_norms, const bool base_norm_flag){
+        time_recorder batch_recorder = time_recorder();
+        bool show_batch_time = true;
+
         std::vector<float> residuals(n * dimension);
         //Compute residuals
         encode(n, data, group_ids, residuals.data());
+        if (show_batch_time) batch_recorder.print_time_usage("compute residuals");
 
         //Compute code for residuals
         std::vector<uint8_t> batch_codes(n * this->code_size);
         this->pq.compute_codes(residuals.data(), batch_codes.data(), n);
+        if (show_batch_time) batch_recorder.print_time_usage("encode data residuals");
 
         //Add codes into index
         for (size_t i = 0; i < n; i++){
@@ -505,12 +510,14 @@ namespace bslib{
             for (size_t j = 0; j < this->code_size; j++){this->base_codes[group_id][group_position * code_size + j] = batch_codes[i * this->code_size + j];}
             this->base_sequence_ids[group_id][group_position] = sequence_ids[i];
         }
+        if (show_batch_time) batch_recorder.print_time_usage("add codes to index");
 
         std::vector<float> decoded_residuals(n * dimension);
         this->pq.decode(batch_codes.data(), decoded_residuals.data(), n);
 
         std::vector<float> reconstructed_x(n * dimension);
         decode(n, decoded_residuals.data(), group_ids, reconstructed_x.data());
+        if (show_batch_time) batch_recorder.print_time_usage("compute reconstructed base vectors");
 
        //This is the norm for reconstructed vectors
         if (!base_norm_flag){
@@ -534,6 +541,7 @@ namespace bslib{
                 this->base_norms[sequence_id] = base_norms[i];
             }
         }
+        if (show_batch_time) batch_recorder.print_time_usage("add base norms");
     }
 
     /**
@@ -1751,7 +1759,7 @@ namespace bslib{
             std::vector<size_t> groups_size(this->final_group_num, 0); std::vector<size_t> group_position(nb, 0);
             for (size_t i = 0; i < nb; i++){group_position[i] = groups_size[ids[i]]; groups_size[ids[i]] ++;}
 
-            PrintMessage("Constructing the index");
+            PrintMessage("Loading the index");
             this->base_codes.resize(this->final_group_num);
             this->base_sequence_ids.resize(this->final_group_num);
             if (use_norm_quantization){this->base_norm_codes.resize(nb);} else{this->base_norms.resize(nb);}
