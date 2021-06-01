@@ -1,58 +1,75 @@
-#include <cstdio>
-#include <iostream>
-
-typedef uint8_t origin_data_type;
+#include "./parameters_billions.h"
 
 /* Parameter setting: */
 //Exp parameters
 //For index initialization
 const size_t layers = 2;
+const size_t VQ_layers = 1;
+const size_t PQ_layers = 0;
 const std::string index_type[layers] = {"VQ", "LQ"};
-const uint32_t ncentroids[layers] = {10000, 100};
-const char * path_quantizers = "/home/y/yujianfu/ivf-hnsw/models_VQ_LQ/SIFT1B/quantizer_10000_100.qt";;
-const bool use_subset = true;
-const bool pq_use_subset = true;
-const bool use_reranking = true;
-const size_t reranking_space = 200;
+const uint32_t ncentroids[layers-PQ_layers] = {100000, 64};
 
-//For train PQ
-const size_t bytes_per_code = 16;
-const size_t bytes_per_norm_code = 1;
-const size_t nbits = 8; //Or 16
-const size_t nt = 100000000;
-const size_t subnt = 1000000;
-const size_t dimension = 128;
-
-//For assigning ID
 
 //For building index
-const size_t nb = 1000000000;
-const uint32_t batch_size = 1000000;
-const size_t nbatches = nb / batch_size; //1000
+const size_t M_HNSW[VQ_layers] = {};
+const size_t efConstruction [VQ_layers] = {};
+const size_t efSearch[VQ_layers] = {};
+
+const size_t M_PQ_layer[PQ_layers] = {};
+const size_t nbits_PQ_layer[PQ_layers] = {};
+const size_t num_train[layers] = {100000};
 
 //For searching
-const size_t ngt = 1000;
-const size_t nq = 10000;
-const size_t result_k = 10;
-const size_t max_vectors = 10000;
-size_t keep_space[layers] = {50, 10};
+const size_t keep_space[layers * num_search_paras] = {100, 200, 300, 400, 500, 600, 700, 800, 900, 1000};
 
 
-bool is_recording = true;
+std::string conf_combination(){
+    std::string result = "";
+    for (size_t i = 0; i < layers; i++){
+        result += "_"; result += index_type[i] == "PQ"? std::to_string(M_PQ_layer[i]) + "_" + std::to_string(nbits_PQ_layer[i]) : std::to_string(ncentroids[i]);}
+    return result;
+}
+
+std::string index_combination(){
+    std::string result = "";
+    for (size_t i = 0; i < layers; i++){
+        result += "_"; result += index_type[i]; if (index_type[i] == "VQ" && use_HNSW_VQ) result += "_HNSW";}
+    return result;
+}
 
 // Folder path
-const char * folder_model = "/home/y/yujianfu/ivf-hnsw/models_VQ_LQ";
-const char * folder_data = "/home/y/yujianfu/ivf-hnsw/data";
+std::string ncentroid_conf = conf_combination();
+std::string model = "models" + index_combination();
+
+
+const std::string folder_model = path_folder + model;
 
 //File paths
-const char * path_learn = "/home/y/yujianfu/ivf-hnsw/data/SIFT1B/bigann_learn.bvecs";
-const char * path_base = "/home/y/yujianfu/ivf-hnsw/data/SIFT1B/bigann_base.bvecs";
-const char * path_gt = "/home/y/yujianfu/ivf-hnsw/data/SIFT1B/gnd/idx_1000M.ivecs";
-const char * path_query = "/home/y/yujianfu/ivf-hnsw/data/SIFT1B/bigann_learn.bvecs";
+const std::string path_learn =     path_folder + "data/" + dataset + "/" + dataset +"_learn.fvecs";
+const std::string path_base =      path_folder + "data/" + dataset + "/" + dataset +"_base.fvecs";
+const std::string path_gt =        path_folder + "data/" + dataset + "/" + dataset +"_groundtruth.ivecs";
+const std::string path_query =     path_folder + "data/" + dataset + "/" + dataset +"_query.fvecs";
 
-const char * path_record =    "/home/y/yujianfu/ivf-hnsw/models_VQ_LQ/SIFT1B/recording_10000_100.txt";
-const char * path_pq =        "/home/y/yujianfu/ivf-hnsw/models_VQ_LQ/SIFT1B/PQ16_10000_100.pq";
-const char * path_pq_norm =   "/home/y/yujianfu/ivf-hnsw/models_VQ_LQ/SIFT1B/PQ_NORM16_10000_100.pq";
-const char * path_idxs =      "/home/y/yujianfu/ivf-hnsw/models_VQ_LQ/SIFT1B/base_idxs_10000_100.ivecs";
-const char * path_index =     "/home/y/yujianfu/ivf-hnsw/models_VQ_LQ/SIFT1B/PQ16_10000_100.index";
 
+const std::string path_OPQ =        path_folder + model + "/" + dataset + "/opq_matrix_" + std::to_string(M_PQ) + ".opq";
+const std::string path_speed_record = path_folder + model + "/" + dataset + "/recording" + ncentroid_conf + "_qps.txt";
+const std::string path_record =     path_folder + model + "/" + dataset + "/recording" + ncentroid_conf + ".txt";
+const std::string path_quantizers = path_folder + model + "/" + dataset + "/quantizer" + ncentroid_conf + ".qt";
+const std::string path_ids =        path_folder + model + "/" + dataset + "/base_idxs" + ncentroid_conf + ".ivecs";
+const std::string path_centroid_norm = path_folder + model + "/" + dataset + "/centroid_norm" + ncentroid_conf + ".norm";
+const std::string path_pq =  path_folder + model + "/" + dataset + "/PQ" + std::to_string(M_PQ) + ncentroid_conf + "_" + std::to_string(M_PQ) + "_" + std::to_string(nbits) + ".pq";
+const std::string path_pq_norm =    path_folder + model + "/" + dataset + "/PQ_NORM" + std::to_string(M_PQ) + ncentroid_conf  + ".norm";
+const std::string path_base_norm =      path_folder + model + "/" + dataset + "/base_norm" + std::to_string(M_PQ) + ncentroid_conf + "_" + std::to_string(M_PQ) + "_" + std::to_string(nbits) + ".norm";
+const std::string path_index =      path_folder + model + "/" + dataset + "/PQ" + std::to_string(M_PQ) + ncentroid_conf + "_" + std::to_string(M_PQ) + "_" + std::to_string(nbits) + ".index";
+
+
+/**
+ **This is the centroids for assigining origin train vectors  size: n_group * dimension
+ **/
+const std::string path_groups = path_folder + model + "/" + dataset + "/selector_centroids_" + std::to_string(selector_group_size) + ".fvecs";
+//This is for recording the labels based on the generated centroids
+
+/**
+ ** This is the labels for all assigned vectors, n_group * group_size 
+ **/
+const std::string path_labels = path_folder + model + "/" + dataset + "/selector_ids_" + std::to_string(selector_group_size);
