@@ -17,7 +17,7 @@ const size_t efSearch[VQ_layers] = {};
 
 const size_t M_PQ_layer[PQ_layers] = {};
 const size_t nbits_PQ_layer[PQ_layers] = {};
-const size_t num_train[layers] = {10000000, 100000000, 100000000};
+const size_t num_train[layers] = {1000000, 100000000, 100000000};
 
 //For searching
 const size_t keep_space[layers * num_search_paras] = {100, 200, 300, 400, 500, 600, 700, 800, 900, 1000};
