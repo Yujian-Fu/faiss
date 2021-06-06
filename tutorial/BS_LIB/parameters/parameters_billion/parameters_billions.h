@@ -25,7 +25,7 @@ const size_t nbits = 8; //Or 16
 const size_t dimension = 128;
 
 const size_t train_size = 100000000; //This is the size of train set
-const size_t OPQ_train_size = 100000000;
+const size_t OPQ_train_size = 100000;
 const size_t selector_train_size = 10000000;
 const size_t selector_group_size = 2000;
 
