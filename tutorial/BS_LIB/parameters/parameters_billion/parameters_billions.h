@@ -36,7 +36,7 @@ const uint32_t batch_size =  nb / nbatches;
 
 
 const size_t ngt = 1000;
-const size_t nq = 100000;
+const size_t nq = 10000;
 const size_t num_search_paras = 10;
 const size_t num_recall = 2;
 
