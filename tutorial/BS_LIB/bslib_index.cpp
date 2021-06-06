@@ -1674,7 +1674,7 @@ namespace bslib{
     */
     void Bslib_Index::assign_vectors(std::string path_ids, std::string path_base, 
         uint32_t batch_size, size_t nbatches, std::ofstream & record_file){
-        
+
         PrintMessage("Assigning the points");
         Trecorder.reset();
         if (!exists(path_ids)){
