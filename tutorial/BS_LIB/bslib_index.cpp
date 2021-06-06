@@ -288,7 +288,7 @@ namespace bslib{
             std::vector<float> sum_train_data (total_size * dimension, 0);
             readXvecFvec<learn_data_type>(learn_input, sum_train_data.data(), dimension, total_size, true, true);
             std::cout << "Reading subset without selector" << std::endl;
-            RandomSubset(sum_train_data.data(), this->train_data.data(), dimension, total_size, train_set_size);
+            RandomSubset<float>(sum_train_data.data(), this->train_data.data(), dimension, total_size, train_set_size);
         }
 
         if (use_OPQ){
@@ -358,6 +358,15 @@ namespace bslib{
                     read_train_set(path_learn, this->train_size, num_train[i+1]);
                     std::cout << "Updating train set for the next layer" << std::endl;
                     vq_quantizer_index[vq_quantizer_index.size() - 1].search_all(train_data_ids.size(), 1, train_data.data(), train_data_ids.data());
+                }
+                
+                std::cout << "Trainset Sample" << std::endl;
+                for (size_t temp = 0; temp <2; temp++){
+                    for (size_t temp1 = 0; temp < dimension; temp1++){
+                        std::cout << this->train_data[temp * dimension + temp1] << " ";
+                    }
+                        std::cout << train_data_ids[temp];
+                        std::cout << std::endl;
                 }
 
                 std::cout << i << "th VQ quantizer added, check it " << std::endl;

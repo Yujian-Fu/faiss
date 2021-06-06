@@ -107,6 +107,14 @@ namespace bslib{
             }
         }
 
+        std::cout << "Centroid Sample" << std::endl;
+        for (size_t temp1 = 0; temp1 < 2; temp1 ++){
+            for (size_t temp2 = 0; temp2 < dimension; temp2 ++){
+                std::cout << centroid_index.xb[temp1 * dimension + temp2] << " ";
+            }
+            std::cout << std::endl;
+        }
+
         std::vector<float> result_dists(n);
         centroid_index.search(n, query_data, k, result_dists.data(), query_data_ids);
     }
