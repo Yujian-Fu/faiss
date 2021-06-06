@@ -35,7 +35,6 @@ int main(){
     index.build_index(M_PQ, path_learn, path_groups, path_labels, path_quantizers, VQ_layers,
     PQ_layers, path_OPQ, ncentroids, M_HNSW, efConstruction, efSearch, M_PQ_layer, nbits_PQ_layer, num_train, OPQ_train_size, selector_train_size, selector_group_size, record_file);
 
-    exit(0);
     index.assign_vectors(path_ids, path_base, batch_size, nbatches, record_file);
 
     index.train_pq_quantizer(path_pq, path_pq_norm, M_norm_PQ, path_learn, PQ_train_size, record_file);

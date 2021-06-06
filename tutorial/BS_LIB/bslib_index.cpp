@@ -361,8 +361,9 @@ namespace bslib{
                 }
                 
                 std::cout << "Trainset Sample" << std::endl;
+                
                 for (size_t temp = 0; temp <2; temp++){
-                    for (size_t temp1 = 0; temp < dimension; temp1++){
+                    for (size_t temp1 = 0; temp1 < dimension; temp1++){
                         std::cout << this->train_data[temp * dimension + temp1] << " ";
                     }
                         std::cout << train_data_ids[temp];
