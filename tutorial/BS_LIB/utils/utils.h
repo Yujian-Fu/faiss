@@ -131,7 +131,9 @@ namespace bslib{
                 std::cout << dim << " " << dimension << " dimension error \n";
                 exit(1);
             }
+            std::cout << " Loading the data " << std::endl;
             in.read((char * ) & origin_data, dim * sizeof(T));
+            std::cout << " Transfer the data type " << std::endl;
             for (size_t j = 0; j < dimension; j++){
                 data[i * dim + j] = 1.0 * origin_data[j];
             }

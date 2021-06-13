@@ -1810,7 +1810,7 @@ namespace bslib{
             if (!base_norm_flag){
                 std::ofstream base_norm_output(path_base_norm, std::ios::binary);
                 base_norm_output.write((char * )& nb, sizeof(uint32_t));
-                base_norm_output.write((char *)xnorms.data(), xnorms.size() * sizeof(float));
+                base_norm_output.write((char *) xnorms.data(), xnorms.size() * sizeof(float));
                 base_norm_output.close();
             }
 
