@@ -1,9 +1,10 @@
 #include <fstream>
 
 #include "../bslib_index.h"
-
+/* Important */
 //Change the base_data_type for billion and million scale datasets
-#include "../parameters/parameters_billion/parameters_VQ_VQ.h"
+/*          */
+#include "../parameters/parameters_million/parameters_VQ_VQ.h"
 
 using namespace bslib;
 

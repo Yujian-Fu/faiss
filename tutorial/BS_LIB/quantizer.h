@@ -19,6 +19,7 @@
 #include <faiss/IndexFlat.h>
 #include <faiss/Index.h>
 //#include <faiss/IndexHNSW.h>
+#include "HNSWlib/hnswalg.h"
 
 typedef faiss::Index::idx_t idx_t;
 

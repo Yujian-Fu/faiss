@@ -3,13 +3,15 @@
 namespace bslib{
     struct LQ_quantizer : Base_quantizer
     {
+        bool use_all_HNSW;
+        hnswlib::HierarchicalNSW * HNSW_all_quantizer;
         std::vector<float> alphas; // Initialized in read_quantizer
         std::vector<float> upper_centroids; // Initialized in constructor
         std::vector<std::vector<idx_t>> nn_centroid_ids; // Initialized in constructor
         std::vector<std::vector<float>> nn_centroid_dists; // Initialized in constructor
 
         explicit LQ_quantizer(size_t dimension, size_t nc_upper, size_t nc_per_group, const float * upper_centroids,
-                              const idx_t * upper_centroid_ids, const float * upper_centroid_dists);
+                              const idx_t * upper_centroid_ids, const float * upper_centroid_dists, bool use_all_HNSW = false);
         void build_centroids(const float * train_data, size_t train_set_size, idx_t * train_set_idxs);
         float compute_alpha(const float * centroid_vectors, const float * points, const float * centroid,
                                       const float * centroid_vector_norms_L2sqr, size_t group_size);

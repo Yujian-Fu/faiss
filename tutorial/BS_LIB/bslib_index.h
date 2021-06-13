@@ -11,11 +11,11 @@
 namespace bslib{
 
 // Change this type for different datasets
-typedef uint8_t learn_data_type;
-typedef uint8_t base_data_type;
+//typedef uint8_t learn_data_type;
+//typedef uint8_t base_data_type;
 
-//typedef float learn_data_type;
-//typedef float base_data_type;
+typedef float learn_data_type;
+typedef float base_data_type;
 
 typedef faiss::Index::idx_t idx_t;
 typedef std::pair<std::pair<size_t, size_t>, size_t> HNSW_para;
@@ -23,7 +23,7 @@ typedef std::pair<size_t, size_t> PQ_para;
 
 struct Bslib_Index{
     size_t dimension; // Initialized in constructer
-    size_t layers; // Initialized in constructer
+    size_t layers = 0; // Initialized in constructer
     std::vector<std::string> index_type; // Initialized in constructer
     size_t train_size; //Initialized in constructer by 0, assigned in main
     size_t max_group_size;
@@ -93,7 +93,7 @@ struct Bslib_Index{
 
     void encode(size_t n, const float * data, const idx_t * encoded_ids, float * encoded_data);
     void decode(size_t n, const float * encoded_data, const idx_t * encoded_ids, float * decoded_data);
-    void assign(const size_t n, const float * assign_data, idx_t * assigned_ids);
+    void assign(const size_t n, const float * assign_data, idx_t * assigned_ids, size_t assign_layer);
     void add_batch(size_t n, const float * data, const idx_t * sequence_ids, const idx_t * group_ids, const size_t * group_positions, float * base_norms, const bool base_norm_flag);
     void get_final_group_num();
     void compute_centroid_norm(std::string path_centroid_norm);

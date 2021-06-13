@@ -357,7 +357,8 @@ namespace bslib{
                 if (update_ids){
                     read_train_set(path_learn, this->train_size, num_train[i+1]);
                     std::cout << "Updating train set for the next layer" << std::endl;
-                    vq_quantizer_index[vq_quantizer_index.size() - 1].search_all(train_data_ids.size(), 1, train_data.data(), train_data_ids.data());
+                    assign(train_data_ids.size(), train_data.data(), train_data_ids.data(), i);
+                    //vq_quantizer_index[vq_quantizer_index.size() - 1].search_all(train_data_ids.size(), 1, train_data.data(), train_data_ids.data());
                 }
                 
                 std::cout << "Trainset Sample" << std::endl;
@@ -401,7 +402,8 @@ namespace bslib{
                 if (update_ids){
                     read_train_set(path_learn, this->train_size, num_train[i+1]);
                     std::cout << "Updating train set for the next layer" << std::endl;
-                    lq_quantizer_index[lq_quantizer_index.size() - 1].search_all(train_data_ids.size(), 1, train_data.data(), train_data_ids.data());
+                    assign(train_data_ids.size(), train_data.data(), train_data_ids.data(), i);
+                    //lq_quantizer_index[lq_quantizer_index.size() - 1].search_all(train_data_ids.size(), 1, train_data.data(), train_data_ids.data());
                 }
 
                 std::cout << i << "th LQ quantizer added, check it " << std::endl;
@@ -420,7 +422,6 @@ namespace bslib{
             write_quantizers(path_quantizer);
         }
     }
-
 
     /**
      * 
@@ -445,7 +446,7 @@ namespace bslib{
         std::cout << "Assigning the train dataset to compute residual" << std::endl;
         std::vector<float> residuals(train_set_size * dimension);
 
-        assign(train_set_size, this->train_data.data(), train_data_ids.data());
+        assign(train_set_size, this->train_data.data(), train_data_ids.data(), this->layers);
 
         for (size_t i = train_set_size - 100; i < train_set_size; i++){std::cout << train_data_ids[i] << " ";} std::cout << std::endl;
 
@@ -682,7 +683,7 @@ namespace bslib{
      * 
      **/
 
-    void Bslib_Index::assign(const size_t n, const float * assign_data, idx_t * assigned_ids){
+    void Bslib_Index::assign(const size_t n, const float * assign_data, idx_t * assigned_ids, size_t assign_layer){
 
         /*
         if (index_type[layers - 1] == "VQ"){
@@ -705,7 +706,7 @@ namespace bslib{
             std::vector<idx_t> query_result_ids;
             std::vector<float> query_result_dists;
 
-            for (size_t j = 0; j < layers; j++){
+            for (size_t j = 0; j < assign_layer; j++){
                 assert(n_vq+ n_lq + n_pq == j);
 
                 if (index_type[j] == "VQ"){
@@ -1687,7 +1688,7 @@ namespace bslib{
             for (size_t i = 0; i < nbatches; i++){
                 readXvecFvec<base_data_type> (base_input, batch.data(), dimension, batch_size, false, false);
                 if (use_OPQ) {this->do_OPQ(batch_size, batch.data());}
-                this->assign(batch_size, batch.data(), assigned_ids.data());
+                this->assign(batch_size, batch.data(), assigned_ids.data(), this->layers);
                 base_output.write((char * ) & batch_size, sizeof(uint32_t));
                 base_output.write((char *) assigned_ids.data(), batch_size * sizeof(idx_t));
                 if (i % 10 == 0){

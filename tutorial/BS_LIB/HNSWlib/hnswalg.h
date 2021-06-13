@@ -70,7 +70,7 @@ namespace hnswlib {
 
     public:
         HierarchicalNSW();
-        HierarchicalNSW(size_t d, size_t maxelements, size_t M, size_t maxM, size_t efConstruction = 500);
+        HierarchicalNSW(size_t d, size_t maxelements, size_t M = 30, size_t maxM = 60, size_t efConstruction = 500);
         ~HierarchicalNSW();
 
         inline float *getDataByInternalId(idx_t internal_id) const {

@@ -1,5 +1,4 @@
 #include "quantizer.h"
-#include "HNSWlib/hnswalg.h"
 #include "faiss/IndexHNSW.h"
 
 namespace bslib{
@@ -15,12 +14,15 @@ namespace bslib{
         size_t efConstruction;
         size_t efSearch;
         bool use_HNSW;
+        bool use_all_HNSW;
         std::vector<hnswlib::HierarchicalNSW *> HNSW_quantizers;
-        std::vector<size_t> nc_num;
         std::vector<faiss::IndexFlatL2 *> L2_quantizers; //Resized with nc_upper in read quantizer
+        hnswlib::HierarchicalNSW * HNSW_all_quantizer;
+
+        std::vector<size_t> nc_num;
 
          // The size should be train_set_size, the max size is nc_upper
-        explicit VQ_quantizer(size_t dimension, size_t nc_upper, size_t nc_per_group, size_t M = 16, size_t efConstruction = 100, size_t efSearch = 50, bool use_HNSW = false);
+        explicit VQ_quantizer(size_t dimension, size_t nc_upper, size_t nc_per_group, size_t M = 16, size_t efConstruction = 100, size_t efSearch = 50, bool use_HNSW = false, bool build_all_HNSW = false);
         void build_centroids(const float * train_data, size_t train_set_size, idx_t * train_data_ids);
         void compute_final_centroid(const idx_t group_id, const idx_t inner_group_id, float * final_centroid);
         void compute_residual_group_id(size_t n, const idx_t * labels, const float * x, float * residuals); 
