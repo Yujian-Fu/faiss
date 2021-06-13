@@ -1783,7 +1783,7 @@ namespace bslib{
             std::vector<float> base_batch(batch_size * dimension);
             std::vector<idx_t> batch_sequence_ids(batch_size);
 
-            std::cout << "Start adding batches " << std::endl;
+            
             std::vector<float> xnorms(nb);
             bool base_norm_flag = false;
             if (exists(path_base_norm)){
@@ -1794,6 +1794,7 @@ namespace bslib{
                 base_norm_input.close();
             }
 
+            std::cout << "Start adding batches " << std::endl;
             for (size_t i = 0; i < nbatches; i++){
                 readXvecFvec<base_data_type> (base_input, base_batch.data(), dimension, batch_size);
                 if (use_OPQ) {this->do_OPQ(batch_size, base_batch.data());}
