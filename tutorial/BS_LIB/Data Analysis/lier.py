@@ -663,13 +663,13 @@ r_1_V_V_L_OP_PO = [0.248, 0.331, 0.361, 0.4192, 0.439, 0.455, 0.468]
 r_10_V_V_L_OP_PO = [0.338, 0.416, 0.458, 0.5650, 0.5705, 0.578, 0.582]
 t_1_V_V_L_OP_PO = [1.13, 1.25, 1.341, 1.481, 1.591, 1.93, 2.72]
 
-
 r_1_LOPQ = [0.20, 0.235, 0.296, 0.331, 0.382, 0.391, 0.396]
 r_10_LOPQ = [0.235, 0.302, 0.403, 0.423, 0.434, 0.445, 0.447]
 t_1_LOPQ = [1.3, 1.35, 1.41, 1.51, 1.91, 2.43, 3.01]
 
 # 16 bytes
 #SIFT1B
+
 r_10_V_L = [0.45, 0.55, 0.59, 0.62, 0.65, 0.661, 0.661]
 t_1_V_L = [2.42, 2.59, 2.67, 2.84, 3.54, 3.83, 5.03]
 
@@ -687,6 +687,7 @@ r_10_LOPQ = [0.30, 0.38, 0.461, 0.50, 0.54, 0.56, 0.57]
 t_1_LOPQ = [2.13, 2.65, 2.81, 3.31, 3.71, 4.63, 5.52]
 
 #DEEP1B
+
 r_10_IMI = [0.38, 0.45, 0.57, 0.68, 0.76, 0.77, 0.779]
 t_1_IMI = [2.42, 2.59, 2.67, 2.84, 3.54, 3.83, 5.03]
 
@@ -709,7 +710,7 @@ plt.plot(t_1_LOPQ, r_10_LOPQ, label = "LOPQ", color = "black", marker = "^", lin
 plt.plot(t_1_V_V_L_OP, r_10_V_V_L_OP, label = "VQ VQ LQ_OP", color = "black", marker = 'o', linestyle = '-.')
 plt.plot(t_1_V_V_L_OP_PO, r_10_V_V_L_OP_PO, label = "VQ VQ LQ_OP PO", color = 'black', marker = 'v', linestyle = "-")
 
-plt.title("DEEP1B Dataset 16 bytes")
+plt.title("DEEP1B 16 bytes")
 plt.xlabel("Search Time / ms")
 plt.ylabel("Recall@10")
 plt.legend()

@@ -1770,7 +1770,6 @@ namespace bslib{
             std::vector<size_t> groups_size(this->final_group_num, 0); std::vector<size_t> group_position(nb, 0);
             for (size_t i = 0; i < nb; i++){group_position[i] = groups_size[ids[i]]; groups_size[ids[i]] ++;}
 
-            
             this->base_codes.resize(this->final_group_num);
             this->base_sequence_ids.resize(this->final_group_num);
             if (use_norm_quantization){this->base_norm_codes.resize(nb);} else{this->base_norms.resize(nb);}
@@ -1778,17 +1777,18 @@ namespace bslib{
                 this->base_codes[i].resize(groups_size[i] * this->code_size);
                 this->base_sequence_ids[i].resize(groups_size[i]);
             }
-
+            
             
             std::ifstream base_input(path_base, std::ios::binary);
             std::vector<float> base_batch(batch_size * dimension);
             std::vector<idx_t> batch_sequence_ids(batch_size);
 
-
+            std::cout << "Start adding batches " << std::endl;
             std::vector<float> xnorms(nb);
             bool base_norm_flag = false;
             if (exists(path_base_norm)){
                 base_norm_flag = true;
+                std::cout << "Loading pre-computed base norm " << std::endl;
                 std::ifstream base_norm_input(path_base_norm, std::ios::binary);
                 readXvecFvec<float>(base_norm_input, xnorms.data(), nb, 1);
                 base_norm_input.close();
@@ -1818,7 +1818,7 @@ namespace bslib{
             //In order to save disk usage
             //Annotate the write_index function
             if (this->saving_index){
-                this->write_index(path_index);
+                //this->write_index(path_index);
             }
             
             std::string message = "Constructed and wrote the index ";
