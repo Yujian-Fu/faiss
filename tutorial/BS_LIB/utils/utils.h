@@ -123,7 +123,7 @@ namespace bslib{
         if (ShowProcess)
         std::cout << "Loading data with " << n << " vectors in " << dimension << std::endl;
         uint32_t dim = dimension;
-        T origin_data[dimension];
+        std::vector<T> origin_data(dimension);
         size_t print_every = n / 10;
         for (size_t i = 0; i < n; i++){
             std::cout << " Checking the dimension " << std::endl;
@@ -133,7 +133,7 @@ namespace bslib{
                 exit(1);
             }
             std::cout << " Loading the data " << std::endl;
-            in.read((char * ) & origin_data, dim * sizeof(T));
+            in.read((char * ) origin_data.data(), dim * sizeof(T));
             std::cout << " Transfer the data type " << std::endl;
             for (size_t j = 0; j < dimension; j++){
                 data[i * dim + j] = 1.0 * origin_data[j];
