@@ -126,6 +126,7 @@ namespace bslib{
         T origin_data[dimension];
         size_t print_every = n / 10;
         for (size_t i = 0; i < n; i++){
+            std::cout << " Checking the dimension " << std::endl;
             in.read((char * ) & dim, sizeof(uint32_t));
             if (dim != dimension) {
                 std::cout << dim << " " << dimension << " dimension error \n";
