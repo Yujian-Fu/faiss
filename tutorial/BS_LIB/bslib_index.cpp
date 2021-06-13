@@ -1790,7 +1790,7 @@ namespace bslib{
                 base_norm_flag = true;
                 std::cout << "Loading pre-computed base norm " << std::endl;
                 std::ifstream base_norm_input(path_base_norm, std::ios::binary);
-                readXvecFvec<float>(base_norm_input, xnorms.data(), nb, 1);
+                readXvecFvec<float>(base_norm_input, xnorms.data(), nb, 1, true, true);
                 base_norm_input.close();
             }
 
