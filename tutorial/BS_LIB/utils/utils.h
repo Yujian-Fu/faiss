@@ -126,15 +126,12 @@ namespace bslib{
         std::vector<T> origin_data(dimension);
         size_t print_every = n / 10;
         for (size_t i = 0; i < n; i++){
-            std::cout << "Checking the dimension " << std::endl;
             in.read((char * ) & dim, sizeof(uint32_t));
             if (dim != dimension) {
                 std::cout << dim << " " << dimension << " dimension error \n";
                 exit(1);
             }
-            std::cout << "Loading the data " << std::endl;
             in.read((char * ) origin_data.data(), dim * sizeof(T));
-            std::cout << " Transfer the data type " << std::endl;
             for (size_t j = 0; j < dimension; j++){
                 data[i * dim + j] = 1.0 * origin_data[j];
             }
