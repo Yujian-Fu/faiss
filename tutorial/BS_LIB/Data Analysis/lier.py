@@ -219,7 +219,7 @@ plt.legend()
 plt.show()
 '''
 
-'''
+
 plt.plot(ICI_time, ICI_recall1, label = "ICI", linestyle=':', color = 'black', marker = ".")
 plt.plot(IMI_time, IMI_recall1, label = "IMI", linestyle='-.', color = 'black', marker = ',')
 plt.plot(II_time, II_recall1, label = "II", linestyle='-.', color = 'black', marker = 'v')
@@ -232,9 +232,9 @@ plt.plot(VQT_time_OPT, VQT_recall1_OPT, label = "VQT_optimized", linestyle='--',
 plt.xlabel("Search Time / ms")
 plt.ylabel("Recall")
 plt.title("SIFT1B Parameter Optimization")
-#plt.legend()
+plt.legend()
 plt.show()
-'''
+
 
 '''
 plt.plot(II_time_OPT, II_recall10_OPT, label = "3 layers (100)")
@@ -487,16 +487,16 @@ r_10_V_V_V_V = [0.298, 0.372, 0.441, 0.4792, 0.512, 0.525, 0.532]
 t_10_V_V_V_V = [1.42, 1.59, 1.67, 1.84, 2.54, 2.83, 4.03]
 
 '''
-plt.plot(t_10_V_L, r_10_V_L, label = "VQ LQ", marker = '.', color = 'black', linestyle = ':')
-plt.plot(t_10_V_P, r_10_V_P, label = "VQ PQ", marker = 'o', color = 'black', linestyle = '--')
-plt.plot(t_10_V_V, r_10_V_V, label = "VQ VQ", marker = 'v', color = 'black', linestyle = '-.')
-plt.plot(t_10_V_V_L, r_10_V_V_L,label = "VQ VQ LQ", marker = '^', color = 'black', linestyle = '-')
-plt.plot(t_10_V_V_P, r_10_V_V_P, label = "VQ VQ PQ", marker = '<', color = 'black', linestyle = "-.")
-plt.plot(t_10_V_V_V, r_10_V_V_V, label = "VQ VQ VQ", marker = '>', color = 'black', linestyle = '-')
-plt.plot(t_10_V_V_V_L, r_10_V_V_V_L, label = "VQ VQ VQ LQ", marker = '1', color = 'black', linestyle = '-.')
-plt.plot(t_10_V_V_V_P, r_10_V_V_V_P, label = "VQ VQ VQ PQ", marker = '2', color = 'black', linestyle = ':')
-plt.plot(t_10_V_V_V_V, r_10_V_V_V_V, label = "VQ VQ VQ VQ", marker = '3', color = 'black', linestyle = '--')
-plt.title("DEEP1B Dataset")
+plt.plot(t_10_V_L, r_1_V_L, label = "VQ LQ", marker = '.', color = 'black', linestyle = ':')
+plt.plot(t_10_V_P, r_1_V_P, label = "VQ PQ", marker = 'o', color = 'black', linestyle = '--')
+plt.plot(t_10_V_V, r_1_V_V, label = "VQ VQ", marker = 'v', color = 'black', linestyle = '-.')
+plt.plot(t_10_V_V_L, r_1_V_V_L,label = "VQ VQ LQ", marker = '^', color = 'black', linestyle = '-')
+plt.plot(t_10_V_V_P, r_1_V_V_P, label = "VQ VQ PQ", marker = '<', color = 'black', linestyle = "-.")
+plt.plot(t_10_V_V_V, r_1_V_V_V, label = "VQ VQ VQ", marker = '>', color = 'black', linestyle = '-')
+plt.plot(t_10_V_V_V_L, r_1_V_V_V_L, label = "VQ VQ VQ LQ", marker = '1', color = 'black', linestyle = '-.')
+plt.plot(t_10_V_V_V_P, r_1_V_V_V_P, label = "VQ VQ VQ PQ", marker = '2', color = 'black', linestyle = ':')
+plt.plot(t_10_V_V_V_V, r_1_V_V_V_V, label = "VQ VQ VQ VQ", marker = '3', color = 'black', linestyle = '--')
+plt.title("SIFT1B Dataset")
 plt.xlabel("Search Time / ms")
 plt.ylabel("Recall")
 plt.legend()
@@ -633,8 +633,6 @@ r_10_V_V_L_OP = [0.33, 0.396, 0.468, 0.530, 0.545, 0.562, 0.568]
 t_10_V_V_L_OP = [1.13, 1.25, 1.341, 1.481, 1.591, 1.93, 3.52]
 
 
-
-'''
 plt.plot(t_1_V_V, r_1_V_V, label = "VQ VQ", color = "black", marker = '.', linestyle = '-.')
 plt.plot(t_1_V_V_V, r_1_V_V_V, label = "VQ VQ VQ", color = "black", marker = ',', linestyle = '--')
 plt.plot(t_1_V_V_L, r_1_V_V_L, label = "VQ VQ LQ", color = "black", marker = 'o', linestyle = '-.')
@@ -642,11 +640,12 @@ plt.plot(t_1_V_V_L_OP, r_1_V_V_L_OP, label = "VQ VQ LQ_OP", color = 'black', mar
 plt.title("SIFT1B Dataset")
 plt.xlabel("Search Time / ms")
 plt.ylabel("Recall")
-#plt.legend()
+plt.legend()
 plt.show()
-'''
+
 
 # 8 bytes
+
 r_1_V_L = [0.257, 0.295, 0.341, 0.368, 0.412, 0.438, 0.445]
 r_10_V_L = [0.33, 0.396, 0.478, 0.526, 0.543, 0.552, 0.558]
 t_1_V_L = [1.42, 1.59, 1.67, 1.84, 2.54, 2.83, 3.03]
@@ -669,7 +668,7 @@ t_1_LOPQ = [1.3, 1.35, 1.41, 1.51, 1.91, 2.43, 3.01]
 
 # 16 bytes
 #SIFT1B
-
+'''
 r_10_V_L = [0.45, 0.55, 0.59, 0.62, 0.65, 0.661, 0.661]
 t_1_V_L = [2.42, 2.59, 2.67, 2.84, 3.54, 3.83, 5.03]
 
@@ -702,7 +701,7 @@ t_1_V_V_L_PO = [2.2, 2.3, 2.4, 2.5, 2.9, 4.5, 5.42]
 
 r_10_V_L = [0.28, 0.38, 0.51, 0.64, 0.73, 0.76, 0.79]
 t_1_V_L = [2.35, 2.78, 2.87, 3.1, 3.61, 3.99, 4.92]
-
+'''
 
 plt.plot(t_1_V_L, r_10_V_L, label = "IVFADC", color = "black", marker = '.', linestyle = ':')
 plt.plot(t_1_V_P, r_10_V_P, label = "IMI", color = "black", marker = ',', linestyle = '--')
@@ -710,7 +709,7 @@ plt.plot(t_1_LOPQ, r_10_LOPQ, label = "LOPQ", color = "black", marker = "^", lin
 plt.plot(t_1_V_V_L_OP, r_10_V_V_L_OP, label = "VQ VQ LQ_OP", color = "black", marker = 'o', linestyle = '-.')
 plt.plot(t_1_V_V_L_OP_PO, r_10_V_V_L_OP_PO, label = "VQ VQ LQ_OP PO", color = 'black', marker = 'v', linestyle = "-")
 
-plt.title("DEEP1B 16 bytes")
+plt.title("SIFT1B 8 bytes")
 plt.xlabel("Search Time / ms")
 plt.ylabel("Recall@10")
 plt.legend()
@@ -749,7 +748,7 @@ t_1_VVVP = [2.33, 2.45, 2.591, 2.6981, 3.31, 3.73, 4.52]
 
 
 # 24 bytes
-'''
+
 r_10_VL = [0.47, 0.58, 0.66, 0.72, 0.75, 0.761, 0.782]
 t_1_VL = [2.92, 3.09, 3.27, 3.44, 3.94, 4.43, 5.83]
 
@@ -776,7 +775,7 @@ t_1_VVVL = [2.83, 3.25, 3.51, 3.91, 4.31, 5.23, 5.92]
 
 r_10_VVVP = [0.48, 0.58, 0.637, 0.682, 0.76, 0.78, 0.79]
 t_1_VVVP = [3.13, 3.45, 3.91, 4.6981, 4.931, 5.73, 6.52]
-'''
+
 
 #32 bytes
 '''
@@ -804,7 +803,7 @@ t_1_VVVV = [2.73, 2.95, 3.091, 3.2981, 3.91, 4.23, 5.92]
 
 
 #Deep1B dataset 16 bytes
-'''
+
 r_1_VL = [0.19, 0.27, 0.34, 0.374, 0.4, 0.42, 0.43]
 r_10_VL = [0.38, 0.45, 0.57, 0.68, 0.76, 0.77, 0.779]
 t_1_VL = [2.42, 2.59, 2.67, 2.84, 3.54, 3.83, 5.03]
@@ -837,10 +836,10 @@ t_1_VVVL = [2.56, 2.73, 2.84, 3.95, 4.32, 4.98, 5.72]
 
 r_10_VVVP = [0.35, 0.39, 0.48, 0.52, 0.64, 0.71, 0.73]
 t_1_VVVP = [2.42, 2.59, 2.67, 2.84, 3.54, 3.83, 5.03]
-'''
+
 
 #24 bytes
-'''
+
 r_10_VL = [0.48, 0.55, 0.67, 0.74, 0.79, 0.853, 0.86]
 t_1_VL = [2.52, 3.09, 3.17, 3.44, 3.94, 4.33, 5.63]
 
@@ -867,8 +866,8 @@ t_1_VVVL = [3.16, 3.33, 3.54, 4.55, 4.92, 5.78, 6.52]
 
 r_10_VVVP = [0.45, 0.569, 0.68, 0.72, 0.784, 0.81, 0.83]
 t_1_VVVP = [3.02, 3.29, 3.47, 3.64, 4.24, 5.13, 6.03]
-'''
 
+'''
 #32 bytes
 r_1_VL = [0.19, 0.27, 0.34, 0.374, 0.4, 0.42, 0.43]
 r_10_VL = [0.69, 0.78, 0.84, 0.87, 0.93, 0.94, 0.95]
@@ -902,22 +901,22 @@ t_1_VVVL = [3.56, 3.73, 3.84, 4.95, 5.32, 5.98, 6.72]
 
 r_10_VVVP = [0.65, 0.69, 0.78, 0.82, 0.84, 0.88, 0.893]
 t_1_VVVP = [3.42, 3.59, 3.67, 3.84, 4.54, 4.83, 6.03]
-
+'''
 
 
 plt.plot(t_1_VL, r_10_VL, label = "VQ LQ", marker = '.', color = 'black', linestyle = ':')
 plt.plot(t_1_VP, r_10_VP, label = "VQ PQ", marker = 'o', color = 'black', linestyle = '--')
 plt.plot(t_1_VV, r_10_VV, label = "VQ VQ", marker = 'v', color = 'black', linestyle = '-.')
-#plt.plot(t_1_VVL, r_10_VVL,label = "VQ VQ LQ", marker = '^', color = 'black', linestyle = '-')
+plt.plot(t_1_VVL, r_10_VVL,label = "VQ VQ LQ", marker = '^', color = 'black', linestyle = '-')
 plt.plot(t_1_VVP, r_10_VVP, label = "VQ VQ PQ", marker = '<', color = 'black', linestyle = "-.")
 plt.plot(t_1_VVV, r_10_VVV, label = "VQ VQ VQ", marker = '>', color = 'black', linestyle = '-')
-#plt.plot(t_1_VVVL, r_10_VVVL, label = "VQ VQ VQ LQ", marker = '1', color = 'black', linestyle = '-.')
-#plt.plot(t_1_VVVP, r_10_VVVP, label = "VQ VQ VQ PQ", marker = '2', color = 'black', linestyle = ':')
-#plt.plot(t_1_VVVV, r_10_VVVV, label = "VQ VQ VQ VQ", marker = '3', color = 'black', linestyle = '--')
-plt.title("DEEP1B Dataset 32 bytes")
+plt.plot(t_1_VVVL, r_10_VVVL, label = "VQ VQ VQ LQ", marker = '1', color = 'black', linestyle = '-.')
+plt.plot(t_1_VVVP, r_10_VVVP, label = "VQ VQ VQ PQ", marker = '2', color = 'black', linestyle = ':')
+plt.plot(t_1_VVVV, r_10_VVVV, label = "VQ VQ VQ VQ", marker = '3', color = 'black', linestyle = '--')
+plt.title("DEEP1B 24 bytes")
 plt.xlabel("Search Time / ms")
 plt.ylabel("Recall")
-#plt.legend()
+plt.legend()
 plt.show()
 
 

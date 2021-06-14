@@ -2,9 +2,9 @@
 
 #include "../bslib_index.h"
 /* Important */
-//Change the base_data_type for billion and million scale datasets
+//Change the base_data_type in bslib_index.h for billion and million scale datasets
 /*          */
-#include "../parameters/parameters_million/parameters_VQ_VQ.h"
+#include "../parameters/parameters_billion/parameters_VQ_VQ.h"
 
 using namespace bslib;
 
@@ -46,5 +46,4 @@ int main(){
 
     index.query_test(num_search_paras, num_recall, nq, ngt, max_vectors, result_k, keep_space, reranking_space, record_file, 
                     qps_record_file, search_mode, path_base, path_gt, path_query);
-
 }
