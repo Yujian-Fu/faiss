@@ -26,7 +26,7 @@ namespace bslib{
             }
 
             void record_time_usage(std::ofstream & output_record, std::string s){
-                output_record << s << "The time usage: " << getTimeConsumption() / 1000000 << " s " << std::endl;
+                output_record << s << " The time usage: " << getTimeConsumption() / 1000000 << " s " << std::endl;
             }
 
             void print_time_usage(std::string s){

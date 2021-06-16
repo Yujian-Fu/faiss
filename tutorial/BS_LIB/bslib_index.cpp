@@ -21,7 +21,7 @@ namespace bslib{
             this->use_HNSW_VQ = use_HNSW_VQ;
             this->use_HNSW_group = use_HNSW_group;
             this->use_all_HNSW = use_all_HNSW;
-            
+
             this->use_norm_quantization = use_norm_quantization;
             this->use_OPQ = use_OPQ;
             this->use_train_selector = use_train_selector;
@@ -314,7 +314,8 @@ namespace bslib{
      * 
      * 
      **/
-    void Bslib_Index::build_quantizers(const uint32_t * ncentroids, const std::string path_quantizer, const std::string path_learn, const size_t * num_train, const std::vector<HNSW_para> HNSW_paras, const std::vector<PQ_para> PQ_paras){
+    void Bslib_Index::build_quantizers(const uint32_t * ncentroids, const std::string path_quantizer, const std::string path_learn, const size_t * num_train, 
+    const std::vector<HNSW_para> HNSW_paras, const std::vector<PQ_para> PQ_paras, std::ofstream & record_file){
         if (exists(path_quantizer)){
             read_quantizers(path_quantizer);
             std::cout << "Checking the quantizers read from file " << std::endl;
@@ -335,8 +336,11 @@ namespace bslib{
 
         //Prepare train set for initialization
         read_train_set(path_learn, this->train_size, num_train[0]);
+        time_recorder inner_Trecorder = time_recorder();
+        
 
         for (size_t i = 0; i < layers; i++){
+            inner_Trecorder.reset();
             
             bool update_ids = (i == layers-1) ? false:true;
             nc_per_group = index_type[i] == "PQ" ? 0 : ncentroids[i];
@@ -354,13 +358,17 @@ namespace bslib{
                 else{
                     add_vq_quantizer(nc_upper, nc_per_group);
                 }
+                inner_Trecorder.record_time_usage(record_file, "Trained VQ layer");
+
                 
                 //Prepare train set for the next layer
                 if (update_ids){
                     read_train_set(path_learn, this->train_size, num_train[i+1]);
                     std::cout << "Updating train set for the next layer" << std::endl;
                     //assign(train_data_ids.size(), train_data.data(), train_data_ids.data(), i+1);
+                    //inner_Trecorder.record_time_usage(record_file, "Updated train set for next layer with assign function");
                     vq_quantizer_index[vq_quantizer_index.size() - 1].search_all(train_data_ids.size(), 1, train_data.data(), train_data_ids.data());
+                    inner_Trecorder.record_time_usage(record_file, "Updated train set for next layer with search_all function");
                 }
                 
                 std::cout << "Trainset Sample" << std::endl;
@@ -400,12 +408,16 @@ namespace bslib{
                     add_lq_quantizer(nc_upper, nc_per_group, upper_centroids.data(), nn_centroids_idxs.data(), nn_centroids_dists.data());
                 }
 
+                inner_Trecorder.record_time_usage(record_file, "Trained LQ layer");
+
                 //Prepare train set for the next layer
                 if (update_ids){
                     read_train_set(path_learn, this->train_size, num_train[i+1]);
                     std::cout << "Updating train set for the next layer" << std::endl;
                     //assign(train_data_ids.size(), train_data.data(), train_data_ids.data(), i+1);
+                    //inner_Trecorder.record_time_usage(record_file, "Updated train set for next layer with assign function");
                     lq_quantizer_index[lq_quantizer_index.size() - 1].search_all(train_data_ids.size(), 1, train_data.data(), train_data_ids.data());
+                    inner_Trecorder.record_time_usage(record_file, "Updated train set for next layer with search_all function");
                 }
 
                 std::cout << i << "th LQ quantizer added, check it " << std::endl;
@@ -416,7 +428,8 @@ namespace bslib{
                 assert(i == layers-1);
                 PrintMessage("Adding PQ quantizer");
                 add_pq_quantizer(nc_upper, PQ_paras[0].first, PQ_paras[0].second);
-                std::cout << i << "th PQ quantizer added, check it " << std::endl;
+
+                inner_Trecorder.record_time_usage(record_file, "Trained PQ layer");
             }
             nc_upper  = nc_upper * nc_per_group;
         }
@@ -1653,7 +1666,7 @@ namespace bslib{
         }
 
         PrintMessage("Constructing the quantizers");
-        this->build_quantizers(ncentroids, path_quantizers, path_learn, num_train, HNSW_paras, PQ_paras);
+        this->build_quantizers(ncentroids, path_quantizers, path_learn, num_train, HNSW_paras, PQ_paras, record_file);
         this->get_final_group_num();
 
         if (is_recording){

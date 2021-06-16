@@ -83,7 +83,7 @@ struct Bslib_Index{
     const size_t train_size, const size_t M_PQ, const size_t nbits);
 
     void do_OPQ(idx_t n, float * dataset);
-    void build_quantizers(const uint32_t * ncentroids, const std::string path_quantizer, const std::string path_learn, const size_t * num_train, const std::vector<HNSW_para> HNSW_paras, const std::vector<PQ_para> PQ_paras);
+    void build_quantizers(const uint32_t * ncentroids, const std::string path_quantizer, const std::string path_learn, const size_t * num_train, const std::vector<HNSW_para> HNSW_paras, const std::vector<PQ_para> PQ_paras, std::ofstream & record_file);
     
     void add_vq_quantizer(size_t nc_upper, size_t nc_per_group, size_t M, size_t efConstruction, size_t efSearch);
     void add_lq_quantizer(size_t nc_upper, size_t nc_per_group, const float * upper_centroids, const idx_t * upper_nn_centroid_idxs, const float * upper_nn_centroid_dists);
