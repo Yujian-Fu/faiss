@@ -41,7 +41,32 @@ const size_t num_search_paras = 10;
 const size_t num_recall = 2;
 
 const size_t result_k[num_recall] = {1, 10};
-const size_t max_vectors[num_search_paras] = {10000, 20000, 30000, 40000, 50000, 60000, 70000, 80000, 90000, 100000};
+const size_t max_vectors[num_search_paras] = {10000, 15000, 20000, 25000, 30000, 35000, 40000, 45000, 50000, 550000};
 const size_t reranking_space[num_recall] = {10, 150};
 const std::string search_mode = "non parallel";
+
+
+std::string conf_combination(const uint_32t * ncentroids, const std::string * index_type, 
+const size_t layers, const size_t * M_PQ_layer, const size_t * nbits_PQ_layer){
+    std::string result = "";
+    for (size_t i = 0; i < layers; i++){
+        result += "_"; result += index_type[i] == "PQ"? std::to_string(M_PQ_layer[i]) + "_" + std::to_string(nbits_PQ_layer[i]) : std::to_string(ncentroids[i]);
+    }
+    result += " " + std::to_string(M_PQ);
+    return result;
+}
+
+std::string index_combination(const std::string * index_type, const size_t layers){
+    std::string result = "";
+    for (size_t i = 0; i < layers; i++){
+        result += "_"; result += index_type[i]; if (index_type[i] == "VQ" && use_HNSW_VQ) result += "_HNSW";}
+    return result;
+}
+
+//File paths
+const std::string path_learn =     path_folder + "data/" + dataset + "/" + "bigann_learn.bvecs";
+const std::string path_base =      path_folder + "data/" + dataset + "/" + "bigann_base.bvecs";
+const std::string path_gt =        path_folder + "data/" + dataset + "/" + "gnd/idx_1000M.ivecs";
+const std::string path_query =     path_folder + "data/" + dataset + "/" + "bigann_query.bvecs";
+
 

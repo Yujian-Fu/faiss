@@ -11,9 +11,9 @@ using namespace bslib;
 int main(){
 
 /*Prepare the work space*/
-    PrepareFolder((char *) folder_model.c_str());
-    PrepareFolder((char *) (std::string(folder_model)+"/" + dataset).c_str());
-    std::cout << "Preparing work space: " << folder_model << std::endl;
+    PrepareFolder((char *) (path_folder + model).c_str());
+    PrepareFolder((char *) (path_folder + model+"/" + dataset).c_str());
+    std::cout << "Preparing work space: " << path_folder + model << std::endl;
 
     //For recording 
     std::ofstream record_file;
