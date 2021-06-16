@@ -2,9 +2,10 @@
 
 #include "../bslib_index.h"
 /* Important */
-//Change the base_data_type in bslib_index.h for billion and million scale datasets
+//Change the base_data_type and learn_data_type accordingly 
+// in bslib_index.h for billion and million scale datasets
 /*          */
-#include "../parameters/parameters_million/parameters_VQ_VQ.h"
+#include "../parameters/parameters_billion/parameters_PQ.h"
 
 using namespace bslib;
 
@@ -26,7 +27,6 @@ int main(){
             exit(0);
         }
 
-
         record_file.open(path_record, std::ios::app);
         qps_record_file.open(path_speed_record, std::ios::binary);
         
@@ -35,9 +35,14 @@ int main(){
         char* dt = ctime(&now);
         
         record_file << std::endl << "The time now is " << dt << std::endl;
-        record_file << "The host name is: " << hostname << std::endl;
+        record_file << "The server node is: " << hostname << std::endl;
         record_file << "The memory usage format is ixrss, isrss, idrss, maxrss" << std::endl;
         record_file << "Now starting the indexing process " << std::endl;
+        record_file << "/*            Parameter Setting          */ " << std::endl;
+        record_file << "Training vectors: ";
+        for (size_t i = 0; i < layers; i++) {record_file << num_train[i] << " ";} record_file << std::endl;
+        record_file << "PQ Training Vectors: " << PQ_train_size << std::endl;
+        record_file << "Number of batches: " << nbatches << std::endl;
     }
 
     Bslib_Index index = Bslib_Index(dimension, layers, index_type, use_reranking, saving_index, use_norm_quantization, is_recording,

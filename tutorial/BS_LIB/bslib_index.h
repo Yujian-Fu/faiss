@@ -13,11 +13,11 @@
 namespace bslib{
 
 // Change this type for different datasets
-//typedef uint8_t learn_data_type;
-//typedef uint8_t base_data_type;
+typedef uint8_t learn_data_type;
+typedef uint8_t base_data_type;
 
-typedef float learn_data_type;
-typedef float base_data_type;
+//typedef float learn_data_type;
+//typedef float base_data_type;
 
 typedef faiss::Index::idx_t idx_t;
 typedef std::pair<std::pair<size_t, size_t>, size_t> HNSW_para;

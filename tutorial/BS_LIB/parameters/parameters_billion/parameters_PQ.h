@@ -24,10 +24,10 @@ const size_t keep_space[layers * num_search_paras] = {20, 40, 60, 80, 100, 120, 
 
 
 // Folder path
-std::string ncentroid_conf = conf_combination(index_type, layers);
+std::string ncentroid_conf = conf_combination(ncentroids, index_type, layers, M_PQ_layer, nbits_PQ_layer);
 std::string model = "models" + index_combination(index_type, layers);
 
-const std::string path_OPQ =        path_folder + model + "/" + dataset + "/opq_matrix_" + std::to_string(M_PQ) + ".opq";
+const std::string path_OPQ =        path_folder + model + "/" + dataset + "/opq_matrix_" + ncentroid_conf + ".opq";
 const std::string path_speed_record = path_folder + model + "/" + dataset + "/recording" + ncentroid_conf + "_qps.txt";
 const std::string path_record =     path_folder + model + "/" + dataset + "/recording" + ncentroid_conf + ".txt";
 const std::string path_quantizers = path_folder + model + "/" + dataset + "/quantizer" + ncentroid_conf + ".qt";

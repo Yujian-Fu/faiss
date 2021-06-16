@@ -52,7 +52,7 @@ const size_t layers, const size_t * M_PQ_layer, const size_t * nbits_PQ_layer){
     for (size_t i = 0; i < layers; i++){
         result += "_"; result += index_type[i] == "PQ"? std::to_string(M_PQ_layer[i]) + "_" + std::to_string(nbits_PQ_layer[i]) : std::to_string(ncentroids[i]);
     }
-    result += " " + std::to_string(M_PQ);
+    result += "_" + std::to_string(M_PQ);
     return result;
 }
 
