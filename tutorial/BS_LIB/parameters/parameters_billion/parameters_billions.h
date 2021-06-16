@@ -64,9 +64,8 @@ std::string index_combination(const std::string * index_type, const size_t layer
 }
 
 //File paths
-const std::string path_learn =     path_folder + "data/" + dataset + "/" + dataset +"_learn.fvecs";
-const std::string path_base =      path_folder + "data/" + dataset + "/" + dataset +"_base.fvecs";
-const std::string path_gt =        path_folder + "data/" + dataset + "/" + dataset +"_groundtruth.ivecs";
-const std::string path_query =     path_folder + "data/" + dataset + "/" + dataset +"_query.fvecs";
-
+const std::string path_learn =     path_folder + "data/" + dataset + "/" + "bigann_learn.bvecs";
+const std::string path_base =      path_folder + "data/" + dataset + "/" + "bigann_base.bvecs";
+const std::string path_gt =        path_folder + "data/" + dataset + "/" + "gnd/idx_1000M.ivecs";
+const std::string path_query =     path_folder + "data/" + dataset + "/" + "bigann_query.bvecs";
 
