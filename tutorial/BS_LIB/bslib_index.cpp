@@ -357,8 +357,8 @@ namespace bslib{
                 if (update_ids){
                     read_train_set(path_learn, this->train_size, num_train[i+1]);
                     std::cout << "Updating train set for the next layer" << std::endl;
-                    assign(train_data_ids.size(), train_data.data(), train_data_ids.data(), i+1);
-                    //vq_quantizer_index[vq_quantizer_index.size() - 1].search_all(train_data_ids.size(), 1, train_data.data(), train_data_ids.data());
+                    //assign(train_data_ids.size(), train_data.data(), train_data_ids.data(), i+1);
+                    vq_quantizer_index[vq_quantizer_index.size() - 1].search_all(train_data_ids.size(), 1, train_data.data(), train_data_ids.data());
                 }
                 
                 std::cout << "Trainset Sample" << std::endl;
@@ -402,8 +402,8 @@ namespace bslib{
                 if (update_ids){
                     read_train_set(path_learn, this->train_size, num_train[i+1]);
                     std::cout << "Updating train set for the next layer" << std::endl;
-                    assign(train_data_ids.size(), train_data.data(), train_data_ids.data(), i+1);
-                    //lq_quantizer_index[lq_quantizer_index.size() - 1].search_all(train_data_ids.size(), 1, train_data.data(), train_data_ids.data());
+                    //assign(train_data_ids.size(), train_data.data(), train_data_ids.data(), i+1);
+                    lq_quantizer_index[lq_quantizer_index.size() - 1].search_all(train_data_ids.size(), 1, train_data.data(), train_data_ids.data());
                 }
 
                 std::cout << i << "th LQ quantizer added, check it " << std::endl;

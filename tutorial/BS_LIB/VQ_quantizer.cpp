@@ -64,7 +64,14 @@ namespace bslib{
             std::vector<float> centroids(dimension * nc_per_group);
             size_t nt_sub = train_set[i].size() / this->dimension;
             //std::cout << "Clustering " << nt_sub << " train vectors into " << nc_per_group << " groups " << std::endl;
-            faiss::kmeans_clustering(dimension, nt_sub, nc_per_group, train_set[i].data(), centroids.data(), 30, false);
+            if (nc_upper > 1){
+                faiss::kmeans_clustering(dimension, nt_sub, nc_per_group, train_set[i].data(), centroids.data(), 30, false);
+            }
+            else{
+                faiss::kmeans_clustering(dimension, nt_sub, nc_per_group, train_set[i].data(), centroids.data(), 30, false);
+            }
+            
+            
 
             //Adding centroids into quantizers
             if (use_HNSW){
