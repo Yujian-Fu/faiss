@@ -130,7 +130,7 @@ namespace bslib{
                     query_data_ids[i * k + k - j - 1] = result_queue.top().second;
                     result_queue.pop();
                 }
-                std::cout << "[ " + i+1 << " / " << n << " ]" << '\r';  
+                std::cout << "\r[ " << i+1 << " / " << n << " ]";  
             }
         }
 
@@ -143,7 +143,7 @@ namespace bslib{
                     for (size_t j = 0; j < k; j++){
                         query_data_ids[i * k + k - j - 1] = result_queue.top().second;
                     }
-                    std::cout << "[ " + i+1 << " / " << n << " ]" << '\r';  
+                    std::cout << "\r[ " << i+1 << " / " << n << " ]";  
                 }
             }
             else{
@@ -152,7 +152,7 @@ namespace bslib{
 //#pragma omp parallel for
                 for (size_t i = 0; i < n; i++){
                     L2_quantizers[0]->search(1, query_data + i * dimension, k, result_dists.data() + i * k, query_data_ids + i * k);
-                    std::cout << "[ " + i+1 << " / " << n << " ]" << '\r';  
+                    std::cout << "\r[ " << i+1 << " / " << n << " ]";  
                 }
             }
         }
@@ -178,7 +178,7 @@ namespace bslib{
             std::vector<float> result_dists(n * k);
 //#pragma omp parallel for
             for (size_t i = 0; i < n; i++){
-                std::cout << "[ " + i+1 << " / " << n << " ]" << '\r';  
+                std::cout << "\r[ " << i+1 << " / " << n << " ]";  
                 centroid_index.search(1, query_data + i * dimension, k, result_dists.data()+ i * k, query_data_ids + i * k);
             }
         }

@@ -1,5 +1,4 @@
 #include <fstream>
-
 #include "../bslib_index.h"
 /* Important */
 //Change the base_data_type and learn_data_type accordingly 
