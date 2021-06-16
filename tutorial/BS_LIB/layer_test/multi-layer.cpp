@@ -34,7 +34,7 @@ int main(){
         time_t now = time(0);
         char* dt = ctime(&now);
         
-        record_file << std::endl << "The time now is " << dt << std::endl;
+        record_file << std::endl << "The time now is " << dt;
         record_file << "The server node is: " << hostname << std::endl;
         record_file << "The memory usage format is ixrss, isrss, idrss, maxrss" << std::endl;
         record_file << "Now starting the indexing process " << std::endl;
