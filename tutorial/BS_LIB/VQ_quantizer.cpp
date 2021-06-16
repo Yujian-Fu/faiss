@@ -116,14 +116,10 @@ namespace bslib{
      * train_data_ids: the ids for train vectors        size: n
      * 
      **/
-    void VQ_quantizer::search_all(const size_t n, const size_t k, const float * query_data, idx_t * query_data_ids){
-        if (nc_upper == 1){
-            assert(L2_quantizers.size() == 1);
-            std::vector<float> result_dists(n);
-            L2_quantizers[0]->search(n, query_data, k, result_dists.data(), query_data_ids);
-        }
 
-        else if (use_all_HNSW){
+    void VQ_quantizer::search_all(const size_t n, const size_t k, const float * query_data, idx_t * query_data_ids){
+        if (use_all_HNSW){
+#pragma omp parallel for
             for (size_t i = 0; i < n; i++){
                 auto result_queue = HNSW_all_quantizer->searchKnn(query_data + i * dimension, k);
                 size_t result_size = result_queue.size();
@@ -131,6 +127,27 @@ namespace bslib{
                 for (size_t j = 0; j < result_size; j++){
                     query_data_ids[i * k + k - j - 1] = result_queue.top().second;
                     result_queue.pop();
+                }
+            }
+        }
+
+        else if (nc_upper == 1){
+            if (use_HNSW){
+                assert(HNSW_quantizers.size() == 1);
+#pragma omp parallel for
+                for (size_t i = 0; i < n; i++){
+                    auto result_queue = HNSW_quantizers[0]->searchKnn(query_data + i * dimension, k);
+                    for (size_t j = 0; j < k; j++){
+                        query_data_ids[i * k + k - j - 1] = result_queue.top().second;
+                    }
+                }
+            }
+            else{
+                std::vector<float> result_dists(n * k);
+                assert(L2_quantizers.size() == k);
+#pragma omp parallel for
+                for (size_t i = 0; i < n; i++){
+                    L2_quantizers[0]->search(1, query_data + i * dimension, k, result_dists.data() + i * k, query_data_ids + i * k);
                 }
             }
         }
@@ -145,7 +162,6 @@ namespace bslib{
                     centroid_index.add(1, one_centroid.data());
                 }
             }
-
             std::cout << "Centroid Sample" << std::endl;
             for (size_t temp1 = 0; temp1 < 2; temp1 ++){
                 for (size_t temp2 = 0; temp2 < dimension; temp2 ++){
@@ -154,8 +170,11 @@ namespace bslib{
                 std::cout << std::endl;
             }
 
-            std::vector<float> result_dists(n);
-            centroid_index.search(n, query_data, k, result_dists.data(), query_data_ids);
+            std::vector<float> result_dists(n * k);
+#pragma omp parallel for
+            for (size_t i = 0; i < n; i++){
+                centroid_index.search(1, query_data + i * dimension, k, result_dists.data()+ i * k, query_data_ids + i * k);
+            }
         }
     }
     
