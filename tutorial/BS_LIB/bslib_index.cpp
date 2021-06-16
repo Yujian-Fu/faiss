@@ -365,10 +365,10 @@ namespace bslib{
                 if (update_ids){
                     read_train_set(path_learn, this->train_size, num_train[i+1]);
                     std::cout << "Updating train set for the next layer" << std::endl;
-                    //assign(train_data_ids.size(), train_data.data(), train_data_ids.data(), i+1);
-                    //inner_Trecorder.record_time_usage(record_file, "Updated train set for next layer with assign function");
-                    vq_quantizer_index[vq_quantizer_index.size() - 1].search_all(train_data_ids.size(), 1, train_data.data(), train_data_ids.data());
-                    inner_Trecorder.record_time_usage(record_file, "Updated train set for next layer with search_all function");
+                    assign(train_data_ids.size(), train_data.data(), train_data_ids.data(), i+1);
+                    inner_Trecorder.record_time_usage(record_file, "Updated train set for next layer with assign function");
+                    //vq_quantizer_index[vq_quantizer_index.size() - 1].search_all(train_data_ids.size(), 1, train_data.data(), train_data_ids.data());
+                    //inner_Trecorder.record_time_usage(record_file, "Updated train set for next layer with search_all function");
                 }
                 
                 std::cout << "Trainset Sample" << std::endl;
@@ -414,10 +414,10 @@ namespace bslib{
                 if (update_ids){
                     read_train_set(path_learn, this->train_size, num_train[i+1]);
                     std::cout << "Updating train set for the next layer" << std::endl;
-                    //assign(train_data_ids.size(), train_data.data(), train_data_ids.data(), i+1);
-                    //inner_Trecorder.record_time_usage(record_file, "Updated train set for next layer with assign function");
-                    lq_quantizer_index[lq_quantizer_index.size() - 1].search_all(train_data_ids.size(), 1, train_data.data(), train_data_ids.data());
-                    inner_Trecorder.record_time_usage(record_file, "Updated train set for next layer with search_all function");
+                    assign(train_data_ids.size(), train_data.data(), train_data_ids.data(), i+1);
+                    inner_Trecorder.record_time_usage(record_file, "Updated train set for next layer with assign function");
+                    //lq_quantizer_index[lq_quantizer_index.size() - 1].search_all(train_data_ids.size(), 1, train_data.data(), train_data_ids.data());
+                    //inner_Trecorder.record_time_usage(record_file, "Updated train set for next layer with search_all function");
                 }
 
                 std::cout << i << "th LQ quantizer added, check it " << std::endl;

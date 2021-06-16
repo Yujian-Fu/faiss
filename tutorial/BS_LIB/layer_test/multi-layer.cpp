@@ -6,6 +6,31 @@
 /*          */
 #include "../parameters/parameters_billion/parameters_VQ_VQ_PQ.h"
 
+
+/*
+Todo:
+Components: 
+
+Decreasing the number of centroids
+HNSW_VQ
+OPQ
+HNSW_group
+Line Quantization
+
+
+Test:
+Search Parameters
+1-3 (4)layers
+Parameter Tuning
+
+
+Baseline:
+Faiss (IMI)
+IVFHNSW
+(LOPQ)
+
+*/
+
 using namespace bslib;
 
 int main(){
