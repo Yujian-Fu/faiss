@@ -5,7 +5,7 @@
 //Change the base_data_type and learn_data_type accordingly 
 // in bslib_index.h for billion and million scale datasets
 /*          */
-#include "../parameters/parameters_billion/parameters_VQ_VQ.h"
+#include "../parameters/parameters_billion/parameters_VQ_LQ.h"
 
 using namespace bslib;
 
