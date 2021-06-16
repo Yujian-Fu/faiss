@@ -11,7 +11,7 @@ namespace bslib{
      **/
     Bslib_Index::Bslib_Index(const size_t dimension, const size_t layers, const std::string * index_type, 
     const bool use_reranking, const bool saving_index, const bool use_norm_quantization, const bool is_recording,
-    const bool use_HNSW_VQ, const bool use_HNSW_group, const bool use_OPQ, const bool use_train_selector,
+    const bool use_HNSW_VQ, const bool use_HNSW_group, const bool use_all_HNSW, const bool use_OPQ, const bool use_train_selector,
     const size_t train_size, const size_t M_PQ, const size_t nbits){
             
             this->dimension = dimension;
@@ -19,10 +19,12 @@ namespace bslib{
 
             this->use_reranking = use_reranking;
             this->use_HNSW_VQ = use_HNSW_VQ;
+            this->use_HNSW_group = use_HNSW_group;
+            this->use_all_HNSW = use_all_HNSW;
+            
             this->use_norm_quantization = use_norm_quantization;
             this->use_OPQ = use_OPQ;
             this->use_train_selector = use_train_selector;
-            this->use_HNSW_group = use_HNSW_group;
 
             this->is_recording = is_recording;
             this->saving_index = saving_index;
@@ -49,7 +51,7 @@ namespace bslib{
      **/
     void Bslib_Index::add_vq_quantizer(size_t nc_upper, size_t nc_per_group, size_t M = 16, size_t efConstruction = 500, size_t efSearch = 100){
         
-        VQ_quantizer vq_quantizer = VQ_quantizer(dimension, nc_upper, nc_per_group, M, efConstruction, efSearch, use_HNSW_VQ);
+        VQ_quantizer vq_quantizer = VQ_quantizer(dimension, nc_upper, nc_per_group, M, efConstruction, efSearch, use_HNSW_VQ, use_all_HNSW);
         PrintMessage("Building centroids for vq quantizer");
         vq_quantizer.build_centroids(this->train_data.data(), this->train_data.size() / dimension, this->train_data_ids.data());
         PrintMessage("Finished construct the VQ layer");
@@ -69,7 +71,7 @@ namespace bslib{
      * 
      **/
     void Bslib_Index::add_lq_quantizer(size_t nc_upper, size_t nc_per_group, const float * upper_centroids, const idx_t * upper_nn_centroid_idxs, const float * upper_nn_centroid_dists){
-        LQ_quantizer lq_quantizer = LQ_quantizer(dimension, nc_upper, nc_per_group, upper_centroids, upper_nn_centroid_idxs, upper_nn_centroid_dists);
+        LQ_quantizer lq_quantizer = LQ_quantizer(dimension, nc_upper, nc_per_group, upper_centroids, upper_nn_centroid_idxs, upper_nn_centroid_dists, use_all_HNSW);
         PrintMessage("Building centroids for lq quantizer");
         lq_quantizer.build_centroids(this->train_data.data(), this->train_data.size() / dimension, this->train_data_ids.data());
         PrintMessage("Finished construct the LQ layer");

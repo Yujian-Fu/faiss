@@ -68,11 +68,9 @@ namespace bslib{
                 faiss::kmeans_clustering(dimension, nt_sub, nc_per_group, train_set[i].data(), centroids.data(), 30, false);
             }
             else{
-                faiss::kmeans_clustering(dimension, nt_sub, nc_per_group, train_set[i].data(), centroids.data(), 30, false);
+                faiss::kmeans_clustering(dimension, nt_sub, nc_per_group, train_set[i].data(), centroids.data(), 30);
             }
             
-            
-
             //Adding centroids into quantizers
             if (use_HNSW){
                 hnswlib::HierarchicalNSW * centroid_quantizer = new hnswlib::HierarchicalNSW(dimension, nc_per_group, M, 2 * M, efConstruction);
@@ -93,7 +91,7 @@ namespace bslib{
         if (use_all_HNSW){
             std::cout << "Constructing all HNSW for search_all function in VQ layer" << std::endl;
             std::vector<float> one_centroid(dimension);
-            hnswlib::HierarchicalNSW * centroid_quantizer = new hnswlib::HierarchicalNSW(dimension, nc, M, 2 * M, efConstruction);
+            hnswlib::HierarchicalNSW * centroid_quantizer = new hnswlib::HierarchicalNSW(dimension, nc, M_all_HNSW, 2 * M_all_HNSW, efConstruction_all_HNSW);
             for (size_t group_id = 0; group_id < nc_upper; group_id++){
                 for (size_t inner_group_id = 0; inner_group_id < nc_per_group; inner_group_id++){
                     compute_final_centroid(group_id, inner_group_id, one_centroid.data());
@@ -119,8 +117,13 @@ namespace bslib{
      * 
      **/
     void VQ_quantizer::search_all(const size_t n, const size_t k, const float * query_data, idx_t * query_data_ids){
-        
-        if (use_all_HNSW){
+        if (nc_upper == 1){
+            assert(L2_quantizers.size() == 1);
+            std::vector<float> result_dists(n);
+            L2_quantizers[0]->search(n, query_data, k, result_dists.data(), query_data_ids);
+        }
+
+        else if (use_all_HNSW){
             for (size_t i = 0; i < n; i++){
                 auto result_queue = HNSW_all_quantizer->searchKnn(query_data + i * dimension, k);
                 size_t result_size = result_queue.size();

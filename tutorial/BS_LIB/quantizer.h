@@ -35,7 +35,8 @@ struct Base_quantizer
     size_t nc_upper;
     size_t nc_per_group;
     size_t nc;
-    
+    size_t M_all_HNSW;
+    size_t efConstruction_all_HNSW;
     
     
     std::vector<idx_t> CentroidDistributionMap;

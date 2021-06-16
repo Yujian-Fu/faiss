@@ -24,6 +24,7 @@ namespace bslib{
             this->nn_centroid_ids.resize(nc_upper);
             this->nn_centroid_dists.resize(nc_upper);
 
+
             for (size_t i = 0; i < dimension * nc_upper; i++){
                 this->upper_centroids[i] = upper_centroids[i];
             }
@@ -143,7 +144,7 @@ namespace bslib{
         if (use_all_HNSW){
             std::cout << "Constructing all HNSW for search_all function in LQ layer" << std::endl;
             std::vector<float> one_centroid(dimension);
-            hnswlib::HierarchicalNSW * centroid_quantizer = new hnswlib::HierarchicalNSW(dimension, nc);
+            hnswlib::HierarchicalNSW * centroid_quantizer = new hnswlib::HierarchicalNSW(dimension, nc, M_all_HNSW, 2 * M_all_HNSW, efConstruction_all_HNSW);
             for (size_t group_id = 0; group_id < nc_upper; group_id++){
                 for (size_t inner_group_id = 0; inner_group_id < nc_per_group; inner_group_id++){
                     compute_final_centroid(group_id, inner_group_id, one_centroid.data());

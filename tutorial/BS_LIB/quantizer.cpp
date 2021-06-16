@@ -3,6 +3,8 @@
 namespace bslib{
     Base_quantizer::Base_quantizer(size_t dimension, size_t nc_upper, size_t nc_per_group):
     dimension(dimension), nc_upper(nc_upper), nc_per_group(nc_per_group){
+        M_all_HNSW = 12;
+        efConstruction_all_HNSW = 20;
         nc = nc_upper * nc_per_group;
         CentroidDistributionMap.resize(nc_upper);
         size_t num_centroids = 0;

@@ -46,7 +46,7 @@ int main(){
     }
 
     Bslib_Index index = Bslib_Index(dimension, layers, index_type, use_reranking, saving_index, use_norm_quantization, is_recording,
-    use_HNSW_VQ, use_HNSW_group, use_OPQ, use_train_selector, train_size, M_PQ, nbits);
+    use_HNSW_VQ, use_HNSW_group, use_all_HNSW, use_OPQ, use_train_selector, train_size, M_PQ, nbits);
 
     index.build_index(M_PQ, path_learn, path_groups, path_labels, path_quantizers, VQ_layers,
     PQ_layers, path_OPQ, ncentroids, M_HNSW, efConstruction, efSearch, M_PQ_layer, nbits_PQ_layer, num_train, OPQ_train_size, selector_train_size, selector_group_size, record_file);

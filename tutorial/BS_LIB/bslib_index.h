@@ -33,6 +33,7 @@ struct Bslib_Index{
     bool use_reranking;
     bool use_HNSW_VQ;
     bool use_HNSW_group;
+    bool use_all_HNSW;
     bool use_OPQ;
     bool use_norm_quantization;
     bool use_train_selector;
@@ -78,7 +79,7 @@ struct Bslib_Index{
 
     explicit Bslib_Index(const size_t dimension, const size_t layers, const std::string * index_type, 
     const bool use_reranking, const bool save_index, const bool use_norm_quantization, const bool is_recording,
-    const bool use_HNSW_VQ, const bool use_HNSW_group, const bool use_OPQ, const bool use_train_selector,
+    const bool use_HNSW_VQ, const bool use_HNSW_group, const bool use_all_HNSW, const bool use_OPQ, const bool use_train_selector,
     const size_t train_size, const size_t M_PQ, const size_t nbits);
 
     void do_OPQ(idx_t n, float * dataset);
