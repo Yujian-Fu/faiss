@@ -7,7 +7,7 @@ const size_t layers = 2;
 const size_t VQ_layers = 2;
 const size_t PQ_layers = 0;
 const std::string index_type[layers] = {"VQ", "VQ"};
-const uint32_t ncentroids[layers-PQ_layers] = {1000, 100};
+const uint32_t ncentroids[layers-PQ_layers] = {2000, 1000};
 
 
 //For building index
@@ -17,50 +17,25 @@ const size_t efSearch[VQ_layers] = {};
 
 const size_t M_PQ_layer[PQ_layers] = {};
 const size_t nbits_PQ_layer[PQ_layers] = {};
-const size_t num_train[layers] = {100000, 1000000};
+const size_t num_train[layers] = {1000000, 10000000};
 
 //For searching
 const size_t keep_space[layers * num_search_paras] = {10, 10, 20, 10, 10, 20, 20, 30, 30, 20, 40, 10, 50, 10, 50, 20, 60, 10, 60, 20};
 
-std::string conf_combination(){
-    std::string result = "";
-    for (size_t i = 0; i < layers; i++){
-        result += "_"; result += index_type[i] == "PQ"? std::to_string(M_PQ_layer[i]) + "_" + std::to_string(nbits_PQ_layer[i]) : std::to_string(ncentroids[i]);}
-    return result;
-}
-
-std::string index_combination(){
-    std::string result = "";
-    for (size_t i = 0; i < layers; i++){
-        result += "_"; result += index_type[i]; if (index_type[i] == "VQ" && use_HNSW_VQ) result += "_HNSW";}
-    return result;
-}
-
 // Folder path
-std::string ncentroid_conf = conf_combination();
-std::string model = "models" + index_combination();
+std::string ncentroid_conf = conf_combination(ncentroids, index_type, layers, M_PQ_layer, nbits_PQ_layer);
+std::string model = "models" + index_combination(index_type, layers);
 
-
-const std::string folder_model = path_folder + model;
-
-//File paths
-const std::string path_learn =     path_folder + "data/" + dataset + "/" + "bigann_learn.bvecs";
-const std::string path_base =      path_folder + "data/" + dataset + "/" + "bigann_base.bvecs";
-const std::string path_gt =        path_folder + "data/" + dataset + "/" + "gnd/idx_1000M.ivecs";
-const std::string path_query =     path_folder + "data/" + dataset + "/" + "bigann_query.bvecs";
-
-
-const std::string path_OPQ =        path_folder + model + "/" + dataset + "/opq_matrix_" + std::to_string(M_PQ) + ".opq";
+const std::string path_OPQ =        path_folder + model + "/" + dataset + "/opq_matrix_" + ncentroid_conf + ".opq";
 const std::string path_speed_record = path_folder + model + "/" + dataset + "/recording" + ncentroid_conf + "_qps.txt";
 const std::string path_record =     path_folder + model + "/" + dataset + "/recording" + ncentroid_conf + ".txt";
 const std::string path_quantizers = path_folder + model + "/" + dataset + "/quantizer" + ncentroid_conf + ".qt";
 const std::string path_ids =        path_folder + model + "/" + dataset + "/base_idxs" + ncentroid_conf + ".ivecs";
 const std::string path_centroid_norm = path_folder + model + "/" + dataset + "/centroid_norm" + ncentroid_conf + ".norm";
-const std::string path_pq =  path_folder + model + "/" + dataset + "/PQ" + std::to_string(M_PQ) + ncentroid_conf + "_" + std::to_string(M_PQ) + "_" + std::to_string(nbits) + ".pq";
+const std::string path_pq =  path_folder + model + "/" + dataset + "/PQ" + std::to_string(M_PQ) + ncentroid_conf  + "_" + std::to_string(nbits) + ".pq";
 const std::string path_pq_norm =    path_folder + model + "/" + dataset + "/PQ_NORM" + std::to_string(M_PQ) + ncentroid_conf  + ".norm";
-const std::string path_base_norm =      path_folder + model + "/" + dataset + "/base_norm" + std::to_string(M_PQ) + ncentroid_conf + "_" + std::to_string(M_PQ) + "_" + std::to_string(nbits) + ".norm";
-const std::string path_index =      path_folder + model + "/" + dataset + "/PQ" + std::to_string(M_PQ) + ncentroid_conf + "_" + std::to_string(M_PQ) + "_" + std::to_string(nbits) + ".index";
-
+const std::string path_base_norm =      path_folder + model + "/" + dataset + "/base_norm" + std::to_string(M_PQ) + ncentroid_conf + "_" + std::to_string(nbits) + ".norm";
+const std::string path_index =      path_folder + model + "/" + dataset + "/PQ" + std::to_string(M_PQ) + ncentroid_conf + "_" + std::to_string(nbits) + ".index";
 
 /**
  **This is the centroids for assigining origin train vectors  size: n_group * dimension
