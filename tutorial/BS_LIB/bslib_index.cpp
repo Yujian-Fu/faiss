@@ -1693,7 +1693,10 @@ namespace bslib{
                 base_output.write((char *) assigned_ids.data(), batch_size * sizeof(idx_t));
                 if (i % 10 == 0){
                     std::cout << " assigned batches [ " << i << " / " << nbatches << " ]";
+
                     Trecorder.print_time_usage("");
+                    record_file << " assigned batches [ " << i << " / " << nbatches << " ]";
+                    Trecorder.record_time_usage(record_file, " ");
                 }
             }
             base_input.close();
@@ -1805,6 +1808,8 @@ namespace bslib{
                 if (i % 10 == 0){
                     std::cout << " adding batches [ " << i << " / " << nbatches << " ]";
                     Trecorder.print_time_usage("");
+                    record_file << " adding batches [ " << i << " / " << nbatches << " ]";
+                    Trecorder.record_time_usage(record_file, " ");
                 }
             }
 

@@ -4,7 +4,7 @@
 /* Important */
 //Change the base_data_type in bslib_index.h for billion and million scale datasets
 /*          */
-#include "../parameters/parameters_billion/parameters_VQ_VQ.h"
+#include "../parameters/parameters_million/parameters_VQ_VQ.h"
 
 using namespace bslib;
 
@@ -18,14 +18,24 @@ int main(){
     //For recording 
     std::ofstream record_file;
     std::ofstream qps_record_file;
+    
     if (is_recording){
+        char hostname[100] = {0};
+        if (gethostname(hostname, sizeof(hostname)) < 0){
+            perror("Error in get host name");
+            exit(0);
+        }
+
+
         record_file.open(path_record, std::ios::app);
         qps_record_file.open(path_speed_record, std::ios::binary);
-
+        
         qps_record_file << "The num of centroid is: " << std::to_string(ncentroids[0]) << std::endl;
         time_t now = time(0);
         char* dt = ctime(&now);
+        
         record_file << std::endl << "The time now is " << dt << std::endl;
+        record_file << "The host name is: " << hostname << std::endl;
         record_file << "The memory usage format is ixrss, isrss, idrss, maxrss" << std::endl;
         record_file << "Now starting the indexing process " << std::endl;
     }
