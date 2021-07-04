@@ -63,7 +63,7 @@ namespace bslib{
         std::cout <<  std::endl << "The min size for sub train set is: " << min_train_size << std::endl;
 
 
-#pragma omp parallel for
+//#pragma omp parallel for
         for (size_t i = 0; i < nc_upper; i++){
             
             size_t nt_sub = train_set[i].size() / this->dimension;
