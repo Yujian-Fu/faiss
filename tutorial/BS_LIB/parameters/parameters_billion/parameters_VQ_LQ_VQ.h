@@ -1,53 +1,28 @@
-#include <cstdio>
-#include <iostream>
+#include "./parameters_billions.h"
 
 /* Parameter setting: */
 //Exp parameters
 //For index initialization
-const size_t layers = 3;
+
+const size_t VQ_layers = 2;
+const size_t PQ_layers = 0;
+const size_t LQ_layers = 1;
+const size_t layers = VQ_layers + PQ_layers + LQ_layers;
+const size_t LQ_type[LQ_layers] = {0};
+
 const std::string index_type[layers] = {"VQ", "LQ", "VQ"};
-const uint32_t ncentroids[layers] = {200, 100, 10};
-const char * path_quantizers = "/home/y/yujianfu/ivf-hnsw/models_VQ_LQ_VQ/SIFT1B/quantizer_200_100_10.qt";;
+const uint32_t ncentroids[layers-PQ_layers] = {1000};
 
-//For train PQ
-const size_t bytes_per_code = 16;
-const size_t bytes_per_norm_code = 1;
-const size_t nbits = 8; //Or 16
-const size_t nt = 100000000;
-const size_t subnt = 100000000;
-const size_t dimension = 128;
-
-//For assigning ID
 
 //For building index
-const size_t nb = 1000000000;
-const uint32_t batch_size = 10000000;
-const size_t nbatches = nb / batch_size; //1000
+const size_t M_HNSW[VQ_layers] = {};
+const size_t efConstruction [VQ_layers] = {};
+const size_t efSearch[VQ_layers] = {};
+
+const size_t M_PQ_layer[PQ_layers] = {};
+const size_t nbits_PQ_layer[PQ_layers] = {};
+const size_t num_train[layers] = {500000, 100000000};
 
 //For searching
-const size_t ngt = 1000;
-const size_t nq = 10000;
-const size_t result_k = 1;
-const size_t max_vectors = 50000;
-size_t search_space[layers] = {100, 20};
-size_t keep_space[layers] = {50, 10};
-
-
-bool is_recording = true;
-
-// Folder path
-const char * folder_model = "/home/y/yujianfu/ivf-hnsw/models_VQ_LQ_VQ";
-const char * folder_data = "/home/y/yujianfu/ivf-hnsw/data";
-
-//File paths
-const char * path_learn = "/home/y/yujianfu/ivf-hnsw/data/SIFT1B/bigann_learn.bvecs";
-const char * path_base = "/home/y/yujianfu/ivf-hnsw/data/SIFT1B/bigann_base.bvecs";
-const char * path_gt = "/home/y/yujianfu/ivf-hnsw/data/SIFT1B/gnd/idx_1000M.ivecs";
-const char * path_query = "/home/y/yujianfu/ivf-hnsw/data/SIFT1B/bigann_learn.bvecs";
-
-const char * path_record =    "/home/y/yujianfu/ivf-hnsw/models_VQ_LQ_VQ/SIFT1B/recording_200_100_10.txt";
-const char * path_pq =        "/home/y/yujianfu/ivf-hnsw/models_VQ_LQ_VQ/SIFT1B/PQ16_200_100_10.pq";
-const char * path_pq_norm =   "/home/y/yujianfu/ivf-hnsw/models_VQ_LQ_VQ/SIFT1B/PQ_NORM16_200_100_10.pq";
-const char * path_idxs =      "/home/y/yujianfu/ivf-hnsw/models_VQ_LQ_VQ/SIFT1B/base_idxs_200_100_10.ivecs";
-const char * path_index =     "/home/y/yujianfu/ivf-hnsw/models_VQ_LQ_VQ/SIFT1B/PQ16_200_100_10.index";
+const size_t keep_space[layers * num_search_paras] = {50, 10, 100, 10, 150, 20, 200, 30, 250, 20, 300, 10, 350, 10, 400, 20, 450, 10, 500, 20};
 

@@ -7,24 +7,24 @@ namespace bslib{
      * 
      * Input: 
      * nc_upper:        number of groups = number of centroids in upper layer
-     * nc_per_group:    number of subcentroids per group
+     * nc_per_group:    number of subcentroids per group, might be shrinked if no enough training points
      * use_HNSW:        use HNSW for searching or L2 exhaustive search
      * M:               for HNSW construction, 16 in default
      * efConstruction:  for HNSW construction
      * efSearch:        for efSearch: keep_space < efSearch < nc_per_group
      * 
-     **/
-    VQ_quantizer::VQ_quantizer(size_t dimension, size_t nc_upper, size_t nc_per_group, size_t M, size_t efConstruction, size_t efSearch, bool use_HNSW, bool use_all_HNSW):
-        Base_quantizer(dimension, nc_upper, nc_per_group), use_HNSW(use_HNSW), use_all_HNSW(use_all_HNSW){
+     **/ 
+    VQ_quantizer::VQ_quantizer(size_t dimension, size_t nc_upper, size_t max_nc_per_group, size_t M, size_t efConstruction, size_t efSearch, bool use_HNSW, bool use_all_HNSW):
+        Base_quantizer(dimension, nc_upper, max_nc_per_group), use_HNSW(use_HNSW), use_all_HNSW(use_all_HNSW){
             if (use_HNSW){
                 this->M = M;
                 this->efConstruction = efConstruction;
                 this->efSearch = efSearch;
                 this->HNSW_quantizers.resize(nc_upper);
-                this->nc_num.resize(nc_upper);
             }
             else{
                 this->L2_quantizers.resize(nc_upper);
+                this->exact_nc_in_groups.resize(nc_upper);
             }
         }
 
@@ -54,27 +54,36 @@ namespace bslib{
         std::cout << "Building group quantizers for vq_quantizer " << std::endl;
         size_t min_train_size = train_set[0].size() / dimension; 
         for (size_t i = 0; i < nc_upper; i++){if (min_train_size > train_set[i].size() / dimension) min_train_size = train_set[i].size() / dimension; if (i <= 1000) {std::cout << train_set[i].size() / dimension <<" ";}}
-        
+
 
         std::cout <<  std::endl << "The min size for sub train set is: " << min_train_size << std::endl;
 
 
 #pragma omp parallel for
         for (size_t i = 0; i < nc_upper; i++){
-            std::vector<float> centroids(dimension * nc_per_group);
+            
             size_t nt_sub = train_set[i].size() / this->dimension;
             //std::cout << "Clustering " << nt_sub << " train vectors into " << nc_per_group << " groups " << std::endl;
-            if (nc_upper > 1){
-                faiss::kmeans_clustering(dimension, nt_sub, nc_per_group, train_set[i].data(), centroids.data(), 30, false);
+
+            size_t exact_nc_in_group;
+            if (nt_sub < max_nc_per_group * min_train_size_per_group){
+                //Shrink the nc size in this group
+                exact_nc_in_group = nt_sub / min_train_size_per_group;
+                if (exact_nc_in_group <= 0){ exact_nc_in_group = 1;} //Ensure there is at least one centroid in this cluster
             }
             else{
-                faiss::kmeans_clustering(dimension, nt_sub, nc_per_group, train_set[i].data(), centroids.data(), 30);
+                exact_nc_in_group = max_nc_per_group;
             }
+            exact_nc_in_groups[i] = exact_nc_in_group;
+
+            bool verbose = nc_upper > 1 ? false : true;
+            std::vector<float> centroids(dimension * exact_nc_in_group);
+            faiss::kmeans_clustering(dimension, nt_sub, exact_nc_in_group, train_set[i].data(), centroids.data(), 30, verbose);
             
             //Adding centroids into quantizers
             if (use_HNSW){
-                hnswlib::HierarchicalNSW * centroid_quantizer = new hnswlib::HierarchicalNSW(dimension, nc_per_group, M, 2 * M, efConstruction);
-                for (size_t j = 0; j < nc_per_group; j++){
+                hnswlib::HierarchicalNSW * centroid_quantizer = new hnswlib::HierarchicalNSW(dimension, exact_nc_in_group, M, 2 * M, efConstruction);
+                for (size_t j = 0; j < exact_nc_in_group; j++){
                     centroid_quantizer->addPoint(centroids.data() + j * dimension);
                 }
                 this->HNSW_quantizers[i] = centroid_quantizer;
@@ -82,27 +91,49 @@ namespace bslib{
             else
             {
                 faiss::IndexFlatL2 * centroid_quantizer = new faiss::IndexFlatL2(dimension);
-                centroid_quantizer->add(nc_per_group, centroids.data());
+                centroid_quantizer->add(exact_nc_in_group, centroids.data());
                 this->L2_quantizers[i] = centroid_quantizer;
             }
         }
-        std::cout << "finished computing centoids" <<std::endl;
+
+        size_t num_centroids = 0;
+        for (size_t i = 0; i < nc_upper; i++){
+            CentroidDistributionMap[i] = num_centroids;
+            num_centroids += exact_nc_in_groups[i];
+        }
+        
+        if (num_centroids < layer_nc){
+            std::cout << "The number of centroids is shrinked in VQ layer from " << layer_nc << " to " << num_centroids << std::endl;
+            layer_nc = num_centroids;
+        }
+
+        std::cout << "Finished computing centoids with final centroids: " << layer_nc <<std::endl;
 
         if (use_all_HNSW){
             std::cout << "Constructing all HNSW for search_all function in VQ layer" << std::endl;
             std::vector<float> one_centroid(dimension);
-            hnswlib::HierarchicalNSW * centroid_quantizer = new hnswlib::HierarchicalNSW(dimension, nc, M_all_HNSW, 2 * M_all_HNSW, efConstruction_all_HNSW);
-            for (size_t group_id = 0; group_id < nc_upper; group_id++){
-                for (size_t inner_group_id = 0; inner_group_id < nc_per_group; inner_group_id++){
-                    compute_final_centroid(group_id, inner_group_id, one_centroid.data());
-                    centroid_quantizer->addPoint(one_centroid.data());
-                }
+            hnswlib::HierarchicalNSW * centroid_quantizer = new hnswlib::HierarchicalNSW(dimension, layer_nc, M_all_HNSW, 2 * M_all_HNSW, efConstruction_all_HNSW);
+            
+            for (size_t i = 0; i < layer_nc; i++){
+                compute_final_centroid(i, one_centroid.data());
+                centroid_quantizer->addPoint(one_centroid.data());
             }
+            
             this->HNSW_all_quantizer = centroid_quantizer;
             std::cout << "Finished construct the all_HNSW in VQ layer" << std::endl;
         }
     }
 
+
+    void VQ_quantizer::get_group_id(idx_t label, idx_t & group_id, idx_t & inner_group_id){
+        for (size_t i = 0; i < nc_upper; i++){
+            if (label - CentroidDistributionMap[i] >= 0){
+                group_id = i;
+                inner_group_id = label - CentroidDistributionMap[i];
+                break;
+            }
+        }
+    }
 
     /**
      * 
@@ -130,7 +161,6 @@ namespace bslib{
                     query_data_ids[i * k + k - j - 1] = result_queue.top().second;
                     result_queue.pop();
                 }
-                std::cout << "\r[ " << i+1 << " / " << n << " ]";  
             }
         }
 
@@ -142,8 +172,9 @@ namespace bslib{
                     auto result_queue = HNSW_quantizers[0]->searchKnn(query_data + i * dimension, k);
                     for (size_t j = 0; j < k; j++){
                         query_data_ids[i * k + k - j - 1] = result_queue.top().second;
+                        result_queue.pop();
                     }
-                    std::cout << "\r[ " << i+1 << " / " << n << " ]";  
+                    std::cout << "\r Search all finished [ " << i+1 << " / " << n << " ]";  
                 }
             }
             else{
@@ -152,7 +183,7 @@ namespace bslib{
 //#pragma omp parallel for
                 for (size_t i = 0; i < n; i++){
                     L2_quantizers[0]->search(1, query_data + i * dimension, k, result_dists.data() + i * k, query_data_ids + i * k);
-                    std::cout << "\r[ " << i+1 << " / " << n << " ]";  
+                    std::cout << "\r Search all finished [ " << i+1 << " / " << n << " ]";   
                 }
             }
         }
@@ -161,14 +192,12 @@ namespace bslib{
             faiss::IndexFlatL2 centroid_index(dimension * k);
             std::vector<float> one_centroid(dimension * k);
 
-            for (size_t group_id = 0; group_id < nc_upper; group_id++){
-                for (size_t inner_group_id = 0; inner_group_id < nc_per_group; inner_group_id++){
-                    compute_final_centroid(group_id, inner_group_id, one_centroid.data());
+            for(size_t i = 0; i < layer_nc; i++){
+                    compute_final_centroid(i, one_centroid.data());
                     centroid_index.add(1, one_centroid.data());
-                }
             }
-            std::cout << "Centroid Sample" << std::endl;
-            for (size_t temp1 = 0; temp1 < 2; temp1 ++){
+            std::cout << "Centroid Sample:" << std::endl;
+            for (size_t temp1 = 0; temp1 < 1; temp1 ++){
                 for (size_t temp2 = 0; temp2 < dimension; temp2 ++){
                     std::cout << centroid_index.xb[temp1 * dimension + temp2] << " ";
                 }
@@ -178,7 +207,7 @@ namespace bslib{
             std::vector<float> result_dists(n * k);
 //#pragma omp parallel for
             for (size_t i = 0; i < n; i++){
-                std::cout << "\r[ " << i+1 << " / " << n << " ]";  
+                std::cout << "\r Search all finished [ " << i+1 << " / " << n << " ]";  
                 centroid_index.search(1, query_data + i * dimension, k, result_dists.data()+ i * k, query_data_ids + i * k);
             }
         }
@@ -186,6 +215,9 @@ namespace bslib{
     
 
     /**
+     * 
+     * With the shrink mode, we must ensure the k is smaller than the group size
+     * 
      * For a query sequence queries, search in their group and return the k cloest centroids
      * 
      * Notice: 
@@ -197,25 +229,29 @@ namespace bslib{
      * group_ids: the group id for relative query: which group should we search in  size: n
      * 
      * Output:
-     * result_labels in L2 search: the search result labels in L2 search mode       size: n * nc_per_group
+     * result_labels in L2 search: the search result labels in L2 search mode       size: n * max_nc_per_group
      * result_labels in HNSW search: the search result labels in HNSW search mode   size: n * k (n * efSearch?)
-     * result_dists in L2 search:                                                   size: n * nc_per_group
+     * result_dists in L2 search:                                                   size: n * max_nc_per_group
      * result_dists in HNSW search:                                                 size: n * k (n * efSearch?)
      * The output result for HNSW search and L2 search is different
      **/
     void VQ_quantizer::search_in_group(const float * query, const idx_t group_id, float * result_dists, idx_t * result_labels, size_t k){
+        
+        //If no enough centroids, return error, need to check before use
+        if (k > exact_nc_in_groups[group_id]){
+            std::cout << "No enough centroids in group " << group_id << " in VQ layer" << std::endl;
+            exit(0);
+        }
         if (use_HNSW){
 //#pragma omp parallel for
             //The distance result for search kNN is in reverse 
-            size_t search_para = efSearch > k ? efSearch : k;
-            auto result_queue = this->HNSW_quantizers[group_id]->searchKnn(query, search_para);
-            size_t result_length = result_queue.size(); 
-            // The result of search result 
-            assert (result_length >= k && result_length <= nc_per_group);
-            for (size_t j = 0; j < this->nc_per_group; j++){
-                if (j < result_length){
-                    result_dists[result_length - j - 1] = result_queue.top().first;
-                    result_labels[result_length - j -1] = CentroidDistributionMap[group_id] + result_queue.top().second;
+            size_t search_para = k < exact_nc_in_groups[group_id] ?  k : exact_nc_in_groups[group_id];
+            auto result_queue = this->HNSW_quantizers[group_id]->searchBaseLayer(query, search_para);
+            // The result of search result
+            for (size_t j = 0; j < this->max_nc_per_group; j++){
+                if (j < search_para){
+                    result_dists[search_para - j - 1] = result_queue.top().first;
+                    result_labels[search_para - j -1] = CentroidDistributionMap[group_id] + result_queue.top().second;
                     result_queue.pop();
                 }
                 else{
@@ -226,10 +262,16 @@ namespace bslib{
         }
         else{
 //#pragma omp parallel for
-            for (size_t j = 0; j < this->nc_per_group; j++){
-                const float * target_centroid = this->L2_quantizers[group_id]->xb.data() + j * this->dimension;
-                result_dists[j] = faiss::fvec_L2sqr(target_centroid, query, dimension);
-                result_labels[j] = CentroidDistributionMap[group_id] + j;
+            for (size_t j = 0; j < this->max_nc_per_group; j++){
+                if (j < exact_nc_in_groups[group_id]){
+                    const float * target_centroid = this->L2_quantizers[group_id]->xb.data() + j * this->dimension;
+                    result_dists[j] = faiss::fvec_L2sqr(target_centroid, query, dimension);
+                    result_labels[j] = CentroidDistributionMap[group_id] + j;
+                }
+                else{
+                    result_dists[j] = MAX_DIST;
+                    result_labels[j] = INVALID_ID;
+                }
             }
         }
     }
@@ -246,7 +288,12 @@ namespace bslib{
      * Output:
      * final_centroid:  the target centroid          size: dimension
      **/
-    void VQ_quantizer::compute_final_centroid(const idx_t group_id, const idx_t inner_group_id, float * final_centroid){
+    void VQ_quantizer::compute_final_centroid(idx_t label, float * final_centroid){
+
+        idx_t group_id;
+        idx_t inner_group_id;
+        get_group_id(label, group_id, inner_group_id);
+
         if (use_HNSW){
             const float * target_centroid = this->HNSW_quantizers[group_id]->getDataByInternalId(inner_group_id);
             for (size_t i = 0; i < dimension; i++){
@@ -277,10 +324,7 @@ namespace bslib{
 #pragma omp parallel for
         for (size_t i = 0; i < n; i++){
             std::vector<float> final_centroid(dimension);
-            size_t group_id = labels[i] / nc_per_group;
-            size_t inner_group_id = labels[i] - CentroidDistributionMap[group_id];
-
-            compute_final_centroid(group_id, inner_group_id, final_centroid.data());
+            compute_final_centroid(labels[i], final_centroid.data());
             faiss::fvec_madd(dimension, x + i * dimension, -1.0, final_centroid.data(), residuals + i * dimension);
         }
     }
@@ -301,10 +345,7 @@ namespace bslib{
 #pragma omp parallel for
         for (size_t i = 0; i < n; i++){
             std::vector<float> final_centroid(dimension);
-            size_t group_id = labels[i] / nc_per_group;
-            size_t inner_group_id = labels[i] - CentroidDistributionMap[group_id];
-
-            compute_final_centroid(group_id, inner_group_id, final_centroid.data());
+            compute_final_centroid(labels[i], final_centroid.data());
             faiss::fvec_madd(dimension, residuals + i * dimension, 1.0, final_centroid.data(), x + i * dimension);
         }
     }
@@ -326,44 +367,43 @@ namespace bslib{
     void VQ_quantizer::compute_nn_centroids(size_t k, float * nn_centroids, float * nn_dists, idx_t * nn_ids){
         std::vector<float> target_centroid(dimension);
         if (use_all_HNSW){
-            for (size_t group_id = 0; group_id < this->nc_upper; group_id++){
-                for (size_t inner_group_id = 0; inner_group_id < this->nc_per_group; inner_group_id++){
-                    compute_final_centroid(group_id, inner_group_id, target_centroid.data());
-                    auto result_queue = HNSW_all_quantizer->searchKnn(target_centroid.data(), k+1);
-                    assert(result_queue.size() == k+1);
-                    // The centroid with smallest size should be itself
-                    // We just start from the top (As the search result is from large distance to small distance)
-                    // And get the first k results (from k+1 results)
-                    for (size_t temp = 0; temp < k; temp ++){
-                        hnswlib::idx_t search_centroid_id = CentroidDistributionMap[group_id] + inner_group_id;
-                        assert(search_centroid_id != result_queue.top().second);
-                        nn_ids[search_centroid_id * k + k - temp -1] = result_queue.top().second;
-                        nn_dists[search_centroid_id * k + k - temp - 1] = result_queue.top().first;  
-                    }
+            for (size_t label = 0; label< layer_nc; label++){
+
+                compute_final_centroid(label, target_centroid.data());
+                auto result_queue = HNSW_all_quantizer->searchKnn(target_centroid.data(), k+1);
+                assert(result_queue.size() == k+1);
+                // The centroid with smallest size should be itself
+                // We just start from the top (As the search result is from large distance to small distance)
+                // And get the first k results (from k+1 results)
+                std::cout << "searching the idx for centroids' nearest neighbors " << std::endl;
+                for (size_t temp = 0; temp < k; temp ++){
+                    hnswlib::idx_t search_centroid_id = label;
+                    assert(search_centroid_id != result_queue.top().second);
+                    nn_ids[search_centroid_id * k + k - temp -1] = result_queue.top().second;
+                    nn_dists[search_centroid_id * k + k - temp - 1] = result_queue.top().first;  
+                    result_queue.pop();
                 }
             }
         }
         else{
             faiss::IndexFlatL2 all_quantizer(dimension);
             //Add all centroids to the all_quantizer
-            for (size_t group_id = 0; group_id < this->nc_upper; group_id++){
-                for (size_t inner_group_id = 0; inner_group_id < this->nc_per_group; inner_group_id++){
-                    compute_final_centroid(group_id, inner_group_id, target_centroid.data());
-                    all_quantizer.add(1, target_centroid.data());
-                }
+            for (size_t label = 0; label < layer_nc; label++){
+                compute_final_centroid(label, target_centroid.data());
+                all_quantizer.add(1, target_centroid.data());
             }
 
             std::cout << "searching the idx for centroids' nearest neighbors " << std::endl;
-            for (size_t i = 0; i < this->nc * this->dimension; i++){
+            for (size_t i = 0; i < this->layer_nc * this->dimension; i++){
                 nn_centroids[i] = all_quantizer.xb[i];
             }
 
-            std::vector<idx_t> search_nn_ids(this->nc * (k+1));
-            std::vector<float> search_nn_dis (this->nc * (k+1));
-            all_quantizer.search(this->nc, all_quantizer.xb.data(), k+1, search_nn_dis.data(), search_nn_ids.data());
+            std::vector<idx_t> search_nn_ids(this->layer_nc * (k+1));
+            std::vector<float> search_nn_dis (this->layer_nc * (k+1));
+            all_quantizer.search(layer_nc, all_quantizer.xb.data(), k+1, search_nn_dis.data(), search_nn_ids.data());
 
 
-            for (size_t i = 0; i < this->nc; i++){
+            for (size_t i = 0; i < this->layer_nc; i++){
                 for (size_t j = 0; j < k; j++){
                     nn_dists[i * k + j] = search_nn_dis[i * (k + 1) + j + 1];
                     nn_ids [i * k + j] = search_nn_ids[i * (k + 1) + j + 1];
@@ -399,7 +439,7 @@ namespace bslib{
             }
 
             //Saving Data
-            for (size_t i = 0; i < nc_per_group; i++){
+            for (size_t i = 0; i < exact_nc_in_groups[HNSW_id]; i++){
                 output.write((char *) & dimension, sizeof(uint32_t));
                 output.write((char *) HNSW->getDataByInternalId(i), dimension * sizeof(float));
             }
@@ -411,7 +451,7 @@ namespace bslib{
         assert(HNSW_quantizers.size() == nc_upper);
 
         for (size_t HNSW_id = 0; HNSW_id < nc_upper; HNSW_id++){
-            hnswlib::HierarchicalNSW * HNSW = new hnswlib::HierarchicalNSW();
+            hnswlib::HierarchicalNSW * HNSW = new hnswlib::HierarchicalNSW(false, false, false);
 
             //Load Info
             readBinaryPOD(input, HNSW->maxelements_);

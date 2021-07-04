@@ -2,13 +2,42 @@
 
 namespace hnswlib {
 
-    HierarchicalNSW::HierarchicalNSW()
-    {}
+    HierarchicalNSW::HierarchicalNSW(bool PQ_flag, bool PQ_full_data, bool use_vector_alpha)
+    {
+        PQ_flag = PQ_flag;
+        PQ_full_data = PQ_full_data;
+        use_vector_alpha = use_vector_alpha;
+        data_level0_memory_ = NULL;
+        visitedlistpool = NULL;
+        nn_dist = NULL;
+        vector_alpha_norm = NULL;
+        vector_alpha = NULL;
+        base_norms = NULL;
+    }
 
-    HierarchicalNSW::HierarchicalNSW(size_t d, size_t maxelements, size_t M, size_t maxM, size_t efConstruction)
+    HierarchicalNSW::HierarchicalNSW(size_t d, size_t maxelements, size_t M, size_t maxM, size_t efConstruction, 
+    bool PQ_flag, bool PQ_full_data, size_t code_size, size_t ksub)
 {
     d_ = d;
-    data_size_ = d * sizeof(float);
+    code_size = code_size;
+    PQ_flag = PQ_flag;
+    PQ_full_data = PQ_full_data;
+    ksub = ksub;
+
+    if (PQ_flag){
+        if (PQ_full_data){
+            // Load full data for construction
+            data_size_ = d * sizeof(float);
+        }
+        else{
+            // Use compressed data for search
+            data_size_ = 0;
+        }
+    }
+    else{
+        data_size_ = d * sizeof(float);
+    }
+    
 
     efConstruction_ = efConstruction;
     efSearch = efConstruction;
@@ -16,15 +45,16 @@ namespace hnswlib {
     maxelements_ = maxelements;
     M_ = M;
     maxM_ = maxM;
+
     size_links_level0 = maxM * sizeof(idx_t) + sizeof(uint8_t);
     size_data_per_element = size_links_level0 + data_size_;
     offset_data = size_links_level0;
 
-    std::cout << (data_level0_memory_ ? 1 : 0) << std::endl;
+    std::cout << (data_level0_memory_ ? " Memory allocated " : " Memory not allocated ") << std::endl;
     data_level0_memory_ = (char *) malloc(maxelements_ * size_data_per_element);
-    std::cout << (data_level0_memory_ ? 1 : 0) << std::endl;
+    std::cout << (data_level0_memory_ ? " Memory allocated " : " Memory not allocated ") << std::endl;
 
-    std::cout << "Size Mb: " << (maxelements_ * size_data_per_element) / (1000 * 1000) << std::endl;
+    std::cout << "HNSW Size Mb: " << (maxelements_ * size_data_per_element) / (1000 * 1000) << std::endl;
 
     visitedlistpool = new VisitedListPool(1, maxelements_);
 
@@ -32,11 +62,26 @@ namespace hnswlib {
     cur_element_count = 0;
 }
 
-//HierarchicalNSW::~HierarchicalNSW()
-//{
-//    free(data_level0_memory_);
-//    delete visitedlistpool;
-//}
+HierarchicalNSW::~HierarchicalNSW()
+{
+    free(data_level0_memory_);
+    delete visitedlistpool;
+}
+
+
+float HierarchicalNSW::getDistance(const float * point, idx_t id){
+    if (PQ_flag){
+        if (PQ_full_data){
+            return fstdistfunc(point, getDataByInternalId(id));
+        }
+        else{
+            return PQdistfunc(point, id);
+        }
+    }
+    else{
+        return fstdistfunc(point, getDataByInternalId(id));
+    }
+}
 
 
 std::priority_queue<std::pair<float, idx_t>> HierarchicalNSW::searchBaseLayer(const float *point, size_t ef)
@@ -47,7 +92,8 @@ std::priority_queue<std::pair<float, idx_t>> HierarchicalNSW::searchBaseLayer(co
     std::priority_queue<std::pair<float, idx_t >> topResults;
     std::priority_queue<std::pair<float, idx_t >> candidateSet;
 
-    float dist = fstdistfunc(point, getDataByInternalId(enterpoint_node));
+    float dist = getDistance(point, enterpoint_node);
+
     dist_calc++;
 
     topResults.emplace(dist, enterpoint_node);
@@ -81,7 +127,7 @@ std::priority_queue<std::pair<float, idx_t>> HierarchicalNSW::searchBaseLayer(co
             if (!(massVisited[tnum] == currentV)) {
                 massVisited[tnum] = currentV;
 
-                float dist = fstdistfunc(point, getDataByInternalId(tnum));
+                float dist = getDistance(point, tnum);
                 dist_calc++;
 
                 if (topResults.top().first > dist || topResults.size() < ef) {
@@ -170,7 +216,7 @@ void HierarchicalNSW::mutuallyConnectNewElement(idx_t cur_c,
         uint8_t *ll_other = get_linklist0(res[idx]);
         uint8_t sz_link_list_other = *ll_other;
 
-        if (sz_link_list_other > resMmax) //|| sz_link_list_other < 0)
+        if (sz_link_list_other > resMmax ) //|| sz_link_list_other < 0)
             throw std::runtime_error("Bad sz_link_list_other");
 
         if (sz_link_list_other < resMmax) {
@@ -220,6 +266,15 @@ void HierarchicalNSW::addPoint(const float *point)
 
 std::priority_queue<std::pair<float, idx_t>> HierarchicalNSW::searchKnn(const float *query, size_t k)
 {
+    assert(q_c_dist > 0 && base_sequece_id_list != NULL && base_norms != NULL);
+
+    if (!use_vector_alpha){
+        assert(centroid_norm > 0);
+    }
+    else{
+        assert(nn_dist != NULL && vector_alpha_norm != NULL && vector_alpha != NULL);
+    }
+
     auto topResults = searchBaseLayer(query, efSearch);
     while (topResults.size() > k)
         topResults.pop();
@@ -316,6 +371,29 @@ void HierarchicalNSW::LoadEdges(const std::string &location)
         input.read((char *) data, size * sizeof(idx_t));
     }
 }
+
+
+float HierarchicalNSW::PQdistfunc(const float * PQ_dist_table, const idx_t id){
+    idx_t base_sequece_id = base_sequece_id_list[id];
+    uint8_t * code = getcodeByInternalId(id);
+
+    if (!use_vector_alpha){
+        float term1 = q_c_dist - centroid_norm;
+        float term2 = base_norms[base_sequece_id];
+        float term3 = 2 * bslib::pq_L2sqr(code, PQ_dist_table, code_size, ksub);
+        return term1 + term2 - term3;
+    }
+    else{
+        float term1 = q_c_dist;
+        float term2 = base_norms[base_sequece_id];
+        float term3 = 2 * bslib::pq_L2sqr(code, PQ_dist_table, code_size, ksub);
+        float term4 = (q_alpha - vector_alpha[id]) * (q_alpha - vector_alpha[id]) * nn_dist[id];
+        float term5 = vector_alpha_norm[id];
+        return term1 + term2 - term3 + term4 - term5;
+    }
+    
+}
+
 
 float HierarchicalNSW::fstdistfunc(const float *x, const float *y)
 {

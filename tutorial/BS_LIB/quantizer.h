@@ -33,15 +33,16 @@ struct Base_quantizer
 
     size_t dimension;
     size_t nc_upper;
-    size_t nc_per_group;
-    size_t nc;
+    size_t max_nc_per_group;
+    size_t layer_nc;
+
+    size_t min_train_size_per_group; // Only for VQ and PQ layer
     size_t M_all_HNSW;
     size_t efConstruction_all_HNSW;
     
-    
     std::vector<idx_t> CentroidDistributionMap;
     
-    explicit Base_quantizer(size_t dimension, size_t nc_upper, size_t nc_per_group);
+    explicit Base_quantizer(size_t dimension, size_t nc_upper, size_t max_nc_per_group);
 };
 }
 #endif

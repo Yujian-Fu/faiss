@@ -1,6 +1,8 @@
 #include "fstream"
 #include "iostream"
 #include <faiss/utils/random.h>
+#include <faiss/utils/Heap.h>
+#include <queue>
 #include <chrono>
 #include <string.h>
 #include <fstream>
@@ -9,6 +11,7 @@
 #include <dirent.h>
 
 namespace bslib{
+    using idx_t = int64_t;
     struct time_recorder{
         std::chrono::steady_clock::time_point start_time;
         public:
@@ -206,5 +209,35 @@ namespace bslib{
         return time;	
     }
 
+    /**
+     * 
+     * This is the function for getting the product between query and base vector
+     * 
+     * Input:
+     * code: the code of base vectors
+     * 
+     * Output:
+     * the product value of query and quantized base vectors
+     * 
+     **/
+    float pq_L2sqr(const uint8_t *code, const float * precomputed_table, size_t code_size, size_t ksub);
 
+
+    /**
+     * 
+     * This is the function for keeping k results in m result value
+     * 
+     * Input:
+     * m: the total number of result pairs
+     * k: the number of result pairs that to be kept
+     * all_dists: the origin results of dists         size: m 
+     * all_labels: the origin label results           size: m
+     * sub_dists: the kept result of dists            size: k
+     * sub_labels: the kept result of labels          size: k   
+     * 
+     **/
+    void keep_k_min(const size_t m, const size_t k, const float * all_dists, const idx_t * all_labels, float * sub_dists, idx_t * sub_labels);
+
+    void keep_k_min_alpha(const size_t m, const size_t k, const float * all_dists, const idx_t * all_labels, const float * all_alphas, 
+    float * sub_dists, idx_t * sub_labels, float * sub_alphas);
 }

@@ -11,7 +11,7 @@ TEST = multi-layer
 
 test: $(TEST)
 
-%: %.cpp ../bslib_index.cpp ../VQ_quantizer.cpp ../LQ_quantizer.cpp ../PQ_quantizer.cpp ../quantizer.cpp ../utils/utils.h ../HNSWlib/hnswalg.cpp ../../../libfaiss.a 
+%: %.cpp ../bslib_index.cpp ../VQ_quantizer.cpp ../LQ_quantizer.cpp ../PQ_quantizer.cpp ../quantizer.cpp ../utils/utils.h ../utils/utils.cpp ../HNSWlib/hnswalg.cpp ../../../libfaiss.a 
 	$(CXX) $(CXXFLAGS) $(CPPFLAGS) -o $@ $^ $(LDFLAGS) -I../../../.. $(LIBS)
 
 clean:

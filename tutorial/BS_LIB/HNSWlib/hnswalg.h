@@ -14,6 +14,8 @@
 #include <queue>
 
 #include <faiss/utils/Heap.h>
+#include <faiss/Index.h>
+#include "../utils/utils.h"
 
 #ifdef _MSC_VER
 #include <intrin.h>
@@ -42,24 +44,32 @@ static void readBinaryPOD(std::istream &in, T &podRef) {
 }
 
 namespace hnswlib {
+    //typedef faiss::Index::idx_t idx_t;
     typedef uint32_t idx_t;
-
+    
     struct HierarchicalNSW
     {
+
         size_t maxelements_;
         size_t cur_element_count;
         size_t efConstruction_;
 
         VisitedListPool *visitedlistpool;
 
-        std::mutex cur_element_count_guard_;
         idx_t enterpoint_node;
 
         size_t dist_calc;
 
         char *data_level0_memory_;
 
+        bool PQ_flag;
+        bool PQ_full_data;
+        bool use_vector_alpha;
+
         size_t d_;
+        size_t code_size;
+        size_t ksub;
+
         size_t data_size_;
         size_t offset_data;
         size_t size_data_per_element;
@@ -67,10 +77,25 @@ namespace hnswlib {
         size_t maxM_;
         size_t size_links_level0;
         size_t efSearch;
+        float centroid_norm;
+
+        uint8_t * base_code_point;
+        faiss::Index::idx_t * base_sequece_id_list;
+        
+        float q_c_dist;
+        float q_alpha;
+
+        float * nn_dist;
+        float * vector_alpha_norm;
+        float * vector_alpha;
+        float * base_norms;
+
 
     public:
-        HierarchicalNSW();
-        HierarchicalNSW(size_t d, size_t maxelements, size_t M = 30, size_t maxM = 60, size_t efConstruction = 500);
+        HierarchicalNSW(bool PQ_flag, bool PQ_full_data, bool use_vector_alpha);
+
+        HierarchicalNSW(size_t d, size_t maxelements, size_t M, size_t maxM, size_t efConstruction = 500, bool PQ_flag = false,
+         bool PQ_full_data = false, size_t code_size = 8, size_t ksub = 256);
         ~HierarchicalNSW();
 
         inline float *getDataByInternalId(idx_t internal_id) const {
@@ -81,10 +106,16 @@ namespace hnswlib {
             return (uint8_t *) (data_level0_memory_ + internal_id * size_data_per_element);
         }
 
+        inline uint8_t *getcodeByInternalId(idx_t internal_id) const {
+            return (uint8_t *) (base_code_point + internal_id * code_size);
+        }
+
         std::priority_queue<std::pair<float, idx_t>> searchBaseLayer(const float *x, size_t ef);
+        std::vector<float> vector_norm; // Use for storing the vector norm (term 2)
 
         void getNeighborsByHeuristic(std::priority_queue<std::pair<float, idx_t>> &topResults, size_t NN);
 
+        float getDistance(const float * point, idx_t id);
         void mutuallyConnectNewElement(idx_t id, std::priority_queue<std::pair<float, idx_t>> topResults);
 
         void addPoint(const float *point);
@@ -99,5 +130,7 @@ namespace hnswlib {
         void LoadEdges(const std::string &location);
         
         float fstdistfunc(const float *x, const float *y);
+        
+        float PQdistfunc(const float * PQ_dist_table, const idx_t id);
     };
 }

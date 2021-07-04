@@ -4,31 +4,31 @@
 //Change the base_data_type and learn_data_type accordingly 
 // in bslib_index.h for billion and million scale datasets
 /*          */
-#include "../parameters/parameters_billion/parameters_VQ_VQ_PQ.h"
-
+#include "../parameters/parameters_million/parameters_result.h"
 
 /*
 Todo:
 Components: 
 
-Decreasing the number of centroids
+Decreasing the number of centroids/ shrink strategy
+
 HNSW_VQ
 OPQ
 HNSW_group
 Line Quantization
 
-
 Test:
 Search Parameters
 1-3 (4)layers
 Parameter Tuning
-
+Longer Code Length
 
 Baseline:
 Faiss (IMI)
 IVFHNSW
 (LOPQ)
 
+Check the name of the index files
 */
 
 using namespace bslib;
@@ -70,16 +70,17 @@ int main(){
     }
 
     Bslib_Index index = Bslib_Index(dimension, layers, index_type, use_reranking, saving_index, use_norm_quantization, is_recording,
-    use_HNSW_VQ, use_HNSW_group, use_all_HNSW, use_OPQ, use_train_selector, train_size, M_PQ, nbits);
+    use_HNSW_VQ, use_HNSW_group, use_all_HNSW, use_OPQ, use_train_selector, train_size, M_PQ, nbits, group_HNSW_thres);
 
-    index.build_index(M_PQ, path_learn, path_groups, path_labels, path_quantizers, VQ_layers,
-    PQ_layers, path_OPQ, ncentroids, M_HNSW, efConstruction, efSearch, M_PQ_layer, nbits_PQ_layer, num_train, OPQ_train_size, selector_train_size, selector_group_size, record_file);
+    index.build_index(path_learn, path_groups, path_labels, path_quantizers, VQ_layers,
+    PQ_layers, LQ_layers, ncentroids, M_HNSW, efConstruction, efSearch, M_PQ_layer, nbits_PQ_layer, 
+    num_train, selector_train_size, selector_group_size, LQ_type, record_file);
 
-    index.assign_vectors(path_ids, path_base, batch_size, nbatches, record_file);
+    index.assign_vectors(path_ids, path_base, path_alphas, batch_size, nbatches, record_file);
 
-    index.train_pq_quantizer(path_pq, path_pq_norm, M_norm_PQ, path_learn, PQ_train_size, record_file);
+    index.train_pq_quantizer(path_pq, path_pq_norm, M_PQ, path_learn, path_OPQ, PQ_train_size, record_file);
 
-    index.load_index(path_index, path_ids, path_base, path_base_norm, path_centroid_norm, batch_size, nbatches, nb, record_file);
+    index.load_index(path_index, path_ids, path_base, path_base_norm, path_centroid_norm, path_group_HNSW, path_alphas_raw, path_alphas, path_base_alpha_norm, batch_size, nbatches, nb, record_file);
 
     index.index_statistic();
 

@@ -3,7 +3,6 @@
 #include "VQ_quantizer.h"
 #include "LQ_quantizer.h"
 #include "PQ_quantizer.h"
-#include "utils/utils.h"
 #include <unordered_set>
 #include <algorithm>
 #include "faiss/VectorTransform.h"
@@ -13,11 +12,11 @@
 namespace bslib{
 
 // Change this type for different datasets
-typedef uint8_t learn_data_type;
-typedef uint8_t base_data_type;
+//typedef uint8_t learn_data_type;
+//typedef uint8_t base_data_type;
 
-//typedef float learn_data_type;
-//typedef float base_data_type;
+typedef float learn_data_type;
+typedef float base_data_type;
 
 typedef faiss::Index::idx_t idx_t;
 typedef std::pair<std::pair<size_t, size_t>, size_t> HNSW_para;
@@ -30,24 +29,26 @@ struct Bslib_Index{
     size_t train_size; //Initialized in constructer by 0, assigned in main
     size_t max_group_size;
 
-    bool use_reranking;
-    bool use_HNSW_VQ;
-    bool use_HNSW_group;
+    size_t group_HNSW_thres;
+
+    bool use_reranking;  //Not used
+    bool use_VQ_HNSW;
+    bool use_group_HNSW;
     bool use_all_HNSW;
     bool use_OPQ;
     bool use_norm_quantization;
     bool use_train_selector;
-    bool saving_index;
-    bool is_recording;
+    bool use_saving_index;
+    bool use_recording;
+    bool use_vector_alpha;
 
     memory_recorder Mrecorder = memory_recorder();
     recall_recorder Rrecorder = recall_recorder();
     time_recorder Trecorder = time_recorder();
 
     
-
-    size_t M; // Initialized by training pq
-    size_t norm_M;
+    size_t M_pq; // Initialized by training pq
+    size_t M_norm_pq; 
     size_t nbits; // Initialized by training pq
     size_t code_size; // Initialized by reading PQ
     size_t norm_code_size; // Initialized by reading PQ
@@ -62,15 +63,22 @@ struct Bslib_Index{
 
     faiss::ProductQuantizer pq; // Initialized in train_pq
     faiss::ProductQuantizer norm_pq; // Initialized in train_pq
-    faiss::OPQMatrix * opq_matrix;
+    faiss::OPQMatrix opq_matrix;
+
+    std::vector<hnswlib::HierarchicalNSW> group_HNSW_list;
+    std::map<size_t, size_t> group_HNSW_idxs;
 
     std::vector<float> base_norms;
     std::vector<uint8_t> base_norm_codes;
     std::vector<float> centroid_norms;
     std::vector<uint8_t> centroid_norm_codes;
 
+
     std::vector<std::vector<uint8_t>> base_codes;
     std::vector<std::vector<idx_t>> base_sequence_ids;
+
+    std::vector<std::vector<float>> base_alphas;
+    std::vector<std::vector<float>> base_alpha_norms;
     //std::vector<std::vector<idx_t>> base_pre_hash_ids;
 
     std::vector<std::vector<idx_t>> train_set_ids; // This is for train data selection 
@@ -80,31 +88,36 @@ struct Bslib_Index{
     explicit Bslib_Index(const size_t dimension, const size_t layers, const std::string * index_type, 
     const bool use_reranking, const bool save_index, const bool use_norm_quantization, const bool is_recording,
     const bool use_HNSW_VQ, const bool use_HNSW_group, const bool use_all_HNSW, const bool use_OPQ, const bool use_train_selector,
-    const size_t train_size, const size_t M_PQ, const size_t nbits);
+    const size_t train_size, const size_t M_PQ, const size_t nbits, const size_t group_HNSW_thres);
 
-    void do_OPQ(idx_t n, float * dataset);
-    void build_quantizers(const uint32_t * ncentroids, const std::string path_quantizer, const std::string path_learn, const size_t * num_train, const std::vector<HNSW_para> HNSW_paras, const std::vector<PQ_para> PQ_paras, std::ofstream & record_file);
+    void do_OPQ(size_t n, float * dataset);
+    void reverse_OPQ(size_t n, float * dataset);
+    void build_quantizers(const uint32_t * ncentroids, const std::string path_quantizer, const std::string path_learn, 
+    const size_t * num_train, const std::vector<HNSW_para> HNSW_paras, const std::vector<PQ_para> PQ_paras, const size_t * LQ_type, std::ofstream & record_file);
     
     void add_vq_quantizer(size_t nc_upper, size_t nc_per_group, size_t M, size_t efConstruction, size_t efSearch);
-    void add_lq_quantizer(size_t nc_upper, size_t nc_per_group, const float * upper_centroids, const idx_t * upper_nn_centroid_idxs, const float * upper_nn_centroid_dists);
+    void add_lq_quantizer(size_t nc_upper, size_t nc_per_group, const float * upper_centroids, const idx_t * upper_nn_centroid_idxs, 
+    const float * upper_nn_centroid_dists, size_t LQ_type);
     void add_pq_quantizer(size_t nc_upper, size_t M, size_t nbits);
 
     void build_train_selector(const std::string path_learn, const std::string path_groups, const std::string path_labels, size_t total_train_size, size_t sub_train_size, size_t group_size);
     void read_train_set(const std::string path_learn, size_t total_size, size_t train_set_size);
 
-    void train_pq(const std::string path_pq, const std::string path_norm_pq, const std::string path_learn, const size_t train_set_size);
+    void train_pq(const std::string path_pq, const std::string path_norm_pq, const std::string path_learn, const std::string path_OPQ, const size_t train_set_size);
 
-    void encode(size_t n, const float * data, const idx_t * encoded_ids, float * encoded_data);
-    void decode(size_t n, const float * encoded_data, const idx_t * encoded_ids, float * decoded_data);
-    void assign(const size_t n, const float * assign_data, idx_t * assigned_ids, size_t assign_layer);
-    void add_batch(size_t n, const float * data, const idx_t * sequence_ids, const idx_t * group_ids, const size_t * group_positions, float * base_norms, const bool base_norm_flag);
+    void encode(size_t n, const float * data, const idx_t * encoded_ids, float * encoded_data, const float * alphas);
+    void decode(size_t n, const float * encoded_data, const idx_t * encoded_ids, float * decoded_data, const float * alphas);
+    void assign(const size_t n, const float * assign_data, idx_t * assigned_ids, size_t assign_layer, float * alphas = NULL);
+    
+    void add_batch(size_t n, const float * data, const idx_t * sequence_ids, const idx_t * group_ids, 
+    const size_t * group_positions, const bool base_norm_flag, const bool alpha_flag, const float * vector_alphas, const float * vector_alpha_norm);
+
     void get_final_group_num();
     void compute_centroid_norm(std::string path_centroid_norm);
-    void keep_k_min(const size_t m, const size_t k, const float * all_dists, const idx_t * all_labels, float * sub_dists, idx_t * sub_labels);
     void search(size_t n, size_t result_k, float * queries, float * query_dists, idx_t * query_ids, const size_t * keep_space, uint32_t * groundtruth, std::string path_base);
     size_t get_next_group_idx(size_t keep_result_space, idx_t * group_ids, float * query_group_dists, std::pair<idx_t, float> & result_idx_dist);
     
-    float pq_L2sqr(const uint8_t *code, const float * precomputed_table);
+    //float pq_L2sqr(const uint8_t *code, const float * precomputed_table);
 
     void read_quantizers(const std::string path_quantizers);
     void write_quantizers(const std::string path_quantizers);
@@ -113,19 +126,21 @@ struct Bslib_Index{
 
     void get_final_centroid(const size_t group_id, float * final_centroid);
 
-    void build_index(const size_t M_PQ, std::string path_learn, std::string path_groups, std::string path_labels,
-    std::string path_quantizers, uint32_t VQ_layers, uint32_t PQ_layers, std::string path_OPQ, 
+    void build_index(std::string path_learn, std::string path_groups, std::string path_labels,
+    std::string path_quantizers, size_t VQ_layers, size_t PQ_layers, size_t LQ_layers,
     const uint32_t * ncentroids, const size_t * M_HNSW, const size_t * efConstruction, 
     const size_t * efSearch, const size_t * M_PQ_layer, const size_t * nbits_PQ_layer, const size_t * num_train,
-    size_t OPQ_train_size, size_t selector_train_size, size_t selector_group_size, std::ofstream & record_file);
+    size_t selector_train_size, size_t selector_group_size, const size_t * LQ_type, std::ofstream & record_file);
 
-    void assign_vectors(std::string path_ids, std::string path_base, uint32_t batch_size, size_t nbatches, std::ofstream & record_file);
+    void assign_vectors(std::string path_ids, std::string path_base, std::string path_alphas, uint32_t batch_size, size_t nbatches, std::ofstream & record_file);
 
-    void train_pq_quantizer(std::string path_pq, std::string path_pq_norm,
-        size_t M_norm_PQ, std::string path_learn, size_t PQ_train_size, std::ofstream & record_file);
+    void train_pq_quantizer(const std::string path_pq, const std::string path_pq_norm,
+        const size_t M_PQ, const std::string path_learn, const std::string path_OPQ, const size_t PQ_train_size, std::ofstream & record_file);
 
     void load_index(std::string path_index, std::string path_ids, std::string path_base,
-        std::string path_base_norm, std::string path_centroid_norm, size_t batch_size, size_t nbatches, size_t nb, std::ofstream & record_file);
+        std::string path_base_norm, std::string path_centroid_norm, std::string path_group_HNSW, std::string path_alphas_raw,
+        std::string path_alphas, std::string path_base_alpha_norm,
+        size_t batch_size, size_t nbatches, size_t nb, std::ofstream & record_file);
     
     void index_statistic();
 
@@ -134,12 +149,18 @@ struct Bslib_Index{
         std::ofstream & record_file, std::ofstream & qps_record_file, 
         std::string search_mode, std::string path_base, std::string path_gt, std::string path_query);
 
+    void read_group_HNSW(const std::string path_group_HNSW);
+
     /**
      ** This is the function for dynamically get the reranking space for 
      ** For future work
      **/
     size_t get_reranking_space(size_t k, size_t group_label, size_t group_id);
-
+    
+    void read_base_alphas(std::string path_base_alpha);
+    void write_base_alphas(std::string path_base_alpha);
+    void read_base_alpha_norms(std::string path_base_alpha_norm);
+    void write_base_alpha_norms(std::string path_base_alpha_norm);
 
 };
 }

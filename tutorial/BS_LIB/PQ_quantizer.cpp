@@ -15,23 +15,24 @@ namespace bslib{
         bool operator() ( dist_pair a, dist_pair b ){return a.first > b.first;}
     };
 
-
     /**
      * The initialization function for PQ layer
      * 
      * Input: 
      * M: number of sub-spaces
-     * nbits: bits for storing centroids in each subspace
+     * max_nbits: bits for storing centroids in each subspace
      * 
      * Notice: we should keep the total number of centroids smaller than the range of int64
-     * nc_upper * pow(2, nbits * M)
+     * nc_upper * pow(2, max_nbits * M)
      * 
      **/
-    PQ_quantizer::PQ_quantizer(size_t dimension, size_t nc_upper, size_t M, size_t nbits):
-        Base_quantizer(dimension, nc_upper, new_pow(2, nbits*M)), M(M), nbits(nbits){
+    PQ_quantizer::PQ_quantizer(size_t dimension, size_t nc_upper, size_t M, size_t max_nbits):
+        Base_quantizer(dimension, nc_upper, new_pow(2, max_nbits*M)), M(M), max_nbits(max_nbits){
 
-            this->ksub = new_pow(2, nbits);
+            this->max_ksub = new_pow(2, max_nbits);
             this->dsub = dimension / M;
+            this->exact_ksubs.resize(nc_upper);
+            this->exact_nbits.resize(nc_upper);
         }
 
     /**
@@ -58,12 +59,14 @@ namespace bslib{
      * id: the id for an data vector in the whole range [0, nc_upper * nc_per_group]
      * 
      **/
-    idx_t PQ_quantizer::index_2_id(const idx_t * index, const idx_t group_id){
+    idx_t PQ_quantizer::spaceID_2_label(const idx_t * index, const idx_t group_id){
         idx_t idx = 0;
+
         for (size_t i = 0; i < M; i++){
-            idx += index[i] * new_pow(ksub, i);
+            idx += index[i] * new_pow(exact_ksubs[group_id], i);
         }
-        idx_t result_idx = CentroidDistributionMap[group_id] + idx; assert(result_idx < nc);
+        idx_t result_idx = CentroidDistributionMap[group_id] + idx; 
+        assert(result_idx < layer_nc);
         return result_idx;
     }
 
@@ -79,13 +82,26 @@ namespace bslib{
      * group_id: the group of the id that belongs to
      * 
      **/
-    idx_t PQ_quantizer::id_2_index(idx_t idx, idx_t * index){
-        assert(idx < nc);
-        size_t group_id = idx / this->nc_per_group;
-        idx = idx - CentroidDistributionMap[group_id];
-        for (size_t i = 0; i < M; i++){index[i] = idx % ksub;idx = idx / ksub;}
+    idx_t PQ_quantizer::label_2_spaceID(idx_t label, idx_t * index){
+        assert(label < layer_nc);
+        
+        idx_t group_id = 0;
+        idx_t inner_group_id = 0;
+        for (size_t i = 0; i < nc_upper; i++){
+            if (label >= CentroidDistributionMap[i]){
+                group_id = i;
+                inner_group_id = label - CentroidDistributionMap[i];
+                break;
+            }
+        }
+
+        for (size_t i = 0; i < M; i++){
+            index[i] = inner_group_id % exact_ksubs[group_id];
+            inner_group_id = inner_group_id / exact_ksubs[group_id];
+        }
         return group_id;
     }
+
 
     /**
      * Function for constructing PQ layer
@@ -113,26 +129,49 @@ namespace bslib{
 
         std::cout << "Building group quantizers for pq_quantizer" << std::endl;
         
-        size_t min_train_size = train_set[0].size() / dimension; 
+        size_t min_train_size = train_set[0].size() / dimension;
         for (size_t i = 0; i < nc_upper; i++){if (min_train_size > train_set[i].size() / dimension) min_train_size = train_set[i].size() / dimension; if (i <= 1000) {std::cout << train_set[i].size() / dimension <<" ";}}
         std::cout <<  std::endl << "The min size for sub train set is: " << min_train_size << std::endl;
 
+
 #pragma omp parallel for
-        for (size_t i = 0; i < nc_upper; i++){
-            faiss::ProductQuantizer * product_quantizer = new faiss::ProductQuantizer(dimension, M, nbits);
-            size_t nt_sub = train_set[i].size() / this->dimension;
-            product_quantizer->verbose = false;
-            product_quantizer->train(nt_sub, train_set[i].data());
-            this->PQs[i] = product_quantizer;
+        for (size_t group_id = 0; group_id < nc_upper; group_id++){
+            size_t nt_sub = train_set[group_id].size() / this->dimension;
+            
+            if (nt_sub < max_ksub * min_train_size_per_group){
+
+                for (size_t nbits = max_nbits; nbits> 0; nbits--){
+                    if (nt_sub > new_pow(2, nbits) * min_train_size_per_group){
+                        exact_nbits[group_id] = nbits;
+                        exact_ksubs[group_id] = pow(2, nbits);
+                        break;
+                    }
+                }
+            }
+            else{
+                exact_ksubs[group_id] = max_ksub;
+                exact_nbits[group_id] = max_nbits;
+            }
+
+            faiss::ProductQuantizer * product_quantizer = new faiss::ProductQuantizer(dimension, M, exact_nbits[group_id]);
+            
+            product_quantizer->verbose = (nc_upper == 1) ? true : false;
+            product_quantizer->train(nt_sub, train_set[group_id].data());
+            this->PQs[group_id] = product_quantizer;
+        }
+
+        size_t num_centroids = 0;
+        for (size_t group_id = 0; group_id < nc_upper; group_id++){
+            CentroidDistributionMap[group_id] = num_centroids;
+            num_centroids += exact_ksubs[group_id];
         }
 
         this->centroid_norms.resize(nc_upper);
         for (size_t i = 0; i < this->nc_upper; i++){
-            for (size_t j = 0; j < this->M * this->ksub; j++){
+            for (size_t j = 0; j < this->M * this->exact_ksubs[i]; j++){
                 this->centroid_norms[i].push_back(faiss::fvec_norm_L2sqr(this->PQs[i]->centroids.data() + j * dsub, dsub));
             }
         }
-
         std::cout << "finished training PQ quantizer" <<std::endl;
     }
 
@@ -179,16 +218,18 @@ namespace bslib{
      * 
      **/
    void PQ_quantizer::multi_sequence_sort(const idx_t group_id, const float * dist_sequence, size_t keep_space, float * result_dists, idx_t * result_labels){
-       std::vector<std::vector<float>> dist_seqs(this->M, std::vector<float>(this->ksub));
-       std::vector<std::vector<idx_t>> dist_index(this->M, std::vector<idx_t>(this->ksub));
+       size_t ksub = exact_ksubs[group_id];
+
+       std::vector<std::vector<float>> dist_seqs(this->M, std::vector<float>(ksub));
+       std::vector<std::vector<idx_t>> dist_index(this->M, std::vector<idx_t>(ksub));
 
        for (size_t i = 0; i < this->M; i++){
            uint32_t x = 0;
            //From 0 to M-1
            std::iota(dist_index[i].begin(), dist_index[i].end(), x++);
 
-           for (size_t j = 0; j < this->ksub; j++){
-               dist_seqs[i][j] = dist_sequence[i * this->ksub + j];
+           for (size_t j = 0; j < ksub; j++){
+               dist_seqs[i][j] = dist_sequence[i * ksub + j];
            }
             std::sort(dist_index[i].begin(), dist_index[i].end(), [&](int a,int b){return dist_seqs[i][a]<dist_seqs[i][b];} );
        }
@@ -213,7 +254,7 @@ namespace bslib{
                //Check if there is an zero value (j)
                if (top_pair.second[j] == 0){
                    for (size_t m = 0; m < this->M; m++){
-                        if (m == j || top_pair.second[m] == this->ksub - 1){
+                        if (m == j || top_pair.second[m] == ksub - 1){
                             //keep index j (0) the same as before 
                             // skip if index m reaches the bound 
                             continue; 
@@ -276,7 +317,7 @@ namespace bslib{
             for (size_t j = 0; j < this->M; j++){
                 recovered_index[j] = dist_index[j][new_pair.second[j]];
             }
-            result_labels[i] = index_2_id(recovered_index.data(), group_id);
+            result_labels[i] = spaceID_2_label(recovered_index.data(), group_id);
             
             result_dists[i] = new_pair.first;
         }
@@ -297,7 +338,8 @@ namespace bslib{
      * 
      **/
     void PQ_quantizer::search_in_group(const float * query, const idx_t group_id, float * result_dists, idx_t * result_labels, size_t keep_space){
-        std::vector<float> distance_table(this->M * this->ksub);
+        assert(keep_space <= exact_ksubs[group_id]);
+        std::vector<float> distance_table(this->M * exact_ksubs[group_id]);
         this->PQs[group_id]->compute_distance_table(query, distance_table.data());
         multi_sequence_sort(group_id, distance_table.data(), keep_space, result_dists, result_labels);
     }
@@ -305,6 +347,7 @@ namespace bslib{
 
     /**
      * This is the function for search in all groups
+     * should not be used since no trainning vectors for next layer
      **/
     void PQ_quantizer::search_all(const size_t n, const float * query_data, idx_t * query_data_ids){
         std::vector<idx_t> query_group_labels(n  * nc_upper);
@@ -335,19 +378,20 @@ namespace bslib{
      * This is the function for computing final centroid in the PQ layer
      * 
      * Input:
-     * centroid_idx:    the id for target centroid        idx_t 
+     * label:    the id for target centroid        idx_t 
      * 
      * Output:
      * final_centroid:  the final out centroid required   size: dimension 
      * 
      **/
-    void PQ_quantizer::compute_final_centroid(const idx_t centroid_idx, float * final_centroid){
+    void PQ_quantizer::compute_final_centroid(const idx_t label, float * final_centroid){
+        
         std::vector<idx_t> group_index(this->M);
-        size_t group_id = id_2_index(centroid_idx, group_index.data());
+        idx_t group_id = label_2_spaceID(label, group_index.data());
 
         for (size_t i = 0; i < this->M; i++){
             for (size_t j = 0; j < this->dsub; j++){
-                final_centroid[i * dsub + j] = this->PQs[group_id]->centroids[i * ksub * dsub + group_index[i] * dsub + j];
+                final_centroid[i * dsub + j] = this->PQs[group_id]->centroids[i * exact_ksubs[group_id] * dsub + group_index[i] * dsub + j];
             }
         }
     }
@@ -356,16 +400,16 @@ namespace bslib{
     /**
      * Function for computing residuals
      * 
-     * Input: centroid_idxs:
+     * Input: labels:
      *  
      * Output: residuals:
      * 
      **/ 
-    void PQ_quantizer::compute_residual_group_id(size_t n, const idx_t * centroid_idxs, const float * x, float * residuals){
+    void PQ_quantizer::compute_residual_group_id(size_t n, const idx_t * labels, const float * x, float * residuals){
 #pragma omp parallel for
         for (size_t i = 0; i < n; i++){
-            std::vector<float> final_centroid(this->dimension);
-            compute_final_centroid(centroid_idxs[i], final_centroid.data());
+            std::vector<float> final_centroid(dimension);
+            compute_final_centroid(labels[i], final_centroid.data());
             faiss::fvec_madd(dimension, x + i * dimension, -1.0, final_centroid.data(), residuals + i * dimension);
         }
     }
@@ -380,13 +424,12 @@ namespace bslib{
         }
     }
 
-    
     float PQ_quantizer::get_centroid_norms(const idx_t centroid_idx){
         float result = 0;
         std::vector<idx_t> index(this->M);
-        idx_t group_id = id_2_index(centroid_idx, index.data());
+        idx_t group_id = label_2_spaceID(centroid_idx, index.data());
         for (size_t i = 0; i < this->M; i++){
-            result += this->centroid_norms[group_id][i * ksub + index[i]];
+            result += this->centroid_norms[group_id][i * exact_ksubs[group_id] + index[i]];
         }
         return result;
     }
