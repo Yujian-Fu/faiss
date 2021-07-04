@@ -63,7 +63,7 @@ namespace bslib{
         std::cout <<  std::endl << "The min size for sub train set is: " << min_train_size << std::endl;
 
 
-//#pragma omp parallel for
+#pragma omp parallel for
         for (size_t i = 0; i < nc_upper; i++){
             
             size_t nt_sub = train_set[i].size() / this->dimension;
@@ -108,7 +108,6 @@ namespace bslib{
                 centroid_quantizer->add(exact_nc_in_group, centroids.data());
                 this->L2_quantizers[i] = centroid_quantizer;
             }
-            std::cout << i << "/" << nc_upper << std::endl;
         }
 
         size_t num_centroids = 0;
