@@ -252,9 +252,7 @@ void HierarchicalNSW::addPoint(const float *point)
 
     // Do nothing for the first element
     if (cur_c != 0) {
-        std::cout << "Searching the base layer " << std::endl;
         std::priority_queue <std::pair<float, idx_t>> topResults = searchBaseLayer(point, efConstruction_);
-        std::cout << "Adding new element " << std::endl;
         mutuallyConnectNewElement(cur_c, topResults);
     }
 };

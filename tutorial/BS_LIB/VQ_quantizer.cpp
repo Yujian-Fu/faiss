@@ -60,7 +60,7 @@ namespace bslib{
         std::cout <<  std::endl << "The min size for sub train set is: " << min_train_size << std::endl;
 
 
-#pragma omp parallel for
+//#pragma omp parallel for
         for (size_t i = 0; i < nc_upper; i++){
             
             size_t nt_sub = train_set[i].size() / this->dimension;
@@ -81,6 +81,13 @@ namespace bslib{
             bool verbose = nc_upper > 1 ? false : true;
             std::vector<float> centroids(dimension * exact_nc_in_group);
             faiss::kmeans_clustering(dimension, nt_sub, exact_nc_in_group, train_set[i].data(), centroids.data(), 30, verbose);
+            
+            for (size_t temp = 0; temp < 10; temp++){
+                for (size_t j = 0; j < dimension; j++){
+                    std::cout << centroids[temp * dimension + j] << " ";
+                }
+                std::cout << std::endl;
+            }
             
             //Adding centroids into quantizers
             if (use_HNSW){
