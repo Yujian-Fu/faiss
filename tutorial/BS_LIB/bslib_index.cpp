@@ -51,11 +51,8 @@ namespace bslib{
      * Use HNSW quantizer: nc_upper, nc_group, M, efConstruction, efSearch
      * 
      **/
-    void Bslib_Index::add_vq_quantizer(size_t nc_upper, size_t nc_per_group, bool use_VQ_HNSW_layer, size_t M, size_t efConstruction, size_t efSearch){
-
-        std::cout << "Adding VQ quantizer with parameter: " << efConstruction << " " << efSearch << " " << std::endl;
-        VQ_quantizer vq_quantizer = VQ_quantizer(dimension, nc_upper, nc_per_group, M, efConstruction, efSearch, use_VQ_HNSW_layer, use_all_HNSW);
-        std::cout << vq_quantizer.efConstruction << " " << vq_quantizer.efSearch << " " << std::endl;
+    void Bslib_Index::add_vq_quantizer(size_t nc_upper, size_t nc_per_group, bool use_HNSW, size_t M, size_t efConstruction, size_t efSearch){
+        VQ_quantizer vq_quantizer = VQ_quantizer(dimension, nc_upper, nc_per_group, M, efConstruction, efSearch, use_HNSW, use_all_HNSW);
         PrintMessage("Building centroids for vq quantizer");
         vq_quantizer.build_centroids(this->train_data.data(), this->train_data.size() / dimension, this->train_data_ids.data());
         PrintMessage("Finished construct the VQ layer");
@@ -743,7 +740,7 @@ namespace bslib{
                     
                     const float * query_data = assign_data + i * dimension;
                     vq_quantizer_index[n_vq].search_in_group(query_data, group_id, query_result_dists.data(), query_result_ids.data(), 1);
-                    if (use_VQ_HNSW){
+                    if (vq_quantizer_index[n_vq].use_HNSW){
                         query_search_id[j] = query_result_ids[0];
                     }
                     else{
@@ -961,7 +958,7 @@ namespace bslib{
                         vq_quantizer_index[n_vq].search_in_group(query, query_group_ids[m], query_result_dists.data()+m* max_group_size, query_result_labels.data() + m*max_group_size, layer_keep_space);
                     }
                     size_t sum_result_space = 0;
-                    if (use_VQ_HNSW){
+                    if (vq_quantizer_index[n_vq].use_HNSW){
                         for (size_t m = 0; m < upper_result_space; m++){
                             for (size_t k = 0; k < layer_keep_spaces[m]; k++){
                                 query_group_ids[sum_result_space + k] = query_result_labels[m * max_group_size + k];
@@ -1291,13 +1288,13 @@ namespace bslib{
                 quantizers_output.write((char *) & max_nc_per_group, sizeof(size_t));
                 quantizers_output.write((char *) vq_quantizer_index[n_vq].exact_nc_in_groups.data(), nc_upper * sizeof(size_t));
                 quantizers_output.write((char *) vq_quantizer_index[n_vq].CentroidDistributionMap.data(), nc_upper * sizeof(idx_t));
-                size_t HNSW_flag = use_VQ_HNSW ? 1 : 0;
+                size_t HNSW_flag = vq_quantizer_index[n_vq].use_HNSW ? 1 : 0;
                 quantizers_output.write((char *) & HNSW_flag, sizeof(size_t));
 
 
                 std::cout << " nc in this layer: " << layer_nc << " nc in upper layer: " << nc_upper << std::endl;
 
-                if (use_VQ_HNSW){
+                if (vq_quantizer_index[n_vq].use_HNSW){
                     std::cout << "Writing HNSW indexes " << std::endl;
                     size_t M = vq_quantizer_index[n_vq].M;
                     size_t efConstruction = vq_quantizer_index[n_vq].efConstruction;
@@ -1414,13 +1411,12 @@ namespace bslib{
                 quantizer_input.read((char *)CentroidDistributionMap.data(), nc_upper * sizeof(idx_t));
                 size_t HNSW_flag;
                 quantizer_input.read((char *) & HNSW_flag, sizeof(size_t));
-                if (use_VQ_HNSW){assert(HNSW_flag == 1);} else{assert(HNSW_flag == 0);}
 
                 std::cout << " nc in this layer: " << layer_nc << " nc in upper layer: " << nc_upper << std::endl;
 
                 assert(max_nc_per_group * nc_upper >= layer_nc);
 
-                if (use_VQ_HNSW){
+                if (HNSW_flag == 1){
                     size_t M;
                     size_t efConstruction;
                     size_t efSearch;
@@ -1428,7 +1424,7 @@ namespace bslib{
                     quantizer_input.read((char *) & efConstruction, sizeof(size_t));
                     quantizer_input.read((char *) & efSearch, sizeof(size_t));
                     
-                    VQ_quantizer vq_quantizer = VQ_quantizer(dimension, nc_upper, max_nc_per_group, M, efConstruction, efSearch, use_VQ_HNSW);
+                    VQ_quantizer vq_quantizer = VQ_quantizer(dimension, nc_upper, max_nc_per_group, M, efConstruction, efSearch, true);
                     vq_quantizer.layer_nc = layer_nc;
                     for (size_t j = 0; j < nc_upper; j++){
                         vq_quantizer.exact_nc_in_groups[j] = exact_nc_in_group[j];
@@ -1631,12 +1627,11 @@ namespace bslib{
         }
 
         std::vector<HNSW_para> HNSW_paras;
-        if (use_VQ_HNSW){
-            for (size_t i = 0; i < VQ_layers; i++){
-                HNSW_para new_para; new_para.first.first = M_HNSW[i]; new_para.first.second = efConstruction[i]; new_para.second = efSearch[i];
-                HNSW_paras.push_back(new_para);
-            }
+        for (size_t i = 0; i < VQ_layers; i++){
+            HNSW_para new_para; new_para.first.first = M_HNSW[i]; new_para.first.second = efConstruction[i]; new_para.second = efSearch[i];
+            HNSW_paras.push_back(new_para);
         }
+
         std::vector<PQ_para> PQ_paras;
         for (size_t i = 0; i < PQ_layers; i++){
             PQ_para new_para; new_para.first = M_PQ_layer[i]; new_para.second = nbits_PQ_layer[i];

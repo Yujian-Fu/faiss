@@ -16,7 +16,6 @@ namespace bslib{
      **/ 
     VQ_quantizer::VQ_quantizer(size_t dimension, size_t nc_upper, size_t max_nc_per_group, size_t M, size_t efConstruction, size_t efSearch, bool use_HNSW, bool use_all_HNSW):
         Base_quantizer(dimension, nc_upper, max_nc_per_group){
-            std::cout << "Initializing: " << efConstruction << " " << efSearch << std::endl;
             this->use_HNSW = use_HNSW;
             this->use_all_HNSW = use_all_HNSW;
             this->M = M;
@@ -31,7 +30,6 @@ namespace bslib{
             else{
                 this->L2_quantizers.resize(nc_upper);
             }
-            std::cout << "Initialization: " << this->efConstruction << " " << this->efSearch << std::endl;
         }
 
     /**
@@ -91,7 +89,6 @@ namespace bslib{
             //Adding centroids into quantizers
             if (use_HNSW){
                 hnswlib::HierarchicalNSW * centroid_quantizer = new hnswlib::HierarchicalNSW(dimension, exact_nc_in_group, M, 2 * M, efConstruction);
-                std::cout << "Build group HNSW" << "EfCon" << this->efConstruction << " EfCon: " << centroid_quantizer->efConstruction_ << " EfSearch " << centroid_quantizer->efSearch <<std::endl;
                 for (size_t j = 0; j < exact_nc_in_group; j++){
                     centroid_quantizer->addPoint(centroids.data() + j * dimension);
                 }
@@ -273,10 +270,6 @@ namespace bslib{
                     result_labels[j] = INVALID_ID;
                 }
             }
-            for (size_t j = 0; j < this->max_nc_per_group; j++){
-                std::cout << result_labels[j] << " " << result_dists[j] << " " <<std::endl;
-            }
-            exit(0);
         }
         else{
 //#pragma omp parallel for
