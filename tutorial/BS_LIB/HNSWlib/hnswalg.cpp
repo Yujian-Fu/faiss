@@ -12,15 +12,15 @@ namespace hnswlib {
     HierarchicalNSW::HierarchicalNSW(size_t d, size_t maxelements, size_t M, size_t maxM, size_t efConstruction, 
     bool PQ_flag, bool PQ_full_data, size_t code_size, size_t ksub)
     {
-    if (PQ_flag) std::cout << "PQ flag " << std::endl;
-    if (PQ_full_data) std::cout << "PQ full data" << std::endl;
-    
+
     d_ = d;
     code_size = code_size;
     PQ_flag = PQ_flag;
     PQ_full_data = PQ_full_data;
     ksub = ksub;
 
+    if (PQ_flag) std::cout << "PQ flag " << std::endl;
+    if (PQ_full_data) std::cout << "PQ full data" << std::endl;
     if (PQ_flag){
         if (PQ_full_data){
             // Load full data for construction
@@ -51,7 +51,7 @@ namespace hnswlib {
     enterpoint_node = 0;
     cur_element_count = 0;
 
-    std::cout << "Size per element: " << size_data_per_element << "Offset data: " << size_links_level0 << std::endl;
+    std::cout << "Size per element: " << size_data_per_element << " Offset data: " << size_links_level0 << std::endl;
     std::cout << (data_level0_memory_ ? " Memory allocated " : " Memory not allocated ") << std::endl;
     data_level0_memory_ = (char *) malloc(maxelements_ * size_data_per_element);
     std::cout << (data_level0_memory_ ? " Memory allocated " : " Memory not allocated ") << std::endl;
