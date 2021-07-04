@@ -333,10 +333,11 @@ namespace bslib{
             compute_final_centroid(labels[i], final_centroid.data());
             faiss::fvec_madd(dimension, x + i * dimension, -1.0, final_centroid.data(), residuals + i * dimension);
             for (size_t j = 0; j < dimension; j++){
+                if (i > 100) break;
                 std::cout << residuals[i * dimension + j] << " ";
             }
             std::cout << std::endl;
-            if (i > 100) exit(0);
+            
         }
     }
 

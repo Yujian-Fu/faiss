@@ -484,7 +484,7 @@ namespace bslib{
 
         for (size_t i = 0; i < 100; i++){
             for (size_t j = 0; j < dimension; j++){
-                std::cout << train_data_ids[i * dimension + j] << " ";
+                std::cout << residuals[i * dimension + j] << " ";
             }
             std::cout << std::endl;
         }
