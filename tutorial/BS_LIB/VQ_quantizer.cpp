@@ -301,6 +301,9 @@ namespace bslib{
             }
         }
         else{
+            if (this->L2_quantizers[group_id]->xb.size() < inner_group_id * dimension){
+                std::cout << group_id << " " << inner_group_id << " " << L2_quantizers[group_id]->xb.size() << std::endl;
+            }
             assert(this->L2_quantizers[group_id]->xb.size() >= inner_group_id * dimension);
             for (size_t i = 0; i < dimension; i++){
                 final_centroid[i] = this->L2_quantizers[group_id]->xb[inner_group_id * this->dimension + i];
