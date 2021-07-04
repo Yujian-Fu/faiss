@@ -60,7 +60,7 @@ namespace hnswlib {
 
         size_t dist_calc;
 
-        char * data_level0_memory_;
+        
 
         bool PQ_flag;
         bool PQ_full_data;
@@ -85,6 +85,7 @@ namespace hnswlib {
         float q_c_dist;
         float q_alpha;
 
+        char * data_level0_memory_;
         float * nn_dist;
         float * vector_alpha_norm;
         float * vector_alpha;

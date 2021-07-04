@@ -48,7 +48,6 @@ namespace hnswlib {
     enterpoint_node = 0;
     cur_element_count = 0;
 
-    free(data_level0_memory_);
     std::cout << (data_level0_memory_ ? " Memory allocated " : " Memory not allocated ") << std::endl;
     data_level0_memory_ = (char *) malloc(maxelements_ * size_data_per_element);
     std::cout << (data_level0_memory_ ? " Memory allocated " : " Memory not allocated ") << std::endl;
