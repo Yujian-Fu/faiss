@@ -60,7 +60,7 @@ namespace hnswlib {
 
         size_t dist_calc;
 
-        char *data_level0_memory_;
+        char * data_level0_memory_;
 
         bool PQ_flag;
         bool PQ_full_data;
