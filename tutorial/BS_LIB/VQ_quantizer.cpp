@@ -252,6 +252,7 @@ namespace bslib{
 //#pragma omp parallel for
             //The distance result for search kNN is in reverse 
             size_t search_para = k > this->HNSW_quantizers[group_id]->efSearch ? k : this->HNSW_quantizers[group_id]->efSearch;
+            std::cout << "efsearch: " << this->HNSW_quantizers[group_id]->efSearch << "search para: " << search_para << std::endl;
 
             auto result_queue = this->HNSW_quantizers[group_id]->searchBaseLayer(query, search_para);
 
