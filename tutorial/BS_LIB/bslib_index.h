@@ -95,7 +95,7 @@ struct Bslib_Index{
     void build_quantizers(const uint32_t * ncentroids, const std::string path_quantizer, const std::string path_learn, 
     const size_t * num_train, const std::vector<HNSW_para> HNSW_paras, const std::vector<PQ_para> PQ_paras, const size_t * LQ_type, std::ofstream & record_file);
     
-    void add_vq_quantizer(size_t nc_upper, size_t nc_per_group, size_t M, size_t efConstruction, size_t efSearch);
+    void add_vq_quantizer(size_t nc_upper, size_t nc_per_group, size_t M = 4, size_t efConstruction = 10, size_t efSearch = 10);
     void add_lq_quantizer(size_t nc_upper, size_t nc_per_group, const float * upper_centroids, const idx_t * upper_nn_centroid_idxs, 
     const float * upper_nn_centroid_dists, size_t LQ_type);
     void add_pq_quantizer(size_t nc_upper, size_t M, size_t nbits);
