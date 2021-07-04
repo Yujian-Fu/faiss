@@ -52,7 +52,7 @@ namespace bslib{
      * 
      **/
     void Bslib_Index::add_vq_quantizer(size_t nc_upper, size_t nc_per_group, size_t M, size_t efConstruction, size_t efSearch){
-
+        std::cout << "Adding VQ quantizer with parameter: " << efConstruction << " " << efSearch << " " << std::endl;
         VQ_quantizer vq_quantizer = VQ_quantizer(dimension, nc_upper, nc_per_group, M, efConstruction, efSearch, use_VQ_HNSW, use_all_HNSW);
         std::cout << vq_quantizer.efConstruction << " " << vq_quantizer.efSearch << " " << std::endl;
         PrintMessage("Building centroids for vq quantizer");
