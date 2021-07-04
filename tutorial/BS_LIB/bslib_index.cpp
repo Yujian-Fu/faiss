@@ -482,13 +482,6 @@ namespace bslib{
         std::cout << "Encoding the train dataset with " << train_set_size<< " data points " << std::endl;
         encode(train_set_size, this->train_data.data(), train_data_ids.data(), residuals.data(), train_vector_alphas.data());
 
-        for (size_t i = 0; i < 100; i++){
-            for (size_t j = 0; j < dimension; j++){
-                std::cout << residuals[i * dimension + j] << " ";
-            }
-            std::cout << std::endl;
-        }
-
         if (use_OPQ){
             PrintMessage("Training the OPQ matrix");
             this->opq_matrix = faiss::OPQMatrix(dimension, M_pq);
@@ -874,13 +867,6 @@ namespace bslib{
       **/
 
     void Bslib_Index::search(size_t n, size_t result_k, float * queries, float * query_dists, idx_t * query_ids, const size_t * keep_space, uint32_t * groundtruth, std::string path_base){
-        
-        /*
-        std::ofstream dist_file;
-        dist_file.open(path_dist, std::ios::app);
-        dist_file << "The search analysis for recall @ " << result_k << std::endl;
-        */
-
         // Variables for testing and validation and printing
         // Notice: they should only be activated when parallel is not used
         const bool validation = false; 
@@ -951,7 +937,6 @@ namespace bslib{
             if (use_vector_alpha){
                 vector_group_alphas.resize(final_keep_space);
                 vector_result_alphas.resize(max_search_space);}
-
 
 //#pragma omp critical
             for (size_t j = 0; j < layers; j++){
@@ -1839,7 +1824,7 @@ namespace bslib{
 
                     base_alphas.resize(this->final_group_num);
                     base_alpha_norms.resize(this->final_group_num);
-                    
+
                     for (size_t i = 0; i < final_group_num; i++){
                         base_alphas[i].resize(groups_size[i]);
                         base_alpha_norms[i].resize(groups_size[i]);
