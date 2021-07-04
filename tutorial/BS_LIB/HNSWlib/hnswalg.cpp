@@ -50,16 +50,15 @@ namespace hnswlib {
     size_data_per_element = size_links_level0 + data_size_;
     offset_data = size_links_level0;
 
-    std::cout << (data_level0_memory_ ? " Memory allocated " : " Memory not allocated ") << std::endl;
-    data_level0_memory_ = (char *) malloc(maxelements_ * size_data_per_element);
-    std::cout << (data_level0_memory_ ? " Memory allocated " : " Memory not allocated ") << std::endl;
-
-    std::cout << "HNSW Size Kb: " << (maxelements_ * size_data_per_element) / (1000) << std::endl;
-
     visitedlistpool = new VisitedListPool(1, maxelements_);
 
     enterpoint_node = 0;
     cur_element_count = 0;
+
+    std::cout << (data_level0_memory_ ? " Memory allocated " : " Memory not allocated ") << std::endl;
+    data_level0_memory_ = (char *) malloc(maxelements_ * size_data_per_element);
+    std::cout << (data_level0_memory_ ? " Memory allocated " : " Memory not allocated ") << std::endl;
+    std::cout << "HNSW Size Kb: " << (maxelements_ * size_data_per_element) / (1000) << std::endl;
 }
 
 HierarchicalNSW::~HierarchicalNSW()
