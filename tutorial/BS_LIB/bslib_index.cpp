@@ -1422,6 +1422,7 @@ namespace bslib{
                     quantizer_input.read((char *) & efSearch, sizeof(size_t));
                     
                     VQ_quantizer vq_quantizer = VQ_quantizer(dimension, nc_upper, max_nc_per_group, M, efConstruction, efSearch, use_VQ_HNSW);
+                    vq_quantizer.layer_nc = layer_nc;
                     for (size_t j = 0; j < nc_upper; j++){
                         vq_quantizer.exact_nc_in_groups[j] = exact_nc_in_group[j];
                         vq_quantizer.CentroidDistributionMap[j] = CentroidDistributionMap[j];
@@ -1432,6 +1433,7 @@ namespace bslib{
                 }
                 else{
                     VQ_quantizer vq_quantizer = VQ_quantizer(dimension, nc_upper, max_nc_per_group);
+                    vq_quantizer.layer_nc = layer_nc;
                     for (size_t j = 0; j < nc_upper; j++){
                         vq_quantizer.exact_nc_in_groups[j] = exact_nc_in_group[j];
                         vq_quantizer.CentroidDistributionMap[j] = CentroidDistributionMap[j];
@@ -1491,7 +1493,8 @@ namespace bslib{
                 quantizer_input.read((char *) & max_ksub, sizeof(size_t));
                 
                 
-                PQ_quantizer pq_quantizer = PQ_quantizer(dimension, nc_upper, M, nbits);
+                PQ_quantizer pq_quantizer = PQ_quantizer(dimension, nc_upper, M, max_nbits);
+                pq_quantizer.layer_nc = layer_nc;
                 quantizer_input.read((char *) pq_quantizer.exact_nbits.data(), nc_upper * sizeof(size_t));
                 quantizer_input.read((char *) pq_quantizer.exact_ksubs.data(), nc_upper * sizeof(size_t));
                 quantizer_input.read((char *) pq_quantizer.CentroidDistributionMap.data(), nc_upper * sizeof(size_t));
