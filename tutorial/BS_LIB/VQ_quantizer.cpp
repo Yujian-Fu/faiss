@@ -16,20 +16,22 @@ namespace bslib{
      **/ 
     VQ_quantizer::VQ_quantizer(size_t dimension, size_t nc_upper, size_t max_nc_per_group, size_t M, size_t efConstruction, size_t efSearch, bool use_HNSW, bool use_all_HNSW):
         Base_quantizer(dimension, nc_upper, max_nc_per_group){
+            std::cout << "Initializing: " << efConstruction << " " << efSearch << std::endl;
             this->use_HNSW = use_HNSW;
             this->use_all_HNSW = use_all_HNSW;
+            this->M = M;
+            this->efConstruction = efConstruction;
+            this->efSearch = efSearch;
 
             this->exact_nc_in_groups.resize(nc_upper);
 
             if (this->use_HNSW){
-                this->M = M;
-                this->efConstruction = efConstruction;
-                this->efSearch = efSearch;
                 this->HNSW_quantizers.resize(nc_upper);
             }
             else{
                 this->L2_quantizers.resize(nc_upper);
             }
+            std::cout << "Initialization: " << this->efConstruction << " " << this->efSearch << std::endl;
         }
 
     /**
