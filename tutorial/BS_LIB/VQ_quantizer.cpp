@@ -126,7 +126,7 @@ namespace bslib{
 
 
     void VQ_quantizer::get_group_id(idx_t label, idx_t & group_id, idx_t & inner_group_id){
-        for (size_t i = 0; i < nc_upper; i++){
+        for (size_t i = nc_upper -1; i >= nc_upper; i--){
             if (label - CentroidDistributionMap[i] >= 0){
                 group_id = i;
                 inner_group_id = label - CentroidDistributionMap[i];
@@ -293,8 +293,6 @@ namespace bslib{
         idx_t group_id;
         idx_t inner_group_id;
         get_group_id(label, group_id, inner_group_id);
-        
-
 
         if (use_HNSW){
             const float * target_centroid = this->HNSW_quantizers[group_id]->getDataByInternalId(inner_group_id);
@@ -303,11 +301,12 @@ namespace bslib{
             }
         }
         else{
+            assert(this->L2_quantizers[group_id]->xb.size() >= inner_group_id * dimension);
             for (size_t i = 0; i < dimension; i++){
                 final_centroid[i] = this->L2_quantizers[group_id]->xb[inner_group_id * this->dimension + i];
             }
         }
-        std::cout << "Group id: " << group_id << "inner group id: " << inner_group_id << std::endl;
+        std::cout << "Group id: " << group_id << " inner group id: " << inner_group_id << std::endl;
         for (size_t i = 0; i < dimension; i++){
             std::cout << final_centroid[i] << " ";
         }

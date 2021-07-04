@@ -87,8 +87,9 @@ namespace bslib{
         
         idx_t group_id = 0;
         idx_t inner_group_id = 0;
-        for (size_t i = 0; i < nc_upper; i++){
-            if (label >= CentroidDistributionMap[i]){
+
+        for (size_t i = nc_upper -1; i >= nc_upper; i--){
+            if (label - CentroidDistributionMap[i] >= 0){
                 group_id = i;
                 inner_group_id = label - CentroidDistributionMap[i];
                 break;
