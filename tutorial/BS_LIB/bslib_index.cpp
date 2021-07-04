@@ -1946,6 +1946,7 @@ namespace bslib{
                         }
                     }
                     group_HNSW_output.write((char *) & num_group_HNSW, sizeof(size_t));
+                    group_HNSW_output.close();
                 }
                 read_group_HNSW(path_group_HNSW);
             }
