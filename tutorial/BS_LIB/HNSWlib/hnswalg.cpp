@@ -4,9 +4,9 @@ namespace hnswlib {
 
     HierarchicalNSW::HierarchicalNSW(bool PQ_flag, bool PQ_full_data, bool use_vector_alpha)
     {
-        PQ_flag = PQ_flag;
-        PQ_full_data = PQ_full_data;
-        use_vector_alpha = use_vector_alpha;
+        this->PQ_flag = PQ_flag;
+        this->PQ_full_data = PQ_full_data;
+        this->use_vector_alpha = use_vector_alpha;
     }
 
     HierarchicalNSW::HierarchicalNSW(size_t d, size_t maxelements, size_t M, size_t maxM, size_t efConstruction, 
@@ -19,8 +19,6 @@ namespace hnswlib {
     this->PQ_full_data = PQ_full_data;
     this->ksub = ksub;
 
-    if (this->PQ_flag) std::cout << "PQ flag " << std::endl;
-    if (this->PQ_full_data) std::cout << "PQ full data" << std::endl;
     if (this->PQ_flag){
         if (this->PQ_full_data){
             // Load full data for construction
@@ -68,16 +66,13 @@ HierarchicalNSW::~HierarchicalNSW()
 float HierarchicalNSW::getDistance(const float * point, idx_t id){
     if (PQ_flag){
         if (PQ_full_data){
-            std::cout << "Full data computation " << std::endl;
             return fstdistfunc(point, getDataByInternalId(id));
         }
         else{
-            std::cout << "PQ data computation " << std::endl;
             return PQdistfunc(point, id);
         }
     }
     else{
-        std::cout << "Full data computation " << std::endl;
         return fstdistfunc(point, getDataByInternalId(id));
     }
 }
