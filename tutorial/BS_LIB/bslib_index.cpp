@@ -155,7 +155,6 @@ namespace bslib{
      * 
      **/
     void Bslib_Index::do_OPQ(size_t n, float * dataset){
-        std::cout << "Doing OPQ for the input data" << std::endl;
         assert(& opq_matrix != NULL);
         std::vector<float> copy_dataset(n * dimension);
         memcpy(copy_dataset.data(), dataset, n * dimension * sizeof(float));
@@ -163,7 +162,6 @@ namespace bslib{
     }
 
     void Bslib_Index::reverse_OPQ(size_t n, float * dataset){
-        std::cout << "Reverse OPQ for the input data" << std::endl;
         std::vector<float> copy_dataset(n * dimension);
         memcpy(copy_dataset.data(), dataset, n * dimension * sizeof(float));
         opq_matrix.transform_transpose(n, copy_dataset.data(), dataset);
