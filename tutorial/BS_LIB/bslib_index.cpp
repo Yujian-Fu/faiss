@@ -54,6 +54,7 @@ namespace bslib{
     void Bslib_Index::add_vq_quantizer(size_t nc_upper, size_t nc_per_group, size_t M = 4, size_t efConstruction = 10, size_t efSearch = 10){
 
         VQ_quantizer vq_quantizer = VQ_quantizer(dimension, nc_upper, nc_per_group, M, efConstruction, efSearch, use_VQ_HNSW, use_all_HNSW);
+        std::cout << vq_quantizer.efConstruction << " " << vq_quantizer.efSearch << " " << std::endl;
         PrintMessage("Building centroids for vq quantizer");
         vq_quantizer.build_centroids(this->train_data.data(), this->train_data.size() / dimension, this->train_data_ids.data());
         PrintMessage("Finished construct the VQ layer");

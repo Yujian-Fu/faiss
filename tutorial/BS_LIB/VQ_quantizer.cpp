@@ -15,10 +15,13 @@ namespace bslib{
      * 
      **/ 
     VQ_quantizer::VQ_quantizer(size_t dimension, size_t nc_upper, size_t max_nc_per_group, size_t M, size_t efConstruction, size_t efSearch, bool use_HNSW, bool use_all_HNSW):
-        Base_quantizer(dimension, nc_upper, max_nc_per_group), use_HNSW(use_HNSW), use_all_HNSW(use_all_HNSW){
+        Base_quantizer(dimension, nc_upper, max_nc_per_group){
+            this->use_HNSW = use_HNSW;
+            this->use_all_HNSW = use_all_HNSW;
+
             this->exact_nc_in_groups.resize(nc_upper);
 
-            if (use_HNSW){
+            if (this->use_HNSW){
                 this->M = M;
                 this->efConstruction = efConstruction;
                 this->efSearch = efSearch;
@@ -86,12 +89,11 @@ namespace bslib{
             //Adding centroids into quantizers
             if (use_HNSW){
                 hnswlib::HierarchicalNSW * centroid_quantizer = new hnswlib::HierarchicalNSW(dimension, exact_nc_in_group, M, 2 * M, efConstruction);
-                std::cout << "Build group HNSW" << std::endl;
+                std::cout << "Build group HNSW" << "EfCon" << this->efConstruction << " EfCon: " << centroid_quantizer->efConstruction_ << " EfSearch " << centroid_quantizer->efSearch <<std::endl;
                 for (size_t j = 0; j < exact_nc_in_group; j++){
                     centroid_quantizer->addPoint(centroids.data() + j * dimension);
                 }
                 this->HNSW_quantizers[i] = centroid_quantizer;
-                std::cout << "EfCon" << efConstruction << " EfCon: " << centroid_quantizer->efConstruction_ << " EfSearch " << centroid_quantizer->efSearch << std::endl;
             }
             else
             {
