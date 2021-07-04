@@ -475,6 +475,11 @@ namespace bslib{
             train_vector_alphas.resize(train_set_size);
         }
         assign(train_set_size, this->train_data.data(), train_data_ids.data(), this->layers, train_vector_alphas.data());
+        
+        for (size_t i = 0; i < 1000; i++){
+            std::cout << train_data_ids[i] << " ";
+        }
+        std::cout << std::endl;
 
         for (size_t i = train_set_size - 100; i < train_set_size; i++){std::cout << train_data_ids[i] << " ";} std::cout << std::endl;
 
