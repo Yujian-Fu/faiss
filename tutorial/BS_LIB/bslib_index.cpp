@@ -488,7 +488,6 @@ namespace bslib{
             }
             std::cout << std::endl;
         }
-    
 
         if (use_OPQ){
             PrintMessage("Training the OPQ matrix");

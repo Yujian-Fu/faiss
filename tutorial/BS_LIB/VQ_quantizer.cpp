@@ -293,6 +293,8 @@ namespace bslib{
         idx_t group_id;
         idx_t inner_group_id;
         get_group_id(label, group_id, inner_group_id);
+        
+
 
         if (use_HNSW){
             const float * target_centroid = this->HNSW_quantizers[group_id]->getDataByInternalId(inner_group_id);
@@ -305,6 +307,11 @@ namespace bslib{
                 final_centroid[i] = this->L2_quantizers[group_id]->xb[inner_group_id * this->dimension + i];
             }
         }
+        std::cout << "Group id: " << group_id << "inner group id: " << inner_group_id << std::endl;
+        for (size_t i = 0; i < dimension; i++){
+            std::cout << final_centroid[i] << " ";
+        }
+        std::cout << std::endl;
     }
 
 
@@ -321,11 +328,16 @@ namespace bslib{
      * 
      **/
     void VQ_quantizer::compute_residual_group_id(size_t n,  const idx_t * labels, const float * x, float * residuals){
-#pragma omp parallel for
+//#pragma omp parallel for
         for (size_t i = 0; i < n; i++){
             std::vector<float> final_centroid(dimension);
             compute_final_centroid(labels[i], final_centroid.data());
             faiss::fvec_madd(dimension, x + i * dimension, -1.0, final_centroid.data(), residuals + i * dimension);
+            for (size_t j = 0; j < dimension; j++){
+                std::cout << residuals[i * dimension + j] << " ";
+            }
+            std::cout << std::endl;
+            if (n > 100) exit(0);
         }
     }
 
