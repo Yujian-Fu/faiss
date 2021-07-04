@@ -16,6 +16,8 @@ namespace bslib{
      **/ 
     VQ_quantizer::VQ_quantizer(size_t dimension, size_t nc_upper, size_t max_nc_per_group, size_t M, size_t efConstruction, size_t efSearch, bool use_HNSW, bool use_all_HNSW):
         Base_quantizer(dimension, nc_upper, max_nc_per_group), use_HNSW(use_HNSW), use_all_HNSW(use_all_HNSW){
+            this->exact_nc_in_groups.resize(nc_upper);
+
             if (use_HNSW){
                 this->M = M;
                 this->efConstruction = efConstruction;
@@ -24,7 +26,6 @@ namespace bslib{
             }
             else{
                 this->L2_quantizers.resize(nc_upper);
-                this->exact_nc_in_groups.resize(nc_upper);
             }
         }
 
@@ -75,7 +76,8 @@ namespace bslib{
                 exact_nc_in_group = max_nc_per_group;
             }
             exact_nc_in_groups[i] = exact_nc_in_group;
-
+            
+            
             bool verbose = nc_upper > 1 ? false : true;
             std::vector<float> centroids(dimension * exact_nc_in_group);
             faiss::kmeans_clustering(dimension, nt_sub, exact_nc_in_group, train_set[i].data(), centroids.data(), 30, verbose);
@@ -291,7 +293,7 @@ namespace bslib{
      * final_centroid:  the target centroid          size: dimension
      **/
     void VQ_quantizer::compute_final_centroid(idx_t label, float * final_centroid){
-        
+
         idx_t group_id;
         idx_t inner_group_id;
         get_group_id(label, group_id, inner_group_id);
