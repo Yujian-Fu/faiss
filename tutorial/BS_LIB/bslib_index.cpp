@@ -721,7 +721,7 @@ namespace bslib{
             pq_quantizer_index[n_pq - 1].search_all(n, assign_data, assigned_ids);
         }*/
 
-//#pragma omp parallel for
+#pragma omp parallel for
         for (size_t i = 0; i < n; i++){
             size_t n_vq = 0, n_lq = 0, n_pq = 0; 
             std::vector<idx_t> query_search_id(1 , 0);
@@ -788,11 +788,6 @@ namespace bslib{
             }
             assigned_ids[i] = query_search_id[0];
         }
-        for (size_t i = 0; i < n; i++){
-            std::cout << assigned_ids[i] << " ";
-        }
-        exit(0);
-
     }
 
 

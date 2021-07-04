@@ -63,7 +63,7 @@ namespace bslib{
         std::cout <<  std::endl << "The min size for sub train set is: " << min_train_size << std::endl;
 
 
-//#pragma omp parallel for
+#pragma omp parallel for
         for (size_t i = 0; i < nc_upper; i++){
             
             size_t nt_sub = train_set[i].size() / this->dimension;
@@ -251,10 +251,8 @@ namespace bslib{
             exit(0);
         }
         if (use_HNSW){
-//#pragma omp parallel for
             //The distance result for search kNN is in reverse 
             size_t search_para = k > this->HNSW_quantizers[group_id]->efSearch ? k : this->HNSW_quantizers[group_id]->efSearch;
-            std::cout << "efsearch: " << this->HNSW_quantizers[group_id]->efSearch << "search para: " << search_para << std::endl;
 
             auto result_queue = this->HNSW_quantizers[group_id]->searchBaseLayer(query, search_para);
 
