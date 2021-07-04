@@ -126,6 +126,7 @@ namespace bslib{
 
 
     void VQ_quantizer::get_group_id(idx_t label, idx_t & group_id, idx_t & inner_group_id){
+        assert(label < layer_nc);
         for (int i = nc_upper -1; i >= 0; i--){
             if (label - CentroidDistributionMap[i] >= 0){
                 group_id = i;
@@ -237,6 +238,7 @@ namespace bslib{
      **/
     void VQ_quantizer::search_in_group(const float * query, const idx_t group_id, float * result_dists, idx_t * result_labels, size_t k){
         
+        assert(group_id < nc_upper);
         //If no enough centroids, return error, need to check before use
         if (k > exact_nc_in_groups[group_id]){
             std::cout << "No enough centroids in group " << group_id << " in VQ layer" << std::endl;
@@ -289,7 +291,7 @@ namespace bslib{
      * final_centroid:  the target centroid          size: dimension
      **/
     void VQ_quantizer::compute_final_centroid(idx_t label, float * final_centroid){
-
+        
         idx_t group_id;
         idx_t inner_group_id;
         get_group_id(label, group_id, inner_group_id);
