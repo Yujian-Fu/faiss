@@ -2052,7 +2052,7 @@ namespace bslib{
             hnswlib::HierarchicalNSW group_HNSW = hnswlib::HierarchicalNSW(false, false, false);
             group_HNSW.use_vector_alpha = this->use_vector_alpha;
             
-            group_HNSW.PQ_flag = true; group_HNSW.PQ_full_data = true;
+            group_HNSW.PQ_flag = true; group_HNSW.PQ_full_data = false;
             group_HNSW.code_size = pq.code_size; group_HNSW.ksub = pq.ksub;
 
             size_t group_id; group_HNSW_input.read((char *) & group_id, sizeof(size_t)); 

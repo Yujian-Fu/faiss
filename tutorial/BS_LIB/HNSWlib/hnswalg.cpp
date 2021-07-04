@@ -12,6 +12,9 @@ namespace hnswlib {
     HierarchicalNSW::HierarchicalNSW(size_t d, size_t maxelements, size_t M, size_t maxM, size_t efConstruction, 
     bool PQ_flag, bool PQ_full_data, size_t code_size, size_t ksub)
     {
+    if (PQ_flag) std::cout << "PQ flag " << std::endl;
+    if (PQ_full_data) std::cout << "PQ full data" << std::endl;
+    
     d_ = d;
     code_size = code_size;
     PQ_flag = PQ_flag;
