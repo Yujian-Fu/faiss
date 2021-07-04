@@ -7,18 +7,18 @@ namespace hnswlib {
         PQ_flag = PQ_flag;
         PQ_full_data = PQ_full_data;
         use_vector_alpha = use_vector_alpha;
-        data_level0_memory_ = NULL;
-        visitedlistpool = NULL;
-        nn_dist = NULL;
-        vector_alpha_norm = NULL;
-        vector_alpha = NULL;
-        base_norms = NULL;
+        data_level0_memory_ = nullptr;
+        visitedlistpool = nullptr;
+        nn_dist = nullptr;
+        vector_alpha_norm = nullptr;
+        vector_alpha = nullptr;
+        base_norms = nullptr;
     }
 
     HierarchicalNSW::HierarchicalNSW(size_t d, size_t maxelements, size_t M, size_t maxM, size_t efConstruction, 
     bool PQ_flag, bool PQ_full_data, size_t code_size, size_t ksub)
     {
-        std::cout << (data_level0_memory_ ? " Memory allocated " : " Memory not allocated ") << std::endl;
+    
     d_ = d;
     code_size = code_size;
     PQ_flag = PQ_flag;
@@ -56,7 +56,7 @@ namespace hnswlib {
     enterpoint_node = 0;
     cur_element_count = 0;
 
-    
+    std::cout << (data_level0_memory_ ? " Memory allocated " : " Memory not allocated ") << std::endl;
     data_level0_memory_ = (char *) malloc(maxelements_ * size_data_per_element);
     std::cout << (data_level0_memory_ ? " Memory allocated " : " Memory not allocated ") << std::endl;
     std::cout << "HNSW Size Kb: " << (maxelements_ * size_data_per_element) / (1000) << std::endl;
