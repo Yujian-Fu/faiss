@@ -87,6 +87,7 @@ namespace bslib{
                 hnswlib::HierarchicalNSW * centroid_quantizer = new hnswlib::HierarchicalNSW(dimension, exact_nc_in_group, M, 2 * M, efConstruction);
                 for (size_t j = 0; j < exact_nc_in_group; j++){
                     centroid_quantizer->addPoint(centroids.data() + j * dimension);
+                    std::cout << j << " ";
                 }
                 this->HNSW_quantizers[i] = centroid_quantizer;
             }
