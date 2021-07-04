@@ -476,15 +476,19 @@ namespace bslib{
         }
         assign(train_set_size, this->train_data.data(), train_data_ids.data(), this->layers, train_vector_alphas.data());
         
-        for (size_t i = 0; i < 1000; i++){
-            std::cout << train_data_ids[i] << " ";
-        }
-        std::cout << std::endl;
 
         for (size_t i = train_set_size - 100; i < train_set_size; i++){std::cout << train_data_ids[i] << " ";} std::cout << std::endl;
 
         std::cout << "Encoding the train dataset with " << train_set_size<< " data points " << std::endl;
         encode(train_set_size, this->train_data.data(), train_data_ids.data(), residuals.data(), train_vector_alphas.data());
+
+        for (size_t i = 0; i < 100; i++){
+            for (size_t j = 0; j < dimension; j++){
+                std::cout << train_data_ids[i * dimension + j] << " ";
+            }
+            std::cout << std::endl;
+        }
+    
 
         if (use_OPQ){
             PrintMessage("Training the OPQ matrix");
