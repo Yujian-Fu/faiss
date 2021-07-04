@@ -68,6 +68,10 @@ namespace bslib{
             
             size_t nt_sub = train_set[i].size() / this->dimension;
             //std::cout << "Clustering " << nt_sub << " train vectors into " << nc_per_group << " groups " << std::endl;
+            if (nt_sub == 0){
+                std::cout << "No enough training point, reduce the number of cluster or add more training points" << std::endl;
+                exit(0);
+            }
 
             size_t exact_nc_in_group;
             if (nt_sub < max_nc_per_group * min_train_size_per_group){
@@ -81,11 +85,15 @@ namespace bslib{
             exact_nc_in_groups[i] = exact_nc_in_group;
             
             
-            bool verbose = nc_upper > 1 ? false : true;
             std::vector<float> centroids(dimension * exact_nc_in_group);
-            faiss::kmeans_clustering(dimension, nt_sub, exact_nc_in_group, train_set[i].data(), centroids.data(), 30, verbose);
-
-
+            if (exact_nc_in_group > 1){
+                bool verbose = nc_upper > 1 ? false : true;
+                faiss::kmeans_clustering(dimension, nt_sub, exact_nc_in_group, train_set[i].data(), centroids.data(), 30, verbose);
+            }
+            else{
+                for (size_t temp = 0; temp < dimension; temp++){centroids[temp] = train_set[i][temp];}
+            }
+            
             //Adding centroids into quantizers
             if (use_HNSW){
                 hnswlib::HierarchicalNSW * centroid_quantizer = new hnswlib::HierarchicalNSW(dimension, exact_nc_in_group, M, 2 * M, efConstruction);
@@ -100,6 +108,7 @@ namespace bslib{
                 centroid_quantizer->add(exact_nc_in_group, centroids.data());
                 this->L2_quantizers[i] = centroid_quantizer;
             }
+            std::cout << i << "/" << nc_upper << std::endl;
         }
 
         size_t num_centroids = 0;
