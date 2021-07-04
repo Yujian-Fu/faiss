@@ -19,8 +19,8 @@ namespace hnswlib {
     PQ_full_data = PQ_full_data;
     ksub = ksub;
 
-    if (PQ_flag) std::cout << "PQ flag " << std::endl;
-    if (PQ_full_data) std::cout << "PQ full data" << std::endl;
+    if (this->PQ_flag) std::cout << "PQ flag " << std::endl;
+    if (this->PQ_full_data) std::cout << "PQ full data" << std::endl;
     if (PQ_flag){
         if (PQ_full_data){
             // Load full data for construction
