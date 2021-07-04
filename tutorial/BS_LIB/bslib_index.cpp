@@ -11,7 +11,7 @@ namespace bslib{
      **/
     Bslib_Index::Bslib_Index(const size_t dimension, const size_t layers, const std::string * index_type, 
     const bool use_reranking, const bool saving_index, const bool use_norm_quantization, const bool is_recording,
-    const bool use_VQ_HNSW, const bool use_group_HNSW, const bool use_all_HNSW, const bool use_OPQ, const bool use_train_selector,
+    bool * use_VQ_HNSW, const bool use_group_HNSW, const bool use_all_HNSW, const bool use_OPQ, const bool use_train_selector,
     const size_t train_size, const size_t M_pq, const size_t nbits, const size_t group_HNSW_thres){
             
             this->dimension = dimension;
@@ -51,9 +51,10 @@ namespace bslib{
      * Use HNSW quantizer: nc_upper, nc_group, M, efConstruction, efSearch
      * 
      **/
-    void Bslib_Index::add_vq_quantizer(size_t nc_upper, size_t nc_per_group, size_t M, size_t efConstruction, size_t efSearch){
+    void Bslib_Index::add_vq_quantizer(size_t nc_upper, size_t nc_per_group, bool use_VQ_HNSW_layer, size_t M, size_t efConstruction, size_t efSearch){
+
         std::cout << "Adding VQ quantizer with parameter: " << efConstruction << " " << efSearch << " " << std::endl;
-        VQ_quantizer vq_quantizer = VQ_quantizer(dimension, nc_upper, nc_per_group, M, efConstruction, efSearch, use_VQ_HNSW, use_all_HNSW);
+        VQ_quantizer vq_quantizer = VQ_quantizer(dimension, nc_upper, nc_per_group, M, efConstruction, efSearch, use_VQ_HNSW_layer, use_all_HNSW);
         std::cout << vq_quantizer.efConstruction << " " << vq_quantizer.efSearch << " " << std::endl;
         PrintMessage("Building centroids for vq quantizer");
         vq_quantizer.build_centroids(this->train_data.data(), this->train_data.size() / dimension, this->train_data_ids.data());
@@ -356,14 +357,12 @@ namespace bslib{
             if (index_type[i] == "VQ"){
 
                 std::cout << "Adding VQ quantizer with parameters: " << nc_upper << " " << nc_per_group << std::endl;
-                if (use_VQ_HNSW){
-                    size_t existed_VQ_layers = this->vq_quantizer_index.size();
-                    HNSW_para para = HNSW_paras[existed_VQ_layers];
-                    add_vq_quantizer(nc_upper, nc_per_group, para.first.first, para.first.second, para.second);
-                }
-                else{
-                    add_vq_quantizer(nc_upper, nc_per_group);
-                }
+
+                size_t existed_VQ_layers = this->vq_quantizer_index.size();
+                HNSW_para para = HNSW_paras[existed_VQ_layers];
+                add_vq_quantizer(nc_upper, nc_per_group, use_VQ_HNSW[existed_VQ_layers], para.first.first, para.first.second, para.second);
+
+
                 inner_Trecorder.record_time_usage(record_file, "Trained VQ layer");
                 nc_upper = vq_quantizer_index[vq_quantizer_index.size()-1].layer_nc;
 

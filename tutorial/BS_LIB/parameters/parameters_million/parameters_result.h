@@ -1,5 +1,28 @@
 #include "./parameters_VQ_VQ_VQ.h"
 
+std::string conf_combination(const uint32_t * ncentroids, const std::string * index_type, 
+const size_t layers, const size_t * M_PQ_layer, const size_t * nbits_PQ_layer){
+    std::string result = "";
+    for (size_t i = 0; i < layers; i++){
+        result += "_"; result += index_type[i] == "PQ"? std::to_string(M_PQ_layer[i]) + "_" + std::to_string(nbits_PQ_layer[i]) : std::to_string(ncentroids[i]);
+    }
+    result += "_" + std::to_string(M_PQ);
+    return result;
+}
+
+std::string index_combination(const std::string * index_type, const size_t layers, const size_t * LQ_type){
+    std::string result = "";
+    size_t n_lq = 0;
+    size_t n_vq = 0;
+    for (size_t i = 0; i < layers; i++){
+        result += "_"; result += index_type[i]; 
+        if (index_type[i] == "VQ" && use_HNSW_VQ[n_vq]) {result += "_HNSW"; n_vq++;}
+        if (index_type[i] == "LQ")                {result += std::to_string(LQ_type[n_lq]); n_lq ++;}
+    }
+    
+    return result;
+}
+
 // Folder path
 std::string ncentroid_conf = conf_combination(ncentroids, index_type, layers, M_PQ_layer, nbits_PQ_layer);
 std::string model = "models" + index_combination(index_type, layers, LQ_type);

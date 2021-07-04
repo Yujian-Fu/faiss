@@ -32,7 +32,7 @@ struct Bslib_Index{
     size_t group_HNSW_thres;
 
     bool use_reranking;  //Not used
-    bool use_VQ_HNSW;
+    bool * use_VQ_HNSW;
     bool use_group_HNSW;
     bool use_all_HNSW;
     bool use_OPQ;
@@ -87,7 +87,7 @@ struct Bslib_Index{
 
     explicit Bslib_Index(const size_t dimension, const size_t layers, const std::string * index_type, 
     const bool use_reranking, const bool save_index, const bool use_norm_quantization, const bool is_recording,
-    const bool use_HNSW_VQ, const bool use_HNSW_group, const bool use_all_HNSW, const bool use_OPQ, const bool use_train_selector,
+    bool * use_HNSW_VQ, const bool use_HNSW_group, const bool use_all_HNSW, const bool use_OPQ, const bool use_train_selector,
     const size_t train_size, const size_t M_PQ, const size_t nbits, const size_t group_HNSW_thres);
 
     void do_OPQ(size_t n, float * dataset);
@@ -95,7 +95,7 @@ struct Bslib_Index{
     void build_quantizers(const uint32_t * ncentroids, const std::string path_quantizer, const std::string path_learn, 
     const size_t * num_train, const std::vector<HNSW_para> HNSW_paras, const std::vector<PQ_para> PQ_paras, const size_t * LQ_type, std::ofstream & record_file);
     
-    void add_vq_quantizer(size_t nc_upper, size_t nc_per_group, size_t M = 4, size_t efConstruction = 10, size_t efSearch = 10);
+    void add_vq_quantizer(size_t nc_upper, size_t nc_per_group, bool use_VQ_HNSW_layer = false, size_t M = 4, size_t efConstruction = 10, size_t efSearch = 10);
     void add_lq_quantizer(size_t nc_upper, size_t nc_per_group, const float * upper_centroids, const idx_t * upper_nn_centroid_idxs, 
     const float * upper_nn_centroid_dists, size_t LQ_type);
     void add_pq_quantizer(size_t nc_upper, size_t M, size_t nbits);
