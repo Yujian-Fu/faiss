@@ -1721,10 +1721,10 @@ namespace bslib{
             std::cout << "Loading PQ codebook from " << path_pq << std::endl;
 
             if (use_OPQ){
-                this->opq_matrix = * dynamic_cast<faiss::OPQMatrix*>((faiss::read_VectorTransform(path_OPQ.c_str())));
+                this->opq_matrix = * dynamic_cast<faiss::LinearTransform *>((faiss::read_VectorTransform(path_OPQ.c_str())));
                 std::cout << "Loading OPQ matrix from " << path_OPQ << std::endl;
             }
-            
+
             if(use_norm_quantization){
                 std::cout << "Loading norm PQ codebook from " << path_pq_norm << std::endl;
                 this->norm_pq = * faiss::read_ProductQuantizer(path_pq_norm.c_str());

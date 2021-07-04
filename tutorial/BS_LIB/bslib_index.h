@@ -63,7 +63,7 @@ struct Bslib_Index{
 
     faiss::ProductQuantizer pq; // Initialized in train_pq
     faiss::ProductQuantizer norm_pq; // Initialized in train_pq
-    faiss::OPQMatrix opq_matrix;
+    faiss::LinearTransform opq_matrix;
 
     std::vector<hnswlib::HierarchicalNSW> group_HNSW_list;
     std::map<size_t, size_t> group_HNSW_idxs;
