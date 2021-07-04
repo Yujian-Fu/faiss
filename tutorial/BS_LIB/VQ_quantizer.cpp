@@ -85,6 +85,7 @@ namespace bslib{
             //Adding centroids into quantizers
             if (use_HNSW){
                 hnswlib::HierarchicalNSW * centroid_quantizer = new hnswlib::HierarchicalNSW(dimension, exact_nc_in_group, M, 2 * M, efConstruction);
+                std::cout << "Build group HNSW" << std::endl;
                 for (size_t j = 0; j < exact_nc_in_group; j++){
                     std::cout << j << " ";
                     centroid_quantizer->addPoint(centroids.data() + j * dimension);
