@@ -22,7 +22,7 @@ namespace bslib{
         hnswlib::HierarchicalNSW * HNSW_all_quantizer;
 
          // The size should be train_set_size, the max size is nc_upper
-        explicit VQ_quantizer(size_t dimension, size_t nc_upper, size_t max_nc_per_group, size_t M = 16, size_t efConstruction = 100, size_t efSearch = 50, bool use_HNSW = false, bool build_all_HNSW = false);
+        explicit VQ_quantizer(size_t dimension, size_t nc_upper, size_t max_nc_per_group, size_t M = 4, size_t efConstruction = 10, size_t efSearch = 10, bool use_HNSW = false, bool build_all_HNSW = false);
         void build_centroids(const float * train_data, size_t train_set_size, idx_t * train_data_ids);
         void compute_final_centroid(idx_t label, float * final_centroid);
         void compute_residual_group_id(size_t n, const idx_t * labels, const float * x, float * residuals); 

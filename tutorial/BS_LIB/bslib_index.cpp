@@ -51,7 +51,7 @@ namespace bslib{
      * Use HNSW quantizer: nc_upper, nc_group, M, efConstruction, efSearch
      * 
      **/
-    void Bslib_Index::add_vq_quantizer(size_t nc_upper, size_t nc_per_group, size_t M = 16, size_t efConstruction = 500, size_t efSearch = 100){
+    void Bslib_Index::add_vq_quantizer(size_t nc_upper, size_t nc_per_group, size_t M = 4, size_t efConstruction = 10, size_t efSearch = 10){
 
         VQ_quantizer vq_quantizer = VQ_quantizer(dimension, nc_upper, nc_per_group, M, efConstruction, efSearch, use_VQ_HNSW, use_all_HNSW);
         PrintMessage("Building centroids for vq quantizer");

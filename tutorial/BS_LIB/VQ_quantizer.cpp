@@ -254,6 +254,7 @@ namespace bslib{
             size_t search_para = k > this->HNSW_quantizers[group_id]->efSearch ? k : this->HNSW_quantizers[group_id]->efSearch;
 
             auto result_queue = this->HNSW_quantizers[group_id]->searchBaseLayer(query, search_para);
+
             // The result of search result
             for (size_t j = 0; j < this->max_nc_per_group; j++){
                 if (j < search_para){
@@ -266,6 +267,10 @@ namespace bslib{
                     result_labels[j] = INVALID_ID;
                 }
             }
+            for (size_t j = 0; j < this->max_nc_per_group; j++){
+                std::cout << result_labels[j] << " " << result_dists[j] << " " <<std::endl;
+            }
+            exit(0);
         }
         else{
 //#pragma omp parallel for
