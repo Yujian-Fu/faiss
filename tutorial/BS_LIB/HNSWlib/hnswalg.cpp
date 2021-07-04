@@ -48,6 +48,7 @@ namespace hnswlib {
     enterpoint_node = 0;
     cur_element_count = 0;
 
+    std::cout << "Size per element: " << size_data_per_element << "Offset data: " << size_links_level0 << std::endl;
     std::cout << (data_level0_memory_ ? " Memory allocated " : " Memory not allocated ") << std::endl;
     data_level0_memory_ = (char *) malloc(maxelements_ * size_data_per_element);
     std::cout << (data_level0_memory_ ? " Memory allocated " : " Memory not allocated ") << std::endl;
@@ -252,7 +253,9 @@ void HierarchicalNSW::addPoint(const float *point)
 
     // Do nothing for the first element
     if (cur_c != 0) {
+        std::cout << "Searching the base layer " << std::endl;
         std::priority_queue <std::pair<float, idx_t>> topResults = searchBaseLayer(point, efConstruction_);
+        std::cout << "Adding new element " << std::endl;
         mutuallyConnectNewElement(cur_c, topResults);
     }
 };
