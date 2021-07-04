@@ -13,16 +13,16 @@ namespace hnswlib {
     bool PQ_flag, bool PQ_full_data, size_t code_size, size_t ksub)
     {
 
-    d_ = d;
-    code_size = code_size;
-    PQ_flag = PQ_flag;
-    PQ_full_data = PQ_full_data;
-    ksub = ksub;
+    this->d_ = d;
+    this->code_size = code_size;
+    this->PQ_flag = PQ_flag;
+    this->PQ_full_data = PQ_full_data;
+    this->ksub = ksub;
 
     if (this->PQ_flag) std::cout << "PQ flag " << std::endl;
     if (this->PQ_full_data) std::cout << "PQ full data" << std::endl;
-    if (PQ_flag){
-        if (PQ_full_data){
+    if (this->PQ_flag){
+        if (this->PQ_full_data){
             // Load full data for construction
             data_size_ = d * sizeof(float);
         }
@@ -35,21 +35,21 @@ namespace hnswlib {
         data_size_ = d * sizeof(float);
     }
 
-    efConstruction_ = efConstruction;
-    efSearch = efConstruction;
+    this->efConstruction_ = efConstruction;
+    this->efSearch = efConstruction;
 
-    maxelements_ = maxelements;
-    M_ = M;
-    maxM_ = maxM;
+    this->maxelements_ = maxelements;
+    this->M_ = M;
+    this->maxM_ = maxM;
 
-    size_links_level0 = maxM * sizeof(idx_t) + sizeof(uint8_t);
-    size_data_per_element = size_links_level0 + data_size_;
-    offset_data = size_links_level0;
+    this->size_links_level0 = maxM * sizeof(idx_t) + sizeof(uint8_t);
+    this->size_data_per_element = size_links_level0 + data_size_;
+    this->offset_data = size_links_level0;
 
-    visitedlistpool = new VisitedListPool(1, maxelements_);
+    this->visitedlistpool = new VisitedListPool(1, maxelements_);
 
-    enterpoint_node = 0;
-    cur_element_count = 0;
+    this->enterpoint_node = 0;
+    this->cur_element_count = 0;
 
     std::cout << "Size per element: " << size_data_per_element << " Offset data: " << size_links_level0 << std::endl;
     std::cout << (data_level0_memory_ ? " Memory allocated " : " Memory not allocated ") << std::endl;
