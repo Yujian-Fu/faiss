@@ -65,13 +65,16 @@ HierarchicalNSW::~HierarchicalNSW()
 float HierarchicalNSW::getDistance(const float * point, idx_t id){
     if (PQ_flag){
         if (PQ_full_data){
+            std::cout << "Full data computation " << std::endl;
             return fstdistfunc(point, getDataByInternalId(id));
         }
         else{
+            std::cout << "PQ data computation " << std::endl;
             return PQdistfunc(point, id);
         }
     }
     else{
+        std::cout << "Full data computation " << std::endl;
         return fstdistfunc(point, getDataByInternalId(id));
     }
 }
