@@ -1919,7 +1919,7 @@ namespace bslib{
                             num_group_HNSW++;
                             std::vector<float> group_vector(groups_size[i]);
                             uint32_t dim;
-                            hnswlib::HierarchicalNSW group_HNSW = hnswlib::HierarchicalNSW(dimension, groups_size[i], 12, 32, true, true, pq.code_size, pq.ksub);
+                            hnswlib::HierarchicalNSW group_HNSW = hnswlib::HierarchicalNSW(dimension, groups_size[i], 12, 24, 32, true, true, pq.code_size, pq.ksub);
                             for (size_t j = 0; j < groups_size[i]; j++){
                                 base_input.seekg(base_sequence_ids[i][j] * dimension * sizeof(base_data_type) + base_sequence_ids[i][j] * sizeof(uint32_t), std::ios::beg);
                                 base_input.read((char *) & dim, sizeof(uint32_t)); assert(dim == this->dimension);

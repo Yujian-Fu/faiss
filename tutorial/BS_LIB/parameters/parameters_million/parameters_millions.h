@@ -2,17 +2,15 @@
 #include <iostream>
 #include <string>
 
-
+//Not supported:
 const bool use_reranking = false;
 const bool use_norm_quantization = false;
-const bool use_dynamic_reranking = false;
-const bool use_OPQ = false;
-const bool use_parallel_indexing = false;
 const bool use_train_selector = false;
-
-const bool use_HNSW_group = false;
 const bool use_all_HNSW = false;
 
+
+const bool use_OPQ = true;
+const bool use_HNSW_group = false;
 const bool is_recording = true;
 const bool saving_index = true;
 
