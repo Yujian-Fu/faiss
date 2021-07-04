@@ -11,7 +11,7 @@ const bool use_parallel_indexing = false;
 const bool use_train_selector = false;
 
 const bool use_HNSW_group = false;
-const bool use_HNSW_VQ = false;
+const bool use_HNSW_VQ = true;
 const bool use_all_HNSW = false;
 
 const bool is_recording = true;

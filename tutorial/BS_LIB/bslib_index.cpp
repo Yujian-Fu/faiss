@@ -986,6 +986,8 @@ namespace bslib{
 
                     //for (size_t m = 0; m < search_space; m++){upper_result_labels[m] = result_labels[m]; upper_result_dists[m] = result_dists[m];}
 //#pragma omp parallel for
+
+                    size_t layer_keep_space = keep_space[j] < max_group_size ? keep_space[j] : max_group_size;
                     for (size_t m = 0; m < upper_result_space; m++){
                         assert(query_group_ids[m] >=0);
                         lq_quantizer_index[n_lq].search_in_group(query, upper_result_labels.data(), upper_result_dists.data(), search_space, query_group_ids[m], query_result_dists.data()+m*max_group_size, 
@@ -993,15 +995,15 @@ namespace bslib{
                     }
                     for (size_t m = 0; m < upper_result_space; m++){
                         if (use_vector_alpha && lq_quantizer_index[n_lq].LQ_type == 2){
-                            keep_k_min_alpha(max_group_size, keep_space[j], query_result_dists.data()+m*max_group_size, query_result_labels.data()+m*max_group_size, vector_result_alphas.data() + m * max_group_size,
-                             query_group_dists.data()+m*keep_space[j], query_group_ids.data()+m*keep_space[j], vector_group_alphas.data() + m * keep_space[j]);
+                            keep_k_min_alpha(max_group_size, layer_keep_space, query_result_dists.data()+m*max_group_size, query_result_labels.data()+m*max_group_size, vector_result_alphas.data() + m * max_group_size,
+                             query_group_dists.data()+m*layer_keep_space, query_group_ids.data()+m*layer_keep_space, vector_group_alphas.data() + m * layer_keep_space);
                         }
                         else{
-                            keep_k_min(max_group_size, keep_space[j], query_result_dists.data()+m*max_group_size, query_result_labels.data()+m*max_group_size, query_group_dists.data()+m*keep_space[j], query_group_ids.data()+m*keep_space[j]);
+                            keep_k_min(max_group_size, layer_keep_space, query_result_dists.data()+m*max_group_size, query_result_labels.data()+m*max_group_size, query_group_dists.data()+m*keep_space[j], query_group_ids.data()+m*keep_space[j]);
                         }
                     }
                     search_space = upper_result_space * max_group_size;
-                    upper_result_space = upper_result_space * keep_space[j];
+                    upper_result_space = upper_result_space * layer_keep_space;
                     n_lq ++;
                 }
 
