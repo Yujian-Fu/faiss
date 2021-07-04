@@ -81,14 +81,8 @@ namespace bslib{
             bool verbose = nc_upper > 1 ? false : true;
             std::vector<float> centroids(dimension * exact_nc_in_group);
             faiss::kmeans_clustering(dimension, nt_sub, exact_nc_in_group, train_set[i].data(), centroids.data(), 30, verbose);
-            
-            for (size_t temp = 0; temp < 10; temp++){
-                for (size_t j = 0; j < dimension; j++){
-                    std::cout << centroids[temp * dimension + j] << " ";
-                }
-                std::cout << std::endl;
-            }
-            
+
+
             //Adding centroids into quantizers
             if (use_HNSW){
                 hnswlib::HierarchicalNSW * centroid_quantizer = new hnswlib::HierarchicalNSW(dimension, exact_nc_in_group, M, 2 * M, efConstruction);
@@ -257,7 +251,8 @@ namespace bslib{
         if (use_HNSW){
 //#pragma omp parallel for
             //The distance result for search kNN is in reverse 
-            size_t search_para = k < exact_nc_in_groups[group_id] ?  k : exact_nc_in_groups[group_id];
+            size_t search_para = k > this->HNSW_quantizers[group_id]->efSearch ? k : this->HNSW_quantizers[group_id]->efSearch;
+
             auto result_queue = this->HNSW_quantizers[group_id]->searchBaseLayer(query, search_para);
             // The result of search result
             for (size_t j = 0; j < this->max_nc_per_group; j++){
