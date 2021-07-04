@@ -141,8 +141,13 @@ namespace bslib{
             
             if (nt_sub < max_ksub * min_train_size_per_group){
 
+                if (nt_sub < new_pow(2,1) * min_train_size_per_group){
+                    std::cout << "No enough training points for PQ layer, reduce the number of clusters or use more training vectors" << std::endl;
+                    exit(0);
+                }
+
                 for (size_t nbits = max_nbits; nbits> 0; nbits--){
-                    if (nt_sub > new_pow(2, nbits) * min_train_size_per_group){
+                    if (nt_sub >= new_pow(2, nbits) * min_train_size_per_group){
                         exact_nbits[group_id] = nbits;
                         exact_ksubs[group_id] = pow(2, nbits);
                         break;

@@ -91,7 +91,14 @@ namespace bslib{
                 faiss::kmeans_clustering(dimension, nt_sub, exact_nc_in_group, train_set[i].data(), centroids.data(), 30, verbose);
             }
             else{
-                for (size_t temp = 0; temp < dimension; temp++){centroids[temp] = train_set[i][temp];}
+                for (size_t temp1 = 0; temp1 < nt_sub; temp1 ++){
+                    for (size_t temp2 = 0; temp2 < dimension; temp2++){
+                        centroids[temp2] = train_set[i][temp1 * dimension + temp2];
+                    }
+                }
+                for (size_t temp2 = 0; temp2 < dimension; temp2 ++){
+                    centroids[temp2] /= nt_sub;
+                }
             }
             
             //Adding centroids into quantizers
