@@ -1907,8 +1907,8 @@ namespace bslib{
                 if(!exists(path_group_HNSW)){
                     size_t num_group_HNSW = 0;
                     std::ofstream group_HNSW_output(path_group_HNSW, std::ios::binary);
-                    group_HNSW_output.write((char *) final_group_num, sizeof(size_t));
-                    group_HNSW_output.write((char *) group_HNSW_thres, sizeof(size_t));
+                    group_HNSW_output.write((char *) & final_group_num, sizeof(size_t));
+                    group_HNSW_output.write((char *) & group_HNSW_thres, sizeof(size_t));
 
                     for (size_t i = 0; i < final_group_num; i++){if (groups_size[i] >= group_HNSW_thres){num_group_HNSW ++;}}
                     group_HNSW_output.write((char *) & num_group_HNSW, sizeof(size_t));
