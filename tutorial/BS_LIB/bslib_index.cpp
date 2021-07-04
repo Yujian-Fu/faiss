@@ -2003,7 +2003,10 @@ namespace bslib{
             Trecorder.print_time_usage(message);
             Trecorder.record_time_usage(record_file, message);
             Trecorder.record_time_usage(qps_record_file, message);
-            
+
+            if (use_OPQ){
+                reverse_OPQ(nq, queries.data());
+            }
 
             for (size_t i = 0; i < nq; i++){
                 std::unordered_set<idx_t> gt;
