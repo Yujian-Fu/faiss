@@ -95,8 +95,9 @@ namespace hnswlib {
     public:
         HierarchicalNSW(bool PQ_flag = false, bool PQ_full_data = false, bool use_vector_alpha = false);
 
-        HierarchicalNSW(size_t d, size_t maxelements, size_t M, size_t maxM, size_t efConstruction = 500, bool PQ_flag = false,
+        HierarchicalNSW(size_t d, size_t maxelements, size_t M, size_t maxM, size_t efConstruction, bool PQ_flag = false,
          bool PQ_full_data = false, size_t code_size = 8, size_t ksub = 256);
+
         ~HierarchicalNSW();
 
         inline float *getDataByInternalId(idx_t internal_id) const {

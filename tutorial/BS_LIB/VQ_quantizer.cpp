@@ -91,6 +91,7 @@ namespace bslib{
                     centroid_quantizer->addPoint(centroids.data() + j * dimension);
                 }
                 this->HNSW_quantizers[i] = centroid_quantizer;
+                std::cout << "EfCon: " << centroid_quantizer->efConstruction_ << "EfSearch " << centroid_quantizer->efSearch << std::endl;
             }
             else
             {
