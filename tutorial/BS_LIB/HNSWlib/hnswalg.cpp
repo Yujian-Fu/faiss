@@ -241,6 +241,7 @@ void HierarchicalNSW::mutuallyConnectNewElement(idx_t cur_c,
 
 void HierarchicalNSW::addPoint(const float *point)
 {
+    std::cout << "Adding one point " << std::endl;
     if (cur_element_count >= maxelements_) {
         std::cout << "The number of elements exceeds the specified limit\n";
         throw std::runtime_error("The number of elements exceeds the specified limit");
