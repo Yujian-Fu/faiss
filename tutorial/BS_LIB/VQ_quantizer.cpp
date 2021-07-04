@@ -337,7 +337,7 @@ namespace bslib{
                 std::cout << residuals[i * dimension + j] << " ";
             }
             std::cout << std::endl;
-            if (n > 100) exit(0);
+            if (i > 100) exit(0);
         }
     }
 
