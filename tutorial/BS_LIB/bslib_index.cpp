@@ -561,7 +561,7 @@ namespace bslib{
         //Compute code for residuals
         std::vector<uint8_t> batch_codes(n * this->code_size);
         this->pq.compute_codes(residuals.data(), batch_codes.data(), n);
-        if (show_batch_time) batch_recorder.print_time_usage("encode data residuals             ");
+        if (show_batch_time) batch_recorder.print_time_usage("PQ encode data residuals             ");
 
         //Add codes into index
         for (size_t i = 0; i < n; i++){
@@ -570,7 +570,7 @@ namespace bslib{
             for (size_t j = 0; j < this->code_size; j++){this->base_codes[group_id][group_position * code_size + j] = batch_codes[i * this->code_size + j];}
             this->base_sequence_ids[group_id][group_position] = sequence_ids[i];
 
-            if (!alpha_flag){
+            if (use_vector_alpha && !alpha_flag){
                 this->base_alphas[group_id][group_position] = vector_alpha[i];
                 this->base_alpha_norms[group_id][group_position] = vector_alpha_norm[i];
             }
@@ -1806,6 +1806,7 @@ namespace bslib{
 
             this->base_codes.resize(this->final_group_num);
             this->base_sequence_ids.resize(this->final_group_num);
+
             if (use_norm_quantization){this->base_norm_codes.resize(nb);} else{this->base_norms.resize(nb);}
             for (size_t i = 0; i < this->final_group_num; i++){
                 this->base_codes[i].resize(groups_size[i] * this->code_size);
@@ -1820,6 +1821,7 @@ namespace bslib{
 
             std::vector<float> vector_alpha_norms;
 
+            // Whether the alpha vector is loaded in index
             bool alpha_flag = false;
 
             if (use_vector_alpha){
@@ -1837,6 +1839,7 @@ namespace bslib{
 
                     base_alphas.resize(this->final_group_num);
                     base_alpha_norms.resize(this->final_group_num);
+                    
                     for (size_t i = 0; i < final_group_num; i++){
                         base_alphas[i].resize(groups_size[i]);
                         base_alpha_norms[i].resize(groups_size[i]);
@@ -1906,7 +1909,7 @@ namespace bslib{
                 base_norm_output.close();
             }
 
-            if (!alpha_flag){
+            if (use_vector_alpha && !alpha_flag){
                 write_base_alphas(path_base_alphas);
                 write_base_alpha_norms(path_base_alpha_norms);
             }
