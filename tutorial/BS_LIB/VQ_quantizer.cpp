@@ -302,7 +302,7 @@ namespace bslib{
         }
         else{
             if (this->L2_quantizers[group_id]->xb.size() < (inner_group_id + 1) * dimension){
-                std::cout << group_id << " " << inner_group_id << " " << L2_quantizers[group_id]->xb.size() << std::endl;
+                std::cout << label << " " << group_id << " " << inner_group_id << " " << L2_quantizers[group_id]->xb.size() << std::endl;
             }
             assert(this->L2_quantizers[group_id]->xb.size() >= (inner_group_id + 1) * dimension);
             for (size_t i = 0; i < dimension; i++){
