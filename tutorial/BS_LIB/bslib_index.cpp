@@ -1900,6 +1900,7 @@ namespace bslib{
             }
 
             if (use_group_HNSW){
+                std::cout << "Building group HNSW " << std::endl;
                 // Build and save the HNSW index for all indexes
                 this->group_HNSW_thres = group_HNSW_thres;
 
@@ -1915,6 +1916,7 @@ namespace bslib{
                     num_group_HNSW = 0;
                     for (size_t i = 0; i < final_group_num; i++){
                         assert(group_HNSW_thres > 0);
+                        std::cout << "Constructing HNSW for group " << i << std::endl;
                         if (groups_size[i] >= group_HNSW_thres){
                             num_group_HNSW++;
                             std::vector<float> group_vector(groups_size[i]);
@@ -2039,6 +2041,7 @@ namespace bslib{
 
 
     void Bslib_Index::read_group_HNSW(const std::string path_group_HNSW){
+        std::cout << "Reading Group HNSW" << std::endl;
         // Load the index 
         std::ifstream group_HNSW_input(path_group_HNSW, std::ios::binary);
         size_t record_group_num, record_HNSW_thres, num_group_HNSW;
