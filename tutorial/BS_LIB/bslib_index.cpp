@@ -2118,7 +2118,7 @@ namespace bslib{
 
     void Bslib_Index::write_base_alphas(std::string path_base_alpha){
         assert(use_vector_alpha);
-        assert(base_alphas.size() == final_group_num);
+        assert(base_alphas.size() == this->final_group_num);
         std::ofstream base_alphas_output(path_base_alpha, std::ios::binary);
         base_alphas_output.write((char *) & final_group_num, sizeof(size_t));
         for (size_t i = 0; i < final_group_num; i++){
@@ -2134,6 +2134,7 @@ namespace bslib{
         std::ifstream base_alphas_input (path_base_alpha, std::ios::binary);
         size_t group_num;
         base_alphas_input.read((char *) & group_num, sizeof(size_t));
+        std::cout << group_num << " " << this->final_group_num << std::endl;
         assert(group_num == this->final_group_num);
         this->base_alphas.resize(group_num);
         size_t group_size;
