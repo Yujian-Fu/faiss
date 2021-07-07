@@ -1937,7 +1937,7 @@ namespace bslib{
                             std::cout << "Wrting HNSW index " << group_HNSW->maxelements_ << std::endl;
                             group_HNSW_output.write((char *) & i, sizeof(size_t));
                             group_HNSW_output.write((char *) & group_HNSW->maxelements_, sizeof(size_t));
-                            group_HNSW_output.write((char *) & group_HNSW->enterpoint_node, sizeof(size_t));
+                            group_HNSW_output.write((char *) & group_HNSW->enterpoint_node, sizeof(hnswlib::idx_t));
                             group_HNSW_output.write((char *) & group_HNSW->offset_data, sizeof(size_t));
                             group_HNSW_output.write((char *) & group_HNSW->M_, sizeof(size_t));
                             group_HNSW_output.write((char *) & group_HNSW->maxM_, sizeof(size_t));
@@ -1947,8 +1947,8 @@ namespace bslib{
                                 uint8_t *ll_cur = group_HNSW->get_linklist0(temp);
                                 uint32_t size = *ll_cur;
                                 group_HNSW_output.write((char *) &size, sizeof(uint32_t));
-                                idx_t *data = (idx_t *)(ll_cur + 1);
-                                group_HNSW_output.write((char *) data, sizeof(idx_t) * size);
+                                hnswlib::idx_t *data = (hnswlib::idx_t *)(ll_cur + 1);
+                                group_HNSW_output.write((char *) data, sizeof(hnswlib::idx_t) * size);
                             }
                             delete [] group_HNSW;
                         }
