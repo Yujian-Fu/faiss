@@ -1125,6 +1125,8 @@ namespace bslib{
                         else{
                             float L2_C1_C2 = (query_alpha - base_alphas[all_group_id][m]) * (query_alpha - base_alphas[all_group_id][m]) * (lq_quantizer_index[n_lq].nn_centroid_dists[lq_group_id][lq_inner_group_id]);
                             query_search_dists[valid_result_length] = q_c_dist - base_alpha_norms[all_group_id][m] + base_norm + L2_C1_C2 - PQ_table_product;
+                            std::cout << q_c_dist << " " << query_alpha << " " << base_alpha_norms[all_group_id][m] << " " << base_norm  << L2_C1_C2 << " " << PQ_table_product << std::endl;
+                            exit(0);
                         }
 
                         query_search_labels[valid_result_length] = base_sequence_ids[all_group_id][m];
