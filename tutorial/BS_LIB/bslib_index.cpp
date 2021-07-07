@@ -1659,7 +1659,7 @@ namespace bslib{
         Output:
             None    (The index is updated)
     */
-    void Bslib_Index::assign_vectors(std::string path_ids, std::string path_base, std::string path_alphas,
+    void Bslib_Index::assign_vectors(std::string path_ids, std::string path_base, std::string path_alphas_raw,
         uint32_t batch_size, size_t nbatches,  std::ofstream & record_file){
 
         PrintMessage("Assigning the points");
@@ -1674,7 +1674,7 @@ namespace bslib{
             std::vector<float> vector_alphas;
             if (use_vector_alpha){
                 vector_alphas.resize(batch_size); 
-                alphas_output = std::ofstream(path_alphas, std::ios::binary);
+                alphas_output = std::ofstream(path_alphas_raw, std::ios::binary);
             }
 
             for (size_t i = 0; i < nbatches; i++){
