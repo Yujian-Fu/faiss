@@ -1965,7 +1965,7 @@ namespace bslib{
             //In order to save disk usage
             //Annotate the write_index function
             if (this->use_saving_index){
-                this->write_index(path_index);
+                //this->write_index(path_index);
             }
             std::string message = "Constructed and wrote the index ";
             Mrecorder.print_memory_usage(message);
