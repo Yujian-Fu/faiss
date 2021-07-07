@@ -173,7 +173,7 @@ namespace bslib{
         for (size_t i = 0; i < nc_upper; i++){if (min_train_size > train_set[i].size() / dimension) min_train_size = train_set[i].size() / dimension; if (i <= 1000) {std::cout << train_set[i].size() / dimension <<" ";}}
         std::cout <<  std::endl << "The min size for sub train set is: " << min_train_size << std::endl;
 
-        std::cout << "Computing alphas for lq_quantizer with upper centroids: " << this->upper_centroids.size() << " nc_per_group: " << max_nc_per_group << std::endl;
+        std::cout << "Computing alphas for lq_quantizer with upper centroids: " << this->upper_centroids.size() / dimension << " nc_per_group: " << max_nc_per_group << std::endl;
         std::cout << "The size of upper_centroids: " << this->upper_centroids.size() / this->dimension << std::endl;
         std::cout << "The size of nn_centroid_ids: " << this->nn_centroid_ids.size() << std::endl;
         alphas.resize(nc_upper);
