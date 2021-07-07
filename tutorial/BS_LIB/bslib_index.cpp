@@ -1923,7 +1923,6 @@ namespace bslib{
                             std::vector<float> float_group_vector(dimension);
                             uint32_t dim;
                             hnswlib::HierarchicalNSW group_HNSW = hnswlib::HierarchicalNSW(dimension, groups_size[i], 6, 12, 32, false, false, pq.code_size, pq.ksub);
-                            std::cout << "Adding points" << std::endl;
                             for (size_t j = 0; j < groups_size[i]; j++){
                                 base_input.seekg(base_sequence_ids[i][j] * dimension * sizeof(base_data_type) + base_sequence_ids[i][j] * sizeof(uint32_t), std::ios::beg);
                                 base_input.read((char *) & dim, sizeof(uint32_t)); assert(dim == this->dimension);
@@ -1942,7 +1941,6 @@ namespace bslib{
                             writeBinaryPOD(group_HNSW_output, group_HNSW.maxM_);
                             writeBinaryPOD(group_HNSW_output, group_HNSW.size_links_level0);
 
-                            std::cout << "Writing HNSW index " << group_HNSW.maxelements_ << std::endl;
                             for (size_t temp = 0; temp < group_HNSW.maxelements_; temp++){
                                 uint8_t *ll_cur = group_HNSW.get_linklist0(temp);
                                 uint32_t size = *ll_cur;
