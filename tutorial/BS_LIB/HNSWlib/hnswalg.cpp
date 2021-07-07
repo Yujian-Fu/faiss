@@ -361,9 +361,12 @@ float HierarchicalNSW::PQdistfunc(const float * PQ_dist_table, const idx_t id){
         return term1 + term2 - term3;
     }
     else{
+        std::cout << "Computing the HNSW LQ2 dist " << std::endl;
         float term1 = q_c_dist;
         float term2 = base_norms[base_sequece_id];
-        float term3 = 2 * bslib::pq_L2sqr(code, PQ_dist_table, code_size, ksub);
+        std::cout << "Computing the PQ product " << std::endl;
+        float term3 = 2 * bslib::pq_L2sqr(code, PQ_dist_table, this->code_size, this->ksub);
+        std::cout << "Computing the HNSW final distance " << std::endl;
         float term4 = (q_alpha - vector_alpha[id]) * (q_alpha - vector_alpha[id]) * nn_dist[id];
         float term5 = vector_alpha_norm[id];
         return term1 + term2 - term3 + term4 - term5;
