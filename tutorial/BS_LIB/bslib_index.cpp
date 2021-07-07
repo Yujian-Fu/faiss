@@ -2127,12 +2127,13 @@ namespace bslib{
     }
 
     void Bslib_Index::read_base_alphas(std::string path_base_alpha){
+        std::cout << "Loading base alphas " << std::endl;
         assert(use_vector_alpha);
         assert(this->base_alphas.size() == 0);
         std::ifstream base_alphas_input (path_base_alpha, std::ios::binary);
         size_t group_num;
         base_alphas_input.read((char *) & group_num, sizeof(size_t));
-        std::cout << group_num << " " << this->final_group_num << std::endl;
+        
         assert(group_num == this->final_group_num);
         this->base_alphas.resize(group_num);
         size_t group_size;
@@ -2144,6 +2145,7 @@ namespace bslib{
     }
 
     void Bslib_Index::write_base_alpha_norms(std::string path_base_alpha_norm){
+        
         assert(use_vector_alpha);
         assert(base_alpha_norms.size() == final_group_num);
         std::ofstream base_alphas_norms_output(path_base_alpha_norm, std::ios::binary);
@@ -2157,6 +2159,7 @@ namespace bslib{
     }
 
     void Bslib_Index::read_base_alpha_norms(std::string path_base_alpha_norm){
+        std::cout << "Loading base alpha norms " << std::endl;
         assert(use_vector_alpha);
         assert(this->base_alpha_norms.size() == 0);
         std::ifstream base_alpha_norms_input(path_base_alpha_norm, std::ios::binary);
