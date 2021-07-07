@@ -1921,7 +1921,8 @@ namespace bslib{
                             num_group_HNSW++;
                             std::vector<float> group_vector(groups_size[i]);
                             uint32_t dim;
-                            hnswlib::HierarchicalNSW * group_HNSW = new hnswlib::HierarchicalNSW(dimension, groups_size[i], 12, 24, 32, true, true, pq.code_size, pq.ksub);
+                            hnswlib::HierarchicalNSW * group_HNSW = new hnswlib::HierarchicalNSW(dimension, groups_size[i], 6, 12, 32, true, true, pq.code_size, pq.ksub);
+                            std::cout << "Adding points" << std::endl;
                             for (size_t j = 0; j < groups_size[i]; j++){
                                 base_input.seekg(base_sequence_ids[i][j] * dimension * sizeof(base_data_type) + base_sequence_ids[i][j] * sizeof(uint32_t), std::ios::beg);
                                 base_input.read((char *) & dim, sizeof(uint32_t)); assert(dim == this->dimension);
@@ -1929,6 +1930,7 @@ namespace bslib{
                                 group_HNSW->addPoint(group_vector.data());
                             }
 
+                            std::cout << "Wrting HNSW index" << std::endl;
                             group_HNSW_output.write((char *) & i, sizeof(size_t));
                             group_HNSW_output.write((char *) & group_HNSW->maxelements_, sizeof(size_t));
                             group_HNSW_output.write((char *) & group_HNSW->enterpoint_node, sizeof(size_t));
