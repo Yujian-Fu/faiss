@@ -392,7 +392,7 @@ namespace bslib{
                 const size_t upper_search_space, const idx_t group_id, float * result_dists, idx_t * result_labels, float * vector_alpha){        
 
         for (size_t inner_group_id = 0; inner_group_id < max_nc_per_group; inner_group_id++){
-            const float alpha = alphas[group_id][inner_group_id];
+            
             result_labels[inner_group_id] = CentroidDistributionMap[group_id] + inner_group_id;
             idx_t nn_id = nn_centroid_ids[group_id][inner_group_id];
             float query_nn_dist = Not_Found;
@@ -424,12 +424,12 @@ namespace bslib{
                 float group_nn_dist = nn_centroid_dists[group_id][inner_group_id];
 
                 if (LQ_type == 2){
-                    std::cout << "Fast LQ 2 distance " << std::endl;
                     auto result_pair = LQ0_fast_distance(group_nn_dist, query_group_dist, query_nn_dist);
                     result_dists[inner_group_id] = result_pair.second;
                     vector_alpha[inner_group_id] = result_pair.first;
                 }
                 else{
+                    float alpha = alphas[group_id][inner_group_id];
                     result_dists[inner_group_id] = alpha*(alpha-1)*group_nn_dist + (1-alpha)*query_group_dist + alpha*query_nn_dist;  
                 }                                                     
             }
@@ -440,7 +440,6 @@ namespace bslib{
                 float nn_dist = nn_centroid_dists[group_id][inner_group_id];
 
                 if (LQ_type == 2){
-                    std::cout << "LQ 2 distance " << std::endl;
                     auto result_pair = LQ0_distance(query, group_centroid, nn_centroid, nn_dist);
                     result_dists[inner_group_id] = result_pair.second;
                     vector_alpha[inner_group_id] = result_pair.first;
@@ -450,6 +449,7 @@ namespace bslib{
                 //compute_final_centroid(group_id, j, sub_centroid.data());
                 //faiss::fvec_madd(dimension, sub_centroid.data(), -1.0, query, query_sub_centroid_vector.data());
                 else{
+                    float alpha = alphas[group_id][inner_group_id];
                     for (size_t k = 0; k < dimension; k++){
                         query_sub_centroid_vector[k] = alpha * nn_centroid[k] + (1-alpha)*group_centroid[k]-query[k];
                     }
