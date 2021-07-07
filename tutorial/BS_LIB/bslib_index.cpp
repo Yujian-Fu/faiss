@@ -1899,6 +1899,8 @@ namespace bslib{
                 write_base_alpha_norms(path_base_alpha_norms);
             }
 
+            this->compute_centroid_norm(path_centroid_norm);
+            
             if (use_group_HNSW){
                 std::cout << "Building group HNSW " << std::endl;
                 // Build and save the HNSW index for all indexes
@@ -1956,14 +1958,11 @@ namespace bslib{
                 read_group_HNSW(path_group_HNSW);
             }
 
-            this->compute_centroid_norm(path_centroid_norm);
-
             //In order to save disk usage
             //Annotate the write_index function
             if (this->use_saving_index){
                 //this->write_index(path_index);
             }
-            
             std::string message = "Constructed and wrote the index ";
             Mrecorder.print_memory_usage(message);
             Mrecorder.record_memory_usage(record_file,  message);
@@ -2060,16 +2059,18 @@ namespace bslib{
             group_HNSW.code_size = pq.code_size; group_HNSW.ksub = pq.ksub;
 
             size_t group_id;
-            group_HNSW_input.read((char *) & group_id, sizeof(size_t)); 
+            readBinaryPOD(group_HNSW_input, group_id); 
             group_HNSW_idxs[group_id] = i;
             std::cout << "Read Group HNSW " << group_id << std::endl; 
             if (use_vector_alpha){
+                std::cout << "Load vector alpha info " << std::endl;
                 size_t n_lq = lq_quantizer_index.size() - 1;
                 group_HNSW.nn_dist = lq_quantizer_index[n_lq].nn_centroid_dists[group_id].data();
                 group_HNSW.vector_alpha_norm = this->base_alpha_norms[group_id].data();
                 group_HNSW.vector_alpha = this->base_alphas[group_id].data();
             }
             else{
+                std::cout << "Load centroid norm info " << std::endl;
                 group_HNSW.centroid_norm = this->centroid_norms[group_id];
             }
 
