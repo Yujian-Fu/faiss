@@ -1922,7 +1922,7 @@ namespace bslib{
                             std::vector<base_data_type> group_vector(dimension);
                             std::vector<float> float_group_vector(dimension);
                             uint32_t dim;
-                            hnswlib::HierarchicalNSW * group_HNSW = new hnswlib::HierarchicalNSW(dimension, groups_size[i], 6, 12, 32, true, true, pq.code_size, pq.ksub);
+                            hnswlib::HierarchicalNSW * group_HNSW = new hnswlib::HierarchicalNSW(dimension, groups_size[i], 6, 12, 32, false, false, pq.code_size, pq.ksub);
                             std::cout << "Adding points" << std::endl;
                             for (size_t j = 0; j < groups_size[i]; j++){
                                 base_input.seekg(base_sequence_ids[i][j] * dimension * sizeof(base_data_type) + base_sequence_ids[i][j] * sizeof(uint32_t), std::ios::beg);
