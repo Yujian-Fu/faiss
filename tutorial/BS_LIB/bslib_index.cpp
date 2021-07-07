@@ -1946,9 +1946,7 @@ namespace bslib{
                                 uint32_t size = *ll_cur;
                                 group_HNSW_output.write((char *) &size, sizeof(uint32_t));
                                 hnswlib::idx_t *data = (hnswlib::idx_t *)(ll_cur + 1);
-                                std::cout << temp << std::endl;
                                 group_HNSW_output.write((char *) data, sizeof(hnswlib::idx_t) * size);
-                                std::cout << size << std::endl;
                             }
                         }
                     }
