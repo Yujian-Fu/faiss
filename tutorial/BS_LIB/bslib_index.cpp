@@ -867,7 +867,7 @@ namespace bslib{
         const bool validation = false; 
         size_t validation_print_space = 50; 
         const bool analysis = false; 
-        const bool showmessage = false; 
+        const bool showmessage = true; 
 
         std::vector<float>  visited_gt_proportion;
         std::vector<size_t> actual_visited_vectors;
@@ -1052,7 +1052,6 @@ namespace bslib{
             if(showmessage) std::cout << "Assigning the space for dists and labels with size " << max_visited_vectors << " + " << max_size <<  std::endl;
             std::vector<float> query_search_dists(max_visited_vectors + max_size, 0);
             std::vector<idx_t> query_search_labels(max_visited_vectors + max_size, 0);
-            
             
             // The dists for actual distance validation
             std::vector<float> query_actual_dists; if (validation){(query_actual_dists.resize(max_visited_vectors + max_size));}
