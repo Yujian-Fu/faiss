@@ -1914,8 +1914,8 @@ namespace bslib{
                     group_HNSW_output.write((char *) & num_group_HNSW, sizeof(size_t));
 
                     num_group_HNSW = 0;
+                    assert(group_HNSW_thres > 0);
                     for (size_t i = 0; i < final_group_num; i++){
-                        assert(group_HNSW_thres > 0);
                         if (groups_size[i] >= group_HNSW_thres){
                             std::cout << "Constructing HNSW for group " << i <<  " " << groups_size[i] << std::endl;
                             num_group_HNSW++;
@@ -2075,6 +2075,7 @@ namespace bslib{
             group_HNSW.base_sequece_id_list = this->base_sequence_ids[group_id].data();
             group_HNSW.base_code_point = base_codes[group_id].data();
 
+
             readBinaryPOD(group_HNSW_input, group_HNSW.maxelements_);
             readBinaryPOD(group_HNSW_input, group_HNSW.enterpoint_node);
             readBinaryPOD(group_HNSW_input, group_HNSW.offset_data);
@@ -2100,7 +2101,7 @@ namespace bslib{
                 *ll_cur = edge_size;
                 idx_t *data = (idx_t *)(ll_cur + 1);
 
-                group_HNSW_input.read((char *) data, edge_size * sizeof(idx_t));
+                group_HNSW_input.read((char *) data, edge_size * sizeof(hnswlib::idx_t));
             }
             group_HNSW_list.push_back(group_HNSW);
         }
