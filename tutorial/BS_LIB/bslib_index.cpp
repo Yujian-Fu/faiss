@@ -2056,23 +2056,19 @@ namespace bslib{
         this->group_HNSW_list.resize(num_group_HNSW);
 
         for (size_t i = 0; i < num_group_HNSW; i++){
-            std::cout << "Reading Group HNSW" << i << std::endl; 
             hnswlib::HierarchicalNSW * group_HNSW = new hnswlib::HierarchicalNSW(true, this->use_vector_alpha);
             group_HNSW->code_size = pq.code_size; group_HNSW->ksub = pq.ksub;
 
             size_t group_id;
             readBinaryPOD(group_HNSW_input, group_id); 
             group_HNSW_idxs[group_id] = i;
-            std::cout << "Read Group HNSW " << group_id << std::endl; 
             if (use_vector_alpha){
-                std::cout << "Load vector alpha info " << std::endl;
                 size_t n_lq = lq_quantizer_index.size() - 1;
                 group_HNSW->nn_dist = lq_quantizer_index[n_lq].nn_centroid_dists[group_id].data();
                 group_HNSW->vector_alpha_norm = this->base_alpha_norms[group_id].data();
                 group_HNSW->vector_alpha = this->base_alphas[group_id].data();
             }
             else{
-                std::cout << "Load centroid norm info " << std::endl;
                 group_HNSW->centroid_norm = this->centroid_norms[group_id];
             }
 
@@ -2080,7 +2076,6 @@ namespace bslib{
             group_HNSW->base_sequece_id_list = this->base_sequence_ids[group_id].data();
             group_HNSW->base_code_point = base_codes[group_id].data();
 
-            std::cout << "Read Group HNSW info " << group_id << std::endl; 
             readBinaryPOD(group_HNSW_input, group_HNSW->maxelements_);
             readBinaryPOD(group_HNSW_input, group_HNSW->enterpoint_node);
             readBinaryPOD(group_HNSW_input, group_HNSW->offset_data);
@@ -2101,11 +2096,9 @@ namespace bslib{
             
             uint32_t edge_size;
 
-            std::cout << "Read Group HNSW edge " << group_id << " " <<  group_HNSW->maxelements_ << std::endl; 
             for (size_t temp = 0; temp < group_HNSW->maxelements_; temp++) {
                 group_HNSW_input.read((char *) & edge_size, sizeof(uint32_t));
 
-                std::cout << "Get loc "; 
                 uint8_t *ll_cur = group_HNSW->get_linklist0(temp);
                 std::cout << temp << " ";
                 *ll_cur = edge_size;
@@ -2113,7 +2106,6 @@ namespace bslib{
 
                 group_HNSW_input.read((char *) data, edge_size * sizeof(hnswlib::idx_t));
             }
-            std::cout << "Push to list" << std::endl;
             this->group_HNSW_list[i] = group_HNSW;
         }
     }

@@ -8,9 +8,8 @@ const bool use_norm_quantization = false;
 const bool use_train_selector = false;
 const bool use_all_HNSW = false;
 
-
 const bool use_OPQ = false;
-const bool use_HNSW_group = true;
+const bool use_HNSW_group = false;
 const bool is_recording = true;
 const bool saving_index = true;
 
