@@ -2097,7 +2097,7 @@ namespace bslib{
             
             uint32_t edge_size;
 
-            std::cout << "Read Group HNSW edge " << group_id << std::endl; 
+            std::cout << "Read Group HNSW edge " << group_id << " " <<  group_HNSW.maxelements_ << std::endl; 
             for (size_t temp = 0; temp < group_HNSW.maxelements_; temp++) {
                 group_HNSW_input.read((char *) & edge_size, sizeof(uint32_t));
 
@@ -2109,6 +2109,7 @@ namespace bslib{
 
                 group_HNSW_input.read((char *) data, edge_size * sizeof(hnswlib::idx_t));
             }
+            std::cout << "Push to list" << std::endl;
             this->group_HNSW_list.push_back(group_HNSW);
         }
     }
