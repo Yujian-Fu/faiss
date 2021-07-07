@@ -1919,7 +1919,8 @@ namespace bslib{
                         if (groups_size[i] >= group_HNSW_thres){
                             std::cout << "Constructing HNSW for group " << i <<  " " << groups_size[i] << std::endl;
                             num_group_HNSW++;
-                            std::vector<float> group_vector(groups_size[i]);
+                            std::vector<base_data_type> group_vector(dimension);
+                            std::vector<float> float_group_vector(dimension);
                             uint32_t dim;
                             hnswlib::HierarchicalNSW * group_HNSW = new hnswlib::HierarchicalNSW(dimension, groups_size[i], 6, 12, 32, true, true, pq.code_size, pq.ksub);
                             std::cout << "Adding points" << std::endl;
@@ -1927,10 +1928,13 @@ namespace bslib{
                                 base_input.seekg(base_sequence_ids[i][j] * dimension * sizeof(base_data_type) + base_sequence_ids[i][j] * sizeof(uint32_t), std::ios::beg);
                                 base_input.read((char *) & dim, sizeof(uint32_t)); assert(dim == this->dimension);
                                 base_input.read((char *) group_vector.data(), sizeof(base_data_type) * dimension);
-                                group_HNSW->addPoint(group_vector.data());
+                                for (size_t temp = 0; temp < dimension; temp++){
+                                    float_group_vector[temp] = group_vector[temp];
+                                }
+                                group_HNSW->addPoint(float_group_vector.data());
                             }
 
-                            std::cout << "Wrting HNSW index" << std::endl;
+                            std::cout << "Wrting HNSW index " << group_HNSW->maxelements_ << std::endl;
                             group_HNSW_output.write((char *) & i, sizeof(size_t));
                             group_HNSW_output.write((char *) & group_HNSW->maxelements_, sizeof(size_t));
                             group_HNSW_output.write((char *) & group_HNSW->enterpoint_node, sizeof(size_t));
@@ -1938,6 +1942,7 @@ namespace bslib{
                             group_HNSW_output.write((char *) & group_HNSW->M_, sizeof(size_t));
                             group_HNSW_output.write((char *) & group_HNSW->maxM_, sizeof(size_t));
                             group_HNSW_output.write((char *) & group_HNSW->size_links_level0, sizeof(size_t));
+
                             for (size_t temp = 0; temp < group_HNSW->maxelements_; temp++){
                                 uint8_t *ll_cur = group_HNSW->get_linklist0(temp);
                                 uint32_t size = *ll_cur;
