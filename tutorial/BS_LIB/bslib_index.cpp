@@ -2103,7 +2103,7 @@ namespace bslib{
 
                 uint8_t *ll_cur = group_HNSW.get_linklist0(temp);
                 *ll_cur = edge_size;
-                idx_t *data = (idx_t *)(ll_cur + 1);
+                hnswlib::idx_t *data = (hnswlib::idx_t *)(ll_cur + 1);
 
                 group_HNSW_input.read((char *) data, edge_size * sizeof(hnswlib::idx_t));
             }
