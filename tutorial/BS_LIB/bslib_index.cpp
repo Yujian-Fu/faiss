@@ -2046,7 +2046,7 @@ namespace bslib{
 
 
     void Bslib_Index::read_group_HNSW(const std::string path_group_HNSW){
-        std::cout << "Reading Group HNSW" << std::endl; 
+        
         // Load the index 
         std::ifstream group_HNSW_input(path_group_HNSW, std::ios::binary);
         size_t record_group_num, record_HNSW_thres, num_group_HNSW;
@@ -2055,6 +2055,7 @@ namespace bslib{
         readBinaryPOD(group_HNSW_input, num_group_HNSW);
 
         for (size_t i = 0; i < num_group_HNSW; i++){
+            std::cout << "Reading Group HNSW" << i << std::endl; 
             hnswlib::HierarchicalNSW group_HNSW = hnswlib::HierarchicalNSW(true, this->use_vector_alpha);
             group_HNSW.code_size = pq.code_size; group_HNSW.ksub = pq.ksub;
 
