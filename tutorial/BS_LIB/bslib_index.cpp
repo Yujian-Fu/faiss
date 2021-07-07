@@ -2101,7 +2101,9 @@ namespace bslib{
             for (size_t temp = 0; temp < group_HNSW.maxelements_; temp++) {
                 group_HNSW_input.read((char *) & edge_size, sizeof(uint32_t));
 
+                std::cout << "Get loc "; 
                 uint8_t *ll_cur = group_HNSW.get_linklist0(temp);
+                std::cout << temp << " ";
                 *ll_cur = edge_size;
                 hnswlib::idx_t *data = (hnswlib::idx_t *)(ll_cur + 1);
 
