@@ -1082,8 +1082,8 @@ namespace bslib{
                 if (use_group_HNSW && group_size >= group_HNSW_thres){
                     assert(group_HNSW_thres > 0);
                     size_t group_HNSW_id = group_HNSW_idxs.at(all_group_id);
-                    group_HNSW_list[group_HNSW_id].q_c_dist = q_c_dist;
-                    auto result_queue = group_HNSW_list[group_HNSW_id].searchKnn(precomputed_table.data(), result_k);
+                    this->group_HNSW_list[group_HNSW_id].q_c_dist = q_c_dist;
+                    auto result_queue = this->group_HNSW_list[group_HNSW_id].searchKnn(precomputed_table.data(), result_k);
                     for(size_t m = 0; m < result_k; m++){
                         query_search_dists[valid_result_length] = result_queue.top().first;
                         query_search_labels[valid_result_length] = base_sequence_ids[all_group_id][result_queue.top().second];
@@ -2078,7 +2078,7 @@ namespace bslib{
             group_HNSW.base_sequece_id_list = this->base_sequence_ids[group_id].data();
             group_HNSW.base_code_point = base_codes[group_id].data();
 
-            std::cout << "Read Group HNSW edge " << group_id << std::endl; 
+            std::cout << "Read Group HNSW info " << group_id << std::endl; 
             readBinaryPOD(group_HNSW_input, group_HNSW.maxelements_);
             readBinaryPOD(group_HNSW_input, group_HNSW.enterpoint_node);
             readBinaryPOD(group_HNSW_input, group_HNSW.offset_data);
@@ -2097,6 +2097,7 @@ namespace bslib{
             
             uint32_t edge_size;
 
+            std::cout << "Read Group HNSW edge " << group_id << std::endl; 
             for (size_t temp = 0; temp < group_HNSW.maxelements_; temp++) {
                 group_HNSW_input.read((char *) & edge_size, sizeof(uint32_t));
 
@@ -2106,7 +2107,7 @@ namespace bslib{
 
                 group_HNSW_input.read((char *) data, edge_size * sizeof(hnswlib::idx_t));
             }
-            group_HNSW_list.push_back(group_HNSW);
+            this->group_HNSW_list.push_back(group_HNSW);
         }
     }
 
