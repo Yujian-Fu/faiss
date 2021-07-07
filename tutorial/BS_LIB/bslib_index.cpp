@@ -1125,7 +1125,7 @@ namespace bslib{
                         else{
                             float L2_C1_C2 = (query_alpha - base_alphas[all_group_id][m]) * (query_alpha - base_alphas[all_group_id][m]) * (lq_quantizer_index[n_lq].nn_centroid_dists[lq_group_id][lq_inner_group_id]);
                             query_search_dists[valid_result_length] = q_c_dist - base_alpha_norms[all_group_id][m] + base_norm + L2_C1_C2 - PQ_table_product;
-                            std::cout << q_c_dist << " " << query_alpha << " " << base_alpha_norms[all_group_id][m] << " " << base_norm  << L2_C1_C2 << " " << PQ_table_product << std::endl;
+                            std::cout << q_c_dist << " " << query_alpha << " " << base_alpha_norms[all_group_id][m] << " " << base_norm  << " " << L2_C1_C2 << " " << PQ_table_product << std::endl;
                             exit(0);
                         }
 
@@ -1965,7 +1965,7 @@ namespace bslib{
             //In order to save disk usage
             //Annotate the write_index function
             if (this->use_saving_index){
-                //this->write_index(path_index);
+                this->write_index(path_index);
             }
             std::string message = "Constructed and wrote the index ";
             Mrecorder.print_memory_usage(message);
@@ -2155,7 +2155,7 @@ namespace bslib{
         for (size_t i = 0; i < final_group_num; i++){
             size_t group_size = base_alpha_norms[i].size();
             base_alphas_norms_output.write((char *) & group_size, sizeof(size_t));
-            base_alphas_norms_output.write((char *) this->base_alpha_norms.data(), group_size * sizeof(float));
+            base_alphas_norms_output.write((char *) this->base_alpha_norms[i].data(), group_size * sizeof(float));
         }
         base_alphas_norms_output.close();
     }
