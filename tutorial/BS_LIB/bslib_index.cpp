@@ -1545,9 +1545,6 @@ namespace bslib{
             assert(centroid_norms.size() == this->final_group_num);
             output.write((char *) centroid_norms.data(), this->final_group_num * sizeof(float));
         }
-
-
-
         output.close();
     }
 
@@ -2126,6 +2123,7 @@ namespace bslib{
             base_alphas_output.write((char * ) & group_size, sizeof(size_t));
             base_alphas_output.write((char * ) this->base_alphas[i].data(), group_size * sizeof(size_t));
         }
+        base_alphas_output.close();
     }
 
     void Bslib_Index::read_base_alphas(std::string path_base_alpha){
@@ -2155,6 +2153,7 @@ namespace bslib{
             base_alphas_norms_output.write((char *) & group_size, sizeof(size_t));
             base_alphas_norms_output.write((char *) this->base_alpha_norms.data(), group_size * sizeof(size_t));
         }
+        base_alphas_norms_output.close();
     }
 
     void Bslib_Index::read_base_alpha_norms(std::string path_base_alpha_norm){

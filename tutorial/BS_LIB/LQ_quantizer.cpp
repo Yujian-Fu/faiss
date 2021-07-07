@@ -61,7 +61,7 @@ namespace bslib{
 
             float cosine_sqr = (v_c_dist + nn_dist - v_n_dist)*(v_c_dist + nn_dist - v_n_dist)/(2 * v_c_dist * nn_dist);
             // The first and second type of dist
-            float dist_1 = v_c_dist * ( - cosine_sqr);
+            float dist_1 = v_c_dist * (1 - cosine_sqr);
             //float dist_2 = alpha*(alpha-1)*nn_dist + (1-alpha)*v_c_dist + alpha*v_n_dist;
 
             return std::make_pair(alpha, dist_1); 
