@@ -1214,7 +1214,6 @@ namespace bslib{
                         float actual_dist =  faiss::fvec_norm_L2sqr(distance_vector.data(), dimension);
                         reranking_actual_dists[j] = actual_dist;
                     }
-
                     keep_k_min(reranking_space, result_k, reranking_actual_dists.data(), reranking_labels.data(), query_dists + i * result_k, query_ids + i * result_k);
                 }
 
@@ -1942,6 +1941,8 @@ namespace bslib{
                             writeBinaryPOD(group_HNSW_output, group_HNSW.M_);
                             writeBinaryPOD(group_HNSW_output, group_HNSW.maxM_);
                             writeBinaryPOD(group_HNSW_output, group_HNSW.size_links_level0);
+                            writeBinaryPOD(group_HNSW_output, group_HNSW.efConstruction_);
+                            writeBinaryPOD(group_HNSW_output, group_HNSW.efSearch);
 
                             for (size_t temp = 0; temp < group_HNSW.maxelements_; temp++){
                                 uint8_t *ll_cur = group_HNSW.get_linklist0(temp);
@@ -2024,10 +2025,11 @@ namespace bslib{
                 }
 
                 //assert (gt.size() == recall_k);
-                
+
                 for (size_t j = 0; j < recall_k; j++){
-                    if (gt.count(query_labels[i * recall_k + j]) != 0)
+                    if (gt.count(query_labels[i * recall_k + j]) != 0){
                         correct ++;
+                    }
                 }
             }
             //float recall = float(correct) / (recall_k * nq);
@@ -2087,6 +2089,8 @@ namespace bslib{
             readBinaryPOD(group_HNSW_input, group_HNSW->M_);
             readBinaryPOD(group_HNSW_input, group_HNSW->maxM_);
             readBinaryPOD(group_HNSW_input, group_HNSW->size_links_level0);
+            readBinaryPOD(group_HNSW_input, group_HNSW->efConstruction_);
+            readBinaryPOD(group_HNSW_input, group_HNSW->efSearch);
             group_HNSW->data_size_ = 0;
             group_HNSW->size_data_per_element = group_HNSW->size_links_level0;
 
