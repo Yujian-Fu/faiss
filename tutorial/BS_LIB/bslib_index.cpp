@@ -2051,16 +2051,18 @@ namespace bslib{
         // Load the index 
         std::ifstream group_HNSW_input(path_group_HNSW, std::ios::binary);
         size_t record_group_num, record_HNSW_thres, num_group_HNSW;
-        group_HNSW_input.read((char *) & record_group_num, sizeof(size_t)); assert(record_group_num == final_group_num);
-        group_HNSW_input.read((char *) & record_HNSW_thres, sizeof(size_t)); this->group_HNSW_thres = group_HNSW_thres;
-        group_HNSW_input.read((char *) & num_group_HNSW, sizeof(size_t));
+        readBinaryPOD(group_HNSW_input, record_group_num); assert(record_group_num == final_group_num);
+        readBinaryPOD(group_HNSW_input, record_HNSW_thres); this->group_HNSW_thres = group_HNSW_thres;
+        readBinaryPOD(group_HNSW_input, num_group_HNSW);
 
         for (size_t i = 0; i < num_group_HNSW; i++){
             hnswlib::HierarchicalNSW group_HNSW = hnswlib::HierarchicalNSW(true, this->use_vector_alpha);
             group_HNSW.code_size = pq.code_size; group_HNSW.ksub = pq.ksub;
 
-            size_t group_id; group_HNSW_input.read((char *) & group_id, sizeof(size_t)); 
+            size_t group_id;
+            group_HNSW_input.read((char *) & group_id, sizeof(size_t)); 
             group_HNSW_idxs[group_id] = i;
+            std::cout << "Read Group HNSW " << group_id << std::endl; 
             if (use_vector_alpha){
                 size_t n_lq = lq_quantizer_index.size() - 1;
                 group_HNSW.nn_dist = lq_quantizer_index[n_lq].nn_centroid_dists[group_id].data();
@@ -2075,7 +2077,7 @@ namespace bslib{
             group_HNSW.base_sequece_id_list = this->base_sequence_ids[group_id].data();
             group_HNSW.base_code_point = base_codes[group_id].data();
 
-
+            std::cout << "Read Group HNSW edge " << group_id << std::endl; 
             readBinaryPOD(group_HNSW_input, group_HNSW.maxelements_);
             readBinaryPOD(group_HNSW_input, group_HNSW.enterpoint_node);
             readBinaryPOD(group_HNSW_input, group_HNSW.offset_data);
