@@ -1934,15 +1934,15 @@ namespace bslib{
                                 group_HNSW->addPoint(float_group_vector.data());
                             }
 
-                            std::cout << "Wrting HNSW index " << group_HNSW->maxelements_ << std::endl;
-                            group_HNSW_output.write((char *) & i, sizeof(size_t));
-                            group_HNSW_output.write((char *) & group_HNSW->maxelements_, sizeof(size_t));
-                            group_HNSW_output.write((char *) & group_HNSW->enterpoint_node, sizeof(hnswlib::idx_t));
-                            group_HNSW_output.write((char *) & group_HNSW->offset_data, sizeof(size_t));
-                            group_HNSW_output.write((char *) & group_HNSW->M_, sizeof(size_t));
-                            group_HNSW_output.write((char *) & group_HNSW->maxM_, sizeof(size_t));
-                            group_HNSW_output.write((char *) & group_HNSW->size_links_level0, sizeof(size_t));
+                            writeBinaryPOD(group_HNSW_output, i);
+                            writeBinaryPOD(group_HNSW_output, group_HNSW->maxelements_);
+                            writeBinaryPOD(group_HNSW_output, group_HNSW->enterpoint_node);
+                            writeBinaryPOD(group_HNSW_output, group_HNSW->offset_data);
+                            writeBinaryPOD(group_HNSW_output, group_HNSW->M_);
+                            writeBinaryPOD(group_HNSW_output, group_HNSW->maxM_);
+                            writeBinaryPOD(group_HNSW_output, group_HNSW->size_links_level0);
 
+                            std::cout << "Writing HNSW index " << group_HNSW->maxelements_ << std::endl;
                             for (size_t temp = 0; temp < group_HNSW->maxelements_; temp++){
                                 uint8_t *ll_cur = group_HNSW->get_linklist0(temp);
                                 uint32_t size = *ll_cur;
@@ -2042,7 +2042,7 @@ namespace bslib{
 
             if (use_reranking){
                 std::cout << " with reranking parameter: " << this->reranking_space << std::endl;
-            } 
+            }
             std::cout << std::endl;
         }
         }
@@ -2050,7 +2050,7 @@ namespace bslib{
 
 
     void Bslib_Index::read_group_HNSW(const std::string path_group_HNSW){
-        std::cout << "Reading Group HNSW" << std::endl;
+        std::cout << "Reading Group HNSW" << std::endl; 
         // Load the index 
         std::ifstream group_HNSW_input(path_group_HNSW, std::ios::binary);
         size_t record_group_num, record_HNSW_thres, num_group_HNSW;
@@ -2059,10 +2059,7 @@ namespace bslib{
         group_HNSW_input.read((char *) & num_group_HNSW, sizeof(size_t));
 
         for (size_t i = 0; i < num_group_HNSW; i++){
-            hnswlib::HierarchicalNSW group_HNSW = hnswlib::HierarchicalNSW(false, false, false);
-            group_HNSW.use_vector_alpha = this->use_vector_alpha;
-            
-            group_HNSW.PQ_flag = true; group_HNSW.PQ_full_data = false;
+            hnswlib::HierarchicalNSW group_HNSW = hnswlib::HierarchicalNSW(true, this->use_vector_alpha);
             group_HNSW.code_size = pq.code_size; group_HNSW.ksub = pq.ksub;
 
             size_t group_id; group_HNSW_input.read((char *) & group_id, sizeof(size_t)); 
@@ -2081,12 +2078,12 @@ namespace bslib{
             group_HNSW.base_sequece_id_list = this->base_sequence_ids[group_id].data();
             group_HNSW.base_code_point = base_codes[group_id].data();
 
-            group_HNSW_input.read((char *) & group_HNSW.maxelements_, sizeof(size_t));
-            group_HNSW_input.read((char *) & group_HNSW.enterpoint_node, sizeof(size_t));
-            group_HNSW_input.read((char *) & group_HNSW.offset_data, sizeof(size_t));
-            group_HNSW_input.read((char *) & group_HNSW.M_, sizeof(size_t));
-            group_HNSW_input.read((char *) & group_HNSW.maxM_, sizeof(size_t));
-            group_HNSW_input.read((char *) & group_HNSW.size_links_level0, sizeof(size_t));
+            readBinaryPOD(group_HNSW_input, group_HNSW.maxelements_);
+            readBinaryPOD(group_HNSW_input, group_HNSW.enterpoint_node);
+            readBinaryPOD(group_HNSW_input, group_HNSW.offset_data);
+            readBinaryPOD(group_HNSW_input, group_HNSW.M_);
+            readBinaryPOD(group_HNSW_input, group_HNSW.maxM_);
+            readBinaryPOD(group_HNSW_input, group_HNSW.size_links_level0);
             group_HNSW.data_size_ = 0;
             group_HNSW.size_data_per_element = group_HNSW.size_links_level0;
 

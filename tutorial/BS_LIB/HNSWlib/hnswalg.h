@@ -60,11 +60,8 @@ namespace hnswlib {
 
         size_t dist_calc;
 
-        
-
-        bool PQ_flag;
-        bool PQ_full_data;
-        bool use_vector_alpha;
+        const bool PQ_dist_flag;
+        const bool use_vector_alpha;
 
         size_t d_;
         size_t code_size;
@@ -93,10 +90,10 @@ namespace hnswlib {
 
 
     public:
-        HierarchicalNSW(bool PQ_flag = false, bool PQ_full_data = false, bool use_vector_alpha = false);
+        HierarchicalNSW(const bool PQ_flag = false, const bool use_vector_alpha = false);
 
         HierarchicalNSW(size_t d, size_t maxelements, size_t M, size_t maxM, size_t efConstruction, bool PQ_flag = false,
-         bool PQ_full_data = false, size_t code_size = 8, size_t ksub = 256);
+        const bool use_vector_alpha = false, size_t code_size = 8, size_t ksub = 256);
 
         ~HierarchicalNSW();
 

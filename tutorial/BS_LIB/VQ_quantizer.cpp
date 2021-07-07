@@ -479,7 +479,7 @@ namespace bslib{
         assert(HNSW_quantizers.size() == nc_upper);
 
         for (size_t HNSW_id = 0; HNSW_id < nc_upper; HNSW_id++){
-            hnswlib::HierarchicalNSW * HNSW = new hnswlib::HierarchicalNSW(false, false, false);
+            hnswlib::HierarchicalNSW * HNSW = new hnswlib::HierarchicalNSW(false, false);
 
             //Load Info
             readBinaryPOD(input, HNSW->maxelements_);

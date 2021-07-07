@@ -2,36 +2,20 @@
 
 namespace hnswlib {
 
-    HierarchicalNSW::HierarchicalNSW(bool PQ_flag, bool PQ_full_data, bool use_vector_alpha)
-    {
-        this->PQ_flag = PQ_flag;
-        this->PQ_full_data = PQ_full_data;
-        this->use_vector_alpha = use_vector_alpha;
-    }
+    HierarchicalNSW::HierarchicalNSW(const bool PQ_dist_flag, const bool use_vector_alpha):
+    PQ_dist_flag(PQ_dist_flag), use_vector_alpha(use_vector_alpha){}
 
     HierarchicalNSW::HierarchicalNSW(size_t d, size_t maxelements, size_t M, size_t maxM, size_t efConstruction, 
-    bool PQ_flag, bool PQ_full_data, size_t code_size, size_t ksub)
+    const bool PQ_dist_flag, const bool use_vector_alpha,  size_t code_size, size_t ksub):
+    PQ_dist_flag(PQ_dist_flag), use_vector_alpha(use_vector_alpha)
     {
 
     this->d_ = d;
     this->code_size = code_size;
-    this->PQ_flag = PQ_flag;
-    this->PQ_full_data = PQ_full_data;
     this->ksub = ksub;
 
-    if (this->PQ_flag){
-        if (this->PQ_full_data){
-            // Load full data for construction
-            data_size_ = d * sizeof(float);
-        }
-        else{
-            // Use compressed data for search
-            data_size_ = 0;
-        }
-    }
-    else{
-        data_size_ = d * sizeof(float);
-    }
+    this->data_size_ = d * sizeof(float);
+
 
     this->efConstruction_ = efConstruction;
     this->efSearch = efConstruction;
@@ -63,13 +47,8 @@ HierarchicalNSW::~HierarchicalNSW()
 }
 
 float HierarchicalNSW::getDistance(const float * point, idx_t id){
-    if (PQ_flag){
-        if (PQ_full_data){
-            return fstdistfunc(point, getDataByInternalId(id));
-        }
-        else{
+    if (PQ_dist_flag){
             return PQdistfunc(point, id);
-        }
     }
     else{
         return fstdistfunc(point, getDataByInternalId(id));
@@ -109,13 +88,16 @@ std::priority_queue<std::pair<float, idx_t>> HierarchicalNSW::searchBaseLayer(co
 
         _mm_prefetch((char *) (massVisited + *data), _MM_HINT_T0);
         _mm_prefetch((char *) (massVisited + *data + 64), _MM_HINT_T0);
-        _mm_prefetch(getDataByInternalId(*data), _MM_HINT_T0);
+        if(!PQ_dist_flag){_mm_prefetch(getDataByInternalId(*data), _MM_HINT_T0);}
+        else{_mm_prefetch(getcodeByInternalId(*data), _MM_HINT_T0);}
 
         for (size_t j = 0; j < size; ++j) {
             size_t tnum = *(data + j);
 
             _mm_prefetch((char *) (massVisited + *(data + j + 1)), _MM_HINT_T0);
-            _mm_prefetch(getDataByInternalId(*(data + j + 1)), _MM_HINT_T0);
+            if(!PQ_dist_flag){_mm_prefetch(getDataByInternalId(*data), _MM_HINT_T0);}
+            else{_mm_prefetch(getcodeByInternalId(*data), _MM_HINT_T0);}
+
 
             if (!(massVisited[tnum] == currentV)) {
                 massVisited[tnum] = currentV;
@@ -127,6 +109,7 @@ std::priority_queue<std::pair<float, idx_t>> HierarchicalNSW::searchBaseLayer(co
                     candidateSet.emplace(-dist, tnum);
 
                     _mm_prefetch(get_linklist0(candidateSet.top().second), _MM_HINT_T0);
+                    
                     topResults.emplace(dist, tnum);
 
                     if (topResults.size() > ef)
@@ -384,7 +367,6 @@ float HierarchicalNSW::PQdistfunc(const float * PQ_dist_table, const idx_t id){
         float term5 = vector_alpha_norm[id];
         return term1 + term2 - term3 + term4 - term5;
     }
-    
 }
 
 
