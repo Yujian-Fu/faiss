@@ -1328,7 +1328,7 @@ namespace bslib{
                     quantizers_output.write((char * )lq_quantizer_index[n_lq].nn_centroid_dists[j].data(), max_nc_per_group * sizeof(float));
                 }
 
-                if (lq_quantizer_index[n_lq].LQ_type == 2){
+                if (lq_quantizer_index[n_lq].LQ_type != 2){
                     assert(lq_quantizer_index[n_lq].alphas.size() == nc_upper);
                     for (size_t group_id = 0; group_id < nc_upper; group_id++){
                         quantizers_output.write((char *) lq_quantizer_index[n_lq].alphas.data(), max_nc_per_group * sizeof(float));
