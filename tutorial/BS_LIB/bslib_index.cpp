@@ -1916,8 +1916,8 @@ namespace bslib{
                     num_group_HNSW = 0;
                     for (size_t i = 0; i < final_group_num; i++){
                         assert(group_HNSW_thres > 0);
-                        std::cout << "Constructing HNSW for group " << i << std::endl;
                         if (groups_size[i] >= group_HNSW_thres){
+                            std::cout << "Constructing HNSW for group " << i <<  " " << groups_size[i] << std::endl;
                             num_group_HNSW++;
                             std::vector<float> group_vector(groups_size[i]);
                             uint32_t dim;
@@ -1943,6 +1943,7 @@ namespace bslib{
                                 idx_t *data = (idx_t *)(ll_cur + 1);
                                 group_HNSW_output.write((char *) data, sizeof(idx_t) * size);
                             }
+                            delete [] group_HNSW;
                         }
                     }
                     group_HNSW_output.write((char *) & num_group_HNSW, sizeof(size_t));
