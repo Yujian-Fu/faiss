@@ -72,7 +72,7 @@ namespace bslib{
      * 
      **/
     void Bslib_Index::add_lq_quantizer(size_t nc_upper, size_t nc_per_group, const float * upper_centroids, const idx_t * upper_nn_centroid_idxs, const float * upper_nn_centroid_dists, size_t LQ_type){
-        LQ_quantizer lq_quantizer = LQ_quantizer(dimension, nc_upper, nc_per_group, upper_centroids, upper_nn_centroid_idxs, upper_nn_centroid_dists, use_all_HNSW, LQ_type);
+        LQ_quantizer lq_quantizer = LQ_quantizer(dimension, nc_upper, nc_per_group, upper_centroids, upper_nn_centroid_idxs, upper_nn_centroid_dists, LQ_type, use_all_HNSW);
         PrintMessage("Building centroids for lq quantizer");
         lq_quantizer.build_centroids(this->train_data.data(), this->train_data.size() / dimension, this->train_data_ids.data());
         PrintMessage("Finished construct the LQ layer");
@@ -1309,13 +1309,12 @@ namespace bslib{
             }
             else if (index_type[i] == "LQ"){
                 PrintMessage("Writing LQ quantizer layer");
-                const size_t nc = lq_quantizer_index[n_lq].layer_nc;
                 const size_t nc_upper = lq_quantizer_index[n_lq].nc_upper;
                 const size_t max_nc_per_group = lq_quantizer_index[n_lq].max_nc_per_group;
-                quantizers_output.write((char *) & nc, sizeof(size_t));
-                quantizers_output.write((char *) & nc_upper, sizeof(size_t));
-                quantizers_output.write((char *) & max_nc_per_group, sizeof(size_t));
-
+                quantizers_output.write((char *) & lq_quantizer_index[n_lq].layer_nc, sizeof(size_t));
+                quantizers_output.write((char *) & lq_quantizer_index[n_lq].nc_upper, sizeof(size_t));
+                quantizers_output.write((char *) & lq_quantizer_index[n_lq].max_nc_per_group, sizeof(size_t));
+                quantizers_output.write((char *) & lq_quantizer_index[n_lq].LQ_type, sizeof(size_t));
 
                 assert(lq_quantizer_index[n_lq].upper_centroids.size() == nc_upper * dimension);
                 quantizers_output.write((char *) lq_quantizer_index[n_lq].upper_centroids.data(), nc_upper * this->dimension*sizeof(float));
@@ -1329,10 +1328,13 @@ namespace bslib{
                     quantizers_output.write((char * )lq_quantizer_index[n_lq].nn_centroid_dists[j].data(), max_nc_per_group * sizeof(float));
                 }
 
-                assert(lq_quantizer_index[n_lq].alphas.size() == nc_upper);
-                for (size_t group_id = 0; group_id < nc_upper; group_id++){
-                    quantizers_output.write((char *) lq_quantizer_index[n_lq].alphas.data(), max_nc_per_group * sizeof(float));
+                if (lq_quantizer_index[n_lq].LQ_type == 2){
+                    assert(lq_quantizer_index[n_lq].alphas.size() == nc_upper);
+                    for (size_t group_id = 0; group_id < nc_upper; group_id++){
+                        quantizers_output.write((char *) lq_quantizer_index[n_lq].alphas.data(), max_nc_per_group * sizeof(float));
+                    }
                 }
+
                 assert(n_vq + n_lq + n_pq == i);
                 n_lq ++;
             }
@@ -1444,9 +1446,11 @@ namespace bslib{
 
             else if (index_type[i] == "LQ"){
                 std::cout << "Reading LQ layer " << std::endl;
+                size_t LQ_type;
                 quantizer_input.read((char *) & layer_nc, sizeof(size_t));
                 quantizer_input.read((char *) & nc_upper, sizeof(size_t));
                 quantizer_input.read((char *) & max_nc_per_group, sizeof(size_t));
+                quantizer_input.read((char *) & LQ_type, sizeof(size_t));
 
                 assert(max_nc_per_group * nc_upper == layer_nc);
                 std::cout << layer_nc << " " << nc_upper << " " << max_nc_per_group << " " << std::endl;
@@ -1459,12 +1463,15 @@ namespace bslib{
                 quantizer_input.read((char *) nn_centroid_ids.data(), nc_upper * max_nc_per_group * sizeof(idx_t));
                 quantizer_input.read((char *) nn_centroid_dists.data(), nc_upper * max_nc_per_group * sizeof(float));
 
-                LQ_quantizer lq_quantizer = LQ_quantizer(dimension, nc_upper, max_nc_per_group, upper_centroids.data(), nn_centroid_ids.data(), nn_centroid_dists.data());
+                LQ_quantizer lq_quantizer = LQ_quantizer(dimension, nc_upper, max_nc_per_group, upper_centroids.data(), nn_centroid_ids.data(), nn_centroid_dists.data(), LQ_type);
                 
-                for (size_t group_id = 0; group_id < nc_upper; group_id++){
-                    quantizer_input.read((char *) alphas.data(), max_nc_per_group * sizeof(float));
-                    for (size_t inner_group_id = 0; inner_group_id < nc_upper; inner_group_id++){
-                        lq_quantizer.alphas[group_id][inner_group_id] = alphas[inner_group_id];
+
+                if (LQ_type != 2){
+                    for (size_t group_id = 0; group_id < nc_upper; group_id++){
+                        quantizer_input.read((char *) alphas.data(), max_nc_per_group * sizeof(float));
+                        for (size_t inner_group_id = 0; inner_group_id < nc_upper; inner_group_id++){
+                            lq_quantizer.alphas[group_id][inner_group_id] = alphas[inner_group_id];
+                        }
                     }
                 }
                 

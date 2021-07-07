@@ -13,7 +13,7 @@ namespace bslib{
         std::vector<std::vector<float>> nn_centroid_dists; // Initialized in constructor
 
         explicit LQ_quantizer(size_t dimension, size_t nc_upper, size_t nc_per_group, const float * upper_centroids,
-                              const idx_t * upper_centroid_ids, const float * upper_centroid_dists, bool use_all_HNSW = false, size_t LQ_type = 0);
+                              const idx_t * upper_centroid_ids, const float * upper_centroid_dists,  size_t LQ_type,bool use_all_HNSW = false);
         
         std::pair<float, float> LQ0_distance(const float * vector, const float * centroid, const float * nn_centroid, float nn_dist);
         std::pair<float, float> LQ0_fast_distance(float nn_dist, float v_c_dist, float v_n_dist);

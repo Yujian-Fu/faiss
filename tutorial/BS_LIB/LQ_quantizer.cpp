@@ -15,7 +15,7 @@ namespace bslib{
      *  
      **/
     LQ_quantizer::LQ_quantizer(size_t dimension, size_t nc_upper, size_t nc_per_group, const float * upper_centroids,
-                               const idx_t * upper_centroid_ids, const float * upper_centroid_dists, bool use_all_HNSW, size_t LQ_type):
+                               const idx_t * upper_centroid_ids, const float * upper_centroid_dists, size_t LQ_type, bool use_all_HNSW):
         Base_quantizer(dimension, nc_upper, nc_per_group){
 
             this->use_all_HNSW = use_all_HNSW;
