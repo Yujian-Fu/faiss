@@ -1922,7 +1922,7 @@ namespace bslib{
                             std::vector<base_data_type> group_vector(dimension);
                             std::vector<float> float_group_vector(dimension);
                             uint32_t dim;
-                            hnswlib::HierarchicalNSW * group_HNSW = new hnswlib::HierarchicalNSW(dimension, groups_size[i], 6, 12, 32, false, false, pq.code_size, pq.ksub);
+                            hnswlib::HierarchicalNSW group_HNSW = hnswlib::HierarchicalNSW(dimension, groups_size[i], 6, 12, 32, false, false, pq.code_size, pq.ksub);
                             std::cout << "Adding points" << std::endl;
                             for (size_t j = 0; j < groups_size[i]; j++){
                                 base_input.seekg(base_sequence_ids[i][j] * dimension * sizeof(base_data_type) + base_sequence_ids[i][j] * sizeof(uint32_t), std::ios::beg);
@@ -1931,27 +1931,27 @@ namespace bslib{
                                 for (size_t temp = 0; temp < dimension; temp++){
                                     float_group_vector[temp] = group_vector[temp];
                                 }
-                                group_HNSW->addPoint(float_group_vector.data());
+                                group_HNSW.addPoint(float_group_vector.data());
                             }
 
                             writeBinaryPOD(group_HNSW_output, i);
-                            writeBinaryPOD(group_HNSW_output, group_HNSW->maxelements_);
-                            writeBinaryPOD(group_HNSW_output, group_HNSW->enterpoint_node);
-                            writeBinaryPOD(group_HNSW_output, group_HNSW->offset_data);
-                            writeBinaryPOD(group_HNSW_output, group_HNSW->M_);
-                            writeBinaryPOD(group_HNSW_output, group_HNSW->maxM_);
-                            writeBinaryPOD(group_HNSW_output, group_HNSW->size_links_level0);
+                            writeBinaryPOD(group_HNSW_output, group_HNSW.maxelements_);
+                            writeBinaryPOD(group_HNSW_output, group_HNSW.enterpoint_node);
+                            writeBinaryPOD(group_HNSW_output, group_HNSW.offset_data);
+                            writeBinaryPOD(group_HNSW_output, group_HNSW.M_);
+                            writeBinaryPOD(group_HNSW_output, group_HNSW.maxM_);
+                            writeBinaryPOD(group_HNSW_output, group_HNSW.size_links_level0);
 
-                            std::cout << "Writing HNSW index " << group_HNSW->maxelements_ << std::endl;
-                            for (size_t temp = 0; temp < group_HNSW->maxelements_; temp++){
-                                uint8_t *ll_cur = group_HNSW->get_linklist0(temp);
+                            std::cout << "Writing HNSW index " << group_HNSW.maxelements_ << std::endl;
+                            for (size_t temp = 0; temp < group_HNSW.maxelements_; temp++){
+                                uint8_t *ll_cur = group_HNSW.get_linklist0(temp);
                                 uint32_t size = *ll_cur;
                                 group_HNSW_output.write((char *) &size, sizeof(uint32_t));
                                 hnswlib::idx_t *data = (hnswlib::idx_t *)(ll_cur + 1);
                                 std::cout << temp << std::endl;
                                 group_HNSW_output.write((char *) data, sizeof(hnswlib::idx_t) * size);
+                                std::cout << size << std::endl;
                             }
-                            delete [] group_HNSW;
                         }
                     }
                     group_HNSW_output.write((char *) & num_group_HNSW, sizeof(size_t));
