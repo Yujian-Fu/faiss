@@ -867,7 +867,7 @@ namespace bslib{
         const bool validation = false; 
         size_t validation_print_space = 50; 
         const bool analysis = false; 
-        const bool showmessage = true; 
+        const bool showmessage = false; 
 
         std::vector<float>  visited_gt_proportion;
         std::vector<size_t> actual_visited_vectors;
@@ -2140,7 +2140,7 @@ namespace bslib{
         for (size_t i = 0; i < group_num; i++){
             base_alphas_input.read((char *) & group_size, sizeof(size_t));
             this-> base_alphas[i].resize(group_size);
-            base_alphas_input.read((char *) this->base_alphas[i].data(), group_size * sizeof(size_t));
+            base_alphas_input.read((char *) this->base_alphas[i].data(), group_size * sizeof(float));
         }
     }
 
@@ -2171,7 +2171,7 @@ namespace bslib{
         for (size_t i = 0; i < group_num; i++){
             base_alpha_norms_input.read((char *) & group_size, sizeof(size_t));
             this->base_alpha_norms[i].resize(group_size);
-            base_alpha_norms_input.read((char *) this->base_alpha_norms[i].data(), group_size * sizeof(size_t));
+            base_alpha_norms_input.read((char *) this->base_alpha_norms[i].data(), group_size * sizeof(float));
         }
     }
 }
