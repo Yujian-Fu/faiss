@@ -867,7 +867,7 @@ namespace bslib{
         const bool validation = false; 
         size_t validation_print_space = 50; 
         const bool analysis = false; 
-        const bool showmessage = false; 
+        const bool showmessage = true; 
 
         std::vector<float>  visited_gt_proportion;
         std::vector<size_t> actual_visited_vectors;
@@ -1918,7 +1918,6 @@ namespace bslib{
                     assert(group_HNSW_thres > 0);
                     for (size_t i = 0; i < final_group_num; i++){
                         if (groups_size[i] >= group_HNSW_thres){
-                            std::cout << "Constructing HNSW for group " << i <<  " " << groups_size[i] << std::endl;
                             num_group_HNSW++;
                             std::vector<base_data_type> group_vector(dimension);
                             std::vector<float> float_group_vector(dimension);
@@ -2103,7 +2102,6 @@ namespace bslib{
                 group_HNSW_input.read((char *) & edge_size, sizeof(uint32_t));
 
                 uint8_t *ll_cur = group_HNSW->get_linklist0(temp);
-                std::cout << temp << " ";
                 *ll_cur = edge_size;
                 hnswlib::idx_t *data = (hnswlib::idx_t *)(ll_cur + 1);
 
