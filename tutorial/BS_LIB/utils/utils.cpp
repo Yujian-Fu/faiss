@@ -72,6 +72,7 @@ namespace bslib{
                 sub_dists[i] = -maxheap.top().first;
                 sub_labels[i] = maxheap.top().second.first;
                 sub_alphas[i] = maxheap.top().second.second;
+                maxheap.pop();
             }
         }
         else if (k == m){
