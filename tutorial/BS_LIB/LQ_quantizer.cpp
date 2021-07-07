@@ -422,7 +422,9 @@ namespace bslib{
                 query_group_dist = upper_result_dists[group_index];
 
                 float group_nn_dist = nn_centroid_dists[group_id][inner_group_id];
+
                 if (LQ_type == 2){
+                    std::cout << "Fast LQ 2 distance " << std::endl;
                     auto result_pair = LQ0_fast_distance(group_nn_dist, query_group_dist, query_nn_dist);
                     result_dists[inner_group_id] = result_pair.second;
                     vector_alpha[inner_group_id] = result_pair.first;
@@ -434,11 +436,12 @@ namespace bslib{
             else{
                 std::vector<float> query_sub_centroid_vector(dimension);
                 float * nn_centroid = upper_centroids.data() + nn_centroid_ids[group_id][inner_group_id] * dimension;
-                float * group_centrod = upper_centroids.data() + group_id * dimension;
+                float * group_centroid = upper_centroids.data() + group_id * dimension;
                 float nn_dist = nn_centroid_dists[group_id][inner_group_id];
 
                 if (LQ_type == 2){
-                    auto result_pair = LQ0_distance(query, group_centrod, nn_centroid, nn_dist);
+                    std::cout << "LQ 2 distance " << std::endl;
+                    auto result_pair = LQ0_distance(query, group_centroid, nn_centroid, nn_dist);
                     result_dists[inner_group_id] = result_pair.second;
                     vector_alpha[inner_group_id] = result_pair.first;
                 }
@@ -448,7 +451,7 @@ namespace bslib{
                 //faiss::fvec_madd(dimension, sub_centroid.data(), -1.0, query, query_sub_centroid_vector.data());
                 else{
                     for (size_t k = 0; k < dimension; k++){
-                        query_sub_centroid_vector[k] = alpha * nn_centroid[k] + (1-alpha)*group_centrod[k]-query[k];
+                        query_sub_centroid_vector[k] = alpha * nn_centroid[k] + (1-alpha)*group_centroid[k]-query[k];
                     }
                     result_dists[inner_group_id] = faiss::fvec_norm_L2sqr(query_sub_centroid_vector.data(), dimension);
                 }
