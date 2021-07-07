@@ -1063,6 +1063,7 @@ namespace bslib{
 
                 std::pair<idx_t, float> result_idx_dist;
                 size_t list_id = get_next_group_idx(final_keep_space, query_group_ids.data(), query_group_dists.data(), result_idx_dist);
+                std::cout << list_id << " " << query_group_ids[list_id] << std::endl;
                 
                 idx_t all_group_id = result_idx_dist.first;
                 float q_c_dist = result_idx_dist.second;
