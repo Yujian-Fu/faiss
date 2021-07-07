@@ -73,14 +73,15 @@ int main(){
     use_HNSW_VQ, use_HNSW_group, use_all_HNSW, use_OPQ, use_train_selector, train_size, M_PQ, nbits, group_HNSW_thres);
 
     index.build_index(path_learn, path_groups, path_labels, path_quantizers, VQ_layers,
-    PQ_layers, LQ_layers, ncentroids, M_HNSW, efConstruction, efSearch, M_PQ_layer, nbits_PQ_layer, 
+    PQ_layers, LQ_layers, ncentroids, M_HNSW, efConstruction, M_PQ_layer, nbits_PQ_layer, 
     num_train, selector_train_size, selector_group_size, LQ_type, record_file);
 
     index.assign_vectors(path_ids, path_base, path_alphas, batch_size, nbatches, record_file);
 
     index.train_pq_quantizer(path_pq, path_pq_norm, M_PQ, path_learn, path_OPQ, PQ_train_size, record_file);
 
-    index.load_index(path_index, path_ids, path_base, path_base_norm, path_centroid_norm, path_group_HNSW, path_alphas_raw, path_alphas, path_base_alpha_norm, batch_size, nbatches, nb, record_file);
+    index.load_index(path_index, path_ids, path_base, path_base_norm, path_centroid_norm, path_group_HNSW, path_alphas_raw,
+                     path_alphas, path_base_alpha_norm, group_HNSW_M, group_HNSW_efConstruction, batch_size, nbatches, nb, record_file);
 
     index.index_statistic();
 

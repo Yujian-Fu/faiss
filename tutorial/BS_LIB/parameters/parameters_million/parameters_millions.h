@@ -26,7 +26,7 @@ const size_t dimension = 128;
 
 const size_t train_size = 100000; //This is the size of train set
 const size_t OPQ_train_size = 1000000;
-const size_t group_HNSW_thres = 100;
+
 const size_t selector_train_size = 100000;
 const size_t selector_group_size = 2000;
 
@@ -35,6 +35,9 @@ const size_t nb = 1000000;
 const size_t nbatches = 10; //100
 const uint32_t batch_size =  nb / nbatches;
 
+const size_t group_HNSW_thres = 100;
+const size_t group_HNSW_M = 6;
+const size_t group_HNSW_efConstruction = 32;
 
 const size_t ngt = 100;
 const size_t nq = 10000;

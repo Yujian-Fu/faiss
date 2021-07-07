@@ -48,11 +48,11 @@ namespace bslib{
      * 
      * Parameters required for building a VQ layer: 
      * If use L2 quantizer: nc_upper, nc_group 
-     * Use HNSW quantizer: nc_upper, nc_group, M, efConstruction, efSearch
+     * Use HNSW quantizer: nc_upper, nc_group, M, efConstruction
      * 
      **/
-    void Bslib_Index::add_vq_quantizer(size_t nc_upper, size_t nc_per_group, bool use_HNSW, size_t M, size_t efConstruction, size_t efSearch){
-        VQ_quantizer vq_quantizer = VQ_quantizer(dimension, nc_upper, nc_per_group, M, efConstruction, efSearch, use_HNSW, use_all_HNSW);
+    void Bslib_Index::add_vq_quantizer(size_t nc_upper, size_t nc_per_group, bool use_HNSW, size_t M, size_t efConstruction){
+        VQ_quantizer vq_quantizer = VQ_quantizer(dimension, nc_upper, nc_per_group, M, efConstruction, use_HNSW, use_all_HNSW);
         PrintMessage("Building centroids for vq quantizer");
         vq_quantizer.build_centroids(this->train_data.data(), this->train_data.size() / dimension, this->train_data_ids.data());
         PrintMessage("Finished construct the VQ layer");
@@ -314,7 +314,7 @@ namespace bslib{
      * 
      **/
     void Bslib_Index::build_quantizers(const uint32_t * ncentroids, const std::string path_quantizer, const std::string path_learn, const size_t * num_train, 
-    const std::vector<HNSW_para> HNSW_paras, const std::vector<PQ_para> PQ_paras, const size_t * LQ_type, std::ofstream & record_file){
+    const std::vector<HNSW_PQ_para> HNSW_paras, const std::vector<HNSW_PQ_para> PQ_paras, const size_t * LQ_type, std::ofstream & record_file){
         if (exists(path_quantizer)){
             read_quantizers(path_quantizer);
             std::cout << "Checking the quantizers read from file " << std::endl;
@@ -354,8 +354,8 @@ namespace bslib{
                 std::cout << "Adding VQ quantizer with parameters: " << nc_upper << " " << nc_per_group << std::endl;
 
                 size_t existed_VQ_layers = this->vq_quantizer_index.size();
-                HNSW_para para = HNSW_paras[existed_VQ_layers];
-                add_vq_quantizer(nc_upper, nc_per_group, use_VQ_HNSW[existed_VQ_layers], para.first.first, para.first.second, para.second);
+                HNSW_PQ_para para = HNSW_paras[existed_VQ_layers];
+                add_vq_quantizer(nc_upper, nc_per_group, use_VQ_HNSW[existed_VQ_layers], para.first, para.second);
 
 
                 inner_Trecorder.record_time_usage(record_file, "Trained VQ layer");
@@ -1290,10 +1290,9 @@ namespace bslib{
                     std::cout << "Writing HNSW indexes " << std::endl;
                     size_t M = vq_quantizer_index[n_vq].M;
                     size_t efConstruction = vq_quantizer_index[n_vq].efConstruction;
-                    size_t efSearch = vq_quantizer_index[n_vq].efSearch;
+
                     quantizers_output.write((char * ) & M, sizeof(size_t));
                     quantizers_output.write((char * ) & efConstruction, sizeof(size_t));
-                    quantizers_output.write((char * ) & efSearch, sizeof(size_t));
 
                     vq_quantizer_index[n_vq].write_HNSW(quantizers_output);
                 }
@@ -1401,22 +1400,20 @@ namespace bslib{
                 std::vector<size_t> CentroidDistributionMap(nc_upper);
                 quantizer_input.read((char *) exact_nc_in_group.data(), nc_upper * sizeof(size_t));
                 quantizer_input.read((char *)CentroidDistributionMap.data(), nc_upper * sizeof(idx_t));
-                size_t HNSW_flag;
-                quantizer_input.read((char *) & HNSW_flag, sizeof(size_t));
+                size_t VQ_HNSW_flag;
+                quantizer_input.read((char *) & VQ_HNSW_flag, sizeof(size_t));
 
                 std::cout << " nc in this layer: " << layer_nc << " nc in upper layer: " << nc_upper << std::endl;
 
                 assert(max_nc_per_group * nc_upper >= layer_nc);
 
-                if (HNSW_flag == 1){
+                if (VQ_HNSW_flag == 1){
                     size_t M;
                     size_t efConstruction;
-                    size_t efSearch;
                     quantizer_input.read((char *) & M, sizeof(size_t));
                     quantizer_input.read((char *) & efConstruction, sizeof(size_t));
-                    quantizer_input.read((char *) & efSearch, sizeof(size_t));
                     
-                    VQ_quantizer vq_quantizer = VQ_quantizer(dimension, nc_upper, max_nc_per_group, M, efConstruction, efSearch, true);
+                    VQ_quantizer vq_quantizer = VQ_quantizer(dimension, nc_upper, max_nc_per_group, M, efConstruction, true);
                     vq_quantizer.layer_nc = layer_nc;
                     for (size_t j = 0; j < nc_upper; j++){
                         vq_quantizer.exact_nc_in_groups[j] = exact_nc_in_group[j];
@@ -1608,7 +1605,7 @@ namespace bslib{
     void Bslib_Index::build_index(std::string path_learn, std::string path_groups, std::string path_labels,
     std::string path_quantizers, size_t VQ_layers, size_t PQ_layers, size_t LQ_layers,
     const uint32_t * ncentroids, const size_t * M_HNSW, const size_t * efConstruction, 
-    const size_t * efSearch, const size_t * M_PQ_layer, const size_t * nbits_PQ_layer, const size_t * num_train,
+    const size_t * M_PQ_layer, const size_t * nbits_PQ_layer, const size_t * num_train,
     size_t selector_train_size, size_t selector_group_size, const size_t * LQ_type, std::ofstream & record_file){
 
         PrintMessage("Initializing the index");
@@ -1618,15 +1615,15 @@ namespace bslib{
             this->build_train_selector(path_learn, path_groups, path_labels, train_size, selector_train_size, selector_group_size);
         }
 
-        std::vector<HNSW_para> HNSW_paras;
+        std::vector<HNSW_PQ_para> HNSW_paras;
         for (size_t i = 0; i < VQ_layers; i++){
-            HNSW_para new_para; new_para.first.first = M_HNSW[i]; new_para.first.second = efConstruction[i]; new_para.second = efSearch[i];
+            HNSW_PQ_para new_para; new_para.first = M_HNSW[i]; new_para.second = efConstruction[i];
             HNSW_paras.push_back(new_para);
         }
 
-        std::vector<PQ_para> PQ_paras;
+        std::vector<HNSW_PQ_para> PQ_paras;
         for (size_t i = 0; i < PQ_layers; i++){
-            PQ_para new_para; new_para.first = M_PQ_layer[i]; new_para.second = nbits_PQ_layer[i];
+            HNSW_PQ_para new_para; new_para.first = M_PQ_layer[i]; new_para.second = nbits_PQ_layer[i];
             PQ_paras.push_back(new_para);
         }
 
@@ -1750,7 +1747,7 @@ namespace bslib{
     
     void Bslib_Index::load_index(std::string path_index, std::string path_ids, std::string path_base,
         std::string path_base_norm, std::string path_centroid_norm,  std::string path_group_HNSW, std::string path_alphas_raw,
-        std::string path_base_alphas,std::string path_base_alpha_norms,
+        std::string path_base_alphas,std::string path_base_alpha_norms, size_t group_HNSW_M, size_t group_HNSW_efCOnstruction,
         size_t batch_size, size_t nbatches, size_t nb, std::ofstream & record_file){
         Trecorder.reset();
         if (exists(path_index)){
@@ -1923,7 +1920,8 @@ namespace bslib{
                             std::vector<base_data_type> group_vector(dimension);
                             std::vector<float> float_group_vector(dimension);
                             uint32_t dim;
-                            hnswlib::HierarchicalNSW group_HNSW = hnswlib::HierarchicalNSW(dimension, groups_size[i], 6, 12, 32, false, false, pq.code_size, pq.ksub);
+                            hnswlib::HierarchicalNSW group_HNSW = hnswlib::HierarchicalNSW(dimension, groups_size[i], group_HNSW_M, 2 * group_HNSW_M, 
+                                                                                            group_HNSW_efCOnstruction, false, false, pq.code_size, pq.ksub);
                             for (size_t j = 0; j < groups_size[i]; j++){
                                 base_input.seekg(base_sequence_ids[i][j] * dimension * sizeof(base_data_type) + base_sequence_ids[i][j] * sizeof(uint32_t), std::ios::beg);
                                 base_input.read((char *) & dim, sizeof(uint32_t)); assert(dim == this->dimension);

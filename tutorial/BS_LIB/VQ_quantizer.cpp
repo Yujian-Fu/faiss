@@ -14,13 +14,12 @@ namespace bslib{
      * efSearch:        for efSearch: keep_space < efSearch < nc_per_group
      * 
      **/ 
-    VQ_quantizer::VQ_quantizer(size_t dimension, size_t nc_upper, size_t max_nc_per_group, size_t M, size_t efConstruction, size_t efSearch, bool use_HNSW, bool use_all_HNSW):
+    VQ_quantizer::VQ_quantizer(size_t dimension, size_t nc_upper, size_t max_nc_per_group, size_t M, size_t efConstruction, bool use_HNSW, bool use_all_HNSW):
         Base_quantizer(dimension, nc_upper, max_nc_per_group){
             this->use_HNSW = use_HNSW;
             this->use_all_HNSW = use_all_HNSW;
             this->M = M;
             this->efConstruction = efConstruction;
-            this->efSearch = efSearch;
 
             this->exact_nc_in_groups.resize(nc_upper);
 
@@ -131,10 +130,11 @@ namespace bslib{
         std::cout << "Finished computing centoids with final centroids: " << layer_nc <<std::endl;
 
         if (use_all_HNSW){
+            // Not implemented yet
             std::cout << "Constructing all HNSW for search_all function in VQ layer" << std::endl;
             std::vector<float> one_centroid(dimension);
             hnswlib::HierarchicalNSW * centroid_quantizer = new hnswlib::HierarchicalNSW(dimension, layer_nc, M_all_HNSW, 2 * M_all_HNSW, efConstruction_all_HNSW);
-            
+
             for (size_t i = 0; i < layer_nc; i++){
                 compute_final_centroid(i, one_centroid.data());
                 centroid_quantizer->addPoint(one_centroid.data());

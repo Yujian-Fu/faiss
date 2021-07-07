@@ -19,8 +19,7 @@ typedef float learn_data_type;
 typedef float base_data_type;
 
 typedef faiss::Index::idx_t idx_t;
-typedef std::pair<std::pair<size_t, size_t>, size_t> HNSW_para;
-typedef std::pair<size_t, size_t> PQ_para;
+typedef std::pair<size_t, size_t> HNSW_PQ_para;
 
 struct Bslib_Index{
     size_t dimension; // Initialized in constructer
@@ -93,9 +92,9 @@ struct Bslib_Index{
     void do_OPQ(size_t n, float * dataset);
     void reverse_OPQ(size_t n, float * dataset);
     void build_quantizers(const uint32_t * ncentroids, const std::string path_quantizer, const std::string path_learn, 
-    const size_t * num_train, const std::vector<HNSW_para> HNSW_paras, const std::vector<PQ_para> PQ_paras, const size_t * LQ_type, std::ofstream & record_file);
+    const size_t * num_train, const std::vector<HNSW_PQ_para> HNSW_paras, const std::vector<HNSW_PQ_para> PQ_paras, const size_t * LQ_type, std::ofstream & record_file);
     
-    void add_vq_quantizer(size_t nc_upper, size_t nc_per_group, bool use_VQ_HNSW_layer = false, size_t M = 4, size_t efConstruction = 10, size_t efSearch = 10);
+    void add_vq_quantizer(size_t nc_upper, size_t nc_per_group, bool use_VQ_HNSW_layer = false, size_t M = 4, size_t efConstruction = 10);
     void add_lq_quantizer(size_t nc_upper, size_t nc_per_group, const float * upper_centroids, const idx_t * upper_nn_centroid_idxs, 
     const float * upper_nn_centroid_dists, size_t LQ_type);
     void add_pq_quantizer(size_t nc_upper, size_t M, size_t nbits);
@@ -129,7 +128,7 @@ struct Bslib_Index{
     void build_index(std::string path_learn, std::string path_groups, std::string path_labels,
     std::string path_quantizers, size_t VQ_layers, size_t PQ_layers, size_t LQ_layers,
     const uint32_t * ncentroids, const size_t * M_HNSW, const size_t * efConstruction, 
-    const size_t * efSearch, const size_t * M_PQ_layer, const size_t * nbits_PQ_layer, const size_t * num_train,
+    const size_t * M_PQ_layer, const size_t * nbits_PQ_layer, const size_t * num_train,
     size_t selector_train_size, size_t selector_group_size, const size_t * LQ_type, std::ofstream & record_file);
 
     void assign_vectors(std::string path_ids, std::string path_base, std::string path_alphas, uint32_t batch_size, size_t nbatches, std::ofstream & record_file);
@@ -139,7 +138,7 @@ struct Bslib_Index{
 
     void load_index(std::string path_index, std::string path_ids, std::string path_base,
         std::string path_base_norm, std::string path_centroid_norm, std::string path_group_HNSW, std::string path_alphas_raw,
-        std::string path_alphas, std::string path_base_alpha_norm,
+        std::string path_alphas, std::string path_base_alpha_norm, size_t group_HNSW_M, size_t group_HNSW_efCOnstruction,
         size_t batch_size, size_t nbatches, size_t nb, std::ofstream & record_file);
     
     void index_statistic();

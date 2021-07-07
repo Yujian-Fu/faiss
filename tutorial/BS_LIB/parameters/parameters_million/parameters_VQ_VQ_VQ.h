@@ -17,8 +17,11 @@ const uint32_t ncentroids[layers-PQ_layers] = {100, 10, 10};
 //For building index
 bool use_HNSW_VQ[VQ_layers] = {false, false, false};
 const size_t M_HNSW[VQ_layers] = {4};
+//Set efConstruction and efSearch as the same
 const size_t efConstruction [VQ_layers] = {10};
-const size_t efSearch[VQ_layers] = {10};
+
+const size_t M_HNSW_all[VQ_layers] = {4};
+const size_t efConstruction_all [VQ_layers] = {10};
 
 const size_t M_PQ_layer[PQ_layers] = {};
 const size_t nbits_PQ_layer[PQ_layers] = {};
