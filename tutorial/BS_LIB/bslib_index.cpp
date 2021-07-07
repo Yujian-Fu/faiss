@@ -2121,7 +2121,7 @@ namespace bslib{
         for (size_t i = 0; i < final_group_num; i++){
             size_t group_size = this->base_alphas[i].size();
             base_alphas_output.write((char * ) & group_size, sizeof(size_t));
-            base_alphas_output.write((char * ) this->base_alphas[i].data(), group_size * sizeof(size_t));
+            base_alphas_output.write((char * ) this->base_alphas[i].data(), group_size * sizeof(float));
         }
         base_alphas_output.close();
     }
@@ -2153,7 +2153,7 @@ namespace bslib{
         for (size_t i = 0; i < final_group_num; i++){
             size_t group_size = base_alpha_norms[i].size();
             base_alphas_norms_output.write((char *) & group_size, sizeof(size_t));
-            base_alphas_norms_output.write((char *) this->base_alpha_norms.data(), group_size * sizeof(size_t));
+            base_alphas_norms_output.write((char *) this->base_alpha_norms.data(), group_size * sizeof(float));
         }
         base_alphas_norms_output.close();
     }
