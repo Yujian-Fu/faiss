@@ -634,7 +634,7 @@ namespace bslib{
      * 
      **/
     void Bslib_Index::compute_centroid_norm(std::string path_centroid_norm){
-        if (use_vector_alpha){
+        if (this->use_vector_alpha){
             std::cout << "No centroid norms for LQ 2 type " << std::endl;
             return;
         }
