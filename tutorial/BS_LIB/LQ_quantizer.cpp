@@ -59,12 +59,14 @@ namespace bslib{
     std::pair<float, float> LQ_quantizer::LQ0_fast_distance(float nn_dist, float v_c_dist, float v_n_dist){
             float alpha = (v_c_dist + nn_dist - v_n_dist) / (2 * nn_dist);
 
-            float cosine_sqr = (v_c_dist + nn_dist - v_n_dist)*(v_c_dist + nn_dist - v_n_dist)/(4 * v_c_dist * nn_dist);
+            //float cosine_sqr = (v_c_dist + nn_dist - v_n_dist)*(v_c_dist + nn_dist - v_n_dist)/(4 * v_c_dist * nn_dist);
             // The first and second type of dist
-            float dist_1 = v_c_dist * (1 - cosine_sqr);
+            //float dist_1 = v_c_dist * (1 - cosine_sqr);
             //float dist_2 = alpha*(alpha-1)*nn_dist + (1-alpha)*v_c_dist + alpha*v_n_dist;
+            float dist_3 = v_c_dist - alpha * alpha * nn_dist;
 
-            return std::make_pair(alpha, dist_1); 
+
+            return std::make_pair(alpha, dist_3); 
     }
 
     /**
@@ -427,7 +429,7 @@ namespace bslib{
                 if (LQ_type == 2){
                     auto result_pair = LQ0_fast_distance(group_nn_dist, query_group_dist, query_nn_dist);
                     if (!(result_pair.second >=0)){
-                        std::cout << group_nn_dist << " " << query_group_dist << " " << query_nn_dist << " " << result_pair.second << std::endl;
+                        std::cout << result_pair.first << " " << group_nn_dist << " " << query_group_dist << " " << query_nn_dist << " " << result_pair.second << std::endl;
                         std::cout << group_index << " " << nn_index <<  " " << upper_search_space << std::endl; 
                         for (size_t temp = 0; temp < upper_search_space; temp ++){
                             std::cout << upper_result_labels[temp] << " " << upper_result_dists[temp] << " ";
