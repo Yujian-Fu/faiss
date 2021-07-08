@@ -1135,7 +1135,7 @@ namespace bslib{
                         for (size_t temp = 0; temp < dimension; temp++){base_vector_float[temp] = base_vector[temp];}
                         float actual_dist =  faiss::fvec_L2sqr(base_vector_float.data(), query, dimension);
 
-                        std::cout << query_search_dists[valid_result_length] << " " << actual_dist << " ";
+                        std::cout << base_sequence_ids[all_group_id][m] << " " << query_search_dists[valid_result_length] << " " << actual_dist << " ";
 
                         if (m == 25){
                             exit(0);
