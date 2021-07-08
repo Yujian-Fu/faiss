@@ -85,24 +85,10 @@ namespace bslib{
             
             
             std::vector<float> centroids(dimension * exact_nc_in_group);
-            if (exact_nc_in_group > 1){
-                bool verbose = nc_upper > 1 ? false : true;
-                faiss::kmeans_clustering(dimension, nt_sub, exact_nc_in_group, train_set[i].data(), centroids.data(), 30, verbose);
-            }
-            else{
-                for (size_t temp1 = 0; temp1 < nt_sub; temp1 ++){
-                    for (size_t temp2 = 0; temp2 < dimension; temp2++){
-                        centroids[temp2] += train_set[i][temp1 * dimension + temp2];
-                    }
-                }
-                std::cout << "Average centroid: " << std::endl;
-                for (size_t temp2 = 0; temp2 < dimension; temp2 ++){
-                    centroids[temp2] /= nt_sub;
-                    std::cout << centroids[temp2] << " ";
-                }
-                std::cout << std::endl;
-            }
-            
+
+            bool verbose = nc_upper > 1 ? false : true;
+            faiss::kmeans_clustering(dimension, nt_sub, exact_nc_in_group, train_set[i].data(), centroids.data(), 30, verbose);
+
             //Adding centroids into quantizers
             if (use_HNSW){
                 hnswlib::HierarchicalNSW * centroid_quantizer = new hnswlib::HierarchicalNSW(dimension, exact_nc_in_group, M, 2 * M, efConstruction);
