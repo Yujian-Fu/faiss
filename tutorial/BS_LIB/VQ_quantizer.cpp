@@ -63,7 +63,7 @@ namespace bslib{
 
 
 //#pragma omp parallel for
-        for (size_t i = 20; i < nc_upper; i++){
+        for (size_t i = 0; i < nc_upper; i++){
             
             size_t nt_sub = train_set[i].size() / this->dimension;
             //std::cout << "Clustering " << nt_sub << " train vectors into " << nc_per_group << " groups " << std::endl;
