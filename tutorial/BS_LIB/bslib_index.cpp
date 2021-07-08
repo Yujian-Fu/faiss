@@ -2003,11 +2003,12 @@ namespace bslib{
                 for (size_t temp = 0; temp < dimension; temp++){base_vector_float[temp] = base_vector[temp];}
                 std::vector<float> vector_residual(dimension);
                 std::cout << "Encoding one vector " << std::endl;
+                std::vector<idx_t> encode_id(1, i);
                 if (use_vector_alpha){
-                    encode(1, base_vector_float.data(), base_sequence_ids[i].data() + j, vector_residual.data(), base_alphas[i].data() + j);
+                    encode(1, base_vector_float.data(), encode_id.data(), vector_residual.data(), base_alphas[i].data() + j);
                 }
                 else{
-                    encode(1, base_vector_float.data(), base_sequence_ids[i].data() + j, vector_residual.data());
+                    encode(1, base_vector_float.data(), encode_id.data(), vector_residual.data());
                 }
                 avg_b_c_dist += faiss::fvec_norm_L2sqr(vector_residual.data(), dimension);
                 nb ++;

@@ -290,13 +290,11 @@ namespace bslib{
             exit(0);
         }
         idx_t group_id, inner_group_id;
-        std::cout << "Computing the group id " << std::endl;
         get_group_id(label, group_id, inner_group_id);
         
         std::vector<float> centroid_vector(dimension);
         const float * nn_centroid = this->upper_centroids.data() + nn_centroid_ids[group_id][inner_group_id] * dimension;
         const float * centroid = this->upper_centroids.data() + group_id * dimension;
-        std::cout << "Computing the residual " << std::endl;
         faiss::fvec_madd(dimension, nn_centroid, -1.0, centroid, centroid_vector.data());
         faiss::fvec_madd(dimension, centroid, alphas[group_id][inner_group_id], centroid_vector.data(), final_centroid);
     }
@@ -315,7 +313,7 @@ namespace bslib{
      * 
      **/
     void LQ_quantizer::compute_residual_group_id(size_t n, const idx_t * labels, const float * x, float * residuals, const float * vector_alpha){
-//#pragma omp parallel for
+#pragma omp parallel for
         for (size_t i = 0; i < n; i++){
             if (LQ_type == 2){
                 idx_t group_id, inner_group_id;
@@ -333,7 +331,6 @@ namespace bslib{
                 
                 std::vector<float> final_centroid(dimension);
                 compute_final_centroid(labels[i], final_centroid.data());
-                std::cout << "Computing residual " << std::endl;
                 faiss::fvec_madd(dimension, x + i * dimension, -1.0, final_centroid.data(), residuals + i * dimension);
             }
         }
