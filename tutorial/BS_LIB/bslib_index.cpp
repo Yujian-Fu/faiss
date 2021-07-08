@@ -542,6 +542,7 @@ namespace bslib{
         encode(n, data, group_ids, residuals.data(), vector_alpha);
 
         this->b_c_dist += faiss::fvec_norm_L2sqr(residuals.data(), n * dimension);
+        std::cout << b_c_dist << std::endl;
 
         if (show_batch_time) batch_recorder.print_time_usage("compute residuals                 ");
 
