@@ -435,7 +435,10 @@ namespace bslib{
                 else{
                     float alpha = alphas[group_id][inner_group_id];
                     result_dists[inner_group_id] = alpha*(alpha-1)*group_nn_dist + (1-alpha)*query_group_dist + alpha*query_nn_dist;  
-                    assert(result_dists[inner_group_id] >=0);
+                    if (!(result_dists[inner_group_id] >=0)){
+                        std::cout << result_dists[inner_group_id] << " " << alpha << " " << group_nn_dist << " " << query_group_dist << " " << query_nn_dist << std::endl;
+                        exit(0);
+                    }
                 }                                                     
             }
             else{
