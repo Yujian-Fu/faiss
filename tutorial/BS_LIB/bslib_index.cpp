@@ -540,9 +540,9 @@ namespace bslib{
         std::vector<float> residuals(n * dimension);
         //Compute residuals
         encode(n, data, group_ids, residuals.data(), vector_alpha);
-        for (size_t i = 0; i < n; i++){
-            this->b_c_dist += faiss::fvec_norm_L2sqr(residuals.data(), n * dimension);
-        }
+
+        this->b_c_dist += faiss::fvec_norm_L2sqr(residuals.data(), n * dimension);
+
         if (show_batch_time) batch_recorder.print_time_usage("compute residuals                 ");
 
         if (use_OPQ){
