@@ -89,7 +89,7 @@ namespace bslib{
             bool verbose = nc_upper > 1 ? false : true;
             faiss::kmeans_clustering(dimension, nt_sub, exact_nc_in_group, train_set[i].data(), centroids.data(), 30, verbose);
 
-
+            /*
             for (size_t temp1 = 0; temp1 < exact_nc_in_group; temp1 ++){
                 if (int(centroids[temp1 * dimension]) - (centroids[temp1 * dimension]) == 0 && int(centroids[temp1 * dimension+1]) - (centroids[temp1 * dimension+1]) == 0){
                 std::cout << "Result for group " << i << " " << temp1 << std::endl;
@@ -100,6 +100,7 @@ namespace bslib{
                 std::cout << std::endl;  
                 }
             }
+            */
 
             //Adding centroids into quantizers
             if (use_HNSW){
