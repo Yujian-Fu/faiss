@@ -1126,6 +1126,7 @@ namespace bslib{
                             float L2_C1_C2 = (query_alpha - base_alphas[all_group_id][m]) * (query_alpha - base_alphas[all_group_id][m]) * (lq_quantizer_index[n_lq].nn_centroid_dists[lq_group_id][lq_inner_group_id]);
                             query_search_dists[valid_result_length] = q_c_dist - base_alpha_norms[all_group_id][m] + base_norm + L2_C1_C2 - PQ_table_product;
                         }
+                        base_input = std::ifstream(path_base, std::ios::binary);
                         std::vector<base_data_type> base_vector(dimension); uint32_t dim;
                         base_input.seekg(base_sequence_ids[all_group_id][m] * dimension * sizeof(base_data_type) + base_sequence_ids[all_group_id][m] * sizeof(uint32_t), std::ios::beg);
                         base_input.read((char *) & dim, sizeof(uint32_t)); assert(dim == this->dimension);
