@@ -1991,8 +1991,10 @@ namespace bslib{
         // Average distance between the base vector and centroid
 
         std::ifstream base_input = std::ifstream(path_base, std::ios::binary);
-        float avg_b_c_dist = 0;
-        size_t nb = 0;
+        std::vector<float> avg_b_c_dist(final_group_num, 0);
+        std::vector<size_t> nb (final_group_num, 0);
+
+#pragma omp parallel for
         for (size_t i = 0; i < final_group_num; i++){
             for (size_t j = 0; j < base_sequence_ids[i].size(); j++){
                 std::vector<base_data_type> base_vector(dimension); uint32_t dim;
@@ -2009,11 +2011,16 @@ namespace bslib{
                 else{
                     encode(1, base_vector_float.data(), encode_id.data(), vector_residual.data());
                 }
-                avg_b_c_dist += faiss::fvec_norm_L2sqr(vector_residual.data(), dimension);
-                nb ++;
+                avg_b_c_dist[i] += faiss::fvec_norm_L2sqr(vector_residual.data(), dimension);
+                nb[i] ++;
             }
         }
-        std::cout << "Avg b c distance: " << avg_b_c_dist / nb << std::endl;
+        float dist = 0;
+        size_t nb_sum = 0;
+        for (size_t i = 0; i< final_group_num; i++){
+            dist += avg_b_c_dist[i]; nb_sum += nb[i];
+        }
+        std::cout << "Avg b c distance: " << dist / nb_sum << std::endl;
     }
 
 
