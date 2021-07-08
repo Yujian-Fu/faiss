@@ -439,7 +439,7 @@ namespace bslib{
                         std::cout << result_dists[inner_group_id] << " " << alpha << " " << group_nn_dist << " " << query_group_dist << " " << query_nn_dist << std::endl;
                         exit(0);
                     }
-                }                                                     
+                }
             }
             else{
                 std::vector<float> query_sub_centroid_vector(dimension);
