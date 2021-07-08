@@ -1990,13 +1990,14 @@ namespace bslib{
     void Bslib_Index::index_statistic(std::string path_base){
         // Average distance between the base vector and centroid
 
-        std::ifstream base_input = std::ifstream(path_base, std::ios::binary);
+        
         std::vector<float> avg_b_c_dist(final_group_num, 0);
         std::vector<size_t> nb (final_group_num, 0);
 
 #pragma omp parallel for
         for (size_t i = 0; i < final_group_num; i++){
             for (size_t j = 0; j < base_sequence_ids[i].size(); j++){
+                std::ifstream base_input = std::ifstream(path_base, std::ios::binary);
                 std::vector<base_data_type> base_vector(dimension); uint32_t dim;
                 base_input.seekg(base_sequence_ids[i][j] * dimension * sizeof(base_data_type) + base_sequence_ids[i][j] * sizeof(uint32_t), std::ios::beg);
                 base_input.read((char *) & dim, sizeof(uint32_t)); assert(dim == this->dimension);
