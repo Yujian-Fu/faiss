@@ -1977,7 +1977,7 @@ namespace bslib{
             //In order to save disk usage
             //Annotate the write_index function
             if (this->use_saving_index){
-                //this->write_index(path_index);
+                this->write_index(path_index);
             }
             std::string message = "Constructed and wrote the index ";
             Mrecorder.print_memory_usage(message);
@@ -2002,6 +2002,7 @@ namespace bslib{
                 std::vector<float> base_vector_float(dimension);
                 for (size_t temp = 0; temp < dimension; temp++){base_vector_float[temp] = base_vector[temp];}
                 std::vector<float> vector_residual(dimension);
+                std::cout << "Encoding one vector " << std::endl;
                 if (use_vector_alpha){
                     encode(1, base_vector_float.data(), base_sequence_ids[i].data() + j, vector_residual.data(), base_alphas[i].data() + j);
                 }
