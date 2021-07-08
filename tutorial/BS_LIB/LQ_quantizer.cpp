@@ -120,7 +120,7 @@ namespace bslib{
                 maxheap.emplace(-dist, std::make_pair(subc, std::make_pair(numerator, denominator))); 
             }
 
-            sum_group_alpha[maxheap.top().second.first] +=  maxheap.top().second.second.first / maxheap.top().second.second.second;
+            sum_group_alpha[maxheap.top().second.first] +=  (maxheap.top().second.second.second > 0) ? maxheap.top().second.second.first / maxheap.top().second.second.second : 0.0;
             sum_group_vectors[maxheap.top().second.first] ++;
             group_numerator += maxheap.top().second.second.first;
             group_denominator += maxheap.top().second.second.second;
