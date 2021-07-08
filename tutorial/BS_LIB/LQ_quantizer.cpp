@@ -419,6 +419,7 @@ namespace bslib{
 
                 idx_t * group_id_index = std::find(upper_result_labels, upper_result_labels + upper_search_space, group_id);
                 idx_t group_index = group_id_index - upper_result_labels;
+                assert(group_index < upper_search_space);
                 query_group_dist = upper_result_dists[group_index];
 
                 float group_nn_dist = nn_centroid_dists[group_id][inner_group_id];

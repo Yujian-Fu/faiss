@@ -767,7 +767,7 @@ namespace bslib{
                         std::cout << upper_result_ids[temp] << " " << upper_result_dists[temp] << " "; 
                     }
                     std::cout << std::endl << group_id << std::endl;
-                    lq_quantizer_index[n_lq].search_in_group(target_data, upper_result_ids.data(), upper_result_dists.data(), 1, group_id, query_result_dists.data(), query_result_ids.data(), alphas);
+                    lq_quantizer_index[n_lq].search_in_group(target_data, upper_result_ids.data(), upper_result_dists.data(), upper_group_size, group_id, query_result_dists.data(), query_result_ids.data(), alphas);
                     std::vector<float> sub_dist(1);
                     keep_k_min(group_size, 1, query_result_dists.data(), query_result_ids.data(), sub_dist.data(), query_search_id.data());
                     n_lq ++;
