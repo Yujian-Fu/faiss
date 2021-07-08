@@ -1075,12 +1075,11 @@ namespace bslib{
                 idx_t lq_group_id, lq_inner_group_id;
                 if (use_vector_alpha){lq_quantizer_index[n_lq].get_group_id(all_group_id, lq_group_id, lq_inner_group_id);}
 
-
-                if (showmessage) std::cout << "Searching in " << all_group_id << " th group with distance " << q_c_dist << std::endl;
-
                 size_t group_size = this->base_sequence_ids[all_group_id].size();
                 assert(group_size == this->base_codes[all_group_id].size() / this->code_size);
 
+
+                if (showmessage) std::cout << "Searching in " << all_group_id << " th group with distance " << q_c_dist << "and size: " << group_size << std::endl;
 
                 if (use_group_HNSW && group_size >= group_HNSW_thres){
                     assert(group_HNSW_thres > 0);
