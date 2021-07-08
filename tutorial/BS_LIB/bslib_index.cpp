@@ -2002,7 +2002,6 @@ namespace bslib{
                 std::vector<float> base_vector_float(dimension);
                 for (size_t temp = 0; temp < dimension; temp++){base_vector_float[temp] = base_vector[temp];}
                 std::vector<float> vector_residual(dimension);
-                std::cout << "Encoding one vector " << std::endl;
                 std::vector<idx_t> encode_id(1, i);
                 if (use_vector_alpha){
                     encode(1, base_vector_float.data(), encode_id.data(), vector_residual.data(), base_alphas[i].data() + j);
