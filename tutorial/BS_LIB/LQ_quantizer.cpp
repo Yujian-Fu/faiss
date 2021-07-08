@@ -59,7 +59,7 @@ namespace bslib{
     std::pair<float, float> LQ_quantizer::LQ0_fast_distance(float nn_dist, float v_c_dist, float v_n_dist){
             float alpha = (v_c_dist + nn_dist - v_n_dist) / (2 * nn_dist);
 
-            float cosine_sqr = (v_c_dist + nn_dist - v_n_dist)*(v_c_dist + nn_dist - v_n_dist)/(2 * v_c_dist * nn_dist);
+            float cosine_sqr = (v_c_dist + nn_dist - v_n_dist)*(v_c_dist + nn_dist - v_n_dist)/(4 * v_c_dist * nn_dist);
             // The first and second type of dist
             float dist_1 = v_c_dist * (1 - cosine_sqr);
             //float dist_2 = alpha*(alpha-1)*nn_dist + (1-alpha)*v_c_dist + alpha*v_n_dist;
