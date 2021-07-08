@@ -432,7 +432,9 @@ namespace bslib{
                             std::cout << upper_result_labels[temp] << " " << upper_result_dists[temp] << " ";
                         }
                     }
-                    assert(result_pair.second >=0);
+                    if(! (result_pair.second >=0)){
+                        exit(0);
+                    }
                     result_dists[inner_group_id] = result_pair.second;
                     vector_alpha[inner_group_id] = result_pair.first;
                 }
