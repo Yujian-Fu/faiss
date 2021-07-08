@@ -268,7 +268,7 @@ namespace bslib{
                     result_queue.pop();
 
                     if (result_dists[search_para - j - 1] == 0){
-                        std::cout << "Query and distance L2 dist = 0"<< std::endl;
+                        std::cout << "Query and distance L2 dist = 0: "<< result_labels[search_para - j -1] << std::endl;
                         for (size_t temp = 0; temp < dimension; temp++){
                             std::cout << query[temp] << " " ;
                         }
