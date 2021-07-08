@@ -425,7 +425,7 @@ namespace bslib{
 
                 if (LQ_type == 2){
                     auto result_pair = LQ0_fast_distance(group_nn_dist, query_group_dist, query_nn_dist);
-                    if (result_pair.second < 0){
+                    if (!(result_pair.second >=0)){
                         std::cout << group_nn_dist << " " << query_group_dist << " " << query_nn_dist << " " << result_pair.second << std::endl;
                     }
                     assert(result_pair.second >=0);
