@@ -62,7 +62,7 @@ namespace bslib{
         std::cout <<  std::endl << "The min size for sub train set is: " << min_train_size << std::endl;
 
 
-//#pragma omp parallel for
+#pragma omp parallel for
         for (size_t i = 0; i < nc_upper; i++){
             
             size_t nt_sub = train_set[i].size() / this->dimension;
@@ -88,19 +88,6 @@ namespace bslib{
 
             bool verbose = nc_upper > 1 ? false : true;
             faiss::kmeans_clustering(dimension, nt_sub, exact_nc_in_group, train_set[i].data(), centroids.data(), 30, verbose);
-
-            /*
-            for (size_t temp1 = 0; temp1 < exact_nc_in_group; temp1 ++){
-                if (int(centroids[temp1 * dimension]) - (centroids[temp1 * dimension]) == 0 && int(centroids[temp1 * dimension+1]) - (centroids[temp1 * dimension+1]) == 0){
-                std::cout << "Result for group " << i << " " << temp1 << std::endl;
-                std::cout << nt_sub << std::endl;
-                    for (size_t temp2 = 0; temp2 < dimension; temp2 ++){
-                        std::cout << centroids[temp1 * dimension + temp2] << " ";
-                    }
-                std::cout << std::endl;  
-                }
-            }
-            */
 
             //Adding centroids into quantizers
             if (use_HNSW){
@@ -278,23 +265,7 @@ namespace bslib{
                 if (j < search_para){
                     result_dists[search_para - j - 1] = result_queue.top().first;
                     result_labels[search_para - j -1] = CentroidDistributionMap[group_id] + result_queue.top().second;
-                    result_queue.pop();
-
-                    /*
-                    if (result_dists[search_para - j - 1] == 0){
-                        std::cout << "Query and distance L2 dist = 0: "<< result_labels[search_para - j -1] << std::endl;
-                        for (size_t temp = 0; temp < dimension; temp++){
-                            std::cout << query[temp] << " " ;
-                        }
-                        std::cout << std::endl;
-                        std::vector<float> target_centroid(dimension);
-                        compute_final_centroid(result_labels[search_para - j -1], target_centroid.data());
-                        for (size_t temp = 0; temp < dimension; temp++){
-                            std::cout << target_centroid[temp] << " " ;
-                        }
-                        exit(0);
-                    }       
-                    */             
+                    result_queue.pop();           
                 }
                 else{
                     result_dists[j] = MAX_DIST;
@@ -310,22 +281,6 @@ namespace bslib{
                     const float * target_centroid = this->L2_quantizers[group_id]->xb.data() + j * this->dimension;
                     result_dists[j] = faiss::fvec_L2sqr(target_centroid, query, dimension);
                     result_labels[j] = CentroidDistributionMap[group_id] + j;
-
-                    /*
-                    if (result_dists[j] == 0){
-                        std::cout << "Query and distance L2 dist = 0 "<<  group_id << " " << result_labels[j] << std::endl;
-                        for (size_t temp = 0; temp < dimension; temp++){
-                            std::cout << query[temp] << " " ;
-                        }
-                        std::cout << std::endl;
-                        std::vector<float> target_centroid(dimension);
-                        compute_final_centroid(result_labels[j], target_centroid.data());
-                        for (size_t temp = 0; temp < dimension; temp++){
-                            std::cout << target_centroid[temp] << " " ;
-                        }
-                        exit(0);
-                    } 
-                    */
 
                 }
                 else{
