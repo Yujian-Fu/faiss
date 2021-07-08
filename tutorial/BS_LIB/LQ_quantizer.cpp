@@ -427,6 +427,10 @@ namespace bslib{
                     auto result_pair = LQ0_fast_distance(group_nn_dist, query_group_dist, query_nn_dist);
                     if (!(result_pair.second >=0)){
                         std::cout << group_nn_dist << " " << query_group_dist << " " << query_nn_dist << " " << result_pair.second << std::endl;
+                        std::cout << group_id << " " << nn_index << std::endl; 
+                        for (size_t temp = 0; temp < upper_search_space; temp ++){
+                            std::cout << upper_result_labels[temp] << " " << upper_result_dists[temp] << " ";
+                        }
                     }
                     assert(result_pair.second >=0);
                     result_dists[inner_group_id] = result_pair.second;
