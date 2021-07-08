@@ -1467,7 +1467,7 @@ namespace bslib{
                 if (LQ_type != 2){
                     for (size_t group_id = 0; group_id < nc_upper; group_id++){
                         quantizer_input.read((char *) alphas.data(), max_nc_per_group * sizeof(float));
-                        for (size_t inner_group_id = 0; inner_group_id < nc_upper; inner_group_id++){
+                        for (size_t inner_group_id = 0; inner_group_id < max_nc_per_group; inner_group_id++){
                             lq_quantizer.alphas[group_id][inner_group_id] = alphas[inner_group_id];
                         }
                     }
