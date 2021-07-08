@@ -434,8 +434,6 @@ namespace bslib{
                         for (size_t temp = 0; temp < upper_search_space; temp ++){
                             std::cout << upper_result_labels[temp] << " " << upper_result_dists[temp] << " ";
                         }
-                    }
-                    if(! (result_pair.second >=0)){
                         exit(0);
                     }
                     result_dists[inner_group_id] = result_pair.second;

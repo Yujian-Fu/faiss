@@ -311,6 +311,7 @@ namespace bslib{
                     result_dists[j] = faiss::fvec_L2sqr(target_centroid, query, dimension);
                     result_labels[j] = CentroidDistributionMap[group_id] + j;
 
+                    /*
                     if (result_dists[j] == 0){
                         std::cout << "Query and distance L2 dist = 0 "<<  group_id << " " << result_labels[j] << std::endl;
                         for (size_t temp = 0; temp < dimension; temp++){
@@ -324,6 +325,7 @@ namespace bslib{
                         }
                         exit(0);
                     } 
+                    */
 
                 }
                 else{
