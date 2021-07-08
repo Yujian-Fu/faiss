@@ -290,7 +290,9 @@ namespace bslib{
             exit(0);
         }
         idx_t group_id, inner_group_id;
+        std::cout << "Computing the group id " << std::endl;
         get_group_id(label, group_id, inner_group_id);
+        std::cout << "Computing the residual " << std::endl;
         std::vector<float> centroid_vector(dimension);
         const float * nn_centroid = this->upper_centroids.data() + nn_centroid_ids[group_id][inner_group_id] * dimension;
         const float * centroid = this->upper_centroids.data() + group_id * dimension;
