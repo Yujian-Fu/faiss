@@ -54,6 +54,7 @@ struct Bslib_Index{
     size_t final_group_num; // Initialized by compute final nc
     size_t max_visited_vectors; //
     size_t reranking_space;
+    float b_c_dist;
     
     std::vector<size_t> ncentroids;
     std::vector<VQ_quantizer > vq_quantizer_index; // Initialized in read_quantizer

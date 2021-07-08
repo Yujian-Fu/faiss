@@ -540,6 +540,9 @@ namespace bslib{
         std::vector<float> residuals(n * dimension);
         //Compute residuals
         encode(n, data, group_ids, residuals.data(), vector_alpha);
+        for (size_t i = 0; i < n; i++){
+            this->b_c_dist += faiss::fvec_norm_L2sqr(residuals.data(), n * dimension);
+        }
         if (show_batch_time) batch_recorder.print_time_usage("compute residuals                 ");
 
         if (use_OPQ){
@@ -1977,7 +1980,7 @@ namespace bslib{
             //In order to save disk usage
             //Annotate the write_index function
             if (this->use_saving_index){
-                this->write_index(path_index);
+                //this->write_index(path_index);
             }
             std::string message = "Constructed and wrote the index ";
             Mrecorder.print_memory_usage(message);
@@ -1990,38 +1993,7 @@ namespace bslib{
     void Bslib_Index::index_statistic(std::string path_base){
         // Average distance between the base vector and centroid
 
-        
-        std::vector<float> avg_b_c_dist(final_group_num, 0);
-        std::vector<size_t> nb (final_group_num, 0);
-
-#pragma omp parallel for
-        for (size_t i = 0; i < final_group_num; i++){
-            for (size_t j = 0; j < base_sequence_ids[i].size(); j++){
-                std::ifstream base_input = std::ifstream(path_base, std::ios::binary);
-                std::vector<base_data_type> base_vector(dimension); uint32_t dim;
-                base_input.seekg(base_sequence_ids[i][j] * dimension * sizeof(base_data_type) + base_sequence_ids[i][j] * sizeof(uint32_t), std::ios::beg);
-                base_input.read((char *) & dim, sizeof(uint32_t)); assert(dim == this->dimension);
-                base_input.read((char *) base_vector.data(), sizeof(base_data_type)*dimension);
-                std::vector<float> base_vector_float(dimension);
-                for (size_t temp = 0; temp < dimension; temp++){base_vector_float[temp] = base_vector[temp];}
-                std::vector<float> vector_residual(dimension);
-                std::vector<idx_t> encode_id(1, i);
-                if (use_vector_alpha){
-                    encode(1, base_vector_float.data(), encode_id.data(), vector_residual.data(), base_alphas[i].data() + j);
-                }
-                else{
-                    encode(1, base_vector_float.data(), encode_id.data(), vector_residual.data());
-                }
-                avg_b_c_dist[i] += faiss::fvec_norm_L2sqr(vector_residual.data(), dimension);
-                nb[i] ++;
-            }
-        }
-        float dist = 0;
-        size_t nb_sum = 0;
-        for (size_t i = 0; i< final_group_num; i++){
-            dist += avg_b_c_dist[i]; nb_sum += nb[i];
-        }
-        std::cout << "Avg b c distance: " << dist / nb_sum << std::endl;
+        std::cout << "Avg b c distance: " << b_c_dist / 1000000 << std::endl;
     }
 
 
