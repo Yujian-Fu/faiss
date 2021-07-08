@@ -297,7 +297,7 @@ namespace bslib{
                     result_labels[j] = CentroidDistributionMap[group_id] + j;
 
                     if (result_dists[j] == 0){
-                        std::cout << "Query and distance L2 dist = 0 "<<  result_labels[j] << std::endl;
+                        std::cout << "Query and distance L2 dist = 0 "<<  group_id << " " << result_labels[j] << std::endl;
                         for (size_t temp = 0; temp < dimension; temp++){
                             std::cout << query[temp] << " " ;
                         }
