@@ -428,6 +428,8 @@ namespace bslib{
 
                 if (LQ_type == 2){
                     auto result_pair = LQ0_fast_distance(group_nn_dist, query_group_dist, query_nn_dist);
+                    
+                    /*
                     if (!(result_pair.second >=0)){
                         std::cout << result_pair.first << " " << group_nn_dist << " " << query_group_dist << " " << query_nn_dist << " " << result_pair.second << std::endl;
                         std::cout << group_index << " " << nn_index <<  " " << upper_search_space << std::endl; 
@@ -436,6 +438,7 @@ namespace bslib{
                         }
                         exit(0);
                     }
+                    */
                     result_dists[inner_group_id] = result_pair.second;
                     vector_alpha[inner_group_id] = result_pair.first;
                 }
