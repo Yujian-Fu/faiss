@@ -871,7 +871,7 @@ namespace bslib{
         const bool validation = false; 
         size_t validation_print_space = 50; 
         const bool analysis = false; 
-        const bool showmessage = false; 
+        const bool showmessage = true; 
 
         std::vector<float>  visited_gt_proportion;
         std::vector<size_t> actual_visited_vectors;
