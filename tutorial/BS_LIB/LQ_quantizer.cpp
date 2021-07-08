@@ -425,12 +425,14 @@ namespace bslib{
 
                 if (LQ_type == 2){
                     auto result_pair = LQ0_fast_distance(group_nn_dist, query_group_dist, query_nn_dist);
+                    assert(result_pair.second >=0);
                     result_dists[inner_group_id] = result_pair.second;
                     vector_alpha[inner_group_id] = result_pair.first;
                 }
                 else{
                     float alpha = alphas[group_id][inner_group_id];
                     result_dists[inner_group_id] = alpha*(alpha-1)*group_nn_dist + (1-alpha)*query_group_dist + alpha*query_nn_dist;  
+                    assert(result_dists[inner_group_id] >=0);
                 }                                                     
             }
             else{
@@ -442,6 +444,7 @@ namespace bslib{
                 if (LQ_type == 2){
                     auto result_pair = LQ0_distance(query, group_centroid, nn_centroid, nn_dist);
                     result_dists[inner_group_id] = result_pair.second;
+                    assert(result_pair.second >=0);
                     vector_alpha[inner_group_id] = result_pair.first;
                 }
                 
@@ -454,6 +457,7 @@ namespace bslib{
                         query_sub_centroid_vector[k] = alpha * nn_centroid[k] + (1-alpha)*group_centroid[k]-query[k];
                     }
                     result_dists[inner_group_id] = faiss::fvec_norm_L2sqr(query_sub_centroid_vector.data(), dimension);
+                    assert(result_dists[inner_group_id]);
                 }
             }
         }
