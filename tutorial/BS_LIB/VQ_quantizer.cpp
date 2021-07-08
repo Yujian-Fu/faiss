@@ -92,7 +92,7 @@ namespace bslib{
             else{
                 for (size_t temp1 = 0; temp1 < nt_sub; temp1 ++){
                     for (size_t temp2 = 0; temp2 < dimension; temp2++){
-                        centroids[temp2] = train_set[i][temp1 * dimension + temp2];
+                        centroids[temp2] += train_set[i][temp1 * dimension + temp2];
                     }
                 }
                 for (size_t temp2 = 0; temp2 < dimension; temp2 ++){
