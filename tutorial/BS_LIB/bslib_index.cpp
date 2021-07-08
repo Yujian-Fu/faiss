@@ -2064,22 +2064,25 @@ namespace bslib{
             hnswlib::HierarchicalNSW * group_HNSW = new hnswlib::HierarchicalNSW(true, this->use_vector_alpha);
             group_HNSW->code_size = pq.code_size; group_HNSW->ksub = pq.ksub;
 
-            size_t group_id;
-            readBinaryPOD(group_HNSW_input, group_id); 
-            group_HNSW_idxs[group_id] = i;
+            size_t final_group_id;
+            readBinaryPOD(group_HNSW_input, final_group_id); 
+            group_HNSW_idxs[final_group_id] = i;
             if (use_vector_alpha){
                 size_t n_lq = lq_quantizer_index.size() - 1;
-                group_HNSW->nn_dist = lq_quantizer_index[n_lq].nn_centroid_dists[group_id].data();
-                group_HNSW->vector_alpha_norm = this->base_alpha_norms[group_id].data();
-                group_HNSW->vector_alpha = this->base_alphas[group_id].data();
+                idx_t lq_group_id, inner_group_id;
+
+                lq_quantizer_index[n_lq].get_group_id(final_group_id, lq_group_id, inner_group_id);
+                group_HNSW->nn_dist = lq_quantizer_index[n_lq].nn_centroid_dists[lq_group_id][inner_group_id];
+                group_HNSW->vector_alpha_norm = this->base_alpha_norms[final_group_id].data();
+                group_HNSW->vector_alpha = this->base_alphas[final_group_id].data();
             }
             else{
-                group_HNSW->centroid_norm = this->centroid_norms[group_id];
+                group_HNSW->centroid_norm = this->centroid_norms[final_group_id];
             }
 
             group_HNSW->base_norms = this->base_norms.data();
-            group_HNSW->base_sequece_id_list = this->base_sequence_ids[group_id].data();
-            group_HNSW->base_code_point = base_codes[group_id].data();
+            group_HNSW->base_sequece_id_list = this->base_sequence_ids[final_group_id].data();
+            group_HNSW->base_code_point = base_codes[final_group_id].data();
 
             readBinaryPOD(group_HNSW_input, group_HNSW->maxelements_);
             readBinaryPOD(group_HNSW_input, group_HNSW->enterpoint_node);

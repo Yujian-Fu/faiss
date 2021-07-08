@@ -81,9 +81,10 @@ namespace hnswlib {
         
         float q_c_dist;
         float q_alpha;
+        float nn_dist;
 
         char * data_level0_memory_;
-        float * nn_dist;
+        
         float * vector_alpha_norm;
         float * vector_alpha;
         float * base_norms;

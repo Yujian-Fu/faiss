@@ -249,7 +249,7 @@ std::priority_queue<std::pair<float, idx_t>> HierarchicalNSW::searchKnn(const fl
         assert(centroid_norm > 0);
     }
     else{
-        assert(nn_dist != NULL && vector_alpha_norm != NULL && vector_alpha != NULL);
+        assert(nn_dist != 0 && vector_alpha_norm != NULL && vector_alpha != NULL);
     }
 
     auto topResults = searchBaseLayer(query, efSearch);
@@ -367,7 +367,7 @@ float HierarchicalNSW::PQdistfunc(const float * PQ_dist_table, const idx_t id){
         std::cout << "Computing the PQ product " << std::endl;
         float term3 = 2 * bslib::pq_L2sqr(code, PQ_dist_table, this->code_size, this->ksub);
         std::cout << "Computing term4 " << std::endl;
-        float term4 = (q_alpha - vector_alpha[id]) * (q_alpha - vector_alpha[id]) * nn_dist[id];
+        float term4 = (q_alpha - vector_alpha[id]) * (q_alpha - vector_alpha[id]) * nn_dist;
         std::cout << "Computing term5 " << std::endl;
         float term5 = vector_alpha_norm[id];
         std::cout << "Return result " << std::endl;
