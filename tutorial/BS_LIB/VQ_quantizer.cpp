@@ -280,6 +280,7 @@ namespace bslib{
                     result_labels[search_para - j -1] = CentroidDistributionMap[group_id] + result_queue.top().second;
                     result_queue.pop();
 
+                    /*
                     if (result_dists[search_para - j - 1] == 0){
                         std::cout << "Query and distance L2 dist = 0: "<< result_labels[search_para - j -1] << std::endl;
                         for (size_t temp = 0; temp < dimension; temp++){
@@ -292,7 +293,8 @@ namespace bslib{
                             std::cout << target_centroid[temp] << " " ;
                         }
                         exit(0);
-                    }                    
+                    }       
+                    */             
                 }
                 else{
                     result_dists[j] = MAX_DIST;
