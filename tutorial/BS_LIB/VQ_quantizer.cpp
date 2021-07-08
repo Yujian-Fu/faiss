@@ -95,9 +95,12 @@ namespace bslib{
                         centroids[temp2] += train_set[i][temp1 * dimension + temp2];
                     }
                 }
+                std::cout << "Average centroid: " << std::endl;
                 for (size_t temp2 = 0; temp2 < dimension; temp2 ++){
                     centroids[temp2] /= nt_sub;
+                    std::cout << centroids[temp2] << " ";
                 }
+                std::cout << std::endl;
             }
             
             //Adding centroids into quantizers
