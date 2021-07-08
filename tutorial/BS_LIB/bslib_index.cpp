@@ -1083,9 +1083,7 @@ namespace bslib{
                     assert(group_HNSW_thres > 0);
                     size_t group_HNSW_id = group_HNSW_idxs.at(all_group_id);
                     this->group_HNSW_list[group_HNSW_id]->q_c_dist = q_c_dist;
-                    std::cout << "Searching in HNSW" << std::endl;
                     auto result_queue = this->group_HNSW_list[group_HNSW_id]->searchKnn(precomputed_table.data(), result_k);
-                    std::cout << "Finished search" << std::endl;
                     for(size_t m = 0; m < result_k; m++){
                         query_search_dists[valid_result_length] = result_queue.top().first;
                         query_search_labels[valid_result_length] = base_sequence_ids[all_group_id][result_queue.top().second];
