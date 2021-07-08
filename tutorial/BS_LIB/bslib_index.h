@@ -104,7 +104,7 @@ struct Bslib_Index{
 
     void train_pq(const std::string path_pq, const std::string path_norm_pq, const std::string path_learn, const std::string path_OPQ, const size_t train_set_size);
 
-    void encode(size_t n, const float * data, const idx_t * encoded_ids, float * encoded_data, const float * alphas);
+    void encode(size_t n, const float * data, const idx_t * encoded_ids, float * encoded_data, const float * alphas = nullptr);
     void decode(size_t n, const float * encoded_data, const idx_t * encoded_ids, float * decoded_data, const float * alphas);
     void assign(const size_t n, const float * assign_data, idx_t * assigned_ids, size_t assign_layer, float * alphas = NULL);
     
@@ -141,7 +141,7 @@ struct Bslib_Index{
         std::string path_alphas, std::string path_base_alpha_norm, size_t group_HNSW_M, size_t group_HNSW_efCOnstruction,
         size_t batch_size, size_t nbatches, size_t nb, std::ofstream & record_file);
     
-    void index_statistic();
+    void index_statistic(std::string path_base);
 
     void query_test(size_t num_search_paras, size_t num_recall, size_t nq, size_t ngt,
         const size_t * max_vectors, const size_t * result_k, const size_t * keep_space, const size_t * reranking_space,

@@ -1987,7 +1987,33 @@ namespace bslib{
         }
     }
 
-    void Bslib_Index::index_statistic(){}
+    void Bslib_Index::index_statistic(std::string path_base){
+        // Average distance between the base vector and centroid
+
+        std::ifstream base_input = std::ifstream(path_base, std::ios::binary);
+        float avg_b_c_dist = 0;
+        size_t nb = 0;
+        for (size_t i = 0; i < final_group_num; i++){
+            for (size_t j = 0; j < base_sequence_ids[i].size(); j++){
+                std::vector<base_data_type> base_vector(dimension); uint32_t dim;
+                base_input.seekg(base_sequence_ids[i][j] * dimension * sizeof(base_data_type) + base_sequence_ids[i][j] * sizeof(uint32_t), std::ios::beg);
+                base_input.read((char *) & dim, sizeof(uint32_t)); assert(dim == this->dimension);
+                base_input.read((char *) base_vector.data(), sizeof(base_data_type)*dimension);
+                std::vector<float> base_vector_float(dimension);
+                for (size_t temp = 0; temp < dimension; temp++){base_vector_float[temp] = base_vector[temp];}
+                std::vector<float> vector_residual(dimension);
+                if (use_vector_alpha){
+                    encode(1, base_vector_float.data(), base_sequence_ids[i].data() + j, vector_residual.data(), base_alphas[i].data() + j);
+                }
+                else{
+                    encode(1, base_vector_float.data(), base_sequence_ids[i].data() + j, vector_residual.data());
+                }
+                avg_b_c_dist += faiss::fvec_norm_L2sqr(vector_residual.data(), dimension);
+                nb ++;
+            }
+        }
+        std::cout << "Avg b c distance: " << avg_b_c_dist / nb << std::endl;
+    }
 
 
     void Bslib_Index::query_test(size_t num_search_paras, size_t num_recall, size_t nq, size_t ngt,
