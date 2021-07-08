@@ -1995,6 +1995,19 @@ namespace bslib{
         // Average distance between the base vector and centroid
 
         std::cout << "Avg b c distance: " << b_c_dist / 1000000 << std::endl;
+        if (!use_vector_alpha){
+            size_t n_lq = lq_quantizer_index.size();
+            size_t n_g = lq_quantizer_index[n_lq].nc_upper;
+            size_t n_max = lq_quantizer_index[n_lq].max_nc_per_group;
+            for (size_t i = 0; i < n_g; i++){
+                for (size_t j = 0; j < n_max; j++){
+                    std::cout << lq_quantizer_index[n_lq].alphas[i][j] << " ";
+                }
+                std::cout << std::endl;
+            }
+        }
+
+        
     }
 
 
