@@ -91,7 +91,7 @@ namespace bslib{
 
 
             for (size_t temp1 = 0; temp1 < exact_nc_in_group; temp1 ++){
-                if (int(centroids[temp1 * dimension]) - int(centroids[temp1 * dimension]) == 0){
+                if (int(centroids[temp1 * dimension]) - (centroids[temp1 * dimension]) == 0){
                 std::cout << "Result for group " << i << " " << temp1 << std::endl;
                 std::cout << nt_sub << std::endl;
                     for (size_t temp2 = 0; temp2 < dimension; temp2 ++){
