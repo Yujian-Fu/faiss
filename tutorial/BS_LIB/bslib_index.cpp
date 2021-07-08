@@ -719,7 +719,7 @@ namespace bslib{
             pq_quantizer_index[n_pq - 1].search_all(n, assign_data, assigned_ids);
         }*/
 
-#pragma omp parallel for
+//#pragma omp parallel for
         for (size_t i = 0; i < n; i++){
             size_t n_vq = 0, n_lq = 0, n_pq = 0; 
             std::vector<idx_t> query_search_id(1 , 0);
@@ -763,6 +763,10 @@ namespace bslib{
                     query_result_dists.resize(group_size, 0);
 
                     const float * target_data = assign_data + i * dimension;
+                    for (size_t temp = 0; temp < upper_group_size; temp ++){
+                        std::cout << upper_result_ids[temp] << " " << upper_result_dists[temp] << " "; 
+                    }
+                    std::cout << std::endl << group_id << std::endl;
                     lq_quantizer_index[n_lq].search_in_group(target_data, upper_result_ids.data(), upper_result_dists.data(), 1, group_id, query_result_dists.data(), query_result_ids.data(), alphas);
                     std::vector<float> sub_dist(1);
                     keep_k_min(group_size, 1, query_result_dists.data(), query_result_ids.data(), sub_dist.data(), query_search_id.data());
