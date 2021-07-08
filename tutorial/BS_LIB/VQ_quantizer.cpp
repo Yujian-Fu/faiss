@@ -277,11 +277,26 @@ namespace bslib{
                     result_dists[search_para - j - 1] = result_queue.top().first;
                     result_labels[search_para - j -1] = CentroidDistributionMap[group_id] + result_queue.top().second;
                     result_queue.pop();
+
+                    if (result_dists[search_para - j - 1] == 0){
+                        std::cout << "Query and distance L2 dist = 0"<< std::endl;
+                        for (size_t temp = 0; temp < dimension; temp++){
+                            std::cout << query[temp] << " " ;
+                        }
+                        std::cout << std::endl;
+                        std::vector<float> target_centroid(dimension);
+                        compute_final_centroid(result_labels[search_para - j -1], target_centroid.data());
+                        for (size_t temp = 0; temp < dimension; temp++){
+                            std::cout << target_centroid[temp] << " " ;
+                        }
+                        exit(0);
+                    }                    
                 }
                 else{
                     result_dists[j] = MAX_DIST;
                     result_labels[j] = INVALID_ID;
                 }
+
             }
         }
         else{
@@ -291,6 +306,21 @@ namespace bslib{
                     const float * target_centroid = this->L2_quantizers[group_id]->xb.data() + j * this->dimension;
                     result_dists[j] = faiss::fvec_L2sqr(target_centroid, query, dimension);
                     result_labels[j] = CentroidDistributionMap[group_id] + j;
+
+                    if (result_dists[j] == 0){
+                        std::cout << "Query and distance L2 dist = 0"<< std::endl;
+                        for (size_t temp = 0; temp < dimension; temp++){
+                            std::cout << query[temp] << " " ;
+                        }
+                        std::cout << std::endl;
+                        std::vector<float> target_centroid(dimension);
+                        compute_final_centroid(result_labels[j], target_centroid.data());
+                        for (size_t temp = 0; temp < dimension; temp++){
+                            std::cout << target_centroid[temp] << " " ;
+                        }
+                        exit(0);
+                    } 
+
                 }
                 else{
                     result_dists[j] = MAX_DIST;
