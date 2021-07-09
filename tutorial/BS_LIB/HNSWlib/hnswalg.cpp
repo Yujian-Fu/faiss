@@ -243,13 +243,16 @@ void HierarchicalNSW::addPoint(const float *point)
 
 std::priority_queue<std::pair<float, idx_t>> HierarchicalNSW::searchKnn(const float *query, size_t k)
 {
-    assert(q_c_dist > 0 && base_sequece_id_list != NULL && base_norms != NULL);
+    assert(q_c_dist > 0);
+    assert(base_sequece_id_list != NULL);
+    assert(base_norms != NULL);
 
     if (!use_vector_alpha){
         assert(centroid_norm > 0);
     }
     else{
-        assert(nn_dist != 0 && vector_alpha != NULL);
+        assert(nn_dist != 0);
+        assert(vector_alpha != NULL);
     }
 
     auto topResults = searchBaseLayer(query, efSearch);
