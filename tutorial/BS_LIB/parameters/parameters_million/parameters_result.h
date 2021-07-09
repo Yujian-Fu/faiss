@@ -24,7 +24,6 @@ std::string layer_combination(const std::string * index_type, const size_t layer
 }
 
 
-
 // Folder path
 std::string ncentroid_conf = nc_combination(ncentroids, index_type, layers, M_PQ_layer, nbits_PQ_layer);
 std::string model = "models" + layer_combination(index_type, layers, LQ_type);

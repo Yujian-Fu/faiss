@@ -366,9 +366,9 @@ float HierarchicalNSW::PQdistfunc(const float * PQ_dist_table, const idx_t id){
         return  q_c_dist - centroid_norm + base_norms[base_sequece_id] - PQ_product;
     }
     else{
-        std::cout << q_c_dist << " " << PQ_product << " " << base_norms[base_sequece_id] << " " << (q_alpha * q_alpha - 2 * q_alpha * vector_alpha[id]) * nn_dist << std::endl;
-        std::cout << q_c_dist - PQ_product + base_norms[base_sequece_id] - (q_alpha * q_alpha - 2 * q_alpha * vector_alpha[id]) * nn_dist << std::endl;
-        std::cout << q_alpha << " " << vector_alpha[id] << std::endl;
+        //std::cout << q_c_dist << " " << PQ_product << " " << base_norms[base_sequece_id] << " " << (q_alpha * q_alpha - 2 * q_alpha * vector_alpha[id]) * nn_dist << std::endl;
+        //std::cout << q_c_dist - PQ_product + base_norms[base_sequece_id] - (q_alpha * q_alpha - 2 * q_alpha * vector_alpha[id]) * nn_dist << std::endl;
+        //std::cout << q_alpha << " " << vector_alpha[id] << std::endl;
         return q_c_dist - PQ_product + base_norms[base_sequece_id] - (q_alpha * q_alpha - 2 * q_alpha * vector_alpha[id]) * nn_dist;
     }
 }
