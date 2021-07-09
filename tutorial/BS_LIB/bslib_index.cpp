@@ -531,9 +531,12 @@ namespace bslib{
      * group_ids: the group id of the data                                                 size: n
      * group_positions                                                                     size: n
      * 
+     * For vector alpha:
+     * base_norm = ||c2 + rpq||^2 - c^2 - 2 * alpha2 * c * nn
+     * 
      **/
     void Bslib_Index::add_batch(size_t n, const float * data, const idx_t * sequence_ids, const idx_t * group_ids, 
-    const size_t * group_positions, const bool base_norm_flag, const bool alpha_flag, const float * vector_alpha, const float * vector_alpha_norm){
+    const size_t * group_positions, const bool base_norm_flag, const bool alpha_flag, const float * vector_alpha){
         time_recorder batch_recorder = time_recorder();
         bool show_batch_time = true;
 
@@ -564,7 +567,6 @@ namespace bslib{
 
             if (use_vector_alpha && !alpha_flag){
                 this->base_alphas[group_id][group_position] = vector_alpha[i];
-                this->base_alpha_norms[group_id][group_position] = vector_alpha_norm[i];
             }
         }
         if (show_batch_time) batch_recorder.print_time_usage("add codes to index                ");
@@ -581,7 +583,22 @@ namespace bslib{
             decode(n, decoded_residuals.data(), group_ids, reconstructed_x.data(), vector_alpha);
             if (show_batch_time) batch_recorder.print_time_usage("compute reconstructed base vectors ");
             //This is the norm for reconstructed vectors
-            for (size_t i = 0; i < n; i++){base_norms[sequence_ids[i]] =  faiss::fvec_norm_L2sqr(reconstructed_x.data() + i * dimension, dimension);}
+            // For vector alpha: base_norm = ||c2 + rpq||^2 - c^2 - 2 * alpha2 * c * nn 
+            for (size_t i = 0; i < n; i++){
+                float original_base_norm = faiss::fvec_norm_L2sqr(reconstructed_x.data() + i * dimension, dimension);
+                if (use_vector_alpha){
+                    size_t n_lq = lq_quantizer_index.size()-1; idx_t lq_group_id, lq_inner_group_id;
+                    lq_quantizer_index[n_lq].get_group_id(group_ids[i], lq_group_id, lq_inner_group_id);
+                    float centroid_norm = lq_quantizer_index[n_lq].upper_centroid_norm[lq_group_id];
+                    size_t max_nc_per_group = lq_quantizer_index[n_lq].max_nc_per_group;
+                    float centroid_product = lq_quantizer_index[n_lq].upper_centroid_product[lq_group_id * max_nc_per_group + lq_inner_group_id];
+                    float alpha = vector_alpha[i];
+                    base_norms[sequence_ids[i]] = original_base_norm - centroid_norm - 2 * alpha * centroid_product;
+                }
+                else{
+                    base_norms[sequence_ids[i]] =  original_base_norm;
+                }
+            }
             if (show_batch_time) batch_recorder.print_time_usage("add base norms                     ");
         }
 
@@ -862,6 +879,20 @@ namespace bslib{
       * Since OPQ is a Orthogonal Matrix, it does not reflect the norm value
       * Only the query * residual_PQ will be reflected
       * 
+      * 
+      * With vector alpha:
+      * ||q - c1 + c1 - c2 - rpq||2 = ||q - c1||^2 + 2 (q - c1) * (c1 - c2 - rpq) + ||c1 - c2 - rpq||^2
+      * As we have : (q - c1) * (c1 - c2) = 0 :
+      * = ||q - c1||^2 - 2 rpq * (q - c1) + c1 ^ 2 - 2 * c1 (c2 + rpq) + ||c2 + rpq||^2
+      * = ||q - c1||^2 - 2 * q * rpq + 2*c1 * rpq + c1^2 - 2*c1*c2 - 2*c1 * rpq + ||c2 + rpq||^2
+      * = ||q - c1||2 - 2 * q * rpq + c1^2 - 2 * c1 * c2 + ||c2 + rpq||^2
+      * As c1 = c + alpha1 * nn, c2 = c + alpha2 * nn
+      * c1 ^2 - 2 * c1*c2 = c^2 + 2*alpha1*nn + alpha1^2*nn^2 -2 (c^2 + (alpha1 + alpha2)*c*nn + alpha1 * alpha2 * nn^2)
+      * = - c^2 - 2 * alpha2 * c * nn + (alpha1^2 - 2 * alpha1 * alpha2)nn^2
+      * 
+      * The total would be: ||q - c1||^2 - 2 * q * rpq + ||c2 + rpq||^2 - c^2 - 2 * alpha2 * c * nn  + (alpha1 ^ 2 - 2 * alpha1 * alpha2)nn^2
+      *                      q_c_dist      PQ table      |              base norm                 |    |            centroid norm            |
+      * 
       * Input:
       * n: the number of query vectors
       * result_k: the kNN neighbor that we want to search
@@ -1122,7 +1153,7 @@ namespace bslib{
                         assert(abs(q_c_dist - actual_q_c_dist) < VALIDATION_EPSILON && abs(centroid_norm - actual_centroid_norm) < VALIDATION_EPSILON);
                     }*/
 
-                    
+                    //||q - c1||^2 - 2 * q * rpq + ||c2 + rpq||^2 - c^2 - 2 * alpha2 * c * nn  + (alpha1 ^ 2 - 2 * alpha1 * alpha2)nn^2
                     const uint8_t * code = base_codes[all_group_id].data();
                     for (size_t m = 0; m < group_size; m++){
 
@@ -1136,9 +1167,9 @@ namespace bslib{
                             query_search_dists[valid_result_length] =  q_c_dist - centroid_norm + base_norm - PQ_table_product;
                         }
                         else{
-                            
-                            float L2_C1_C2 = (query_alpha - base_alphas[all_group_id][m]) * (query_alpha - base_alphas[all_group_id][m]) * (lq_quantizer_index[n_lq].nn_centroid_dists[lq_group_id][lq_inner_group_id]);
-                            query_search_dists[valid_result_length] = q_c_dist - base_alpha_norms[all_group_id][m] + base_norm + L2_C1_C2 - PQ_table_product;
+                            float base_alpha = base_alphas[all_group_id][m];
+                            float nn_dist = lq_quantizer_index[n_lq].nn_centroid_dists[lq_group_id][lq_inner_group_id];
+                            query_search_dists[valid_result_length] = q_c_dist - PQ_table_product + base_norm + (query_alpha * query_alpha - 2 * query_alpha * base_alpha) * nn_dist;
                         }
 
                         std::vector<base_data_type> base_vector(dimension); uint32_t dim;
@@ -1149,7 +1180,9 @@ namespace bslib{
                         for (size_t temp = 0; temp < dimension; temp++){base_vector_float[temp] = base_vector[temp];}
                         float actual_dist =  faiss::fvec_L2sqr(base_vector_float.data(), query, dimension);
 
+
                         std::cout << actual_dist << " " << query_search_dists[valid_result_length] << std::endl;
+                        
                         if (m == 20){
                             exit(0);
                         }
@@ -1361,6 +1394,12 @@ namespace bslib{
                         quantizers_output.write((char *) lq_quantizer_index[n_lq].alphas[group_id].data(), max_nc_per_group * sizeof(float));
                     }
                 }
+                else{
+                    assert(lq_quantizer_index[n_lq].upper_centroid_norm.size() == nc_upper);
+                    quantizers_output.write((char *) lq_quantizer_index[n_lq].upper_centroid_norm.data(), nc_upper * sizeof(float));
+                    assert(lq_quantizer_index[n_lq].upper_centroid_product.size() == nc_upper * max_nc_per_group);
+                    quantizers_output.write((char *) lq_quantizer_index[n_lq].upper_centroid_product.data(), max_nc_per_group * sizeof (float)); 
+                }
 
                 assert(n_vq + n_lq + n_pq == i);
                 n_lq ++;
@@ -1501,6 +1540,12 @@ namespace bslib{
                             lq_quantizer.alphas[group_id][inner_group_id] = alphas[inner_group_id];
                         }
                     }
+                }
+                else{
+                    lq_quantizer.upper_centroid_norm.resize(nc_upper);
+                    lq_quantizer.upper_centroid_product.resize(nc_upper * max_nc_per_group);
+                    quantizer_input.read((char *) lq_quantizer.upper_centroid_norm.data(), nc_upper * sizeof(float));
+                    quantizer_input.read((char *) lq_quantizer.upper_centroid_product.data(), nc_upper * max_nc_per_group * sizeof(float));
                 }
                 
                 this->lq_quantizer_index.push_back(lq_quantizer);
@@ -1778,7 +1823,7 @@ namespace bslib{
     
     void Bslib_Index::load_index(std::string path_index, std::string path_ids, std::string path_base,
         std::string path_base_norm, std::string path_centroid_norm,  std::string path_group_HNSW, std::string path_alphas_raw,
-        std::string path_base_alphas,std::string path_base_alpha_norms, size_t group_HNSW_M, size_t group_HNSW_efCOnstruction,
+        std::string path_base_alphas, size_t group_HNSW_M, size_t group_HNSW_efCOnstruction,
         size_t batch_size, size_t nbatches, size_t nb, std::ofstream & record_file){
         Trecorder.reset();
         if (exists(path_index)){
@@ -1794,7 +1839,6 @@ namespace bslib{
 
             if (use_vector_alpha){
                 read_base_alphas(path_base_alphas);
-                read_base_alpha_norms(path_base_alpha_norms);
             }
 
             if (use_recording){
@@ -1831,49 +1875,23 @@ namespace bslib{
             readXvec<float> (base_alphas_raw_input, vector_alphas.data(), batch_size, nbatches);
             base_alphas_raw_input.close();
 
-            std::vector<float> vector_alpha_norms;
-
             // Whether the alpha vector is loaded in index
             bool alpha_flag = false;
 
             if (use_vector_alpha){
-                if (exists(path_base_alpha_norms) && exists(path_base_alphas)){
+                if (exists(path_base_alphas)){
                     read_base_alphas(path_base_alphas);
-                    read_base_alpha_norms(path_base_alpha_norms);
                     alpha_flag = true;
                 }
                 else{
-                    //Load the alpha and alpha_norm in nb size
+                    //Load the alpha in nb size
                     size_t n_lq = lq_quantizer_index.size() - 1;
                     assert(index_type[layers-1] == "LQ" && lq_quantizer_index[n_lq].LQ_type == 2);
-                    
-                    vector_alpha_norms.resize(nb);
 
                     base_alphas.resize(this->final_group_num);
-                    base_alpha_norms.resize(this->final_group_num);
 
                     for (size_t i = 0; i < final_group_num; i++){
                         base_alphas[i].resize(groups_size[i]);
-                        base_alpha_norms[i].resize(groups_size[i]);
-                    }
-
-                    std::vector<float> centroid_vector(dimension);
-                    std::vector<float> subcentroid(dimension);
-                    for (size_t i = 0; i < nb; i++){
-                        idx_t group_id, inner_group_id;
-                        lq_quantizer_index[n_lq].get_group_id(ids[i], group_id, inner_group_id);
-                        float * centroid = lq_quantizer_index[n_lq].upper_centroids.data() + group_id * dimension;
-                        idx_t nn_id = lq_quantizer_index[n_lq].nn_centroid_ids[group_id][inner_group_id];
-                        float * nn_centroid = lq_quantizer_index[n_lq].upper_centroids.data() + nn_id * dimension;
-                        faiss::fvec_madd(dimension, nn_centroid, -1.0, centroid, centroid_vector.data());
-                        faiss::fvec_madd(dimension, centroid, vector_alphas[i], centroid_vector.data(), subcentroid.data()); 
-                        vector_alpha_norms[i] = faiss::fvec_norm_L2sqr(subcentroid.data(), dimension);
-                        if (i % batch_size == 0){
-                            std::cout << " Computing alpha norms [ " << i << " / " << nb << " ]";
-                            Trecorder.print_time_usage("");
-                            record_file << " adding batches [ " << i << " / " << nbatches << " ]";
-                            Trecorder.record_time_usage(record_file, " ");
-                        }
                     }
                 }
             }
@@ -1898,12 +1916,12 @@ namespace bslib{
 
                 if (alpha_flag){
                     this->add_batch(batch_size, base_batch.data(), batch_sequence_ids.data(), ids.data() + i * batch_size, 
-                        group_position.data()+i*batch_size, base_norm_flag, alpha_flag, vector_alphas.data(), vector_alpha_norms.data());
+                        group_position.data()+i*batch_size, base_norm_flag, alpha_flag, vector_alphas.data());
                 }
                 else{
                     this->add_batch(batch_size, base_batch.data(), batch_sequence_ids.data(), ids.data() + i * batch_size, 
                     group_position.data()+i*batch_size, base_norm_flag, alpha_flag,
-                    vector_alphas.data() + i * batch_size, vector_alpha_norms.data() + i * batch_size);
+                    vector_alphas.data() + i * batch_size);
                 }
 
                 if (i % 10 == 0){
@@ -1923,7 +1941,6 @@ namespace bslib{
 
             if (use_vector_alpha && !alpha_flag){
                 write_base_alphas(path_base_alphas);
-                write_base_alpha_norms(path_base_alpha_norms);
             }
 
             this->compute_centroid_norm(path_centroid_norm);
@@ -2157,7 +2174,6 @@ namespace bslib{
 
                 lq_quantizer_index[n_lq].get_group_id(final_group_id, lq_group_id, inner_group_id);
                 group_HNSW->nn_dist = lq_quantizer_index[n_lq].nn_centroid_dists[lq_group_id][inner_group_id];
-                group_HNSW->vector_alpha_norm = this->base_alpha_norms[final_group_id].data();
                 group_HNSW->vector_alpha = this->base_alphas[final_group_id].data();
             }
             else{
@@ -2229,37 +2245,6 @@ namespace bslib{
             base_alphas_input.read((char *) & group_size, sizeof(size_t));
             this-> base_alphas[i].resize(group_size);
             base_alphas_input.read((char *) this->base_alphas[i].data(), group_size * sizeof(float));
-        }
-    }
-
-    void Bslib_Index::write_base_alpha_norms(std::string path_base_alpha_norm){
-        
-        assert(use_vector_alpha);
-        assert(base_alpha_norms.size() == final_group_num);
-        std::ofstream base_alphas_norms_output(path_base_alpha_norm, std::ios::binary);
-        base_alphas_norms_output.write((char *) & final_group_num, sizeof(size_t));
-        for (size_t i = 0; i < final_group_num; i++){
-            size_t group_size = base_alpha_norms[i].size();
-            base_alphas_norms_output.write((char *) & group_size, sizeof(size_t));
-            base_alphas_norms_output.write((char *) this->base_alpha_norms[i].data(), group_size * sizeof(float));
-        }
-        base_alphas_norms_output.close();
-    }
-
-    void Bslib_Index::read_base_alpha_norms(std::string path_base_alpha_norm){
-        std::cout << "Loading base alpha norms " << std::endl;
-        assert(use_vector_alpha);
-        assert(this->base_alpha_norms.size() == 0);
-        std::ifstream base_alpha_norms_input(path_base_alpha_norm, std::ios::binary);
-        size_t group_num;
-        base_alpha_norms_input.read((char *) & group_num, sizeof(size_t));
-        assert(group_num == this->final_group_num);
-        this->base_alpha_norms.resize(group_num);
-        size_t group_size;
-        for (size_t i = 0; i < group_num; i++){
-            base_alpha_norms_input.read((char *) & group_size, sizeof(size_t));
-            this->base_alpha_norms[i].resize(group_size);
-            base_alpha_norms_input.read((char *) this->base_alpha_norms[i].data(), group_size * sizeof(float));
         }
     }
 }

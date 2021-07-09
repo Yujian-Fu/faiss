@@ -11,6 +11,8 @@ namespace bslib{
         std::vector<float> upper_centroids; // Initialized in constructor
         std::vector<std::vector<idx_t>> nn_centroid_ids; // Initialized in constructor
         std::vector<std::vector<float>> nn_centroid_dists; // Initialized in constructor
+        std::vector<float> upper_centroid_norm;
+        std::vector<float> upper_centroid_product;
 
         explicit LQ_quantizer(size_t dimension, size_t nc_upper, size_t nc_per_group, const float * upper_centroids,
                               const idx_t * upper_centroid_ids, const float * upper_centroid_dists,  size_t LQ_type,bool use_all_HNSW = false);

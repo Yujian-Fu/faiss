@@ -78,7 +78,6 @@ struct Bslib_Index{
     std::vector<std::vector<idx_t>> base_sequence_ids;
 
     std::vector<std::vector<float>> base_alphas;
-    std::vector<std::vector<float>> base_alpha_norms;
     //std::vector<std::vector<idx_t>> base_pre_hash_ids;
 
     std::vector<std::vector<idx_t>> train_set_ids; // This is for train data selection 
@@ -110,7 +109,7 @@ struct Bslib_Index{
     void assign(const size_t n, const float * assign_data, idx_t * assigned_ids, size_t assign_layer, float * alphas = NULL);
     
     void add_batch(size_t n, const float * data, const idx_t * sequence_ids, const idx_t * group_ids, 
-    const size_t * group_positions, const bool base_norm_flag, const bool alpha_flag, const float * vector_alphas, const float * vector_alpha_norm);
+    const size_t * group_positions, const bool base_norm_flag, const bool alpha_flag, const float * vector_alphas);
 
     void get_final_group_num();
     void compute_centroid_norm(std::string path_centroid_norm);
@@ -139,7 +138,7 @@ struct Bslib_Index{
 
     void load_index(std::string path_index, std::string path_ids, std::string path_base,
         std::string path_base_norm, std::string path_centroid_norm, std::string path_group_HNSW, std::string path_alphas_raw,
-        std::string path_alphas, std::string path_base_alpha_norm, size_t group_HNSW_M, size_t group_HNSW_efCOnstruction,
+        std::string path_alphas, size_t group_HNSW_M, size_t group_HNSW_efCOnstruction,
         size_t batch_size, size_t nbatches, size_t nb, std::ofstream & record_file);
     
     void index_statistic(std::string path_base, std::string path_ids, std::string path_alphas_raw,size_t nb, size_t nbatch);

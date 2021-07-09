@@ -81,7 +81,7 @@ int main(){
     index.train_pq_quantizer(path_pq, path_pq_norm, M_PQ, path_learn, path_OPQ, PQ_train_size, record_file);
 
     index.load_index(path_index, path_ids, path_base, path_base_norm, path_centroid_norm, path_group_HNSW, path_alphas_raw,
-                     path_alphas, path_base_alpha_norm, group_HNSW_M, group_HNSW_efConstruction, batch_size, nbatches, nb, record_file);
+                     path_alphas, group_HNSW_M, group_HNSW_efConstruction, batch_size, nbatches, nb, record_file);
 
     index.index_statistic(path_base, path_ids, path_alphas_raw, nb, nbatches);
 

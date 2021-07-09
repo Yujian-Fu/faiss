@@ -14,9 +14,9 @@ namespace bslib{
      * upper_centroid_dists: dists of nn of upper centroids        size: nc_upper * nc_per_group
      *  
      **/
-    LQ_quantizer::LQ_quantizer(size_t dimension, size_t nc_upper, size_t nc_per_group, const float * upper_centroids,
+    LQ_quantizer::LQ_quantizer(size_t dimension, size_t nc_upper, size_t max_nc_per_group, const float * upper_centroids,
                                const idx_t * upper_centroid_ids, const float * upper_centroid_dists, size_t LQ_type, bool use_all_HNSW):
-            Base_quantizer(dimension,  nc_upper, nc_per_group){
+            Base_quantizer(dimension,  nc_upper, max_nc_per_group){
 
             this->use_all_HNSW = use_all_HNSW;
             this->alphas.resize(nc_upper);
@@ -31,11 +31,11 @@ namespace bslib{
             }
 
             for (size_t i = 0; i < nc_upper; i++){
-                for (size_t j = 0; j < nc_per_group; j++){
-                    this->nn_centroid_ids[i].push_back(upper_centroid_ids[i * nc_per_group + j]);
-                    this->nn_centroid_dists[i].push_back(upper_centroid_dists[i * nc_per_group + j]);
+                for (size_t j = 0; j < max_nc_per_group; j++){
+                    this->nn_centroid_ids[i].push_back(upper_centroid_ids[i * max_nc_per_group + j]);
+                    this->nn_centroid_dists[i].push_back(upper_centroid_dists[i * max_nc_per_group + j]);
                 }
-                assert(this->nn_centroid_ids[i].size() == nc_per_group && this->nn_centroid_dists[i].size() == nc_per_group);
+                assert(this->nn_centroid_ids[i].size() == max_nc_per_group && this->nn_centroid_dists[i].size() == max_nc_per_group);
             }
         }
 
@@ -164,7 +164,25 @@ namespace bslib{
     void LQ_quantizer::build_centroids(const float * train_data, size_t train_set_size, idx_t * train_data_ids){
         if (LQ_type == 2){
             std::cout << " LQ type 2, no need to compute the alpha" << std::endl;
+            
             this->alphas.resize(0);
+
+            std::cout << "Computing the centroid norm and centroid product" << std::endl;
+            upper_centroid_norm.resize(nc_upper);
+            for (size_t i = 0; i < nc_upper; i++){
+                upper_centroid_norm[i] = faiss::fvec_norm_L2sqr(upper_centroids.data() + i * dimension, dimension);
+            }
+            upper_centroid_product.resize(nc_upper * max_nc_per_group);
+            for (size_t i = 0; i < nc_upper; i++){
+                const float * base_centroid = upper_centroids.data() + i * dimension;
+                for (size_t j = 0; j < max_nc_per_group; j++){
+                    idx_t neighbor_id = nn_centroid_ids[i][j];
+                    const float * neighbor_centroid = upper_centroids.data() + neighbor_id * dimension;
+                    std::vector<float> centroid_vector(dimension);
+                    faiss::fvec_madd(dimension, neighbor_centroid, -1.0, base_centroid, centroid_vector.data());
+                    upper_centroid_product[i * max_nc_per_group + j] = faiss::fvec_inner_product(centroid_vector.data(), base_centroid, dimension);
+                }
+            }
             return;
         }
         std::cout << "Adding " << train_set_size << " train set data into " << nc_upper << " groups " << std::endl;
