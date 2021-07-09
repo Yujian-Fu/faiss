@@ -30,14 +30,6 @@ namespace bslib{
                 this->upper_centroids[i] = upper_centroids[i];
             }
 
-            for (size_t i = 0; i < 10* dimension; i++){
-                std::cout << upper_centroids[i] << " ";
-                if (i % dimension == 0){
-                    std::cout << std::endl;
-                }
-            }
-            exit(0);
-
             for (size_t i = 0; i < nc_upper; i++){
                 for (size_t j = 0; j < nc_per_group; j++){
                     this->nn_centroid_ids[i].push_back(upper_centroid_ids[i * nc_per_group + j]);
