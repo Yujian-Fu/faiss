@@ -1172,6 +1172,7 @@ namespace bslib{
                             query_search_dists[valid_result_length] = q_c_dist - PQ_table_product + base_norm + (query_alpha * query_alpha - 2 * query_alpha * base_alpha) * nn_dist;
                         }
 
+                        /*
                         base_input = std::ifstream(path_base, std::ios::binary);
                         std::vector<base_data_type> base_vector(dimension); uint32_t dim;
                         base_input.seekg(base_sequence_ids[all_group_id][m] * dimension * sizeof(base_data_type) + base_sequence_ids[all_group_id][m] * sizeof(uint32_t), std::ios::beg);
@@ -1187,6 +1188,7 @@ namespace bslib{
                         if (m == 20){
                             exit(0);
                         }
+                        */
 
 
                         query_search_labels[valid_result_length] = base_sequence_ids[all_group_id][m];
