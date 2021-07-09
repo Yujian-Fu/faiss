@@ -1712,15 +1712,8 @@ namespace bslib{
                 alphas_output.write((char * ) & batch_size, sizeof(uint32_t));
                 alphas_output.write((char * ) vector_alphas.data(), batch_size * sizeof(float));
 
-                for (size_t temp = 0; temp < 1000; temp ++){
-                    std::cout << vector_alphas[temp] << " ";
-                }
-                std::cout << std::endl;
-                exit(0);
-
                 if (i % 10 == 0){
                     std::cout << " assigned batches [ " << i << " / " << nbatches << " ]";
-
                     Trecorder.print_time_usage("");
                     record_file << " assigned batches [ " << i << " / " << nbatches << " ]";
                     Trecorder.record_time_usage(record_file, " ");
