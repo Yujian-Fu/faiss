@@ -727,6 +727,7 @@ namespace bslib{
         for (size_t i = 0; i < n; i++){
             size_t n_vq = 0, n_lq = 0, n_pq = 0; 
             std::vector<idx_t> query_search_id(1 , 0);
+            std::vector<float> query_search_alpha(1, 0);
             std::vector<idx_t> query_result_ids;
             std::vector<float> query_result_dists;
 
@@ -767,9 +768,16 @@ namespace bslib{
                     query_result_dists.resize(group_size, 0);
 
                     const float * target_data = assign_data + i * dimension;
-                    lq_quantizer_index[n_lq].search_in_group(target_data, upper_result_ids.data(), upper_result_dists.data(), upper_group_size, group_id, query_result_dists.data(), query_result_ids.data(), alphas);
+                    std::vector<float> query_result_alphas; if(use_vector_alpha){query_result_alphas.resize(group_size);}
+                    
+                    lq_quantizer_index[n_lq].search_in_group(target_data, upper_result_ids.data(), upper_result_dists.data(), upper_group_size, group_id, query_result_dists.data(), query_result_ids.data(), query_result_alphas.data());
                     std::vector<float> sub_dist(1);
-                    keep_k_min(group_size, 1, query_result_dists.data(), query_result_ids.data(), sub_dist.data(), query_search_id.data());
+                    if (use_vector_alpha){
+                        keep_k_min_alpha(group_size, 1, query_result_dists.data(),query_result_ids.data(), query_result_alphas.data(), sub_dist.data(), query_search_id.data(), query_search_alpha.data());
+                    }
+                    else{
+                        keep_k_min(group_size, 1, query_result_dists.data(), query_result_ids.data(), sub_dist.data(), query_search_id.data());
+                    }
                     n_lq ++;
                 }
 
@@ -789,6 +797,9 @@ namespace bslib{
                 }
             }
             assigned_ids[i] = query_search_id[0];
+            if (use_vector_alpha){
+                alphas[i] = query_search_alpha[0];
+            }
         }
     }
 
