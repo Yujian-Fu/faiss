@@ -78,17 +78,15 @@ namespace hnswlib {
 
         uint8_t * base_code_point;
         faiss::Index::idx_t * base_sequece_id_list;
-        
+
         float q_c_dist;
         float q_alpha;
-        float nn_dist;
 
         char * data_level0_memory_;
-        
-        float * vector_alpha_norm;
+
         float * vector_alpha;
         float * base_norms;
-
+        float nn_dist;
 
     public:
         HierarchicalNSW(const bool PQ_flag = false, const bool use_vector_alpha = false);

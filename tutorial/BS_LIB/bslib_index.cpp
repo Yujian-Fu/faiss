@@ -931,7 +931,7 @@ namespace bslib{
         if (validation){base_input = std::ifstream(path_base, std::ios::binary);}
 
 //Use parallel in real use
-#pragma omp parallel for
+//#pragma omp parallel for
         for (size_t i = 0; i < n; i++){
 
             //dist_file << "QUery " << i << std::endl;
@@ -1126,6 +1126,7 @@ namespace bslib{
                     assert(group_HNSW_thres > 0);
                     size_t group_HNSW_id = group_HNSW_idxs.at(all_group_id);
                     this->group_HNSW_list[group_HNSW_id]->q_c_dist = q_c_dist;
+                    this->group_HNSW_list[group_HNSW_id]->q_alpha = query_alpha;
                     auto result_queue = this->group_HNSW_list[group_HNSW_id]->searchKnn(precomputed_table.data(), result_k);
                     for(size_t m = 0; m < result_k; m++){
                         query_search_dists[valid_result_length] = result_queue.top().first;
@@ -2026,8 +2027,6 @@ namespace bslib{
         std::ifstream vector_ids(path_ids, std::ios::binary);
         std::ifstream base_vectors(path_base, std::ios::binary);
 
-        
-
         std::vector<float> vectors(dimension * 100);
         std::vector<idx_t> ids(nb);
     
@@ -2155,7 +2154,6 @@ namespace bslib{
 
 
     void Bslib_Index::read_group_HNSW(const std::string path_group_HNSW){
-        
         // Load the index 
         std::ifstream group_HNSW_input(path_group_HNSW, std::ios::binary);
         size_t record_group_num, record_HNSW_thres, num_group_HNSW;
@@ -2186,6 +2184,7 @@ namespace bslib{
             group_HNSW->base_norms = this->base_norms.data();
             group_HNSW->base_sequece_id_list = this->base_sequence_ids[final_group_id].data();
             group_HNSW->base_code_point = base_codes[final_group_id].data();
+
 
             readBinaryPOD(group_HNSW_input, group_HNSW->maxelements_);
             readBinaryPOD(group_HNSW_input, group_HNSW->enterpoint_node);

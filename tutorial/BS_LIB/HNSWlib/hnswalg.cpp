@@ -249,7 +249,7 @@ std::priority_queue<std::pair<float, idx_t>> HierarchicalNSW::searchKnn(const fl
         assert(centroid_norm > 0);
     }
     else{
-        assert(nn_dist != 0 && vector_alpha_norm != NULL && vector_alpha != NULL);
+        assert(nn_dist != 0 && vector_alpha != NULL);
     }
 
     auto topResults = searchBaseLayer(query, efSearch);
@@ -348,25 +348,22 @@ void HierarchicalNSW::LoadEdges(const std::string &location)
         input.read((char *) data, size * sizeof(idx_t));
     }
 }
-
+// For vector alpha:
+//The total would be: ||q - c1||^2 - 2 * q * rpq + ||c2 + rpq||^2 - c^2 - 2 * alpha2 * c * nn  + (alpha1 ^ 2 - 2 * alpha1 * alpha2)nn^2
+//                       q_c_dist      PQ table      |              base norm                 |    |            centroid norm            |
+//Else:
+//||query - centroids||^2 + - ||centroids||^2 + ||residual_PQ + centroids||^2 - 2 * query * residual_PQ 
 
 float HierarchicalNSW::PQdistfunc(const float * PQ_dist_table, const idx_t id){
     idx_t base_sequece_id = base_sequece_id_list[id];
     uint8_t * code = getcodeByInternalId(id);
+    float PQ_product = 2 * bslib::pq_L2sqr(code, PQ_dist_table, this->code_size, this->ksub);
 
     if (!use_vector_alpha){
-        float term1 = q_c_dist - centroid_norm;
-        float term2 = base_norms[base_sequece_id];
-        float term3 = 2 * bslib::pq_L2sqr(code, PQ_dist_table, code_size, ksub);
-        return term1 + term2 - term3;
+        return  q_c_dist - centroid_norm + base_norms[base_sequece_id] - PQ_product;
     }
     else{
-        float term1 = q_c_dist;
-        float term2 = base_norms[base_sequece_id];
-        float term3 = 2 * bslib::pq_L2sqr(code, PQ_dist_table, this->code_size, this->ksub);
-        float term4 = (q_alpha - vector_alpha[id]) * (q_alpha - vector_alpha[id]) * nn_dist;
-        float term5 = vector_alpha_norm[id];
-        return term1 + term2 - term3 + term4 - term5;
+        return q_c_dist - PQ_product + base_norms[base_sequece_id] - (q_alpha * q_alpha - 2 * q_alpha * vector_alpha[id]) * nn_dist;
     }
 }
 
