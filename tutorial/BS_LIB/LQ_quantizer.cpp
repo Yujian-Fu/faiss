@@ -35,8 +35,9 @@ namespace bslib{
                 if (i % dimension == 0){
                     std::cout << std::endl;
                 }
-                exit(0);
+                
             }
+            exit(0);
 
             for (size_t i = 0; i < nc_upper; i++){
                 for (size_t j = 0; j < nc_per_group; j++){
