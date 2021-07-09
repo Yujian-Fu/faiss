@@ -420,7 +420,6 @@ namespace bslib{
         }
         std::cout << std::endl;
         */
-        
 
         for (size_t inner_group_id = 0; inner_group_id < max_nc_per_group; inner_group_id++){
             

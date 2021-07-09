@@ -1141,6 +1141,19 @@ namespace bslib{
                             query_search_dists[valid_result_length] = q_c_dist - base_alpha_norms[all_group_id][m] + base_norm + L2_C1_C2 - PQ_table_product;
                         }
 
+                        std::vector<base_data_type> base_vector(dimension); uint32_t dim;
+                        base_input.seekg(base_sequence_ids[all_group_id][m] * dimension * sizeof(base_data_type) + base_sequence_ids[all_group_id][m] * sizeof(uint32_t), std::ios::beg);
+                        base_input.read((char *) & dim, sizeof(uint32_t)); assert(dim == this->dimension);
+                        base_input.read((char *) base_vector.data(), sizeof(base_data_type)*dimension);
+                        std::vector<float> base_vector_float(dimension);
+                        for (size_t temp = 0; temp < dimension; temp++){base_vector_float[temp] = base_vector[temp];}
+                        float actual_dist =  faiss::fvec_L2sqr(base_vector_float.data(), query, dimension);
+
+                        std::cout << actual_dist << " " << query_search_dists[valid_result_length] << std::endl;
+                        if (m == 20){
+                            exit(0);
+                        }
+
 
                         query_search_labels[valid_result_length] = base_sequence_ids[all_group_id][m];
                         visited_vector_size ++;
@@ -2008,7 +2021,7 @@ namespace bslib{
             readXvec<float>(base_alphas, alphas_raw.data(), nb / nbatch, 1);
         }
 
-        size_t test_size = 100;
+        size_t test_size = 1;
         std::vector<float> vector_residuals(dimension * test_size);
 
         encode(test_size, vectors.data(), ids.data(), vector_residuals.data(), alphas_raw.data());
