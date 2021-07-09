@@ -54,7 +54,7 @@ namespace bslib{
             const float dist = faiss::fvec_L2sqr(vector, subcentroid.data(), dimension); 
 
             if (alpha >= 0.5){
-                std::cout << numerator << " " << nn_dist << " " << alpha << "   " << dist << "   ";
+                std::cout << "LQ0: " << numerator << " " << nn_dist << " " << alpha << " " << dist << "   ";
             }
 
             return std::make_pair(alpha, dist);
@@ -71,7 +71,7 @@ namespace bslib{
             float dist_3 = v_c_dist - alpha * alpha * nn_dist;
 
             if (alpha >= 0.5){
-                std::cout << nn_dist << " " << v_c_dist << " " << v_n_dist << " " << alpha << " " << dist_3  << "   ";
+                std::cout << "LQ0 fast: " << nn_dist << " " << v_c_dist << " " << v_n_dist << " " << alpha << " " << dist_3  << "   ";
             }
             return std::make_pair(alpha, dist_3); 
     }
