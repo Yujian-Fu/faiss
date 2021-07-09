@@ -1833,17 +1833,20 @@ namespace bslib{
         if (exists(path_index)){
             PrintMessage("Loading pre-constructed index");
 
-            read_index(path_index);
-            if (use_group_HNSW) {
-                read_group_HNSW(path_group_HNSW);}
+            if (use_vector_alpha){
+                read_base_alphas(path_base_alphas);
+            }
 
             this->base_norms.resize(nb);
             std::ifstream base_norms_input(path_base_norm, std::ios::binary);
             readXvec<float>(base_norms_input, base_norms.data(), nb, 1, false, false);
 
-            if (use_vector_alpha){
-                read_base_alphas(path_base_alphas);
+            read_index(path_index);
+            if (use_group_HNSW) {
+                read_group_HNSW(path_group_HNSW);
             }
+
+
 
             if (use_recording){
                 std::string message = "Loaded pre-constructed index ";
