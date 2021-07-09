@@ -330,6 +330,8 @@ namespace bslib{
                 float * nn_centroid = this->upper_centroids.data() + nn_id * dimension;
                 std::vector<float> centroid_vector(dimension);
                 faiss::fvec_madd(dimension, nn_centroid, -1.0, group_centroid, centroid_vector.data());
+                for (size_t temp = 0; temp <dimension; temp ++){std::cout << group_centroid[temp] << " ";}std::cout << std::endl;
+                for (size_t temp = 0; temp <dimension; temp ++){std::cout << nn_centroid[temp] << " ";}std::cout << std::endl;
                 for (size_t temp = 0; temp <dimension; temp ++){std::cout << centroid_vector[temp] << " ";}std::cout << std::endl;
                 std::vector<float> subcentroid(dimension); 
                 std::cout << "Vector alpha: " << vector_alpha[i] << std::endl;
