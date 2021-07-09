@@ -1174,7 +1174,7 @@ namespace bslib{
 
                         std::vector<base_data_type> base_vector(dimension); uint32_t dim;
                         base_input.seekg(base_sequence_ids[all_group_id][m] * dimension * sizeof(base_data_type) + base_sequence_ids[all_group_id][m] * sizeof(uint32_t), std::ios::beg);
-                        base_input.read((char *) & dim, sizeof(uint32_t)); assert(dim == this->dimension);
+                        base_input.read((char *) & dim, sizeof(uint32_t)); std::cout << dim << " " << dimension << std::endl; assert(dim == this->dimension);
                         base_input.read((char *) base_vector.data(), sizeof(base_data_type)*dimension);
                         std::vector<float> base_vector_float(dimension);
                         for (size_t temp = 0; temp < dimension; temp++){base_vector_float[temp] = base_vector[temp];}
