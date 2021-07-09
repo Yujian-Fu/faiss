@@ -142,7 +142,7 @@ struct Bslib_Index{
         std::string path_alphas, std::string path_base_alpha_norm, size_t group_HNSW_M, size_t group_HNSW_efCOnstruction,
         size_t batch_size, size_t nbatches, size_t nb, std::ofstream & record_file);
     
-    void index_statistic(std::string path_base);
+    void index_statistic(std::string path_base, std::string path_ids, std::string path_alphas_raw,size_t nb, size_t nbatch);
 
     void query_test(size_t num_search_paras, size_t num_recall, size_t nq, size_t ngt,
         const size_t * max_vectors, const size_t * result_k, const size_t * keep_space, const size_t * reranking_space,

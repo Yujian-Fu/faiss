@@ -1991,10 +1991,40 @@ namespace bslib{
         }
     }
 
-    void Bslib_Index::index_statistic(std::string path_base){
+    void Bslib_Index::index_statistic(std::string path_base, std::string path_ids, 
+                                        std::string path_alphas_raw, size_t nb, size_t nbatch){
         // Average distance between the base vector and centroid
+        std::ifstream vector_ids(path_ids, std::ios::binary);
+        std::ifstream base_vectors(path_base, std::ios::binary);
 
+        
+
+        std::vector<float> vectors(dimension * 100);
+        std::vector<idx_t> ids(nb);
+    
+        readXvec<idx_t>(vector_ids, ids.data(), nb / nbatch, 1);
+        readXvecFvec<base_data_type> (base_vectors, vectors.data(), dimension, 100);
+
+        std::vector<float> alphas_raw(nb / nbatch);
+
+        if (use_vector_alpha){
+            std::ifstream base_alphas(path_alphas_raw, std::ios::binary);
+            readXvec<float>(base_alphas, alphas_raw.data(), nb / nbatch, 1);
+        }
+
+
+        std::vector<float> vector_residuals(dimension * 100);
+
+        encode(100, vectors.data(), ids.data(), vector_residuals.data(), alphas_raw.data());
+        std::cout << "LQ Type: " << lq_quantizer_index[lq_quantizer_index.size() - 1].LQ_type << std::endl;
+        for (size_t i = 0; i < 100; i++){
+            std::cout << faiss::fvec_norm_L2sqr(vectors.data() + i * dimension, dimension) << " ";
+        }
+        std::cout << std::endl;
+
+        /*
         std::cout << "Avg b c distance: " << b_c_dist / 1000000 << std::endl;
+
         if (!use_vector_alpha){
             size_t n_lq = lq_quantizer_index.size() - 1;
             size_t n_g = lq_quantizer_index[n_lq].nc_upper;
@@ -2006,6 +2036,7 @@ namespace bslib{
                 std::cout << std::endl;
             }
         }
+        */
     }
 
 

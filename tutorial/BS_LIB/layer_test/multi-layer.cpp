@@ -83,7 +83,7 @@ int main(){
     index.load_index(path_index, path_ids, path_base, path_base_norm, path_centroid_norm, path_group_HNSW, path_alphas_raw,
                      path_alphas, path_base_alpha_norm, group_HNSW_M, group_HNSW_efConstruction, batch_size, nbatches, nb, record_file);
 
-    index.index_statistic(path_base);
+    index.index_statistic(path_base, path_ids, path_alphas_raw, nb, nbatches);
 
     index.query_test(num_search_paras, num_recall, nq, ngt, max_vectors, result_k, keep_space, reranking_space, record_file, 
                     qps_record_file, search_mode, path_base, path_gt, path_query);
