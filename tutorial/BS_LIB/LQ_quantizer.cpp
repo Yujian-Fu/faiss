@@ -320,7 +320,7 @@ namespace bslib{
      * 
      **/
     void LQ_quantizer::compute_residual_group_id(size_t n, const idx_t * labels, const float * x, float * residuals, const float * vector_alpha){
-#pragma omp parallel for
+//#pragma omp parallel for
         for (size_t i = 0; i < n; i++){
             if (LQ_type == 2){
                 idx_t group_id, inner_group_id;
@@ -330,15 +330,15 @@ namespace bslib{
                 float * nn_centroid = this->upper_centroids.data() + nn_id * dimension;
                 std::vector<float> centroid_vector(dimension);
                 faiss::fvec_madd(dimension, nn_centroid, -1.0, group_centroid, centroid_vector.data());
-                //for (size_t temp = 0; temp <dimension; temp ++){std::cout << group_centroid[temp] << " ";}std::cout << std::endl<< std::endl;
-                //for (size_t temp = 0; temp <dimension; temp ++){std::cout << nn_centroid[temp] << " ";}std::cout << std::endl<< std::endl;
-                //for (size_t temp = 0; temp <dimension; temp ++){std::cout << centroid_vector[temp] << " ";}std::cout << std::endl<< std::endl;
+                for (size_t temp = 0; temp <dimension; temp ++){std::cout << group_centroid[temp] << " ";}std::cout << std::endl<< std::endl;
+                for (size_t temp = 0; temp <dimension; temp ++){std::cout << nn_centroid[temp] << " ";}std::cout << std::endl<< std::endl;
+                for (size_t temp = 0; temp <dimension; temp ++){std::cout << centroid_vector[temp] << " ";}std::cout << std::endl<< std::endl;
                 std::vector<float> subcentroid(dimension); 
-                //std::cout << "Vector alpha: " << vector_alpha[i] << std::endl;
+                std::cout << "Vector alpha: " << vector_alpha[i] << std::endl;
                 faiss::fvec_madd(dimension, group_centroid, vector_alpha[i], centroid_vector.data(), subcentroid.data()); 
-                //for (size_t temp = 0; temp <dimension; temp ++){std::cout << subcentroid[temp] << " ";}std::cout << std::endl<< std::endl;
+                for (size_t temp = 0; temp <dimension; temp ++){std::cout << subcentroid[temp] << " ";}std::cout << std::endl<< std::endl;
                 faiss::fvec_madd(dimension, x + i * dimension, -1.0, subcentroid.data(), residuals + i * dimension);
-                //for (size_t temp = 0; temp <dimension; temp ++){std::cout << residuals[i * dimension + temp] << " ";}std::cout << std::endl<< std::endl;
+                for (size_t temp = 0; temp <dimension; temp ++){std::cout << residuals[i * dimension + temp] << " ";}std::cout << std::endl<< std::endl;
             }
             else{
                 std::vector<float> final_centroid(dimension);

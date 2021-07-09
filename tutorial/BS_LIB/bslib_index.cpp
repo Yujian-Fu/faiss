@@ -2021,10 +2021,10 @@ namespace bslib{
             readXvec<float>(base_alphas, alphas_raw.data(), nb / nbatch, 1);
         }
 
+        size_t test_size = 1;
+        std::vector<float> vector_residuals(dimension * test_size);
 
-        std::vector<float> vector_residuals(dimension * 100);
-
-        encode(100, vectors.data(), ids.data(), vector_residuals.data(), alphas_raw.data());
+        encode(test_size, vectors.data(), ids.data(), vector_residuals.data(), alphas_raw.data());
 
         for (size_t i = 0; i < 2; i++){
             for (size_t j = 0; j < dimension; j++){
@@ -2035,7 +2035,7 @@ namespace bslib{
         size_t n_lq = lq_quantizer_index.size() - 1;
         std::cout << "LQ Type: " << lq_quantizer_index[n_lq].LQ_type << std::endl;
         float avg_dist = 0;
-        for (size_t i = 0; i < 100; i++){
+        for (size_t i = 0; i < test_size; i++){
             float alpha;
             if (use_vector_alpha){
                 alpha = alphas_raw[i];
@@ -2051,8 +2051,8 @@ namespace bslib{
         }
         std::cout << std::endl << "Ag dist: " << avg_dist << std::endl;
 
-        alphas_raw.resize(100, 0);
-        encode(100, vectors.data(), ids.data(), vector_residuals.data(), alphas_raw.data());
+        alphas_raw.resize(test_size, 0);
+        encode(test_size, vectors.data(), ids.data(), vector_residuals.data(), alphas_raw.data());
 
         for (size_t i = 0; i < 2; i++){
             for (size_t j = 0; j < dimension; j++){
