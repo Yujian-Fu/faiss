@@ -2049,9 +2049,9 @@ namespace bslib{
             avg_dist += dist;
             std::cout <<  dist << " " << alpha << " ";
         }
-        std::cout << std::endl << "Ag dist: " << avg_dist << std::endl;
+        std::cout << std::endl << "Ag dist: " << avg_dist / test_size<< std::endl;
 
-        alphas_raw.resize(test_size, 0);
+        alphas_raw.resize(test_size); for (size_t i = 0; i < test_size; i++){alphas_raw[i] = 0;}
         encode(test_size, vectors.data(), ids.data(), vector_residuals.data(), alphas_raw.data());
 
         for (size_t i = 0; i < 2; i++){
