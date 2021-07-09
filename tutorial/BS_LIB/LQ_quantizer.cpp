@@ -420,36 +420,35 @@ namespace bslib{
             idx_t nn_id = nn_centroid_ids[group_id][inner_group_id];
             float query_nn_dist = Not_Found;
             float query_group_dist = Not_Found;
+            bool query_nn_flag = false;
+            bool query_group_flag = false;
+            for(size_t index = 0; index < upper_search_space; index ++){
+                if  (!query_nn_flag && upper_result_labels[index] == nn_id){
+                    query_nn_dist = upper_result_dists[index];
+                    query_nn_flag = true;
+                }
+
+                if (query_group_flag && upper_result_labels[index] == group_id){
+                    query_group_dist = upper_result_dists[index];
+                    query_group_flag = true;
+                }
+
+                if (query_nn_flag && query_group_flag){
+                    break;
+                }
+            }
             // There are many ways for finding whether the nn_id exists in the upper search result, try different ways
-            idx_t * nn_id_index = std::find(upper_result_labels, upper_result_labels+ upper_search_space, nn_id);
-            idx_t nn_index = nn_id_index - upper_result_labels;
 
-            //idx_t nn_index = 0;
-            //for (nn_index = 0; nn_index < upper_search_space; nn_index++){
-            //    if (upper_result_labels[nn_index] == nn_id)
-            //        break;
-            //}
+            //idx_t * nn_id_index = std::find(upper_result_labels, upper_result_labels+ upper_search_space, nn_id);
+            //idx_t nn_index = nn_id_index - upper_result_labels;
 
-            if (nn_index < upper_search_space){
-                query_nn_dist = upper_result_dists [nn_index];
-
-                //idx_t group_index = 0;
-                //for (group_index = 0; group_index < upper_search_space; group_index++){
-                //    if (upper_result_labels[group_index] == group_id){
-                //        break;
-                //    }
-                //}
-
-                idx_t * group_id_index = std::find(upper_result_labels, upper_result_labels + upper_search_space, group_id);
-                idx_t group_index = group_id_index - upper_result_labels;
-                assert(group_index < upper_search_space);
-                query_group_dist = upper_result_dists[group_index];
-
+            if (query_nn_flag){
+                assert(query_nn_dist != Not_Found && query_group_dist != Not_Found);
+                
                 float group_nn_dist = nn_centroid_dists[group_id][inner_group_id];
 
                 if (LQ_type == 2){
                     auto result_pair = LQ0_fast_distance(group_nn_dist, query_group_dist, query_nn_dist);
-                    
                     result_dists[inner_group_id] = result_pair.second;
                     vector_alpha[inner_group_id] = result_pair.first;
                 }
