@@ -1130,8 +1130,7 @@ namespace bslib{
                     auto result_queue = this->group_HNSW_list[group_HNSW_id]->searchKnn(precomputed_table.data(), result_k);
 
                     
-                    base_input = std::ifstream(path_base, std::ios::binary);
-                    std::vector<base_data_type> base_vector(dimension); uint32_t dim;
+
 
                 
                     
@@ -1139,7 +1138,10 @@ namespace bslib{
                         query_search_dists[valid_result_length] = result_queue.top().first;
                         query_search_labels[valid_result_length] = base_sequence_ids[all_group_id][result_queue.top().second];
                         result_queue.pop();
-        
+
+                        /*
+                        base_input = std::ifstream(path_base, std::ios::binary);
+                        std::vector<base_data_type> base_vector(dimension); uint32_t dim;
                         base_input.seekg(query_search_labels[valid_result_length] * dimension * sizeof(base_data_type) + query_search_labels[valid_result_length] * sizeof(uint32_t), std::ios::beg);
                         base_input.read((char *) & dim, sizeof(uint32_t)); assert(dim == this->dimension);
                         base_input.read((char *) base_vector.data(), sizeof(base_data_type)*dimension);
@@ -1147,11 +1149,12 @@ namespace bslib{
                         for (size_t temp = 0; temp < dimension; temp++){base_vector_float[temp] = base_vector[temp];}
                         float actual_dist =  faiss::fvec_L2sqr(base_vector_float.data(), query, dimension);
                         std::cout << actual_dist << " " << query_search_dists[valid_result_length] << std::endl;
+                        */
 
                         valid_result_length ++;
                     }
                     visited_vector_size += group_size;
-                    exit(0);
+                    
                 }
                 else{
                     float centroid_norm = 0;
