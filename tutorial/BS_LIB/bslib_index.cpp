@@ -735,7 +735,6 @@ namespace bslib{
                 assert(n_vq+ n_lq + n_pq == j);
 
                 if (index_type[j] == "VQ"){
-                    
                     idx_t group_id = query_search_id[0];
                     size_t group_size = vq_quantizer_index[n_vq].exact_nc_in_groups[group_id];
                     query_result_dists.resize(group_size, 0);
@@ -797,7 +796,7 @@ namespace bslib{
                 }
             }
             assigned_ids[i] = query_search_id[0];
-            if (use_vector_alpha){
+            if (use_vector_alpha && assign_layer == layers){
                 alphas[i] = query_search_alpha[0];
             }
         }
