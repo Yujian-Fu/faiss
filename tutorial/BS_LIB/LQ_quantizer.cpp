@@ -428,7 +428,7 @@ namespace bslib{
                     query_nn_flag = true;
                 }
 
-                if (query_group_flag && upper_result_labels[index] == group_id){
+                if (!query_group_flag && upper_result_labels[index] == group_id){
                     query_group_dist = upper_result_dists[index];
                     query_group_flag = true;
                 }
