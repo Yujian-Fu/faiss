@@ -54,7 +54,7 @@ namespace bslib{
             const float dist = faiss::fvec_L2sqr(vector, subcentroid.data(), dimension); 
 
             if (alpha >= 0.5){
-                std::cout << "LQ0: " << numerator << " " << nn_dist << " " << alpha << " " << dist << "   ";
+                std::cout << "LQ0: " << numerator << " " << nn_dist << " " << alpha << " " << dist << std::endl;
             }
 
             return std::make_pair(alpha, dist);
@@ -71,7 +71,7 @@ namespace bslib{
             float dist_3 = v_c_dist - alpha * alpha * nn_dist;
 
             if (alpha >= 0.5){
-                std::cout << "LQ0 fast: " << nn_dist << " " << v_c_dist << " " << v_n_dist << " " << alpha << " " << dist_3  << "   ";
+                std::cout << "LQ0 fast: " << nn_dist << " " << v_c_dist << " " << v_n_dist << " " << alpha << " " << dist_3  << std::endl;
             }
             return std::make_pair(alpha, dist_3); 
     }
@@ -402,11 +402,13 @@ namespace bslib{
     void LQ_quantizer::search_in_group(const float * query, idx_t * upper_result_labels, const float * upper_result_dists, 
                 const size_t upper_search_space, const idx_t group_id, float * result_dists, idx_t * result_labels, float * vector_alpha){        
 
+        std::cout << "Search result: ";
         for (size_t i = 0; i < upper_search_space; i++){
             std::cout << upper_result_labels[i] << " " << upper_result_dists[i] << " ";
         }
         std::cout << std::endl;
 
+        std::cout << "Neighbor result: ";
         for (size_t i = 0; i < max_nc_per_group; i++){
             std::cout << nn_centroid_ids[group_id][i] << " " << nn_centroid_dists[group_id][i] << " ";
         }
