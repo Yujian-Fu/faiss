@@ -1172,9 +1172,10 @@ namespace bslib{
                             query_search_dists[valid_result_length] = q_c_dist - PQ_table_product + base_norm + (query_alpha * query_alpha - 2 * query_alpha * base_alpha) * nn_dist;
                         }
 
+                        base_input = std::ifstream(path_base, std::ios::binary);
                         std::vector<base_data_type> base_vector(dimension); uint32_t dim;
                         base_input.seekg(base_sequence_ids[all_group_id][m] * dimension * sizeof(base_data_type) + base_sequence_ids[all_group_id][m] * sizeof(uint32_t), std::ios::beg);
-                        base_input.read((char *) & dim, sizeof(uint32_t)); std::cout << dim << " " << dimension << std::endl; assert(dim == this->dimension);
+                        base_input.read((char *) & dim, sizeof(uint32_t)); assert(dim == this->dimension);
                         base_input.read((char *) base_vector.data(), sizeof(base_data_type)*dimension);
                         std::vector<float> base_vector_float(dimension);
                         for (size_t temp = 0; temp < dimension; temp++){base_vector_float[temp] = base_vector[temp];}
