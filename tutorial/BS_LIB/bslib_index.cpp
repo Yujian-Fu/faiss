@@ -723,7 +723,7 @@ namespace bslib{
             pq_quantizer_index[n_pq - 1].search_all(n, assign_data, assigned_ids);
         }*/
 
-//#pragma omp parallel for
+#pragma omp parallel for
         for (size_t i = 0; i < n; i++){
             size_t n_vq = 0, n_lq = 0, n_pq = 0; 
             std::vector<idx_t> query_search_id(1 , 0);
@@ -2025,8 +2025,16 @@ namespace bslib{
         std::vector<float> vector_residuals(dimension * 100);
 
         encode(100, vectors.data(), ids.data(), vector_residuals.data(), alphas_raw.data());
+
+        for (size_t i = 0; i < 2; i++){
+            for (size_t j = 0; j < dimension; j++){
+                std::cout << vector_residuals[i * dimension + j] << " ";
+            }
+            std::cout << std::endl;
+        }
         size_t n_lq = lq_quantizer_index.size() - 1;
         std::cout << "LQ Type: " << lq_quantizer_index[n_lq].LQ_type << std::endl;
+        float avg_dist = 0;
         for (size_t i = 0; i < 100; i++){
             float alpha;
             if (use_vector_alpha){
@@ -2037,10 +2045,21 @@ namespace bslib{
                 lq_quantizer_index[n_lq].get_group_id(ids[i], group_id, inner_group_id);
                 alpha = lq_quantizer_index[n_lq].alphas[group_id][inner_group_id];
             }
-            std::cout << faiss::fvec_norm_L2sqr(vectors.data() + i * dimension, dimension) << " " << alpha << " ";
+            float dist = faiss::fvec_norm_L2sqr(vectors.data() + i * dimension, dimension);
+            avg_dist += dist;
+            std::cout <<  dist << " " << alpha << " ";
         }
-        std::cout << std::endl;
+        std::cout << std::endl << "Ag dist: " << avg_dist << std::endl;
 
+        alphas_raw.resize(100, 0);
+        encode(100, vectors.data(), ids.data(), vector_residuals.data(), alphas_raw.data());
+
+        for (size_t i = 0; i < 2; i++){
+            for (size_t j = 0; j < dimension; j++){
+                std::cout << vector_residuals[i * dimension + j] << " ";
+            }
+            std::cout << std::endl;
+        }
         /*
         std::cout << "Avg b c distance: " << b_c_dist / 1000000 << std::endl;
 
