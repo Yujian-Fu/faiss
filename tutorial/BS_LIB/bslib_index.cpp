@@ -1140,20 +1140,7 @@ namespace bslib{
                             float L2_C1_C2 = (query_alpha - base_alphas[all_group_id][m]) * (query_alpha - base_alphas[all_group_id][m]) * (lq_quantizer_index[n_lq].nn_centroid_dists[lq_group_id][lq_inner_group_id]);
                             query_search_dists[valid_result_length] = q_c_dist - base_alpha_norms[all_group_id][m] + base_norm + L2_C1_C2 - PQ_table_product;
                         }
-                        base_input = std::ifstream(path_base, std::ios::binary);
-                        std::vector<base_data_type> base_vector(dimension); uint32_t dim;
-                        base_input.seekg(base_sequence_ids[all_group_id][m] * dimension * sizeof(base_data_type) + base_sequence_ids[all_group_id][m] * sizeof(uint32_t), std::ios::beg);
-                        base_input.read((char *) & dim, sizeof(uint32_t)); assert(dim == this->dimension);
-                        base_input.read((char *) base_vector.data(), sizeof(base_data_type)*dimension);
-                        std::vector<float> base_vector_float(dimension);
-                        for (size_t temp = 0; temp < dimension; temp++){base_vector_float[temp] = base_vector[temp];}
-                        float actual_dist =  faiss::fvec_L2sqr(base_vector_float.data(), query, dimension);
 
-                        std::cout << base_sequence_ids[all_group_id][m] << " " << query_search_dists[valid_result_length] << " " << actual_dist << " ";
-
-                        if (m == 25){
-                            exit(0);
-                        }
 
                         query_search_labels[valid_result_length] = base_sequence_ids[all_group_id][m];
                         visited_vector_size ++;
@@ -2026,26 +2013,21 @@ namespace bslib{
 
         encode(test_size, vectors.data(), ids.data(), vector_residuals.data(), alphas_raw.data());
 
-        for (size_t i = 0; i < 2; i++){
-            for (size_t j = 0; j < dimension; j++){
-                std::cout << vector_residuals[i * dimension + j] << " ";
-            }
-            std::cout << std::endl;
-        }
         size_t n_lq = lq_quantizer_index.size() - 1;
         std::cout << "LQ Type: " << lq_quantizer_index[n_lq].LQ_type << std::endl;
         float avg_dist = 0;
         for (size_t i = 0; i < test_size; i++){
             float alpha;
             if (use_vector_alpha){
-                alpha = alphas_raw[i];
+                //alpha = alphas_raw[i];
+                alpha = 0;
             }
             else{
                 idx_t group_id, inner_group_id;
                 lq_quantizer_index[n_lq].get_group_id(ids[i], group_id, inner_group_id);
                 alpha = lq_quantizer_index[n_lq].alphas[group_id][inner_group_id];
             }
-            float dist = faiss::fvec_norm_L2sqr(vectors.data() + i * dimension, dimension);
+            float dist = faiss::fvec_norm_L2sqr(vector_residuals.data() + i * dimension, dimension);
             avg_dist += dist;
             std::cout <<  dist << " " << alpha << " ";
         }
@@ -2054,12 +2036,6 @@ namespace bslib{
         alphas_raw.resize(test_size); for (size_t i = 0; i < test_size; i++){alphas_raw[i] = 0;}
         encode(test_size, vectors.data(), ids.data(), vector_residuals.data(), alphas_raw.data());
 
-        for (size_t i = 0; i < 2; i++){
-            for (size_t j = 0; j < dimension; j++){
-                std::cout << vector_residuals[i * dimension + j] << " ";
-            }
-            std::cout << std::endl;
-        }
         /*
         std::cout << "Avg b c distance: " << b_c_dist / 1000000 << std::endl;
 
