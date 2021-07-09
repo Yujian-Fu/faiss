@@ -334,7 +334,7 @@ namespace bslib{
                 //for (size_t temp = 0; temp <dimension; temp ++){std::cout << nn_centroid[temp] << " ";}std::cout << std::endl<< std::endl;
                 //for (size_t temp = 0; temp <dimension; temp ++){std::cout << centroid_vector[temp] << " ";}std::cout << std::endl<< std::endl;
                 std::vector<float> subcentroid(dimension); 
-                std::cout << "Vector alpha: " << vector_alpha[i] << std::endl;
+                //std::cout << "Vector alpha: " << vector_alpha[i] << std::endl;
                 faiss::fvec_madd(dimension, group_centroid, vector_alpha[i], centroid_vector.data(), subcentroid.data()); 
                 //for (size_t temp = 0; temp <dimension; temp ++){std::cout << subcentroid[temp] << " ";}std::cout << std::endl<< std::endl;
                 faiss::fvec_madd(dimension, x + i * dimension, -1.0, subcentroid.data(), residuals + i * dimension);
