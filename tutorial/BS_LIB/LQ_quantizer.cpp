@@ -35,7 +35,6 @@ namespace bslib{
                 if (i % dimension == 0){
                     std::cout << std::endl;
                 }
-                
             }
             exit(0);
 

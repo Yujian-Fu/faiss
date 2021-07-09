@@ -416,7 +416,7 @@ namespace bslib{
                         idx_t label = CentroidDistributionMap[group_id] + inner_group_id;
                         std::vector<float> centroid(dimension);
                         compute_final_centroid(label, centroid.data());
-                        memcpy(nn_centroids + label * dimension, centroid.data(), dimension);
+                        memcpy(nn_centroids + label * dimension, centroid.data(), dimension * sizeof(float));
                         group_quantizer.add(1, centroid.data());
                     }
 
@@ -431,6 +431,7 @@ namespace bslib{
                         }
                     }
                 }
+
             }
             //Add all centroids to the all_quantizer
             else{
