@@ -407,6 +407,11 @@ namespace bslib{
         }
         std::cout << std::endl;
 
+        for (size_t i = 0; i < max_nc_per_group; i++){
+            std::cout << nn_centroid_ids[group_id][i] << " " << nn_centroid_dists[group_id][i] << " ";
+        }
+        std::cout << std::endl;
+
         for (size_t inner_group_id = 0; inner_group_id < max_nc_per_group; inner_group_id++){
             
             result_labels[inner_group_id] = CentroidDistributionMap[group_id] + inner_group_id;
@@ -455,7 +460,7 @@ namespace bslib{
                 }
             }
             else{
-                std::cout << nn_id << " Not Found  ";
+                std::cout << nn_id << " Not Found  " << std::endl;;
                 std::vector<float> query_sub_centroid_vector(dimension);
                 float * nn_centroid = upper_centroids.data() + nn_centroid_ids[group_id][inner_group_id] * dimension;
                 float * group_centroid = upper_centroids.data() + group_id * dimension;
