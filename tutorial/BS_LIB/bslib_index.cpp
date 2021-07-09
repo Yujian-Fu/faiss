@@ -2008,7 +2008,7 @@ namespace bslib{
             readXvec<float>(base_alphas, alphas_raw.data(), nb / nbatch, 1);
         }
 
-        size_t test_size = 1;
+        size_t test_size = 100;
         std::vector<float> vector_residuals(dimension * test_size);
 
         encode(test_size, vectors.data(), ids.data(), vector_residuals.data(), alphas_raw.data());
@@ -2019,8 +2019,7 @@ namespace bslib{
         for (size_t i = 0; i < test_size; i++){
             float alpha;
             if (use_vector_alpha){
-                //alpha = alphas_raw[i];
-                alpha = 0;
+                alpha = alphas_raw[i];
             }
             else{
                 idx_t group_id, inner_group_id;
@@ -2032,10 +2031,6 @@ namespace bslib{
             std::cout <<  dist << " " << alpha << " ";
         }
         std::cout << std::endl << "Ag dist: " << avg_dist / test_size<< std::endl;
-
-        alphas_raw.resize(test_size); for (size_t i = 0; i < test_size; i++){alphas_raw[i] = 0;}
-        encode(test_size, vectors.data(), ids.data(), vector_residuals.data(), alphas_raw.data());
-
         /*
         std::cout << "Avg b c distance: " << b_c_dist / 1000000 << std::endl;
 
