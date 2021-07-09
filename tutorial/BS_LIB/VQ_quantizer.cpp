@@ -426,7 +426,7 @@ namespace bslib{
                     for (size_t inner_group_id = 0; inner_group_id < exact_nc_in_groups[group_id]; inner_group_id++){
                         idx_t label = CentroidDistributionMap[group_id] + inner_group_id;
                         for (size_t j = 0; j < k; j++){
-                            nn_ids[label * k + j] = search_nn_ids[inner_group_id * (k+1) + j + 1];
+                            nn_ids[label * k + j] = CentroidDistributionMap[group_id] + search_nn_ids[inner_group_id * (k+1) + j + 1];
                             nn_dists[label * k + j] = search_nn_dis[inner_group_id * (k+1) + j + 1];
                         }
                     }
