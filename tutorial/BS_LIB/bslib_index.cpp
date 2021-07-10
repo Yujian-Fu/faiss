@@ -742,7 +742,6 @@ namespace bslib{
 
 #pragma omp parallel for
         for (size_t i = 0; i < n; i++){
-            std::cout << i << " " << n << std::endl;
             size_t n_vq = 0, n_lq = 0, n_pq = 0; 
             std::vector<idx_t> query_search_id(1 , 0);
             std::vector<float> query_search_alpha(1, 0);
@@ -751,7 +750,6 @@ namespace bslib{
 
             for (size_t j = 0; j < assign_layer; j++){
                 assert(n_vq+ n_lq + n_pq == j);
-                std::cout << j << " " << assign_layer << std::endl;
 
                 if (index_type[j] == "VQ"){
                     idx_t group_id = query_search_id[0];
