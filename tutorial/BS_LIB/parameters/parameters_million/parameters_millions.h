@@ -39,11 +39,11 @@ const size_t group_HNSW_M = 6;
 const size_t group_HNSW_efConstruction = 32;
 
 const size_t ngt = 100;
-const size_t nq = 10000;
+const size_t nq = 100;
 const size_t num_search_paras = 10;
 const size_t num_recall = 1;
 
-const size_t result_k[num_recall] = {1};
+const size_t result_k[num_recall] = {10};
 const size_t max_vectors[num_search_paras] = {nb/100};
 const size_t reranking_space[num_recall] = {150};
 const std::string search_mode = "non parallel";

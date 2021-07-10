@@ -291,7 +291,7 @@ namespace bslib{
         else{
             std::ifstream learn_input(path_learn, std::ios::binary);
             std::vector<float> sum_train_data (total_size * dimension, 0);
-            readXvecFvec<learn_data_type>(learn_input, sum_train_data.data(), dimension, total_size, true, true);
+            readXvecFvec<learn_data_type>(learn_input, sum_train_data.data(), dimension, total_size);
             std::cout << "Reading subset with " << train_set_size << " without selector from " << train_size << " vectors" << std::endl;
             RandomSubset<float>(sum_train_data.data(), this->train_data.data(), dimension, total_size, train_set_size);
         }
@@ -911,7 +911,7 @@ namespace bslib{
         // Notice: they should only be activated when parallel is not used
         const bool validation = false; 
         size_t validation_print_space = 50; 
-        const bool analysis = false; 
+        const bool analysis = true; 
         const bool showmessage = false; 
 
         std::vector<float>  visited_gt_proportion;
@@ -931,7 +931,7 @@ namespace bslib{
         if (validation){base_input = std::ifstream(path_base, std::ios::binary);}
 
 //Use parallel in real use
-#pragma omp parallel for
+//#pragma omp parallel for
         for (size_t i = 0; i < n; i++){
 
             //dist_file << "QUery " << i << std::endl;
@@ -1290,7 +1290,7 @@ namespace bslib{
                     recall[i] = float(correct) / result_k;
                     time_consumption[i][layers]  = Trecorder.getTimeConsumption();
                     visited_gt_proportion[i] = float(visited_gt) / result_k;
-                    actual_visited_vectors[i] = valid_result_length;
+                    actual_visited_vectors[i] = visited_vector_size;
                     actual_visited_clusters[i] = j;
                 }
             }

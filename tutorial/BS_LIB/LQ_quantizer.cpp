@@ -469,7 +469,7 @@ namespace bslib{
 
             if (query_nn_flag){
                 assert(query_nn_dist != Not_Found && query_group_dist != Not_Found);
-                
+
                 float group_nn_dist = nn_centroid_dists[group_id][inner_group_id];
 
                 if (LQ_type == 2){
