@@ -142,7 +142,7 @@ namespace bslib{
             if (nt_sub < max_ksub * min_train_size_per_group){
 
                 if (nt_sub < new_pow(2,1) * min_train_size_per_group){
-                    std::cout << "No enough training points for PQ layer, reduce the number of clusters or use more training vectors" << std::endl;
+                    std::cout << "No enough training points for PQ layer, reduce the number of clusters or use more training vectors: " << nt_sub << std::endl;
                     exit(0);
                 }
 
@@ -160,7 +160,7 @@ namespace bslib{
             }
 
             faiss::ProductQuantizer * product_quantizer = new faiss::ProductQuantizer(dimension, M, exact_nbits[group_id]);
-            
+
             product_quantizer->verbose = (nc_upper == 1) ? true : false;
             product_quantizer->train(nt_sub, train_set[group_id].data());
             this->PQs[group_id] = product_quantizer;
@@ -170,6 +170,11 @@ namespace bslib{
         for (size_t group_id = 0; group_id < nc_upper; group_id++){
             CentroidDistributionMap[group_id] = num_centroids;
             num_centroids += exact_ksubs[group_id];
+        }
+
+        if (num_centroids < layer_nc){
+            std::cout << "The number of centroids is shrinked in LQ layer from " << layer_nc << " to " << num_centroids << std::endl;
+            layer_nc = num_centroids;
         }
 
         this->centroid_norms.resize(nc_upper);
@@ -348,6 +353,10 @@ namespace bslib{
         std::vector<float> distance_table(this->M * exact_ksubs[group_id]);
         this->PQs[group_id]->compute_distance_table(query, distance_table.data());
         multi_sequence_sort(group_id, distance_table.data(), keep_space, result_dists, result_labels);
+        for (size_t i = 0; i < keep_space; i++){
+            std::cout << result_labels[i] << " " << result_dists[i] << std::endl;
+        }
+        exit(0);
     }
 
 
