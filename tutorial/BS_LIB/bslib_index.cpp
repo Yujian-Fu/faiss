@@ -2030,6 +2030,7 @@ namespace bslib{
     void Bslib_Index::index_statistic(std::string path_base, std::string path_ids, 
                                         std::string path_alphas_raw, size_t nb, size_t nbatch){
         // Average distance between the base vector and centroid
+        return;
         std::ifstream vector_ids(path_ids, std::ios::binary);
         std::ifstream base_vectors(path_base, std::ios::binary);
 
