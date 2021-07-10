@@ -11,7 +11,7 @@ const size_t layers = VQ_layers + PQ_layers + LQ_layers;
 const size_t LQ_type[LQ_layers] = {0};
 
 const std::string index_type[layers] = {"VQ", "LQ"};
-const uint32_t ncentroids[layers-PQ_layers] = {1000, 120};
+const uint32_t ncentroids[layers-PQ_layers] = {1000, 64};
 
 
 //For building index
@@ -29,3 +29,4 @@ const size_t num_train[layers] = {10000, 100000};
 
 //For searching
 const size_t keep_space[layers * num_search_paras] = {1000, 64};
+

@@ -44,7 +44,7 @@ const size_t num_search_paras = 10;
 const size_t num_recall = 1;
 
 const size_t result_k[num_recall] = {1};
-const size_t max_vectors[num_search_paras] = {nb/10};
+const size_t max_vectors[num_search_paras] = {nb/100};
 const size_t reranking_space[num_recall] = {150};
 const std::string search_mode = "non parallel";
 
