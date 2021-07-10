@@ -1525,7 +1525,7 @@ namespace bslib{
                 quantizer_input.read((char *) & LQ_type, sizeof(size_t));
 
                 assert(max_nc_per_group * nc_upper == layer_nc);
-                std::cout << layer_nc << " " << nc_upper << " " << max_nc_per_group << " " << std::endl;
+                std::cout << " nc in this layer: " << layer_nc << " nc in upper layer: " << nc_upper << " max nc in group: " << max_nc_per_group << " " << std::endl;
                 std::vector<float> alphas(max_nc_per_group);
                 std::vector<float> upper_centroids(nc_upper * dimension);
                 std::vector<idx_t> nn_centroid_ids(nc_upper * max_nc_per_group);
@@ -1569,6 +1569,7 @@ namespace bslib{
                 quantizer_input.read((char *) & M, sizeof(size_t));
                 quantizer_input.read((char *) & max_nbits, sizeof(size_t));
                 quantizer_input.read((char *) & max_ksub, sizeof(size_t));
+                std::cout << " M in PQ layer: " << M << " max nbits in PQ layer: " << max_nbits << std::endl;
                 
                 
                 PQ_quantizer pq_quantizer = PQ_quantizer(dimension, nc_upper, M, max_nbits);

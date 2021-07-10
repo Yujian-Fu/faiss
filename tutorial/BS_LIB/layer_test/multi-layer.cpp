@@ -5,6 +5,9 @@
 // in bslib_index.h for billion and million scale datasets
 /*          */
 #include "../parameters/parameters_million/parameters_result.h"
+//Baeline: July 10 5:13 SIFT1B_grouping_OPQ 
+//Build HNSW: 5:28
+//Train PQ: 
 
 /*
 Todo:
