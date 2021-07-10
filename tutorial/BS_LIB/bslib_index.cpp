@@ -750,6 +750,7 @@ namespace bslib{
 
             for (size_t j = 0; j < assign_layer; j++){
                 assert(n_vq+ n_lq + n_pq == j);
+                std::cout << j << " " << assign_layer << std::endl;
 
                 if (index_type[j] == "VQ"){
                     idx_t group_id = query_search_id[0];
@@ -814,8 +815,10 @@ namespace bslib{
                     exit(0);
                 }
             }
+            std::cout << "add search id" << std::endl;
             assigned_ids[i] = query_search_id[0];
             if (use_vector_alpha && assign_layer == layers){
+                std::cout << "use vector alpha, set alpha" << std::endl;
                 alphas[i] = query_search_alpha[0];
             }
         }
