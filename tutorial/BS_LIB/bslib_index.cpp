@@ -758,7 +758,7 @@ namespace bslib{
                     size_t group_size = vq_quantizer_index[n_vq].exact_nc_in_groups[group_id];
                     query_result_dists.resize(group_size, 0);
                     query_result_ids.resize(group_size, 0);
-                    
+
                     const float * query_data = assign_data + i * dimension;
                     vq_quantizer_index[n_vq].search_in_group(query_data, group_id, query_result_dists.data(), query_result_ids.data(), 1);
                     std::cout << "Search in VQ layer " << std::endl;
