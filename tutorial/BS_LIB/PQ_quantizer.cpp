@@ -356,7 +356,6 @@ namespace bslib{
         for (size_t i = 0; i < keep_space; i++){
             std::cout << i << " " << result_labels[i] << " " << result_dists[i] << std::endl;
         }
-        exit(0);
     }
 
 
