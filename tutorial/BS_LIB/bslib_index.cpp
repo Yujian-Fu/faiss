@@ -740,7 +740,7 @@ namespace bslib{
             pq_quantizer_index[n_pq - 1].search_all(n, assign_data, assigned_ids);
         }*/
 
-//#pragma omp parallel for
+#pragma omp parallel for
         for (size_t i = 0; i < n; i++){
             std::cout << i << " " << n << std::endl;
             size_t n_vq = 0, n_lq = 0, n_pq = 0; 
@@ -761,14 +761,12 @@ namespace bslib{
 
                     const float * query_data = assign_data + i * dimension;
                     vq_quantizer_index[n_vq].search_in_group(query_data, group_id, query_result_dists.data(), query_result_ids.data(), 1);
-                    std::cout << "Search in VQ layer " << std::endl;
                     if (vq_quantizer_index[n_vq].use_HNSW){
                         query_search_id[j] = query_result_ids[0];
                     }
                     else{
                         std::vector<float> sub_dist(1);
                         keep_k_min(group_size, 1, query_result_dists.data(), query_result_ids.data(), sub_dist.data(), query_search_id.data()); 
-                        std::cout << "keep k min " << std::endl;
                     }
                     n_vq ++;
                 }
@@ -816,13 +814,10 @@ namespace bslib{
                     exit(0);
                 }
             }
-            std::cout << "add search id" << std::endl;
             assigned_ids[i] = query_search_id[0];
             if (use_vector_alpha && assign_layer == layers){
-                std::cout << "use vector alpha, set alpha" << std::endl;
                 alphas[i] = query_search_alpha[0];
             }
-            std::cout << "One vector finished " << std::endl;
         }
     }
 
