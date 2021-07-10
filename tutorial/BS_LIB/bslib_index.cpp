@@ -2107,6 +2107,8 @@ namespace bslib{
             readXvecFvec<base_data_type>(query_input, queries.data(), dimension, nq, false, false);
         }
 
+        PrintMessage("Start Search");
+
         for (size_t i = 0; i < num_search_paras; i++){
 
         this->max_visited_vectors = max_vectors[i];
@@ -2162,6 +2164,7 @@ namespace bslib{
 
     void Bslib_Index::read_group_HNSW(const std::string path_group_HNSW){
         // Load the index 
+        std::cout << "Load group HNSW index" << std::endl;
         std::ifstream group_HNSW_input(path_group_HNSW, std::ios::binary);
         size_t record_group_num, record_HNSW_thres, num_group_HNSW;
         readBinaryPOD(group_HNSW_input, record_group_num); assert(record_group_num == final_group_num);
