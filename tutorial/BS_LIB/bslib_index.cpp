@@ -993,6 +993,7 @@ namespace bslib{
                         layer_keep_spaces[m] = layer_keep_space;
                         vq_quantizer_index[n_vq].search_in_group(query, query_group_ids[m], query_result_dists.data()+m* max_group_size, query_result_labels.data() + m*max_group_size, layer_keep_space);
                     }
+                    if (analysis){time_consumption[i][layers] = Trecorder.getTimeConsumption(); Trecorder.reset();}
                     size_t sum_result_space = 0;
                     if (vq_quantizer_index[n_vq].use_HNSW){
                         for (size_t m = 0; m < upper_result_space; m++){
@@ -1031,7 +1032,6 @@ namespace bslib{
                         lq_quantizer_index[n_lq].search_in_group(query, upper_result_labels.data(), upper_result_dists.data(), search_space, query_group_ids[m], query_result_dists.data()+m*max_group_size, 
                         query_result_labels.data()+m*max_group_size, vector_result_alphas.data() + m * max_group_size);
                     }
-                    if (analysis){time_consumption[i][j+1] = Trecorder.getTimeConsumption(); Trecorder.reset();}
 
                     for (size_t m = 0; m < upper_result_space; m++){
                         if (use_vector_alpha && lq_quantizer_index[n_lq].LQ_type == 2){
