@@ -439,6 +439,8 @@ namespace bslib{
         std::cout << std::endl;
         */
 
+
+#pragma omp parallel for
         for (size_t inner_group_id = 0; inner_group_id < max_nc_per_group; inner_group_id++){
 
             result_labels[inner_group_id] = CentroidDistributionMap[group_id] + inner_group_id;
@@ -489,7 +491,7 @@ namespace bslib{
                 else{
                     float alpha = alphas[group_id][inner_group_id];
                     result_dists[inner_group_id] = alpha*(alpha-1)*group_nn_dist + (1-alpha)*query_group_dist + alpha*query_nn_dist;  
-                    
+
                     //if (!(result_dists[inner_group_id] >=0)){
                     //    std::cout << result_dists[inner_group_id] << " " << alpha << " " << group_nn_dist << " " << query_group_dist << " " << query_nn_dist << std::endl;
                     //}
