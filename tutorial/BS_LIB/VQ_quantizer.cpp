@@ -62,7 +62,7 @@ namespace bslib{
         std::cout <<  std::endl << "The min size for sub train set is: " << min_train_size << std::endl;
 
 
-//#pragma omp parallel for
+#pragma omp parallel for
         for (size_t i = 0; i < nc_upper; i++){
             
             size_t nt_sub = train_set[i].size() / this->dimension;
@@ -83,12 +83,22 @@ namespace bslib{
             }
             exact_nc_in_groups[i] = exact_nc_in_group;
             
-            std::cout << "Start Kmeans with " << nt_sub << "training vectors and " << exact_nc_in_group << " groups" << std::endl;
             std::vector<float> centroids(dimension * exact_nc_in_group);
 
-            bool verbose = nc_upper > 1 ? false : true;
-            faiss::kmeans_clustering(dimension, nt_sub, exact_nc_in_group, train_set[i].data(), centroids.data(), 30, verbose);
-            std::cout << "Finished Kmeans with centroids: " << exact_nc_in_group << std::endl;
+            if (exact_nc_in_group == 1){
+                for (size_t temp1 = 0; temp1 < nt_sub; temp1++){
+                    for (size_t temp2 = 0; temp2 < dimension; temp2++){
+                        centroids[temp2] += train_set[i][temp1 * dimension + temp2];
+                    }
+                }
+                for (size_t temp1 = 0; temp1 < dimension; temp1 ++){
+                    centroids[temp1] /= nt_sub;
+                }
+            }
+            else{
+                bool verbose = nc_upper > 1 ? false : true;
+                faiss::kmeans_clustering(dimension, nt_sub, exact_nc_in_group, train_set[i].data(), centroids.data(), 30, verbose);
+            }
 
             //Adding centroids into quantizers
             if (use_HNSW){
@@ -100,7 +110,6 @@ namespace bslib{
             }
             else
             {
-                std::cout << "Adding centroids to L2 index " << std::endl;
                 faiss::IndexFlatL2 * centroid_quantizer = new faiss::IndexFlatL2(dimension);
                 centroid_quantizer->add(exact_nc_in_group, centroids.data());
                 this->L2_quantizers[i] = centroid_quantizer;
