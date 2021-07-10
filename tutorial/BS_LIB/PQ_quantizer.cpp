@@ -356,9 +356,7 @@ namespace bslib{
         std::vector<float> distance_table(this->M * exact_ksubs[group_id]);
         this->PQs[group_id]->compute_distance_table(query, distance_table.data());
         multi_sequence_sort(group_id, distance_table.data(), keep_space, result_dists, result_labels);
-        for (size_t i = 0; i < keep_space; i++){
-            std::cout << i << " " << result_labels[i] << " " << result_dists[i] << std::endl;
-        }
+
     }
 
 
