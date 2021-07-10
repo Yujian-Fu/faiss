@@ -440,11 +440,13 @@ namespace bslib{
         */
 
         for (size_t inner_group_id = 0; inner_group_id < max_nc_per_group; inner_group_id++){
-            
+
             result_labels[inner_group_id] = CentroidDistributionMap[group_id] + inner_group_id;
             idx_t nn_id = nn_centroid_ids[group_id][inner_group_id];
             float query_nn_dist = Not_Found;
             float query_group_dist = Not_Found;
+
+            /*
             bool query_nn_flag = false;
             bool query_group_flag = false;
             for(size_t index = 0; index < upper_search_space; index ++){
@@ -462,13 +464,20 @@ namespace bslib{
                     break;
                 }
             }
+            */
             // There are many ways for finding whether the nn_id exists in the upper search result, try different ways
 
-            //idx_t * nn_id_index = std::find(upper_result_labels, upper_result_labels+ upper_search_space, nn_id);
-            //idx_t nn_index = nn_id_index - upper_result_labels;
+            idx_t * nn_id_index = std::find(upper_result_labels, upper_result_labels+ upper_search_space, nn_id);
+            idx_t nn_index = nn_id_index - upper_result_labels;
 
-            if (query_nn_flag){
-                assert(query_nn_dist != Not_Found && query_group_dist != Not_Found);
+            if (nn_index < upper_search_space){
+                idx_t * group_id_index = std::find(upper_result_labels, upper_result_labels+ upper_search_space, group_id);
+                idx_t group_index = group_id_index - upper_result_labels;
+                assert(group_index < upper_search_space);
+                
+                //assert(query_nn_dist != Not_Found && query_group_dist != Not_Found);
+                query_group_dist = upper_result_dists[group_index];
+                query_nn_dist =upper_result_dists[nn_index];
 
                 float group_nn_dist = nn_centroid_dists[group_id][inner_group_id];
 
@@ -480,9 +489,10 @@ namespace bslib{
                 else{
                     float alpha = alphas[group_id][inner_group_id];
                     result_dists[inner_group_id] = alpha*(alpha-1)*group_nn_dist + (1-alpha)*query_group_dist + alpha*query_nn_dist;  
-                    if (!(result_dists[inner_group_id] >=0)){
-                        std::cout << result_dists[inner_group_id] << " " << alpha << " " << group_nn_dist << " " << query_group_dist << " " << query_nn_dist << std::endl;
-                    }
+                    
+                    //if (!(result_dists[inner_group_id] >=0)){
+                    //    std::cout << result_dists[inner_group_id] << " " << alpha << " " << group_nn_dist << " " << query_group_dist << " " << query_nn_dist << std::endl;
+                    //}
                 }
             }
             else{
