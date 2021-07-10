@@ -42,7 +42,7 @@ int main(){
     PrepareFolder((char *) (path_folder + model).c_str());
     PrepareFolder((char *) (path_folder + model+"/" + dataset).c_str());
     std::cout << "Preparing work space: " << path_folder + model << std::endl;
-
+    std::cout << "The centroid configuration is: " << ncentroid_conf << std::endl;
     //For recording 
     std::ofstream record_file;
     std::ofstream qps_record_file;
