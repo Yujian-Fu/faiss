@@ -66,6 +66,9 @@ namespace bslib{
             idx += index[i] * new_pow(exact_ksubs[group_id], i);
         }
         idx_t result_idx = CentroidDistributionMap[group_id] + idx; 
+        if (result_idx >= layer_nc){
+            std::cout << group_id << " " << CentroidDistributionMap[group_id] << " " << idx << " " << layer_nc << std::endl;
+        }
         assert(result_idx < layer_nc);
         return result_idx;
     }
@@ -149,7 +152,7 @@ namespace bslib{
                 for (size_t nbits = max_nbits; nbits> 0; nbits--){
                     if (nt_sub >= new_pow(2, nbits) * min_train_size_per_group){
                         exact_nbits[group_id] = nbits;
-                        exact_ksubs[group_id] = pow(2, nbits);
+                        exact_ksubs[group_id] = new_pow(2, nbits);
                         break;
                     }
                 }
@@ -169,7 +172,7 @@ namespace bslib{
         size_t num_centroids = 0;
         for (size_t group_id = 0; group_id < nc_upper; group_id++){
             CentroidDistributionMap[group_id] = num_centroids;
-            num_centroids += exact_ksubs[group_id];
+            num_centroids += new_pow(2, this->M * exact_nbits[group_id]);
         }
 
         if (num_centroids < layer_nc){
