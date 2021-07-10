@@ -440,7 +440,6 @@ namespace bslib{
         */
 
 
-#pragma omp parallel for
         for (size_t inner_group_id = 0; inner_group_id < max_nc_per_group; inner_group_id++){
 
             result_labels[inner_group_id] = CentroidDistributionMap[group_id] + inner_group_id;
