@@ -755,7 +755,7 @@ namespace bslib{
 
                 if (index_type[j] == "VQ"){
                     idx_t group_id = query_search_id[0];
-                    size_t group_size = vq_quantizer_index[n_vq].exact_nc_in_groups[group_id];
+                    size_t group_size = vq_quantizer_index[n_vq].max_nc_per_group;
                     query_result_dists.resize(group_size, 0);
                     query_result_ids.resize(group_size, 0);
 
