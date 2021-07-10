@@ -1,4 +1,4 @@
-#include "./parameters_VQ_LQ.h"
+#include "./parameters_VQ_VQ_LQ.h"
 
 std::string nc_combination(const uint32_t * ncentroids, const std::string * index_type, 
 const size_t layers, const size_t * M_PQ_layer, const size_t * nbits_PQ_layer){
