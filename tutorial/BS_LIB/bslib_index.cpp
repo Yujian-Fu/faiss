@@ -742,6 +742,7 @@ namespace bslib{
 
 //#pragma omp parallel for
         for (size_t i = 0; i < n; i++){
+            std::cout << i << " " << n << std::endl;
             size_t n_vq = 0, n_lq = 0, n_pq = 0; 
             std::vector<idx_t> query_search_id(1 , 0);
             std::vector<float> query_search_alpha(1, 0);
