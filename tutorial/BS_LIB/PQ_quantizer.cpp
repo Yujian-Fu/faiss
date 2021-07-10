@@ -257,7 +257,7 @@ namespace bslib{
         for (size_t i = 0; i < this->M; i++){visited_index.push_back(origin_pair.second[i]);}
         dist_queue.push(origin_pair);
         result_sequence[0] = origin_pair;
-        
+
         for (size_t i = 1; i < keep_space; i++){
            dist_pair top_pair = dist_queue.top();
            dist_queue.pop();
@@ -329,7 +329,7 @@ namespace bslib{
                 recovered_index[j] = dist_index[j][new_pair.second[j]];
             }
             result_labels[i] = spaceID_2_label(recovered_index.data(), group_id);
-            
+
             result_dists[i] = new_pair.first;
         }
     }
@@ -354,7 +354,7 @@ namespace bslib{
         this->PQs[group_id]->compute_distance_table(query, distance_table.data());
         multi_sequence_sort(group_id, distance_table.data(), keep_space, result_dists, result_labels);
         for (size_t i = 0; i < keep_space; i++){
-            std::cout << result_labels[i] << " " << result_dists[i] << std::endl;
+            std::cout << i << " " << result_labels[i] << " " << result_dists[i] << std::endl;
         }
         exit(0);
     }
