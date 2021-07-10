@@ -821,6 +821,7 @@ namespace bslib{
                 std::cout << "use vector alpha, set alpha" << std::endl;
                 alphas[i] = query_search_alpha[0];
             }
+            std::cout << "One vector finished " << std::endl;
         }
     }
 
