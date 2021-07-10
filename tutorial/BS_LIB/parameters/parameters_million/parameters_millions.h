@@ -39,7 +39,7 @@ const size_t group_HNSW_M = 6;
 const size_t group_HNSW_efConstruction = 32;
 
 const size_t ngt = 100;
-const size_t nq = 100;
+const size_t nq = 500;
 const size_t num_search_paras = 10;
 const size_t num_recall = 1;
 

@@ -923,7 +923,7 @@ namespace bslib{
 
         if (analysis){
             visited_gt_proportion.resize(n, 0); actual_visited_vectors.resize(n, 0); actual_visited_clusters.resize(n, 0);
-            time_consumption.resize(n); for (size_t i=0;i<n;i++){time_consumption[i].resize(layers+1, 0);}
+            time_consumption.resize(n); for (size_t i=0;i<n;i++){time_consumption[i].resize(layers+2, 0);}
             q_c_dists.resize(n, 0); recall.resize(n, 0);
         }
 
@@ -966,8 +966,6 @@ namespace bslib{
             assert(max_search_space > 0 && final_keep_space > 0);
             std::vector<float> query_result_dists(1 * max_search_space, 0);
             std::vector<idx_t> query_result_labels(1 * max_search_space, 0);
-
-            
 ;
             std::vector<idx_t> query_group_ids(1 * final_keep_space, 0);
             std::vector<float> query_group_dists(1 * final_keep_space, 0);
@@ -1033,6 +1031,8 @@ namespace bslib{
                         lq_quantizer_index[n_lq].search_in_group(query, upper_result_labels.data(), upper_result_dists.data(), search_space, query_group_ids[m], query_result_dists.data()+m*max_group_size, 
                         query_result_labels.data()+m*max_group_size, vector_result_alphas.data() + m * max_group_size);
                     }
+                    if (analysis){time_consumption[i][j+1] = Trecorder.getTimeConsumption(); Trecorder.reset();}
+
                     for (size_t m = 0; m < upper_result_space; m++){
                         if (use_vector_alpha && lq_quantizer_index[n_lq].LQ_type == 2){
                             keep_k_min_alpha(max_group_size, layer_keep_space, query_result_dists.data()+m*max_group_size, query_result_labels.data()+m*max_group_size, vector_result_alphas.data() + m * max_group_size,
@@ -1288,7 +1288,7 @@ namespace bslib{
                 if (analysis){
                     size_t correct = 0; for (size_t temp=0;temp<result_k;temp++){if(grountruth_set.count(query_ids[ i * result_k + temp])!=0) correct++;}
                     recall[i] = float(correct) / result_k;
-                    time_consumption[i][layers]  = Trecorder.getTimeConsumption();
+                    time_consumption[i][layers+1]  = Trecorder.getTimeConsumption();
                     visited_gt_proportion[i] = float(visited_gt) / result_k;
                     actual_visited_vectors[i] = visited_vector_size;
                     actual_visited_clusters[i] = j;
@@ -1297,13 +1297,13 @@ namespace bslib{
 
         if (analysis){
             float avg_visited_vectors = 0, avg_q_c_dist = 0, avg_visited_gt_proportion = 0, avg_recall = 0, avg_visited_clusters = 0;
-            std::vector<float> avg_time_consumption(layers+1, 0);
+            std::vector<float> avg_time_consumption(layers+2, 0);
             for (size_t i = 0; i < n; i++){
                 avg_visited_vectors += actual_visited_vectors[i];
                 avg_visited_clusters += actual_visited_clusters[i];
                 avg_q_c_dist += q_c_dists[i];
                 avg_visited_gt_proportion += visited_gt_proportion[i];
-                for (size_t j = 0; j < layers+1; j++){avg_time_consumption[j] += time_consumption[i][j];}
+                for (size_t j = 0; j < layers+2; j++){avg_time_consumption[j] += time_consumption[i][j];}
                 avg_recall += recall[i];
             }
             std::vector<size_t> base_groups_size(final_group_num); for(size_t i = 0; i < final_group_num; i++){base_groups_size[i] = base_sequence_ids[i].size();}
@@ -1314,7 +1314,7 @@ namespace bslib{
 	        std::for_each (std::begin(base_groups_size), std::end(base_groups_size), [&](const double d) {accum  += (d-mean)*(d-mean);});
 	        double stdev = sqrt(accum/(base_groups_size.size()-1)); //Variance value
 
-            std::cout << "Time consumption in different parts: ";for(size_t i = 0; i < layers+1; i++){std::cout << avg_time_consumption[i] / n << " ";}std::cout << std::endl;
+            std::cout << "Time consumption in different parts: ";for(size_t i = 0; i < layers+2; i++){std::cout << avg_time_consumption[i] / n << " ";}std::cout << std::endl;
             std::cout << "The average visited vectors: " << avg_visited_vectors / n << std::endl;
             std::cout << "The average visited clusters: " << avg_visited_clusters / n << std::endl;
             std::cout << "The average query centroid distance: " << avg_q_c_dist / n << std::endl;
