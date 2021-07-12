@@ -27,4 +27,4 @@ const size_t nbits_PQ_layer[PQ_layers] = {};
 const size_t num_train[layers] = {3000000, 100000000, 100000000};
 
 //For searching
-const size_t keep_space[layers * num_search_paras] = {10, 10, 20, 10, 10, 20, 20, 30, 30, 20, 40, 10, 50, 10, 50, 20, 60, 10, 60, 20};
+const size_t keep_space[layers * num_search_paras] = {200, 100, 20, 200, 100, 20, 200, 100, 20, 200, 100, 20, 200, 100, 20, 200, 100, 20, 200, 100, 20};

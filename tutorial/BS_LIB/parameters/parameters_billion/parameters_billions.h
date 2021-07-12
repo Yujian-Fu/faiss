@@ -30,7 +30,7 @@ const size_t selector_group_size = 2000;
 
 
 
-const size_t PQ_train_size = 100000;
+const size_t PQ_train_size = 1000000;
 const size_t nb = 1000000000;
 const size_t nbatches = 100; //100
 const uint32_t batch_size =  nb / nbatches;
