@@ -6,7 +6,7 @@ namespace bslib{
         //Only for construction, no need to be stored on disk
         M_all_HNSW = 12;
         efConstruction_all_HNSW = 20;
-        min_train_size_per_group = 20;
+        min_train_size_per_group = 10;
 
         //Default setting: may be changed if no enough training vectors
         layer_nc = nc_upper * max_nc_per_group;
