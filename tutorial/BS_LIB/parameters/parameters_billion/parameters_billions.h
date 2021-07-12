@@ -19,7 +19,7 @@ const std::string path_folder = "/home/y/yujianfu/ivf-hnsw/";
 //For train PQ
 const size_t M_PQ = 8;
 const size_t M_norm_PQ = 1;
-const size_t nbits = 8; //Or 16
+const size_t nbits = 16; //Or 16
 const size_t dimension = 128;
 
 const size_t train_size = 100000000; //This is the size of train set
