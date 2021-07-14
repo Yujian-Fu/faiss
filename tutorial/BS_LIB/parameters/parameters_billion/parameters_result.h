@@ -1,4 +1,4 @@
-#include "./parameters_VQ_VQ_VQ_VQ.h"
+#include "./parameters_PQ.h"
 
 std::string nc_combination(const uint32_t * ncentroids, const std::string * index_type, 
 const size_t layers, const size_t * M_PQ_layer, const size_t * nbits_PQ_layer){
@@ -26,7 +26,7 @@ std::string layer_combination(const std::string * index_type, const size_t layer
         if (index_type[i] == "VQ" && use_HNSW_VQ[n_vq]) {result += "_HNSW"; n_vq++;}
         if (index_type[i] == "LQ")                {result += std::to_string(LQ_type[n_lq]); n_lq ++;}
     }
-    
+
     return result;
 }
 
