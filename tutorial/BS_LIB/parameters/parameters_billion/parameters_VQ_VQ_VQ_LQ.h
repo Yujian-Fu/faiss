@@ -11,7 +11,7 @@ const size_t layers = VQ_layers + PQ_layers + LQ_layers;
 const size_t LQ_type[LQ_layers] = {0};
 
 const std::string index_type[layers] = {"VQ", "VQ", "VQ", "LQ"};
-const uint32_t ncentroids[layers-PQ_layers] = {100, 100, 1000, 50};
+const uint32_t ncentroids[layers-PQ_layers] = {10, 100, 1000, 50};
 
 //For building index
 bool use_HNSW_VQ[VQ_layers] = {false, false, false};
