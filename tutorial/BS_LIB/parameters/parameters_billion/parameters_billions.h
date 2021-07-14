@@ -46,7 +46,7 @@ const size_t num_search_paras = 10;
 const size_t num_recall = 2;
 
 const size_t result_k[num_recall] = {1, 10};
-const size_t max_vectors[num_search_paras] = {10000, 15000, 20000, 25000, 30000, 35000, 40000, 45000, 50000, 550000};
+const size_t max_vectors[num_search_paras] = {100000, 150000, 200000, 250000, 300000, 350000, 400000, 450000, 500000, 5500000};
 const size_t reranking_space[num_recall] = {10, 150};
 const std::string search_mode = "non parallel";
 

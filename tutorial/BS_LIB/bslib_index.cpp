@@ -559,6 +559,7 @@ namespace bslib{
         if (show_batch_time) batch_recorder.print_time_usage("PQ encode data residuals             ");
 
         //Add codes into index
+#pragma omp parallel for
         for (size_t i = 0; i < n; i++){
             idx_t group_id = group_ids[i];
             size_t group_position = group_positions[i];
@@ -584,6 +585,8 @@ namespace bslib{
             if (show_batch_time) batch_recorder.print_time_usage("compute reconstructed base vectors ");
             //This is the norm for reconstructed vectors
             // For vector alpha: base_norm = ||c2 + rpq||^2 - c^2 - 2 * alpha2 * c * nn 
+
+#pragma omp parallel for
             for (size_t i = 0; i < n; i++){
                 float original_base_norm = faiss::fvec_norm_L2sqr(reconstructed_x.data() + i * dimension, dimension);
                 if (use_vector_alpha){
