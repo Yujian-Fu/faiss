@@ -1,11 +1,11 @@
-#include "./parameters_PQ.h"
+#include "./parameters_VQ.h"
 
 std::string nc_combination(const uint32_t * ncentroids, const std::string * index_type, 
 const size_t layers, const size_t * M_PQ_layer, const size_t * nbits_PQ_layer){
     std::string result = "";
     size_t n_pq = 0;
     for (size_t i = 0; i < layers; i++){
-        result += "_"; 
+        result += "_";
         if (index_type[i] == "PQ"){
             result +=  std::to_string(M_PQ_layer[n_pq]) + "_" + std::to_string(nbits_PQ_layer[n_pq]);
             n_pq ++;
